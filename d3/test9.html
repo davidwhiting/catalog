@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<!-- Load d3.js -->
+<script src='https://d3js.org/d3.v4.js'></script>
+
+<script type="text/javascript">
+// Create an SVG container
+var svg = d3.select("body").append("svg")
+    .attr("width", 800)
+    .attr("height", 600);
+
+// Define the data for the nodes and links
+var nodesData = [
+    // Mathematics courses
+    {id: "Math1", group: "Mathematics"},
+    {id: "Math2", group: "Mathematics"},
+    // Writing courses
+    {id: "Writing1", group: "Writing"},
+    {id: "Writing2", group: "Writing"},
+    // Science courses
+    {id: "Science1", group: "Science"},
+    {id: "Science2", group: "Science"}
+];
+
+var linksData = [
+    // Mathematics dependencies
+    {source: "Math1", target: "Math2"},
+    // Writing dependencies
+    {source: "Writing1", target: "Writing2"},
+    // Science dependencies
+    {source: "Science1", target: "Science2"}
+];
+
+// Create a force simulation
+var simulation = d3.forceSimulation(nodesData)
+    .force("link", d3.forceLink(linksData).id(d => d.id))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(400, 300));
+
+// Create the link lines
+var link = svg.append("g")
+    .selectAll("line")
+    .data(linksData)
+    .enter().append("line")
+    .attr("stroke-width", 2);
+
+// Create the node circles
+var node = svg.append("g")
+    .selectAll("circle")
+    .data(nodesData)
+    .enter().append("circle")
+    .attr("r", 20)
+    .attr("fill", function(d) {
+        if (d.group === "Mathematics") return "red";
+        if (d.group === "Writing") return "green";
+        if (d.group === "Science") return "blue";
+    });
+
+// Update the positions of the nodes and links on each tick of the simulation
+simulation.on("tick", function() {
+    link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+    node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+});
+</script>
+
+

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<!-- Add a svg area, empty -->
+<svg id='dataviz_area' height=200 width=450></svg>
+
+<!-- Load d3.js -->
+<script src='https://d3js.org/d3.v4.js'></script>
+
+<script>
+var svg = d3.select('#dataviz_area')
+var box_width = 100;
+var box_height = 40;
+var text_x_offset = 15; 
+var text_y_offset = 25;
+
+// Define drag behavior
+var drag = d3.drag()
+  .on("start", dragstarted)
+  .on("drag", dragged);
+
+function dragstarted(d) {
+  d3.select(this).raise().classed("active", true);
+}
+
+function dragged(d) {
+  d3.select(this).select("rect").attr("x", d3.event.x).attr("y", d3.event.y);
+  d3.select(this).select("text").attr("x", d3.event.x + text_x_offset).attr("y", d3.event.y + text_y_offset);
+  
+  // Update the position of the dependent box and line when 'MATH 221' box is dragged
+  if (d.name === 'MATH 221') {
+    var dependentBox = svg.selectAll("g").data().find(box => box.name === 'MATH 100');
+    dependentBox.x = d3.event.x - 150;
+    dependentBox.y = d3.event.y;
+    update();
+  }
+}
+
+// Function to create a rectangle and its associated text
+function my_rectangle(x, y, name, color) {
+  var g = svg.append("g").datum({name: name, x: x, y: y}).attr("transform", "translate(0,0)").call(drag);
+  g.append('rect')
+    .attr('x', x).attr('y', y).attr('width', box_width).attr('height', box_height).style('fill', color);
+  g.append('text')
+    .attr('x', x + text_x_offset).attr('y', y + text_y_offset).text(name).attr('fill', 'white').style("font-size", "14px").style("font-family", "Arial").style("font-weight", "bold");
+}
+
+// Function to update the position of the boxes and line
+function update() {
+  svg.selectAll("g")
+    .attr("transform", d => "translate(" + d.x + "," + d.y + ")")
+    .select("line")
+    .attr("x2", d => d.name === 'MATH 221' ? -150 : 150);
+}
+
+// Use the function to create rectangles
+my_rectangle(2, 2, 'MATH 140', 'blue');
+my_rectangle(140, 70, 'MATH 100', 'red');
+my_rectangle(300, 100, 'MATH 221', 'red');
+
+// Draw a line between 'MATH 100' and 'MATH 221'
+svg.selectAll("g").data().forEach(function(d, i) {
+  if (d.name === 'MATH 100' || d.name === 'MATH 221') {
+    d3.select(svg.selectAll("g").nodes()[i])
+      .append("line")
+      .attr("x1", 0).attr("y1", box_height / 2)
+      .attr("x2", d.name === 'MATH 221' ? -150 : 150).attr("y2", box_height / 2)
+      .attr("stroke", "black");
+  }
+});
+</script>

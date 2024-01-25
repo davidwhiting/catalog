@@ -1,0 +1,2915 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PlusPortals - Rediker Software, Inc.</title>
+<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content>
+<meta name="author" content>
+<meta name="google-translate-customization" content="dd739afe762516a6-5156b261c4b5f6ed-gd4b5e11d8af642de-f">
+<meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" /><script type="text/javascript">window.NREUM||(NREUM={});NREUM.info = {"beacon":"bam.nr-data.net","errorBeacon":"bam.nr-data.net","licenseKey":"88d0f936ce","applicationID":"6389526","transactionName":"ZV1XYhBXXhVZVEMPCVwXeGAhGWAHSlJZEjVGTVFTDEJ0A0xWXgoVcVdbQhBZXApdRRg2B0BdW0IxQkUCXVlDIgNGWVxaEQ==","queueTime":0,"applicationTime":11488,"agent":"","atts":""}</script><script type="text/javascript">(window.NREUM||(NREUM={})).init={privacy:{cookies_enabled:true},ajax:{deny_list:["bam.nr-data.net"]},distributed_tracing:{enabled:true}};(window.NREUM||(NREUM={})).loader_config={agentID:"6389589",accountID:"974081",trustKey:"974081",xpid:"XQEDUV5SGwUDXFhXBQc=",licenseKey:"88d0f936ce",applicationID:"6389526"};window.NREUM||(NREUM={}),__nr_require=function(t,e,n){function r(n){if(!e[n]){var i=e[n]={exports:{}};t[n][0].call(i.exports,function(e){var i=t[n][1][e];return r(i||e)},i,i.exports)}return e[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var i=0;i<n.length;i++)r(n[i]);return r}({1:[function(t,e,n){function r(t){try{s.console&&console.log(t)}catch(e){}}var i,o=t("ee"),a=t(27),s={};try{i=localStorage.getItem("__nr_flags").split(","),console&&"function"==typeof console.log&&(s.console=!0,i.indexOf("dev")!==-1&&(s.dev=!0),i.indexOf("nr_dev")!==-1&&(s.nrDev=!0))}catch(c){}s.nrDev&&o.on("internal-error",function(t){r(t.stack)}),s.dev&&o.on("fn-err",function(t,e,n){r(n.stack)}),s.dev&&(r("NR AGENT IN DEVELOPMENT MODE"),r("flags: "+a(s,function(t,e){return t}).join(", ")))},{}],2:[function(t,e,n){function r(t,e,n,r,s){try{p?p-=1:i(s||new UncaughtException(t,e,n),!0)}catch(f){try{o("ierr",[f,c.now(),!0])}catch(d){}}return"function"==typeof u&&u.apply(this,a(arguments))}function UncaughtException(t,e,n){this.message=t||"Uncaught error with no additional information",this.sourceURL=e,this.line=n}function i(t,e){var n=e?null:c.now();o("err",[t,n])}var o=t("handle"),a=t(28),s=t("ee"),c=t("loader"),f=t("gos"),u=window.onerror,d=!1,l="nr@seenError";if(!c.disabled){var p=0;c.features.err=!0,t(1),window.onerror=r;try{throw new Error}catch(h){"stack"in h&&(t(10),t(9),"addEventListener"in window&&t(6),c.xhrWrappable&&t(11),d=!0)}s.on("fn-start",function(t,e,n){d&&(p+=1)}),s.on("fn-err",function(t,e,n){d&&!n[l]&&(f(n,l,function(){return!0}),this.thrown=!0,i(n))}),s.on("fn-end",function(){d&&!this.thrown&&p>0&&(p-=1)}),s.on("internal-error",function(t){o("ierr",[t,c.now(),!0])})}},{}],3:[function(t,e,n){var r=t("loader");r.disabled||(r.features.ins=!0)},{}],4:[function(t,e,n){function r(){var t=new PerformanceObserver(function(t,e){var n=t.getEntries();s(v,[n])});try{t.observe({entryTypes:["resource"]})}catch(e){}}function i(t){if(s(v,[window.performance.getEntriesByType(w)]),window.performance["c"+l])try{window.performance[h](m,i,!1)}catch(t){}else try{window.performance[h]("webkit"+m,i,!1)}catch(t){}}function o(t){}if(window.performance&&window.performance.timing&&window.performance.getEntriesByType){var a=t("ee"),s=t("handle"),c=t(10),f=t(9),u=t(5),d=t(19),l="learResourceTimings",p="addEventListener",h="removeEventListener",m="resourcetimingbufferfull",v="bstResource",w="resource",g="-start",y="-end",x="fn"+g,b="fn"+y,E="bstTimer",R="pushState",S=t("loader");if(!S.disabled){S.features.stn=!0,t(8),"addEventListener"in window&&t(6);var O=NREUM.o.EV;a.on(x,function(t,e){var n=t[0];n instanceof O&&(this.bstStart=S.now())}),a.on(b,function(t,e){var n=t[0];n instanceof O&&s("bst",[n,e,this.bstStart,S.now()])}),c.on(x,function(t,e,n){this.bstStart=S.now(),this.bstType=n}),c.on(b,function(t,e){s(E,[e,this.bstStart,S.now(),this.bstType])}),f.on(x,function(){this.bstStart=S.now()}),f.on(b,function(t,e){s(E,[e,this.bstStart,S.now(),"requestAnimationFrame"])}),a.on(R+g,function(t){this.time=S.now(),this.startPath=location.pathname+location.hash}),a.on(R+y,function(t){s("bstHist",[location.pathname+location.hash,this.startPath,this.time])}),u()?(s(v,[window.performance.getEntriesByType("resource")]),r()):p in window.performance&&(window.performance["c"+l]?window.performance[p](m,i,d(!1)):window.performance[p]("webkit"+m,i,d(!1))),document[p]("scroll",o,d(!1)),document[p]("keypress",o,d(!1)),document[p]("click",o,d(!1))}}},{}],5:[function(t,e,n){e.exports=function(){return"PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver}},{}],6:[function(t,e,n){function r(t){for(var e=t;e&&!e.hasOwnProperty(u);)e=Object.getPrototypeOf(e);e&&i(e)}function i(t){s.inPlace(t,[u,d],"-",o)}function o(t,e){return t[1]}var a=t("ee").get("events"),s=t("wrap-function")(a,!0),c=t("gos"),f=XMLHttpRequest,u="addEventListener",d="removeEventListener";e.exports=a,"getPrototypeOf"in Object?(r(document),r(window),r(f.prototype)):f.prototype.hasOwnProperty(u)&&(i(window),i(f.prototype)),a.on(u+"-start",function(t,e){var n=t[1];if(null!==n&&("function"==typeof n||"object"==typeof n)){var r=c(n,"nr@wrapped",function(){function t(){if("function"==typeof n.handleEvent)return n.handleEvent.apply(n,arguments)}var e={object:t,"function":n}[typeof n];return e?s(e,"fn-",null,e.name||"anonymous"):n});this.wrapped=t[1]=r}}),a.on(d+"-start",function(t){t[1]=this.wrapped||t[1]})},{}],7:[function(t,e,n){function r(t,e,n){var r=t[e];"function"==typeof r&&(t[e]=function(){var t=o(arguments),e={};i.emit(n+"before-start",[t],e);var a;e[m]&&e[m].dt&&(a=e[m].dt);var s=r.apply(this,t);return i.emit(n+"start",[t,a],s),s.then(function(t){return i.emit(n+"end",[null,t],s),t},function(t){throw i.emit(n+"end",[t],s),t})})}var i=t("ee").get("fetch"),o=t(28),a=t(27);e.exports=i;var s=window,c="fetch-",f=c+"body-",u=["arrayBuffer","blob","json","text","formData"],d=s.Request,l=s.Response,p=s.fetch,h="prototype",m="nr@context";d&&l&&p&&(a(u,function(t,e){r(d[h],e,f),r(l[h],e,f)}),r(s,"fetch",c),i.on(c+"end",function(t,e){var n=this;if(e){var r=e.headers.get("content-length");null!==r&&(n.rxSize=r),i.emit(c+"done",[null,e],n)}else i.emit(c+"done",[t],n)}))},{}],8:[function(t,e,n){var r=t("ee").get("history"),i=t("wrap-function")(r);e.exports=r;var o=window.history&&window.history.constructor&&window.history.constructor.prototype,a=window.history;o&&o.pushState&&o.replaceState&&(a=o),i.inPlace(a,["pushState","replaceState"],"-")},{}],9:[function(t,e,n){var r=t("ee").get("raf"),i=t("wrap-function")(r),o="equestAnimationFrame";e.exports=r,i.inPlace(window,["r"+o,"mozR"+o,"webkitR"+o,"msR"+o],"raf-"),r.on("raf-start",function(t){t[0]=i(t[0],"fn-")})},{}],10:[function(t,e,n){function r(t,e,n){t[0]=a(t[0],"fn-",null,n)}function i(t,e,n){this.method=n,this.timerDuration=isNaN(t[1])?0:+t[1],t[0]=a(t[0],"fn-",this,n)}var o=t("ee").get("timer"),a=t("wrap-function")(o),s="setTimeout",c="setInterval",f="clearTimeout",u="-start",d="-";e.exports=o,a.inPlace(window,[s,"setImmediate"],s+d),a.inPlace(window,[c],c+d),a.inPlace(window,[f,"clearImmediate"],f+d),o.on(c+u,r),o.on(s+u,i)},{}],11:[function(t,e,n){function r(t,e){d.inPlace(e,["onreadystatechange"],"fn-",s)}function i(){var t=this,e=u.context(t);t.readyState>3&&!e.resolved&&(e.resolved=!0,u.emit("xhr-resolved",[],t)),d.inPlace(t,y,"fn-",s)}function o(t){x.push(t),m&&(E?E.then(a):w?w(a):(R=-R,S.data=R))}function a(){for(var t=0;t<x.length;t++)r([],x[t]);x.length&&(x=[])}function s(t,e){return e}function c(t,e){for(var n in t)e[n]=t[n];return e}t(6);var f=t("ee"),u=f.get("xhr"),d=t("wrap-function")(u),l=t(19),p=NREUM.o,h=p.XHR,m=p.MO,v=p.PR,w=p.SI,g="readystatechange",y=["onload","onerror","onabort","onloadstart","onloadend","onprogress","ontimeout"],x=[];e.exports=u;var b=window.XMLHttpRequest=function(t){var e=new h(t);try{u.emit("new-xhr",[e],e),e.addEventListener(g,i,l(!1))}catch(n){try{u.emit("internal-error",[n])}catch(r){}}return e};if(c(h,b),b.prototype=h.prototype,d.inPlace(b.prototype,["open","send"],"-xhr-",s),u.on("send-xhr-start",function(t,e){r(t,e),o(e)}),u.on("open-xhr-start",r),m){var E=v&&v.resolve();if(!w&&!v){var R=1,S=document.createTextNode(R);new m(a).observe(S,{characterData:!0})}}else f.on("fn-end",function(t){t[0]&&t[0].type===g||a()})},{}],12:[function(t,e,n){function r(t){if(!s(t))return null;var e=window.NREUM;if(!e.loader_config)return null;var n=(e.loader_config.accountID||"").toString()||null,r=(e.loader_config.agentID||"").toString()||null,f=(e.loader_config.trustKey||"").toString()||null;if(!n||!r)return null;var h=p.generateSpanId(),m=p.generateTraceId(),v=Date.now(),w={spanId:h,traceId:m,timestamp:v};return(t.sameOrigin||c(t)&&l())&&(w.traceContextParentHeader=i(h,m),w.traceContextStateHeader=o(h,v,n,r,f)),(t.sameOrigin&&!u()||!t.sameOrigin&&c(t)&&d())&&(w.newrelicHeader=a(h,m,v,n,r,f)),w}function i(t,e){return"00-"+e+"-"+t+"-01"}function o(t,e,n,r,i){var o=0,a="",s=1,c="",f="";return i+"@nr="+o+"-"+s+"-"+n+"-"+r+"-"+t+"-"+a+"-"+c+"-"+f+"-"+e}function a(t,e,n,r,i,o){var a="btoa"in window&&"function"==typeof window.btoa;if(!a)return null;var s={v:[0,1],d:{ty:"Browser",ac:r,ap:i,id:t,tr:e,ti:n}};return o&&r!==o&&(s.d.tk=o),btoa(JSON.stringify(s))}function s(t){return f()&&c(t)}function c(t){var e=!1,n={};if("init"in NREUM&&"distributed_tracing"in NREUM.init&&(n=NREUM.init.distributed_tracing),t.sameOrigin)e=!0;else if(n.allowed_origins instanceof Array)for(var r=0;r<n.allowed_origins.length;r++){var i=h(n.allowed_origins[r]);if(t.hostname===i.hostname&&t.protocol===i.protocol&&t.port===i.port){e=!0;break}}return e}function f(){return"init"in NREUM&&"distributed_tracing"in NREUM.init&&!!NREUM.init.distributed_tracing.enabled}function u(){return"init"in NREUM&&"distributed_tracing"in NREUM.init&&!!NREUM.init.distributed_tracing.exclude_newrelic_header}function d(){return"init"in NREUM&&"distributed_tracing"in NREUM.init&&NREUM.init.distributed_tracing.cors_use_newrelic_header!==!1}function l(){return"init"in NREUM&&"distributed_tracing"in NREUM.init&&!!NREUM.init.distributed_tracing.cors_use_tracecontext_headers}var p=t(24),h=t(14);e.exports={generateTracePayload:r,shouldGenerateTrace:s}},{}],13:[function(t,e,n){function r(t){var e=this.params,n=this.metrics;if(!this.ended){this.ended=!0;for(var r=0;r<l;r++)t.removeEventListener(d[r],this.listener,!1);return e.protocol&&"data"===e.protocol?void g("Ajax/DataUrl/Excluded"):void(e.aborted||(n.duration=a.now()-this.startTime,this.loadCaptureCalled||4!==t.readyState?null==e.status&&(e.status=0):o(this,t),n.cbTime=this.cbTime,s("xhr",[e,n,this.startTime,this.endTime,"xhr"],this)))}}function i(t,e){var n=c(e),r=t.params;r.hostname=n.hostname,r.port=n.port,r.protocol=n.protocol,r.host=n.hostname+":"+n.port,r.pathname=n.pathname,t.parsedOrigin=n,t.sameOrigin=n.sameOrigin}function o(t,e){t.params.status=e.status;var n=v(e,t.lastSize);if(n&&(t.metrics.rxSize=n),t.sameOrigin){var r=e.getResponseHeader("X-NewRelic-App-Data");r&&(t.params.cat=r.split(", ").pop())}t.loadCaptureCalled=!0}var a=t("loader");if(a.xhrWrappable&&!a.disabled){var s=t("handle"),c=t(14),f=t(12).generateTracePayload,u=t("ee"),d=["load","error","abort","timeout"],l=d.length,p=t("id"),h=t(20),m=t(18),v=t(15),w=t(19),g=t(21).recordSupportability,y=NREUM.o.REQ,x=window.XMLHttpRequest;a.features.xhr=!0,t(11),t(7),u.on("new-xhr",function(t){var e=this;e.totalCbs=0,e.called=0,e.cbTime=0,e.end=r,e.ended=!1,e.xhrGuids={},e.lastSize=null,e.loadCaptureCalled=!1,e.params=this.params||{},e.metrics=this.metrics||{},t.addEventListener("load",function(n){o(e,t)},w(!1)),h&&(h>34||h<10)||t.addEventListener("progress",function(t){e.lastSize=t.loaded},w(!1))}),u.on("open-xhr-start",function(t){this.params={method:t[0]},i(this,t[1]),this.metrics={}}),u.on("open-xhr-end",function(t,e){"loader_config"in NREUM&&"xpid"in NREUM.loader_config&&this.sameOrigin&&e.setRequestHeader("X-NewRelic-ID",NREUM.loader_config.xpid);var n=f(this.parsedOrigin);if(n){var r=!1;n.newrelicHeader&&(e.setRequestHeader("newrelic",n.newrelicHeader),r=!0),n.traceContextParentHeader&&(e.setRequestHeader("traceparent",n.traceContextParentHeader),n.traceContextStateHeader&&e.setRequestHeader("tracestate",n.traceContextStateHeader),r=!0),r&&(this.dt=n)}}),u.on("send-xhr-start",function(t,e){var n=this.metrics,r=t[0],i=this;if(n&&r){var o=m(r);o&&(n.txSize=o)}this.startTime=a.now(),this.listener=function(t){try{"abort"!==t.type||i.loadCaptureCalled||(i.params.aborted=!0),("load"!==t.type||i.called===i.totalCbs&&(i.onloadCalled||"function"!=typeof e.onload))&&i.end(e)}catch(n){try{u.emit("internal-error",[n])}catch(r){}}};for(var s=0;s<l;s++)e.addEventListener(d[s],this.listener,w(!1))}),u.on("xhr-cb-time",function(t,e,n){this.cbTime+=t,e?this.onloadCalled=!0:this.called+=1,this.called!==this.totalCbs||!this.onloadCalled&&"function"==typeof n.onload||this.end(n)}),u.on("xhr-load-added",function(t,e){var n=""+p(t)+!!e;this.xhrGuids&&!this.xhrGuids[n]&&(this.xhrGuids[n]=!0,this.totalCbs+=1)}),u.on("xhr-load-removed",function(t,e){var n=""+p(t)+!!e;this.xhrGuids&&this.xhrGuids[n]&&(delete this.xhrGuids[n],this.totalCbs-=1)}),u.on("xhr-resolved",function(){this.endTime=a.now()}),u.on("addEventListener-end",function(t,e){e instanceof x&&"load"===t[0]&&u.emit("xhr-load-added",[t[1],t[2]],e)}),u.on("removeEventListener-end",function(t,e){e instanceof x&&"load"===t[0]&&u.emit("xhr-load-removed",[t[1],t[2]],e)}),u.on("fn-start",function(t,e,n){e instanceof x&&("onload"===n&&(this.onload=!0),("load"===(t[0]&&t[0].type)||this.onload)&&(this.xhrCbStart=a.now()))}),u.on("fn-end",function(t,e){this.xhrCbStart&&u.emit("xhr-cb-time",[a.now()-this.xhrCbStart,this.onload,e],e)}),u.on("fetch-before-start",function(t){function e(t,e){var n=!1;return e.newrelicHeader&&(t.set("newrelic",e.newrelicHeader),n=!0),e.traceContextParentHeader&&(t.set("traceparent",e.traceContextParentHeader),e.traceContextStateHeader&&t.set("tracestate",e.traceContextStateHeader),n=!0),n}var n,r=t[1]||{};"string"==typeof t[0]?n=t[0]:t[0]&&t[0].url?n=t[0].url:window.URL&&t[0]&&t[0]instanceof URL&&(n=t[0].href),n&&(this.parsedOrigin=c(n),this.sameOrigin=this.parsedOrigin.sameOrigin);var i=f(this.parsedOrigin);if(i&&(i.newrelicHeader||i.traceContextParentHeader))if("string"==typeof t[0]||window.URL&&t[0]&&t[0]instanceof URL){var o={};for(var a in r)o[a]=r[a];o.headers=new Headers(r.headers||{}),e(o.headers,i)&&(this.dt=i),t.length>1?t[1]=o:t.push(o)}else t[0]&&t[0].headers&&e(t[0].headers,i)&&(this.dt=i)}),u.on("fetch-start",function(t,e){this.params={},this.metrics={},this.startTime=a.now(),this.dt=e,t.length>=1&&(this.target=t[0]),t.length>=2&&(this.opts=t[1]);var n,r=this.opts||{},o=this.target;if("string"==typeof o?n=o:"object"==typeof o&&o instanceof y?n=o.url:window.URL&&"object"==typeof o&&o instanceof URL&&(n=o.href),i(this,n),"data"!==this.params.protocol){var s=(""+(o&&o instanceof y&&o.method||r.method||"GET")).toUpperCase();this.params.method=s,this.txSize=m(r.body)||0}}),u.on("fetch-done",function(t,e){if(this.endTime=a.now(),this.params||(this.params={}),"data"===this.params.protocol)return void g("Ajax/DataUrl/Excluded");this.params.status=e?e.status:0;var n;"string"==typeof this.rxSize&&this.rxSize.length>0&&(n=+this.rxSize);var r={txSize:this.txSize,rxSize:n,duration:a.now()-this.startTime};s("xhr",[this.params,r,this.startTime,this.endTime,"fetch"],this)})}},{}],14:[function(t,e,n){var r={};e.exports=function(t){if(t in r)return r[t];if(0===(t||"").indexOf("data:"))return{protocol:"data"};var e=document.createElement("a"),n=window.location,i={};e.href=t,i.port=e.port;var o=e.href.split("://");!i.port&&o[1]&&(i.port=o[1].split("/")[0].split("@").pop().split(":")[1]),i.port&&"0"!==i.port||(i.port="https"===o[0]?"443":"80"),i.hostname=e.hostname||n.hostname,i.pathname=e.pathname,i.protocol=o[0],"/"!==i.pathname.charAt(0)&&(i.pathname="/"+i.pathname);var a=!e.protocol||":"===e.protocol||e.protocol===n.protocol,s=e.hostname===document.domain&&e.port===n.port;return i.sameOrigin=a&&(!e.hostname||s),"/"===i.pathname&&(r[t]=i),i}},{}],15:[function(t,e,n){function r(t,e){var n=t.responseType;return"json"===n&&null!==e?e:"arraybuffer"===n||"blob"===n||"json"===n?i(t.response):"text"===n||""===n||void 0===n?i(t.responseText):void 0}var i=t(18);e.exports=r},{}],16:[function(t,e,n){function r(){}function i(t,e,n,r){return function(){return u.recordSupportability("API/"+e+"/called"),o(t+e,[f.now()].concat(s(arguments)),n?null:this,r),n?void 0:this}}var o=t("handle"),a=t(27),s=t(28),c=t("ee").get("tracer"),f=t("loader"),u=t(21),d=NREUM;"undefined"==typeof window.newrelic&&(newrelic=d);var l=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],p="api-",h=p+"ixn-";a(l,function(t,e){d[e]=i(p,e,!0,"api")}),d.addPageAction=i(p,"addPageAction",!0),d.setCurrentRouteName=i(p,"routeName",!0),e.exports=newrelic,d.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(t,e){var n={},r=this,i="function"==typeof e;return o(h+"tracer",[f.now(),t,n],r),function(){if(c.emit((i?"":"no-")+"fn-start",[f.now(),r,i],n),i)try{return e.apply(this,arguments)}catch(t){throw c.emit("fn-err",[arguments,this,t],n),t}finally{c.emit("fn-end",[f.now()],n)}}}};a("actionText,setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(t,e){m[e]=i(h,e)}),newrelic.noticeError=function(t,e){"string"==typeof t&&(t=new Error(t)),u.recordSupportability("API/noticeError/called"),o("err",[t,f.now(),!1,e])}},{}],17:[function(t,e,n){function r(t){if(NREUM.init){for(var e=NREUM.init,n=t.split("."),r=0;r<n.length-1;r++)if(e=e[n[r]],"object"!=typeof e)return;return e=e[n[n.length-1]]}}e.exports={getConfiguration:r}},{}],18:[function(t,e,n){e.exports=function(t){if("string"==typeof t&&t.length)return t.length;if("object"==typeof t){if("undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer&&t.byteLength)return t.byteLength;if("undefined"!=typeof Blob&&t instanceof Blob&&t.size)return t.size;if(!("undefined"!=typeof FormData&&t instanceof FormData))try{return JSON.stringify(t).length}catch(e){return}}}},{}],19:[function(t,e,n){var r=!1;try{var i=Object.defineProperty({},"passive",{get:function(){r=!0}});window.addEventListener("testPassive",null,i),window.removeEventListener("testPassive",null,i)}catch(o){}e.exports=function(t){return r?{passive:!0,capture:!!t}:!!t}},{}],20:[function(t,e,n){var r=0,i=navigator.userAgent.match(/Firefox[\/\s](\d+\.\d+)/);i&&(r=+i[1]),e.exports=r},{}],21:[function(t,e,n){function r(t,e){var n=[a,t,{name:t},e];return o("storeMetric",n,null,"api"),n}function i(t,e){var n=[s,t,{name:t},e];return o("storeEventMetrics",n,null,"api"),n}var o=t("handle"),a="sm",s="cm";e.exports={constants:{SUPPORTABILITY_METRIC:a,CUSTOM_METRIC:s},recordSupportability:r,recordCustom:i}},{}],22:[function(t,e,n){function r(){return s.exists&&performance.now?Math.round(performance.now()):(o=Math.max((new Date).getTime(),o))-a}function i(){return o}var o=(new Date).getTime(),a=o,s=t(29);e.exports=r,e.exports.offset=a,e.exports.getLastTimestamp=i},{}],23:[function(t,e,n){function r(t,e){var n=t.getEntries();n.forEach(function(t){"first-paint"===t.name?p("timing",["fp",Math.floor(t.startTime)]):"first-contentful-paint"===t.name&&p("timing",["fcp",Math.floor(t.startTime)])})}function i(t,e){var n=t.getEntries();if(n.length>0){var r=n[n.length-1];if(f&&f<r.startTime)return;var i=[r],o=a({});o&&i.push(o),p("lcp",i)}}function o(t){t.getEntries().forEach(function(t){t.hadRecentInput||p("cls",[t])})}function a(t){var e=navigator.connection||navigator.mozConnection||navigator.webkitConnection;if(e)return e.type&&(t["net-type"]=e.type),e.effectiveType&&(t["net-etype"]=e.effectiveType),e.rtt&&(t["net-rtt"]=e.rtt),e.downlink&&(t["net-dlink"]=e.downlink),t}function s(t){if(t instanceof w&&!y){var e=Math.round(t.timeStamp),n={type:t.type};a(n),e<=h.now()?n.fid=h.now()-e:e>h.offset&&e<=Date.now()?(e-=h.offset,n.fid=h.now()-e):e=h.now(),y=!0,p("timing",["fi",e,n])}}function c(t){"hidden"===t&&(f=h.now(),p("pageHide",[f]))}if(!("init"in NREUM&&"page_view_timing"in NREUM.init&&"enabled"in NREUM.init.page_view_timing&&NREUM.init.page_view_timing.enabled===!1)){var f,u,d,l,p=t("handle"),h=t("loader"),m=t(26),v=t(19),w=NREUM.o.EV;if("PerformanceObserver"in window&&"function"==typeof window.PerformanceObserver){u=new PerformanceObserver(r);try{u.observe({entryTypes:["paint"]})}catch(g){}d=new PerformanceObserver(i);try{d.observe({entryTypes:["largest-contentful-paint"]})}catch(g){}l=new PerformanceObserver(o);try{l.observe({type:"layout-shift",buffered:!0})}catch(g){}}if("addEventListener"in document){var y=!1,x=["click","keydown","mousedown","pointerdown","touchstart"];x.forEach(function(t){document.addEventListener(t,s,v(!1))})}m(c)}},{}],24:[function(t,e,n){function r(){function t(){return e?15&e[n++]:16*Math.random()|0}var e=null,n=0,r=window.crypto||window.msCrypto;r&&r.getRandomValues&&(e=r.getRandomValues(new Uint8Array(31)));for(var i,o="xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx",a="",s=0;s<o.length;s++)i=o[s],"x"===i?a+=t().toString(16):"y"===i?(i=3&t()|8,a+=i.toString(16)):a+=i;return a}function i(){return a(16)}function o(){return a(32)}function a(t){function e(){return n?15&n[r++]:16*Math.random()|0}var n=null,r=0,i=window.crypto||window.msCrypto;i&&i.getRandomValues&&Uint8Array&&(n=i.getRandomValues(new Uint8Array(t)));for(var o=[],a=0;a<t;a++)o.push(e().toString(16));return o.join("")}e.exports={generateUuid:r,generateSpanId:i,generateTraceId:o}},{}],25:[function(t,e,n){function r(t,e){if(!i)return!1;if(t!==i)return!1;if(!e)return!0;if(!o)return!1;for(var n=o.split("."),r=e.split("."),a=0;a<r.length;a++)if(r[a]!==n[a])return!1;return!0}var i=null,o=null,a=/Version\/(\S+)\s+Safari/;if(navigator.userAgent){var s=navigator.userAgent,c=s.match(a);c&&s.indexOf("Chrome")===-1&&s.indexOf("Chromium")===-1&&(i="Safari",o=c[1])}e.exports={agent:i,version:o,match:r}},{}],26:[function(t,e,n){function r(t){function e(){t(s&&document[s]?document[s]:document[o]?"hidden":"visible")}"addEventListener"in document&&a&&document.addEventListener(a,e,i(!1))}var i=t(19);e.exports=r;var o,a,s;"undefined"!=typeof document.hidden?(o="hidden",a="visibilitychange",s="visibilityState"):"undefined"!=typeof document.msHidden?(o="msHidden",a="msvisibilitychange"):"undefined"!=typeof document.webkitHidden&&(o="webkitHidden",a="webkitvisibilitychange",s="webkitVisibilityState")},{}],27:[function(t,e,n){function r(t,e){var n=[],r="",o=0;for(r in t)i.call(t,r)&&(n[o]=e(r,t[r]),o+=1);return n}var i=Object.prototype.hasOwnProperty;e.exports=r},{}],28:[function(t,e,n){function r(t,e,n){e||(e=0),"undefined"==typeof n&&(n=t?t.length:0);for(var r=-1,i=n-e||0,o=Array(i<0?0:i);++r<i;)o[r]=t[e+r];return o}e.exports=r},{}],29:[function(t,e,n){e.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(t,e,n){function r(){}function i(t){function e(t){return t&&t instanceof r?t:t?f(t,c,a):a()}function n(n,r,i,o,a){if(a!==!1&&(a=!0),!p.aborted||o){t&&a&&t(n,r,i);for(var s=e(i),c=m(n),f=c.length,u=0;u<f;u++)c[u].apply(s,r);var l=d[y[n]];return l&&l.push([x,n,r,s]),s}}function o(t,e){g[t]=m(t).concat(e)}function h(t,e){var n=g[t];if(n)for(var r=0;r<n.length;r++)n[r]===e&&n.splice(r,1)}function m(t){return g[t]||[]}function v(t){return l[t]=l[t]||i(n)}function w(t,e){p.aborted||u(t,function(t,n){e=e||"feature",y[n]=e,e in d||(d[e]=[])})}var g={},y={},x={on:o,addEventListener:o,removeEventListener:h,emit:n,get:v,listeners:m,context:e,buffer:w,abort:s,aborted:!1};return x}function o(t){return f(t,c,a)}function a(){return new r}function s(){(d.api||d.feature)&&(p.aborted=!0,d=p.backlog={})}var c="nr@context",f=t("gos"),u=t(27),d={},l={},p=e.exports=i();e.exports.getOrSetContext=o,p.backlog=d},{}],gos:[function(t,e,n){function r(t,e,n){if(i.call(t,e))return t[e];var r=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(t,e,{value:r,writable:!0,enumerable:!1}),r}catch(o){}return t[e]=r,r}var i=Object.prototype.hasOwnProperty;e.exports=r},{}],handle:[function(t,e,n){function r(t,e,n,r){i.buffer([t],r),i.emit(t,e,n)}var i=t("ee").get("handle");e.exports=r,r.ee=i},{}],id:[function(t,e,n){function r(t){var e=typeof t;return!t||"object"!==e&&"function"!==e?-1:t===window?0:a(t,o,function(){return i++})}var i=1,o="nr@id",a=t("gos");e.exports=r},{}],loader:[function(t,e,n){function r(){if(!O++){var t=S.info=NREUM.info,e=m.getElementsByTagName("script")[0];if(setTimeout(f.abort,3e4),!(t&&t.licenseKey&&t.applicationID&&e))return f.abort();c(E,function(e,n){t[e]||(t[e]=n)});var n=a();s("mark",["onload",n+S.offset],null,"api"),s("timing",["load",n]);var r=m.createElement("script");0===t.agent.indexOf("http://")||0===t.agent.indexOf("https://")?r.src=t.agent:r.src=p+"://"+t.agent,e.parentNode.insertBefore(r,e)}}function i(){"complete"===m.readyState&&o()}function o(){s("mark",["domContent",a()+S.offset],null,"api")}var a=t(22),s=t("handle"),c=t(27),f=t("ee"),u=t(25),d=t(17),l=t(19),p=d.getConfiguration("ssl")===!1?"http":"https",h=window,m=h.document,v="addEventListener",w="attachEvent",g=h.XMLHttpRequest,y=g&&g.prototype,x=!1;NREUM.o={ST:setTimeout,SI:h.setImmediate,CT:clearTimeout,XHR:g,REQ:h.Request,EV:h.Event,PR:h.Promise,MO:h.MutationObserver};var b=""+location,E={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1216.min.js"},R=g&&y&&y[v]&&!/CriOS/.test(navigator.userAgent),S=e.exports={offset:a.getLastTimestamp(),now:a,origin:b,features:{},xhrWrappable:R,userAgent:u,disabled:x};if(!x){t(16),t(23),m[v]?(m[v]("DOMContentLoaded",o,l(!1)),h[v]("load",r,l(!1))):(m[w]("onreadystatechange",i),h[w]("onload",r)),s("mark",["firstbyte",a.getLastTimestamp()],null,"api");var O=0}},{}],"wrap-function":[function(t,e,n){function r(t,e){function n(e,n,r,c,f){function nrWrapper(){var o,a,u,l;try{a=this,o=d(arguments),u="function"==typeof r?r(o,a):r||{}}catch(p){i([p,"",[o,a,c],u],t)}s(n+"start",[o,a,c],u,f);try{return l=e.apply(a,o)}catch(h){throw s(n+"err",[o,a,h],u,f),h}finally{s(n+"end",[o,a,l],u,f)}}return a(e)?e:(n||(n=""),nrWrapper[l]=e,o(e,nrWrapper,t),nrWrapper)}function r(t,e,r,i,o){r||(r="");var s,c,f,u="-"===r.charAt(0);for(f=0;f<e.length;f++)c=e[f],s=t[c],a(s)||(t[c]=n(s,u?c+r:r,i,c,o))}function s(n,r,o,a){if(!h||e){var s=h;h=!0;try{t.emit(n,r,o,e,a)}catch(c){i([c,n,r,o],t)}h=s}}return t||(t=u),n.inPlace=r,n.flag=l,n}function i(t,e){e||(e=u);try{e.emit("internal-error",t)}catch(n){}}function o(t,e,n){if(Object.defineProperty&&Object.keys)try{var r=Object.keys(t);return r.forEach(function(n){Object.defineProperty(e,n,{get:function(){return t[n]},set:function(e){return t[n]=e,e}})}),e}catch(o){i([o],n)}for(var a in t)p.call(t,a)&&(e[a]=t[a]);return e}function a(t){return!(t&&t instanceof Function&&t.apply&&!t[l])}function s(t,e){var n=e(t);return n[l]=t,o(t,n,u),n}function c(t,e,n){var r=t[e];t[e]=s(r,n)}function f(){for(var t=arguments.length,e=new Array(t),n=0;n<t;++n)e[n]=arguments[n];return e}var u=t("ee"),d=t(28),l="nr@original",p=Object.prototype.hasOwnProperty,h=!1;e.exports=r,e.exports.wrapFunction=s,e.exports.wrapInPlace=c,e.exports.argsToArray=f},{}]},{},["loader",2,13,4,3]);</script>
+<!--[if IE 8]>
+		<link href="~/Content/themes/Customcss/iestyle8.css" rel="stylesheet" type="text/css" />
+	<![endif]-->
+<link href="/Content/themes/Customcss/all-ie-only-1.0.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="https://plusportals.blob.core.windows.net/springcreekacademy-2018-19/1e4382f8-0a4e-4e9c-ae8c-0a66c5b3d96a-appearance.css" />
+<style>
+		@media(max-width:1024px) {
+			.goog-te-menu-frame {
+				width: 100% !important;
+				height: 288px !important;
+			}
+
+			.goog-te-banner-frame.skiptranslate {
+				display: none !important;
+			}
+		}
+
+		@media(max-width:767px) {
+			.goog-te-menu-frame {
+				width: 100% !important;
+				box-shadow: none !important;
+				max-width: 95%;
+				margin: 0 auto;
+				box-sizing: border-box !important;
+				overflow: scroll !important;
+				margin-left: 10px;
+				margin-right: 12px;
+				height: 288px !important;
+			}
+				/* width */
+				.goog-te-menu-frame::-webkit-scrollbar {
+					width: 10px;
+				}
+				/* Track */
+				.goog-te-menu-frame::-webkit-scrollbar-track {
+					background: #f1f1f1;
+				}
+				/* Handle */
+				.goog-te-menu-frame::-webkit-scrollbar-thumb {
+					background: #888;
+				}
+					/* Handle on hover */
+					.goog-te-menu-frame::-webkit-scrollbar-thumb:hover {
+						background: #555;
+					}
+		}
+	</style>
+<link href="/Content/themes/Customcss/css?v=wpW89OGVgPfR03rWsJlQBHy9Fyjh5hxnhFpvCzzydkk1" rel="stylesheet" />
+<script src="/Scripts/CustomScripts/jquery/1.12.4/jquery.min.js"></script>
+<script src="/Scripts/CustomScripts/Script?v=XBDThzAoXAFc6OUoQ7z1ZH3snmyc3G15WUMc3j5K-jY1"></script>
+<link href="/Content/themes/Customcss/jquery-ui-1.10.3.css" rel="stylesheet" />
+<link href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+<link href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.common.min.css" rel="stylesheet" />
+<link href="https://kendo.cdn.telerik.com/2018.3.911/styles/kendo.default.min.css" rel="stylesheet" />
+<script src="https://kendo.cdn.telerik.com/2018.3.911/js/kendo.all.min.js"></script>
+<script src="https://kendo.cdn.telerik.com/2018.3.911/js/kendo.aspnetmvc.min.js"></script>
+<script src="/Scripts/CustomScripts/jscookie.js"></script>
+<script src="/Scripts/modernizr-2.6.2.js"></script>
+<link href="/layout/css?v=d9GvTc94CXokhUFid4KUHUxMysMY0CEuLXzZwFQr0EI1" rel="stylesheet" />
+<script src="/layout/js?v=zL5TUnGTQpTYE8cs-gHALl1r7CDeVoegVKfzUkZYX6c1"></script>
+<link href="/PostViewDiscussion?v=1zavcaQjfO5LPaaF2p-FOGrdsiWmrLl-ckqg1mgf2OM1" rel="stylesheet" />
+<script src="/Scripts/CustomScripts/rollbar.js"></script>
+<script>
+        var rollbarClientAccessToken = 'b3f0174bf2b34048b460ead791f79c46';
+        var rollbarClientEnvirnoment = 'Production';
+
+        var userId = 2777;
+        var schoolEmail = "donotreply@springcreekacademy.com";
+        var userName = "bwhiting26@springcreekacademy.com";
+        var schoolLink = "SpringCreekAcademy";
+        var userRole = "STUDENT";
+
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Admin/GetAcceptanceTerms/',
+                contentType: 'application/json',
+                type: 'GET'
+            })
+                .success(function (result) {
+                    if (result.acceptTerms || userRole == null) {
+                        $(".acceptanceTermsFooter").hide();
+                    }
+                    else {
+                        $(".acceptanceTermsFooter").show();
+                    }
+                })
+                .error(function (xhr, status) {
+                    alert(xhr.responseText);
+                });
+        });
+	</script>
+<script src="/Scripts/CustomScripts/rollbarconfig.js"></script>
+<script type="text/javascript">appId = '2';</script>
+<script type="text/javascript" crossorigin="anonymous" src="https://redikerpublic1.blob.core.windows.net/status-rediker-com/statusbundle"></script>
+<!--[if !IE]><!-->
+<script>
+		if (/*@cc_on!@*/false) {
+			document.documentElement.className += ' ie10';
+		}
+	</script>
+<!--<![endif]-->
+<script>
+        function teacherSchedule() {
+        $.ajax({
+            url: '/TeacherClassDetails/ShowScheduleTab?_=' + (new Date()).getTime(),
+            contentType: 'application/html;charset=utf-8',
+            type: 'GET',
+            dataType: 'html',
+            data: { scheduleFor: 'Teacher' }
+        })
+        .success(function (result) {
+            checkTimeout(result);
+            // Display the schedule contents.
+            var scheduleWindow = $("#tbScheduleModal").kendoWindow({
+                title: "Schedule",
+                resizable: false,
+                modal: true,
+                open: function (e) { this.wrapper.css({ left: 50, top: $(document).scrollTop() }); },
+                close: function () { $("#tbScheduleModal").empty(); }
+            }).data("kendoWindow").open();
+            scheduleWindow.content(result).open();
+        })
+        .error(function (xhr, status) {
+            alert(xhr.responseText);
+        });
+        }
+	</script>
+<style>
+		.divMaintenanceShow {
+			background-color: #EBE3A3;
+			color: #36342A;
+			font-size: 14px;
+			padding: 5px;
+			font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+			border-bottom: 1px solid #D8D091;
+			padding: 10px 67px;
+		}
+
+		.divMaintenanceHide {
+			display: none;
+		}
+	</style>
+<script src="/Scripts/CustomScripts/google-analytics.js"></script>
+</head>
+<input name="__RequestVerificationToken" type="hidden" value="6HmIKYRBGvgsxlAUY0MeIEym1T3CtY7w_VY_MPC0GlcfNBEOS1uu2-Jk0UDN6VbmqpnFACgOQDGq6XhkG4HdXt4PyMI1" />
+<body id="top">
+
+<div id="divMaintenance" style="display: none">
+<div class="divMaintenanceHide"></div>
+</div>
+<header class="container">
+<img src="/Images/CustomImages/banner3.jpg" alt="Rediker" border="0" class="centr-algn">
+<label id="lblSchoolName">- SPRING CREEK ACADEMY</label>
+</header>
+
+
+<form action="https://www.bkstr.com/webApp/discoverShop" id="bnFollettForm" METHOD="POST" target="TheWindow">
+<input name="merfnbr" id="merfnbr" value type="hidden">
+<input name="termDir" id="termDir" value type="hidden">
+</form>
+
+<div id="LayoutPageloading" class="bgLayoutLoadingoverlay" style="display: none">
+<div id="loader_Icon">
+<img src="/Images/CustomImages/loader.gif" width="32" height="32" border="0" />
+<span>Loading....</span>
+</div>
+</div>
+<div class="container mgn-tp8 mgn-bt8">
+<ul class="breadcrumb pull-left">
+<li class="active"></li>
+</ul>
+<ul class="lnk pull-right">
+<li class="icon-news">
+<a href="#" onclick="SetSubmittedDate()" style="margin-left: 5px;">Newsfeed</a>
+</li>
+<li class="icon-set wdtauto dropdown">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">Ben Whiting<b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li class><a href="/Account/ChangePassword">Change Password</a></li>
+<li class><a href="/Settings/Student">Settings</a></li>
+<li class><a href="/Directory/StudentDirectoryOptIn">Directory Listing</a></li>
+</ul>
+</li>
+<li class="user-guide-icon"><a href="https://docs.rediker.com/plusportals/manager/studentplus-portal-327934.html" target="_blank">Help</a></li>
+<li class="icon-lo">
+<form action="/Account/LogOff" id="plogoutfrm" method="post"><input name="__RequestVerificationToken" type="hidden" value="GZaeEuKQ1iA75rnV2rmc_RE3RXxrWcbkll7nmwcYKquO2jowVrYg2e99JQfsHzGeqgJUv6bNO_MCYq69_1nR_YBbnFw1" /> <a href="javascript:document.getElementById('plogoutfrm').submit()">Logout</a>
+</form>
+<style type="text/css">
+    #plogoutfrm {
+        margin: 0 0 0 !important;
+    }
+</style></li>
+</ul>
+</div>
+
+<nav class="container">
+<div class="navbar-wrapper">
+<div class="container">
+<div class="navbar navbar-inverse">
+<div class="navbar-inner">
+<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a class="brand" href="/ParentStudentDetails/ParentStudentDetails/1728">Welcome Ben Whiting</a> <div class="nav-collapse collapse">
+<ul class="nav pull-left">
+<li class="navMenu active"><a href="https://plusportals.com/ParentStudentDetails/ParentStudentDetails">Home</a></li><li class="navMenu"><a href="https://plusportals.com/Calendar/Calendar">Calendar</a></li><li class="navMenu"><a href="https://plusportals.com/Announcement/Announcements">Alerts</a></li><li class="navMenu"><a href="https://plusportals.com/Communication/Communication">E-Mail & Messages</a></li><li class="navMenu"><a href="https://plusportals.com/Directory/Directory">Directory</a></li><li class="navMenu"><a href="https://plusportals.com/ELocker/Index">E-Locker</a></li><li class="navMenu"><a href="https://apforms.rediker.com/APOnlineForms/index.aspx?SchoolID=B42C12F24810495EA78D9B7549C4A4A5&Session=31bJ1i241cR5t5vg60v7Ec2@2s6C56Dxp15n7.YMS1g87e1J3iODe16c@233FTa85m2622T7y3eo4xx3_jm1sEKHR5.LY66Y24Zs0i277M7z18V6s66fIma20qsTPa31y41@OQyw4U2F.ZeT0Sdn940Q85b6@0.f0W@9e5OCD7.2L.76ct74071d58e7QC02Fkr_as8d3V5cbGr9K9A7aru5izj0Dki678@34@P14i2Pn410b91w67hzr8&Pid=8BP38sg18JR8w41dX5C5EB60v73cb@DG6C565x81Sr7.YMv1O8OP1J3ilD.1F9@2332T98Tf262257E3eZ4xx3_jC1sEKHR5.LY60Y24Zsxi27VM7z18N6s60fIma2HqsT1a31y4p@OQ.w4U2FuZeT0Sdn946Q8506@0.fOW@9.5OCD782L206ut74r71q08t7QCR2F70_7s8d7V55AG49K947aWD5.zj0gki4P8ho4@r1402P6a10s91w&Contact=10323E3F0FF8472A8256F39506871F47&Expid=4D10A6EE2F5747BF9871111999999993" target="_blank">Forms</a></li> </ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".navMenu").click(function () {
+            ResetVisibility();
+            if ($(this).length >0 ) {
+                if ($(this)[0].textContent == "Forms" || $(this)[0].textContent == "FACTS" || $(this)[0].textContent == "Connect1") {
+                    $(this).removeClass("active");
+                }
+                else {
+                    $(this).removeClass("active").addClass("active");
+                }
+            }
+            
+        });
+
+        function ResetVisibility() {
+            $('li').each(function (index) {
+                if ($(this).attr('title') == "navMenu") {
+
+                    $(this).removeClass("active");
+                }
+            });
+        };
+    });
+</script>
+<style type="text/css">
+    .pymtinfoform {
+        margin: 0px !important;
+    }
+
+    .pymtinfobtn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        margin-top: 9.5px;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+        outline:none !important;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+        font-size: 12px !important;
+    }
+
+    @-moz-document url-prefix() { 
+        .pymtinfobtn {
+            margin-top: 10px;
+        }
+    }
+</style>
+<div id="body">
+<section class="content-wrapper main-content clear-fix">
+<div class="container homesOnly">
+<div class="main-cont pdn-0-25-20-25">
+<link href="/PostViewDiscussion?v=1zavcaQjfO5LPaaF2p-FOGrdsiWmrLl-ckqg1mgf2OM1" rel="stylesheet" />
+<div class="container mgn-lft0 wdt100 alignment-btm-30 general-block">
+<div class="re-kid-img">
+<img class="blk-img-crved tm_raised" src="/Image/GetImage?sid=1728&amp;token=EC082F41CF23221A7402FC7ACA3A62DB947B09AFCA2ADD68265C2E03CA26F4B4" alt="name">
+</div>
+
+<div class="re-notifys">
+<div class="jevel">
+<a href="#" class="jewel-img alerts" onclick="showUnReadDetails(1728,'Alerts',0)"></a>
+</div>
+<div class="jevel">
+<a href="#" class="jewel-img messages" onclick="showUnReadDetails(1728,'Messages',0)"></a>
+</div>
+<div class="jevel">
+<a href="#" class="jewel-img notification" onclick="showUnReadDetails(1728,'Notifications',0)"></a>
+</div>
+<div class="jevel">
+<a href="#" class="jewel-img events" onclick="showUnReadDetails(1728,'Events',19)"></a>
+<span class="badge badge-important tp-no">19</span>
+</div>
+</div>
+
+<div class="pull-right hgt0">
+</div>
+<div class="re-blue-strip">
+<label>Ben Whiting</label>
+</div>
+<div id="UnReadMessages" style="display:none"></div><script>
+	kendo.syncReady(function(){jQuery("#UnReadMessages").kendoWindow({"close":onCloseNotification,"modal":true,"iframe":false,"scrollable":true,"pinned":false,"title":"Details","resizable":false,"actions":["Close"]});});
+</script>
+</div>
+<style type="text/css">
+    #UnReadMessages {
+        max-height: 500px !important;
+        overflow-y: scroll;
+    }
+</style>
+<div id="loadingn" class="loader-contn">
+<img src="/Images/CustomImages/loader.gif" width="32" height="32" border="0" />
+<span>Loading...</span>
+</div>
+<section class="container max-wdt100 general-wrap" rel="new-loading" id="new-loading">
+<div class="new new-tab-responsive">
+<div class="newtabsJ" id="PANwtabs">
+<ul class="main-tab">
+<li class="parent-tab selected" id="mainoverviewtab"><a href="#target1" id="tab-1" class="panel">Overview</a></li>
+<li class="parent-tab unselected" id="classparent">
+<a href="#tbClasses" id="classroom" class="panel">Classroom</a>
+<div id="classroomsubmenu">
+<ul class="tabs">
+<li class="dropdown" style="padding: 12px 15px 0; height:36px;">
+<label class="pull-left" style="padding: 3px 10px 0 0; font-weight: bold; color: #565656;">Class: </label> <input id="ddlSection" name="SectionDropDownList" style="width: 200px" type="text" /><script>
+	kendo.syncReady(function(){jQuery("#ddlSection").kendoDropDownList({"change":SectionChanged,"dataBound":dataBound,"dataSource":{"transport":{"read":{"url":"/ParentStudentDetails/LoadSectionDropdown?isGroup=False"},"prefix":""},"schema":{"errors":"Errors"}},"dataTextField":"Name","height":400,"autoBind":false,"dataValueField":"CourseId","optionLabel":"Select a class..."});});
+</script>
+</li>
+<li class="class-submenu inactive"><a href="#tbClasses" id="tab-2" class="panel">Class Page</a></li>
+<li class="class-submenu inactive"><a href="#tbLessonPlan" id="tab-10" class="panel">Lesson Plans</a></li>
+<li class="class-submenu inactive"><a href="#tbScores" id="tab-4" class="panel">Performance</a></li>
+<li class="class-submenu inactive"><a href="#tbReports" id="tab-9" class="panel">Progress Reports</a></li>
+</ul>
+</div>
+</li>
+<li class="parent-tab unselected" id="schoolparent">
+<a href="#tbSchedule" id="school" class="panel">School</a>
+<div id="schoolsubmenu">
+<ul class="school-tabs">
+<li class="school-submenu inactive"><a href="#tbSchedule" id="tab-6" class="panel">Schedule</a></li>
+<li class="school-submenu inactive"><a href="#tbGrades" id="tab-5" class="panel">Report Card</a></li>
+<li class="school-submenu inactive"><a href="#tbAttendance" id="tab-3" class="panel">Attendance</a></li>
+</ul>
+</div>
+</li>
+</ul>
+<ul class="ipad-main-tab">
+<li class="ipad-overview active" id="ipadOverview"><a href="#target1" id="ipadtab-1" class="panel">Overview</a></li>
+<li class="ipad-overview inactive" id="ipadMore" style="display:block !important;">
+<label class="pull-left">More: </label>
+<div class="pull-left">
+<input id="ddlMenus" />
+</div>
+<div id="divSubMenu" class="class-dropdown">
+<div class="ipaddropdown" style="padding: 12px 15px 0; height:36px;">
+<label class="pull-left" style="padding: 3px 10px 0 0; font-weight: bold; color: #565656;">Class: </label> <input id="ddlIpadSection" name="IpadSectionDropDownList" style="width: 200px" type="text" /><script>
+	kendo.syncReady(function(){jQuery("#ddlIpadSection").kendoDropDownList({"change":IpadSectionChanged,"dataBound":IpadDataBound,"dataSource":{"transport":{"read":{"url":"/ParentStudentDetails/LoadSectionDropdown?isGroup=False"},"prefix":""},"schema":{"errors":"Errors"}},"dataTextField":"Name","height":400,"autoBind":false,"dataValueField":"CourseId","optionLabel":"Select a class..."});});
+</script>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<script type="text/javascript">
+
+    $('#tab-1').click(function () {
+        var section = $('#mCourseId_' + studentID).data('kendoDropDownList');
+        var sectionId = 0;
+        if (section !== undefined && section !== null)
+            sectionId = $("#mCourseId_" + studentID).val();
+        loadCourseWorkDetailsForStudent(1728, sectionId);
+    });
+
+
+    $(document).ready(function () {
+        $(window).resize(function () {
+            if ($('ul.main-tab').is(':visible')) {
+                if (currentTabIpad !== 'tab-1') {
+                    if (currentClassIpad !== "") {
+                        currentClassMain = currentClassIpad;
+                        SectionNullCheck(currentClassIpad)
+                    }
+                    if (currentTabIpad == "tab-2" || currentTabIpad == "tab-10" || currentTabIpad == "tab-4" || currentTabIpad == "tab-9") {
+                        if ($('#classroom').hasClass("normal-tab"))
+                            $('#classroom').removeClass("normal-tab");
+                        $('#classroom').addClass("selected");                    
+                    }
+                    else if (currentTabIpad == "tab-3" || currentTabIpad == "tab-5" || currentTabIpad == "tab-6" || currentTabIpad == "tab-7" || currentTabIpad == "tab-8") {
+                        if ($('#school').hasClass("normal-tab"))
+                            $('#school').removeClass("normal-tab");
+                        $('#school').addClass("selected");
+                    }
+                }
+                else {
+                    $("#tab-1").trigger('click');
+                }
+            }
+            else {
+                if ($('ul.main-tab').find('li.parent-tab.selected a:first')[0] !== undefined) {
+                    if ($('ul.main-tab').find('li.parent-tab.selected a:first')[0].id !== 'tab-1') {
+                        var activeTabId;
+                        if ($('ul.main-tab').find('li.active a:first')[0] !== undefined) {
+                            activeTabId = $('ul.main-tab').find('li.active a:first')[0]['id'];
+                        }
+                        var ddlMenu = $("#ddlMenus").data("kendoDropDownList");
+                        $("#ipadMore").removeClass('inactive');
+                        $("#ipadMore").addClass('active');
+                        if (currentTabMain !== "" && currentTabMain !== 'tab-1') {
+                            if (activeTabId == currentTabMain) {
+                                ddlMenu.value(currentTabMain);
+                                currentTabIpad = currentTabMain
+                            }
+                            else {
+                                ddlMenu.value(currentTabIpad);
+                                currentTabMain = currentTabIpad;
+                            }
+                            if (currentTabMain == "tab-2" || currentTabMain == "tab-10" || currentTabMain == "tab-4" || currentTabMain == "tab-9") {
+                                $('#divSubMenu').show();
+                                var ddlIpad = $("#ddlIpadSection").data("kendoDropDownList");
+                                if (ddlIpad !== undefined && ddlIpad !== null) {
+                                    if (currentClassMain !== "") {
+                                        currentClassIpad = currentClassMain;
+                                        $("#ddlIpadSection").data("kendoDropDownList").value(currentClassMain);
+                                        //ddlIpad.trigger('dataBound');
+                                    }
+                                }
+                            }
+                            else
+                                $('#divSubMenu').hide();
+                        }
+                    }
+                    else {
+                        $('#ipadtab-1').trigger('click');
+                    }
+                }
+            }
+        });
+
+        function SectionNullCheck(selectedValue) {
+            if ($("#ddlSection").data("kendoDropDownList") != undefined && $("#ddlSection").data("kendoDropDownList") != null)
+                if (selectedValue == 0)
+                    $("#ddlSection").data("kendoDropDownList").select(selectedValue);
+                else
+                    $("#ddlSection").data("kendoDropDownList").value(selectedValue);
+        }
+
+        $('#classroomsubmenu').hide();
+        $('#schoolsubmenu').hide();
+        $('#divSubMenu').hide();
+        var dropdownlist = $("#ddlSection").data("kendoDropDownList");
+        if (dropdownlist != undefined && dropdownlist != null) {
+            dropdownlist.bind("dataBound", SectionDataBound());
+            dropdownlist.bind("change", SectionChanged());
+        }
+        var ipaddropdownlist = $("#ddlIpadSection").data("kendoDropDownList");
+        if (ipaddropdownlist != null) {
+            ipaddropdownlist.bind("dataBound", IpadSectionDataBound());
+            ipaddropdownlist.bind("change", IpadSectionChanged());
+        }
+        var Submenus = [];
+        if ('Y' == 'Y')
+            Submenus.push({ "MenuName": "Class Page", "MenuId": "tab-2", "MainMenu": "Classroom" });
+        if ('Y' == 'Y')
+            Submenus.push({ "MenuName": "Lesson Plans", "MenuId": "tab-10", "MainMenu": "Classroom" });
+        if ('Y' == 'Y')
+            Submenus.push({ "MenuName": "Performance", "MenuId": "tab-4", "MainMenu": "Classroom" });
+        if ('Y' == 'Y')
+            Submenus.push({ "MenuName": "Progress Reports", "MenuId": "tab-9", "MainMenu": "Classroom" });
+        if ('Y' == 'Y')
+            Submenus.push({ "MenuName": "Schedule", "MenuId": "tab-6", "MainMenu": "School" });
+        if ('Y' == 'Y')
+            Submenus.push({ "MenuName": "Report Card", "MenuId": "tab-5", "MainMenu": "School" });
+        if ('Y' == 'Y')
+            Submenus.push({ "MenuName": "Attendance", "MenuId": "tab-3", "MainMenu": "School" });
+        if ('N' == 'Y')
+            Submenus.push({ "MenuName": "Discipline", "MenuId": "tab-7", "MainMenu": "School" });
+        if ('N' == 'Y')
+            Submenus.push({ "MenuName": "Demographics", "MenuId": "tab-8", "MainMenu": "School" });
+        $("#ddlMenus").kendoDropDownList({
+            dataTextField: "MenuName",
+            dataValueField: "MenuId",
+            optionLabel: "Select a page...",
+            groupTemplate: "#: data #",
+            height: "300",
+            dataSource: {
+                data: Submenus,
+                group: { field: "MainMenu" }
+            },
+            change: onMenuChange
+        });
+        //$('#ipadMore').click(function () {
+        //    debugger;
+        //    $('#target1').hide();
+        //    $('#PANwtabs').css('height', 101);
+        //    //$('#divSubMenu').show();
+        //});
+    });
+</script>
+<div id="JSnew" class="secoundcontN floatleft">
+<div id="loading" class="loader-cont">
+<img src="/Images/CustomImages/loader.gif" width="32" height="32" border="0" />
+<span>Loading...</span>
+</div>
+<div class="panel active" id="target1" style="display: block">
+<link href="/Content/themes/Customcss/Rewrite-1.0.css" rel="stylesheet" />
+<link href="/Content/ParentStudentDetails.css" rel="stylesheet" />
+<script src="/parentstudentdetailssummary/js?v=mOIakzgfl0_kKMOCaihgqfX_f4oI_B7dFk2_KGyyukk1"></script>
+<script type="text/javascript">
+    function linksFilesParameter() {
+        var ddl = $('#ddl_ResourcesFolder').data("kendoDropDownList");
+        var dataItem = ddl.dataItem(ddl.selectedIndex);
+        return {
+            labelTagId: dataItem !== null && (typeof (dataItem) !== "undefined") ? dataItem.LabelTagID : null,
+            gradeLevel: $('#hdnGradeLevl').val()
+        };
+    }
+</script>
+
+<div class="span3 align-newbox margin-right15 algnboxs spacing">
+<div class="category">
+<div class="container continhd" id="newstylespl" style="min-height:35px !important;">
+<ul class="conhdw pull-left" style="width: 80%;">
+<li class="txtovflw" style="float: left; width: 70px;">Progress:</li>
+<li style="float: left; width: 50%; position: relative; bottom: 3px;">
+<input data-val="true" data-val-number="The field CurrentMarkingPeriodId must be a number." data-val-required="The CurrentMarkingPeriodId field is required." id="CurrentMarkingPeriodId" name="CurrentMarkingPeriodId" style="width:209px;font-size:12px;height:25px;" type="text" value="105" /><script>
+	kendo.syncReady(function(){jQuery("#CurrentMarkingPeriodId").kendoDropDownList({"change":MarkingPeriodChanged,"dataBound":MarkingPeriodDataBound,"dataSource":{"transport":{"read":{"url":"/ParentStudentDetails/GetMarkingPeriod"},"prefix":""},"schema":{"errors":"Errors"}},"dataTextField":"Description","autoBind":false,"dataValueField":"MarkingPeriodId"});});
+</script>
+</li>
+</ul>
+<ul class="conhdr pull-right">
+<li>
+<a>
+<img id="idProgressBx" src="../../../Images/CustomImages/blank.png">
+</a>
+</li>
+</ul>
+<a>
+<img src="../../../Images/CustomImages/blank.png" onclick="PrintProgress()" class="newprint-icon">
+</a>
+</div>
+<div class="bgf9">
+<div class="k-widget k-grid" id="GridProgress"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col style="width:200px" /><col style="width:100px" /><col style="width:100px" /></colgroup><thead class="k-grid-header"><tr><th class="k-header" data-field="SectionId" data-index="0" data-title="Subject" id="e301dc99-01f9-4d9f-b1a9-f04de05e844a" scope="col"><span class="k-link">Subject</span></th><th class="k-header" data-index="1" id="7d3c935b-521e-4a47-adee-9aa4e90072ce" scope="col"><span class="k-link">Average</span></th><th class="k-header" data-index="2" id="0e9e9dab-b43b-41df-bfb9-e490bfc13e85" scope="col"><span class="k-link">Grade</span></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:190px"><table><colgroup><col style="width:200px" /><col style="width:100px" /><col style="width:100px" /></colgroup><tbody><tr class="k-no-data"><td colspan="3"></td></tr></tbody></table></div></div><script>
+	kendo.syncReady(function(){jQuery("#GridProgress").kendoGrid({"columns":[{"title":"Subject","headerAttributes":{"data-field":"SectionId","data-title":"Subject"},"width":"200px","template":"#if(data.IsWithdrawnCourse) {# #:data.CourseName# #}else {# \u003ca  class=\u0027pointer\u0027 title=\u0027Subject\u0027 type=\u0027button\u0027 onclick=\u0027showClasstab(this)\u0027\u003e#:data.CourseName#\u003c/a\u003e #} #","field":"SectionId","filterable":false,"encoded":true},{"title":"Average","width":"100px","template":"#if( data.Average ==null) { # \u003ca  class=\u0027pointer\u0027 \u003e\u003c/a\u003e # }else { #\u003ca  class=\u0027pointer\u0027 title=\u0027Average\u0027 onclick=\u0027showScoretab(this)\u0027 \u003e#: data.Average #\u003c/a\u003e # }#"},{"title":"Grade","width":"100px","template":"#if( data.GradeSymbol ==null) { # \u003ca  class=\u0027pointer\u0027\u003e\u003c/a\u003e # }else { #\u003ca  class=\u0027pointer\u0027 title=\u0027Grade\u0027 onclick=\u0027showScoretab(this)\u0027\u003e#: data.GradeSymbol #\u003c/a\u003e # }#"}],"scrollable":{"height":"190px"},"messages":{"noRecords":"No records available."},"autoBind":false,"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":""},"prefix":""},"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"CourseId":{"type":"number"},"CourseName":{"type":"string"},"Average":{"type":"number","defaultValue":null},"GradeSymbol":{"type":"string"},"StaffName":{"type":"string"},"MarkingPeriodId":{"type":"number"},"StudentId":{"type":"number"},"SectionId":{"type":"number"},"IsWithdrawnCourse":{"type":"boolean"},"StaffEmailId":{"type":"string"},"ShowClassesWithBlankAndSpaces":{"type":"boolean"}}}}}});});
+</script>
+</div>
+</div>
+</div>
+
+<div class="span3 align-newbox margin-right15 algnboxs spacing">
+<div class="category">
+<div class="container continhd">
+<ul class="conhdw pull-left">
+<li class="txtovflw">Recent Scores</li>
+</ul>
+<ul class="conhdr pull-right">
+<li>
+<a>
+<img id="idScoresBx" src="../../../Images/CustomImages/blank.png">
+</a>
+</li>
+</ul>
+</div>
+<div class="bgf9">
+<div class="k-widget k-grid" id="GridRecentScore"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col style="width:15px" /><col style="width:7px" /><col style="width:10px" /></colgroup><thead class="k-grid-header"><tr><th class="k-header" data-field="Description" data-index="0" data-title="Description" id="0480f69c-0629-46ab-89f7-806db716a2a5" scope="col"><span class="k-link">Description</span></th><th class="k-header" data-field="AssignmentDate" data-index="1" data-title="Date" id="f9681b06-8be0-4908-88c7-35f7bf439ee9" scope="col"><span class="k-link">Date</span></th><th class="k-header" data-field="Score" data-index="2" data-title="Score" id="dea9616c-6412-4a0c-83d7-e2f63008905c" scope="col"><span class="k-link">Score</span></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:190px"><table><colgroup><col style="width:15px" /><col style="width:7px" /><col style="width:10px" /></colgroup><tbody><tr class="k-no-data"><td colspan="3"></td></tr></tbody></table></div></div><script>
+	kendo.syncReady(function(){jQuery("#GridRecentScore").kendoGrid({"columns":[{"title":"Description","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Description","data-title":"Description"},"width":"15px","field":"Description","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true},{"title":"Date","headerAttributes":{"data-field":"AssignmentDate","data-title":"Date"},"width":"7px","field":"AssignmentDate","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true},{"title":"Score","headerAttributes":{"data-field":"Score","data-title":"Score"},"width":"10px","template":"#=Score# / #=MaxPoints#","field":"Score","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true}],"scrollable":{"height":"190px"},"messages":{"noRecords":"No records available."},"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":""},"prefix":""},"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"Description":{"type":"string"},"Score":{"type":"string"},"MaxPoints":{"type":"string"},"AssignmentDate":{"type":"string"}}}},"data":{"Data":[],"Total":0,"AggregateResults":null}}});});
+</script>
+</div>
+</div>
+</div>
+
+<div class="span3 align-newbox margin-right15 algnboxs spacing">
+<div class="category">
+<div class="container continhd">
+<ul class="conhdw pull-left">
+<li class="txtovflw">Attendance Totals</li>
+</ul>
+<ul class="conhdr pull-right">
+<li>
+<a>
+<img id="idAttendanceBx" src="../../../Images/CustomImages/blank.png">
+</a>
+</li>
+</ul>
+</div>
+<div class="bgf9">
+<div class="k-widget k-grid" id="GridAbsentTotals"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col/><col/></colgroup><thead class="k-grid-header"><tr><th class="k-header" data-field="AttendanceDescription" data-index="0" data-title="Attendance Description" id="f60b0164-b752-40f5-8375-c56dcbf65243" scope="col"><span class="k-link">Attendance Description</span></th><th class="k-header" data-field="AttendanceCount" data-index="1" data-title="Attendance Count" id="e80d3244-31e4-40e0-8323-41366303e647" scope="col"><span class="k-link">Attendance Count</span></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:220px"><table><colgroup><col/><col/></colgroup><tbody><tr class="k-no-data"><td colspan="2"></td></tr></tbody></table></div></div><script>
+	kendo.syncReady(function(){jQuery("#GridAbsentTotals").kendoGrid({"dataBound":hideDetailGridHeaders,"columns":[{"title":"Attendance Description","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"AttendanceDescription","data-title":"Attendance Description"},"field":"AttendanceDescription","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true},{"title":"Attendance Count","headerAttributes":{"data-field":"AttendanceCount","data-title":"Attendance Count"},"field":"AttendanceCount","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true}],"scrollable":{"height":"220px"},"messages":{"noRecords":"No records available."},"autoBind":false,"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":"/ParentStudentDetails/GetPeriodAttendanceBySpec"},"prefix":""},"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"AttendanceCount":{"type":"number"},"AttendanceDescription":{"type":"string"},"AttendanceDate":{"type":"date"}}}}}});});
+</script> </div>
+</div>
+</div>
+<script src="/Scripts/CustomScripts/Conference-2.0.js"></script>
+<script>
+    var url = 'plusportals.com';
+    var redirectUri = 'https://' + url + '/SignOn/OneDriveBusiness';
+    var office365_clientId = 'b96d8afa-f706-4288-b2e8-ba57c049aec5';
+    var scopes = 'user.read files.read Calendars.ReadWrite offline_access';
+    var authServiceUri = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
+    var userRole = 'STUDENT';
+    var groupId = 0;
+    var userId = 2777;
+    $("#ConferenceEventWindow").parent().addClass("test");
+</script>
+<div class="span5 Algn-boxincont algnboxs no-spacing" id="gridConference">
+<div class="category">
+<div class="container continhd">
+<ul class="conhdw pull-left" style="width: 31% !important;">
+<li class="txtovflw" style="float: left; width: 120px;">Online Meetings</li>
+<li style="float: left; width: 60%; position: relative; bottom: 3px;">
+<input class="tchhwddl" id="meetingsStudentFilterddl" name="meetingsStudentFilterddl" style="font-size:12px;height:25px;width:175px" type="text" value="2" /><script>
+	kendo.syncReady(function(){jQuery("#meetingsStudentFilterddl").kendoDropDownList({"dataSource":[{"Text":"All Meetings","Value":"1"},{"Text":"Today\u0027s Meetings","Value":"2"}],"dataTextField":"Text","dataValueField":"Value"});});
+</script>
+</li>
+</ul>
+</div>
+<div class="bgf9">
+<div class="k-widget k-grid" id="gridMeetings" style="min-height: 220px;"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col style="width:150px" /><col style="width:200px" /><col style="width:150px" /><col style="width:70px" /></colgroup><thead class="k-grid-header"><tr><th class="k-header k-filterable" data-field="SectionName" data-index="0" data-title="Class" id="007560e8-5897-42ce-8fc9-37a3b478560a" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/Conference/GetConferenceEvents/1728?userRole=STUDENT&amp;sectionId=0&amp;showAllMeetings=False&amp;groupId=0&amp;includeGroupMeetings=False&amp;gridMeetings-sort=SectionName-asc">Class</a></th><th class="k-header k-filterable" data-field="Title" data-index="1" data-title="Title" id="1dc99d71-6fe8-4c95-9326-17f22b112563" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/Conference/GetConferenceEvents/1728?userRole=STUDENT&amp;sectionId=0&amp;showAllMeetings=False&amp;groupId=0&amp;includeGroupMeetings=False&amp;gridMeetings-sort=Title-asc">Title</a></th><th class="k-header k-filterable" data-field="Description" data-index="2" data-title="Description" id="e4c647ee-c298-4653-923d-6a63b123217f" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/Conference/GetConferenceEvents/1728?userRole=STUDENT&amp;sectionId=0&amp;showAllMeetings=False&amp;groupId=0&amp;includeGroupMeetings=False&amp;gridMeetings-sort=Description-asc">Description</a></th><th class="k-header k-filterable" data-field="StartDateForGrid" data-index="3" data-title="Start Time" id="cbfe2a14-95ad-45bb-b316-48a6d3fc4623" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/Conference/GetConferenceEvents/1728?userRole=STUDENT&amp;sectionId=0&amp;showAllMeetings=False&amp;groupId=0&amp;includeGroupMeetings=False&amp;gridMeetings-sort=StartDateForGrid-asc">Start Time</a></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:191px"><table><colgroup><col style="width:150px" /><col style="width:200px" /><col style="width:150px" /><col style="width:70px" /></colgroup><tbody><tr class="k-no-data"><td colspan="4"></td></tr></tbody></table></div><div class="k-pager-wrap k-grid-pager"><a aria-label="Go to the first page" class="k-link k-pager-nav k-state-disabled k-pager-first" data-page="1" href="#" title="Go to the first page"><span class="k-icon k-i-arrow-end-left"></span></a><a aria-label="Go to the previous page" class="k-link k-pager-nav k-state-disabled" data-page="0" href="#" title="Go to the previous page"><span class="k-icon k-i-arrow-60-left"></span></a><ul class="k-pager-numbers k-reset"><li><span class="k-state-selected" data-page="1">1</span></li></ul><a aria-label="Go to the next page" class="k-link k-pager-nav k-state-disabled" data-page="2" href="#" title="Go to the next page"><span class="k-icon k-i-arrow-60-right"></span></a><a aria-label="Go to the last page" class="k-link k-pager-nav k-state-disabled k-pager-last" data-page="1" href="#" title="Go to the last page"><span class="k-icon k-i-arrow-end-right"></span></a><span class="k-pager-sizes k-label"><select><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option></select>Meetings per page</span><span class="k-pager-info k-label">No Meetings to display</span></div></div><script>
+	kendo.syncReady(function(){jQuery("#gridMeetings").kendoGrid({"columns":[{"title":"Class","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"SectionName","data-title":"Class"},"width":"150px","field":"SectionName","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"Title","attributes":{"class":"txtovflw","id":"TitleS_#: data.ConferenceEventId #"},"headerAttributes":{"data-field":"Title","data-title":"Title"},"width":"200px","template":"\u003ca href=\u0027#=JoinUrl#\u0027 target=\u0027_blank\u0027\u003e#=Title#\u003c/a\u003e","field":"Title","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"Description","attributes":{"class":"txtovflw","id":"DescriptionS_#: data.ConferenceEventId #"},"headerAttributes":{"data-field":"Description","data-title":"Description"},"width":"150px","field":"Description","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"Start Time","headerAttributes":{"data-field":"StartDateForGrid","data-title":"Start Time"},"width":"70px","template":"#= Start == null ? \u0027\u0027 : kendo.toString(Start, \u0027MM-dd-yyyy hh:mm tt\u0027) #","field":"StartDateForGrid","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true}],"pageable":{"autoBind":false,"pageSizes":[10,20,50,100],"buttonCount":10,"messages":{"display":"","empty":"No Meetings to display","itemsPerPage":"Meetings per page"}},"sortable":true,"filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"scrollable":{"height":"191px"},"messages":{"noRecords":"No records available."},"autoBind":false,"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":"/Conference/GetConferenceEvents?userRole=STUDENT\u0026sectionId=0\u0026showAllMeetings=False\u0026groupId=0\u0026includeGroupMeetings=False"},"prefix":""},"pageSize":10,"page":1,"total":0,"requestEnd":gridMeetings_onRequestEnd,"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"ConferenceEventId":{"type":"number"},"Title":{"type":"string"},"JoinUrl":{"type":"string"},"Description":{"type":"string"},"Start":{"type":"date"},"End":{"type":"date"},"PlatformId":{"type":"number"},"MeetingId":{"type":"string"},"IsDeleted":{"type":"boolean"},"SelectedSectionId":{"type":"number"},"Sections":{"type":"object"},"SectionName":{"type":"string"},"IsCopy":{"type":"boolean"},"RecurrenceRule":{"type":"string"},"RecurrenceID":{"type":"number","defaultValue":null},"RecurrenceException":{"type":"string"},"Token":{"type":"string"},"StartDate":{"type":"string"},"EndDate":{"type":"string"},"StartDateForGrid":{"type":"date"},"ShowEmailNotification":{"type":"boolean"},"IsEmail":{"type":"boolean"},"IsVisibleParent":{"type":"boolean"},"IsVisibleStudent":{"type":"boolean"},"IsMeetingsVisibleForParents":{"type":"boolean"},"IsMeetingsVisibleForStudents":{"type":"boolean"},"CustomLinkOccurrenceEdit":{"type":"boolean"},"StudentIds":{"type":"string"},"UserRole":{"type":"string"},"GroupId":{"type":"number","defaultValue":null},"LastModifiedBy":{"type":"number"},"LastModifiedByName":{"type":"string"}}}}}});});
+</script>
+</div>
+</div>
+</div>
+<style>
+    #gridConference .dropdown {
+        list-style-type: none;
+    }
+
+        #gridConference .dropdown .caret {
+            margin: 7px 8px;
+        }
+
+    .k-widget.test.k-window {
+        height: 94vh !important;
+    }
+
+    .conferencepopup.k-widget.k-window {
+        height: auto !important;
+    }
+
+    .conferenceheight {
+        height: 533px !important;
+        top: 800px !important;
+    }
+
+    #conferenceEventTitle,
+    #conferenceEventText {
+        width: 408px;
+    }
+
+    #conferenceEventDescription {
+        border-radius: 4px !important;
+    }
+
+    @media only screen and (min-device-width: 1024px) and (max-device-width: 1366px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait), only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait), only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 1) and (orientation: portrait) {
+        .k-widget.test.k-window {
+            height: 88vh !important;
+            margin-top: 50px !important;
+        }
+    }
+</style>
+
+<div class="pull-left max-wdt100 summaryCoursework" style="width:100%">
+<div class="newboxer pull-left max-wdt100 courseWorkBoxerbg" style="width:100%">
+<div class="max-wdt100 continhd">
+<ul class="conhdw pull-left">
+<li class="txtovflw">Coursework</li>
+</ul>
+<a><img src="../../../Images/CustomImages/blank.png" onclick="PrintCourseworkFromSummary()" class="printcoursewrk-icon" alt></a>
+</div>
+<div class="courseworkGridBg">
+<script type="text/javascript">
+    var count = 0;
+    var pastDueCountNumber = 0;
+    var courseworkDropDownIndex = -1;
+    var assignmentDueCount = 0;
+    var quizDueCount = 0;
+    var courseWorktype = "1";
+    var isSelected = false;
+    var discussionPastDueCount = 0;
+    var userRole = "";
+
+    function PrintCourseworkForStudent() {
+        var courseworkRange = $("#mCourseworkRangeId_1728").val();
+        var courseworkType = $("#mCourseworkTypeId_1728").data("kendoDropDownList").text();
+        var sectionId = $("#mCourseId_1728").val();
+
+        var win = window.open('about:blank');
+        with (win.document) {
+            open();
+            write("Loading...");
+            close();
+        }
+
+        var grid = $("#gridCoursework_" + 1728).data("kendoGrid");
+        var parameterMap = grid.dataSource.transport.parameterMap;
+        var data = parameterMap({ sort: grid.dataSource.sort(), filter: grid.dataSource.filter(), group: grid.dataSource.group() });
+
+        var reqToken = $('[name=__RequestVerificationToken]').val();
+        $.ajax({
+            url: '/Print/PrintCoursework/',
+            contentType: 'application/json',
+            type: "POST",
+            headers: { '__RequestVerificationToken': reqToken },
+            data: JSON.stringify({ studentId: 1728, sectionId: sectionId, courseworkRange: courseworkRange, courseworkType: courseworkType, sortValues: data.sort}),
+            success: function (result) {
+                with (win.document) {
+                    open();
+                    write(result);
+                    close();
+                }
+            }
+        });
+    }
+
+        function CourseworkFilterChanged() {
+            var stuId = 1728;
+        courseworkDropDownIndex = $('#mCourseworkRangeId_' + stuId).data("kendoDropDownList").selectedIndex;
+        loadCourseWorkDetailsForStudent(stuId, $("#mCourseId_" + stuId).val());
+    };
+
+    function SelectClass() {
+        isSelected = true;
+    }
+
+        function courseworkDataBound(e) {
+        var rows = e.sender.tbody.children();
+        var courseworkRange = $("#mCourseworkRangeId_1728").val();
+        for (var j = 0; j < rows.length; j++) {
+            var row = $(rows[j]);
+            var isEmailTeacherVisible = 'True';
+            var dataItem = e.sender.dataItem(row);
+            var type = dataItem.get("Type");
+            var allowMultipleAttempts = dataItem.get("AllowMultipleAttempts");
+            var isCompleted = dataItem.get("IsCompleted");
+            if (courseworkRange == 4 || (courseworkRange == 5 && isCompleted == true)) {
+                if (type == 'Quiz') {
+                    if (isEmailTeacherVisible !== 'True' && allowMultipleAttempts !== true) {
+                        row.context.lastChild.innerHTML = "<img src =\"/Images/CustomImages/3dots-transp-inactive.png\" style=\"cursor:default;\"/>";
+                    }
+                }
+            }
+
+            if (dataItem.get("DueDate") == 'Today') {
+                row.css("background-color", "#F8CC8C");
+                row.context.lastChild.bgColor = 'White';
+            }
+        }
+
+        count++;
+        if (count === 1) {
+            var str = e.sender.element.context.id;
+            var splitString = str.split("_");
+            var studentId = splitString[1];
+            appendImage(false, studentId);
+        }
+
+        if (isSelected === true) {
+            var str = e.sender.element.context.id;
+            var splitString = str.split("_");
+            var studentId = splitString[1];
+            appendImage(false, studentId);
+            isSelected = false;
+        }
+    };
+
+    function onOpenDropDown(e) {
+        var str = e.sender.element.context.id;
+        var splitString = str.split("_");
+        var studentId = splitString[1];
+        appendImage(true, studentId);
+
+    }
+
+    function onCloseDropDown(e) {
+        var str = e.sender.element.context.id;
+        var splitString = str.split("_");
+        var studentId = splitString[1];
+        appendImage(false, studentId);
+    }
+
+    function updateDropDownListFilter(dueCount, selectedIndex, studentId, event) {
+        if (dueCount > 0) {
+            if (event === true) {
+                CourseWorkImageChange(selectedIndex, studentId, true);
+            }
+            else {
+                CourseWorkImageChange(selectedIndex, studentId, false);
+            }
+        }
+        else if (selectedIndex === 0) {
+            $("#mCourseworkRangeId_" + studentId).data("kendoDropDownList").span[0].innerHTML = "Upcoming Coursework";
+            $("#mCourseworkRangeId_" + studentId + "_listbox li")[1].innerHTML = "Past Due Coursework";
+        }
+        else if (selectedIndex === 1) {
+            $("#mCourseworkRangeId_" + studentId).data("kendoDropDownList").span[0].innerHTML = "Past Due Coursework";
+            $("#mCourseworkRangeId_" + studentId + "_listbox li")[1].innerHTML = "Past Due Coursework";
+        }
+        else if (selectedIndex === 2) {
+            $("#mCourseworkRangeId_" + studentId).data("kendoDropDownList").span[0].innerHTML = "Pending Coursework";
+            $("#mCourseworkRangeId_" + studentId + "_listbox li")[1].innerHTML = "Past Due Coursework";
+        }
+        else if (selectedIndex === 3) {
+            $("#mCourseworkRangeId_" + studentId).data("kendoDropDownList").span[0].innerHTML = "Completed Coursework";
+            $("#mCourseworkRangeId_" + studentId + "_listbox li")[1].innerHTML = "Past Due Coursework";
+        }
+        else {
+            $("#mCourseworkRangeId_" + studentId).data("kendoDropDownList").span[0].innerHTML = "All Coursework";
+            $("#mCourseworkRangeId_" + studentId + "_listbox li")[1].innerHTML = "Past Due Coursework";
+        }
+    }
+
+    function appendImage(e, studId) {
+        var selectedIndex = $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").selectedIndex;
+
+        if (courseWorktype === "1") {
+            updateDropDownListFilter(pastDueCountNumber, selectedIndex, studId,e);
+        }
+        else if (courseWorktype === "2") {
+            updateDropDownListFilter(assignmentDueCount, selectedIndex, studId, e);
+        }
+        else if (courseWorktype === "3") {
+            updateDropDownListFilter(assignmentDueCount, selectedIndex, studId, e);
+        }
+        else if (courseWorktype === "4") {
+            updateDropDownListFilter(assignmentDueCount, selectedIndex, studId, e);
+        }
+        else {
+            updateDropDownListFilter(quizDueCount, selectedIndex, studId, e);
+        }
+    }
+
+    function RefreshEventChange(e) {
+        var str = e.sender.element.context.id;
+        courseWorktype = e.dataItem.Value;
+        var splitString = str.split("_");
+        var studentId = splitString[1];
+        appendImage(false, studentId);
+    }
+
+    function CourseWorkImageChange(selectedIndex, studId, dropDownStatus) {
+        if (dropDownStatus) {
+            if (selectedIndex === 0) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Upcoming Coursework";
+            }
+            else if (selectedIndex === 1) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Past Due Coursework";
+            }
+            else if (selectedIndex === 2) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Pending Coursework";
+            }
+            else if (selectedIndex === 3) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Completed Coursework";
+            }
+            else {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "All Coursework";
+            }
+            $("#mCourseworkRangeId_" + studId + "_listbox li")[1].innerHTML = "<font color='orange'>Past Due Coursework</font>"
+                + "<img style='float:right;margin-right:20px;margin-top:2px;' src=\'/Images/CustomImages/information-icon7.png\'/>";
+        }
+        else {
+            if (selectedIndex === 0) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Upcoming Coursework" + "<img style ='float:right;margin-right:17px;margin-top:2px;' src =\'/Images/CustomImages/information-icon7.png\'/>";
+            }
+            else if (selectedIndex === 1) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Past Due Coursework" + "<img style ='float:right;margin-right:17px;margin-top:2px;' src =\'/Images/CustomImages/information-icon7.png\'/>";
+            }
+            else if (selectedIndex === 2) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Pending Coursework" + "<img style ='float:right;margin-right:17px;margin-top:2px;' src =\'/Images/CustomImages/information-icon7.png\'/>";
+            }
+            else if (selectedIndex === 3) {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "Completed Coursework" + "<img style ='float:right;margin-right:17px;margin-top:2px;' src =\'/Images/CustomImages/information-icon7.png\'/>";
+            }
+            else {
+                $("#mCourseworkRangeId_" + studId).data("kendoDropDownList").span[0].innerHTML = "All Coursework" + "<img style ='float:right;margin-right:17px;margin-top:2px;' src =\'/Images/CustomImages/information-icon7.png\'/>";
+            }
+        }
+    }
+    </script>
+
+<div class="coursework-drop-downs">
+<div class="course-dropdownList">
+<span class="mark-period-drp-down-cntnr">
+<input id="mCourseId_1728" name="mCourseId_1728" style="width:200px;margin-bottom:3px;" type="text" /><script>
+	kendo.syncReady(function(){jQuery("#mCourseId_1728").kendoDropDownList({"change":CourseworkFilterChanged,"select":SelectClass,"dataSource":{"transport":{"read":{"url":"/ELocker/GetSectionsforStudent?studentId=1728","type":"POST"},"prefix":""},"schema":{"errors":"Errors"}},"dataTextField":"Text","autoBind":false,"dataValueField":"Value"});});
+</script>
+</span>
+<span class="mark-period-drp-down-cntnr">
+<input id="mCourseworkRangeId_1728" name="mCourseworkRangeId_1728" style="width:200px;margin-bottom:3px;" type="text" value="5" /><script>
+	kendo.syncReady(function(){jQuery("#mCourseworkRangeId_1728").kendoDropDownList({"change":CourseworkFilterChanged,"open":onOpenDropDown,"close":onCloseDropDown,"dataSource":[{"Text":"Upcoming Coursework","Value":"1"},{"Text":"Past Due Coursework","Value":"2"},{"Text":"Pending Coursework","Value":"3"},{"Text":"Completed Coursework","Value":"4"},{"Text":"All Coursework","Value":"5"}],"dataTextField":"Text","dataValueField":"Value"});});
+</script>
+</span>
+<span class="mark-period-drp-down-cntnr">
+<input id="mCourseworkTypeId_1728" name="mCourseworkTypeId_1728" style="width:200px;margin-bottom:3px;" type="text" value="1" /><script>
+	kendo.syncReady(function(){jQuery("#mCourseworkTypeId_1728").kendoDropDownList({"change":CourseworkFilterChanged,"select":RefreshEventChange,"dataSource":[{"Text":"All Types","Value":"1"},{"Text":"Assignments","Value":"2"},{"Text":"Quizzes","Value":"3"},{"Text":"Discussions","Value":"4"}],"dataTextField":"Text","dataValueField":"Value"});});
+</script>
+</span>
+</div>
+<div id="tooltipdiv" style="text-align:left;">
+<span id="tooltipShowCourseWorkInfo" style="margin-top: -34px !important;float: right;margin-right: 20px;">
+<input type="image" style="display: inline-block; cursor:pointer ; width:20px; pointer-events:none;" src="/Images/CustomImages/admin-images/infoicon.png" />
+</span>
+</div>
+<div class="mark-period-table-cntnr" style="margin-top:2px">
+<div id="gridCoursework_1728"></div>
+</div>
+</div>
+<ul id="context-menu"></ul>
+<div id="ActivityWin" style="display:none"></div><script>
+	kendo.syncReady(function(){jQuery("#ActivityWin").kendoWindow({"modal":true,"iframe":false,"scrollable":true,"pinned":false,"title":"PlusPortals","resizable":false,"width":600,"actions":["Close"]});});
+</script> <div id="DiscussionFilesWindow"></div>
+<div style="display: none">
+<form action="/TeacherClassDetails/GetFileFromDisk" method="post"><input name="__RequestVerificationToken" type="hidden" value="f9OqM4UB3axSuHq-eOGr3WOiB1H4D4icvN6wCgedDo93J4FpMtyfe0i_SZq8-ysmgVC1yF3qS7G8sSyXoZ_R8U4W0KQ1" /> <input type="hidden" name="StorageFilePath" id="StorageFilePath" />
+<input type="hidden" name="FileName" id="FileName" />
+<input type="hidden" name="StorageFileName" id="StorageFileName" />
+<input type="hidden" name="Token" id="Token" />
+<input type="submit" id="btnDownloadClassHW" value="Download" />
+</form> </div>
+<script type="text/javascript">
+
+    function loadCourseWorkDetailsForStudent(studentId, sectionId) {
+        var courseworkRange = $("#mCourseworkRangeId_" + studentId).val();
+        var isfromStudent = 1;
+        var isGroup = 'False';
+        var reqToken = $('[name=__RequestVerificationToken]').val();
+        var hideActionsColumn = false;
+        var hideDescriptionColumn = false;
+        var noRecordsCount = true;
+        var gridHeight = 263;
+        if (isfromStudent)
+            gridHeight = 230;
+        var grid = $("#gridCoursework_" + studentId).data("kendoGrid");
+
+        if (isfromStudent == 0) {
+            hideDescriptionColumn = true;
+        }
+
+        if (isGroup == 'True') {
+            hideActionsColumn = true;
+            if (grid != null || grid != undefined) {
+                grid.hideColumn(6);
+            }
+        }
+
+        var dataSource = new kendo.data.DataSource({
+            type: "aspnetmvc-ajax",
+            transport: {
+                read: {
+                    url: "/ParentStudentDetails/GetCourseworkDetailsByStudent",
+                    data: {
+                        studentId: studentId, sectionId: sectionId,
+                        courseworkRange:$("#mCourseworkRangeId_" + studentId).val(),
+                        courseworkType: $("#mCourseworkTypeId_" + studentId).data("kendoDropDownList").text()
+                    },
+                    type: 'POST',
+                    dataType: "json"
+                    ,
+                    headers: { '__RequestVerificationToken': reqToken }
+                },
+            },
+            pageSize: 20,
+            serverPaging: true,
+            serverSorting: true,
+            allowUnsort: true,
+            schema: {
+                data: function (dataResponse) {
+                    return dataResponse.dataResult.Data;
+                },
+                total: function (totalResponse) {
+                    pastDueCountNumber = totalResponse.pastDueCount;
+                    assignmentDueCount = totalResponse.pastDueAsignmentCount;
+                    quizDueCount = totalResponse.pastDueQuizCount;
+                    discussionPastDueCount = totalResponse.pastDueDiscussionCount;
+                    userRole = totalResponse.UserRole;
+                    return totalResponse.dataResult.Total;
+                },
+                model: {
+                    fields: {
+                        StudentId: { type: "number" },
+                        Class: { type: "string" },
+                        Title: { type: "string" },
+                        Type: { type: "string" },
+                        DueDate: { type: "string" },
+                        Description: { type: "string" }
+                    }
+                }
+            }
+        });
+
+        $("#gridCoursework_" + studentId).kendoGrid({
+            dataSource: dataSource,
+            dataBound: function (e) {
+                courseworkDataBound(e);
+            },
+            sortable: true,
+            resizable: true,
+            scrollable: {
+                endless: true
+            },
+            height: gridHeight,
+            noRecords: noRecordsCount,
+            messages: {
+                noRecords: "<h4 style=\"display: block;margin-top: 0.33em;margin-bottom: 1.33em;font-weight: bold;font-family:Helvetica Neue, Helvetica, Arial, sans-serif\">There is no coursework within the selected filter range.</h4>"
+            },
+            columns: [
+                {
+                    field: "StudentId",
+                    hidden: true
+                },
+                {
+                    field: "Class",
+                    title: "Class",
+                    attributes: {
+                        style: "font-weight: 25px"
+                    },
+                    template: "#if(\"" + isfromStudent + "\" === '0') { # <a class=\"pointer\" title=\"Go to Class Page\" type=\"button\" onclick='showClasstab(" + studentId + ",#:data.SectionID#, \"" + '' + "\")' >#:data.Class#</a> # } else {# <a class=\"pointer\" title=\"Go to Class Page\" type=\"button\" onclick='showClasstabs(this)' >#:data.Class#</a> #}#"
+
+                },
+                {
+                    field: "Title",
+                    title: "Title",
+                    template: "#if(data.Type =='Discussion' && userRole === 'STUDENT') { # <a class=\"pointer\" title=\"Go to Discussion\" type=\"button\" onclick='gotoDiscussionPage(\"#:data.DiscussionTopicID#\",\"#:data.SectionID#\",\"#:data.Class#\")'  >#:data.Title#</a> # } else { # <a class=\"pointer\" title=\"See details\" type=\"button\" >#:data.Title#</a> #} #"
+
+                },
+                {
+                    field: "Description",
+                    title: "Description",
+                    hidden: hideDescriptionColumn,
+                    attributes: {
+                        style: "text-align: left; cursor:default; color:black"
+                    }
+                },
+                {
+                    field: "Type",
+                    title: "Type",
+                    template: "#if(data.Type =='Assignment') { # # if(\"" + 'True' + "\" == 'True' &&  \"" + courseworkRange + "\" !== '4' && data.IsCompleted !== true && \"" + isGroup + "\" == 'False') { # <a class=\"pointer\" title=\"Submit assignment\" type=\"button\" onclick='showCoursework(" + studentId + ",#:data.SectionID#,\"#:data.Type#\",\"#:data.AssignmentID#\",\"#:data.ActivityTypeID#\",\"#:data.LessonActivityID#\",\"#:data.UnitID#\",\"#:data.LessonID#\")'  >#:data.Type#</a> # } else {# <span style=\"text-align: center; cursor:default; color:black;\"> #:data.Type# </span> #}  }" +
+                        "else if( data.Type =='Quiz'){ # # if(((\"" + courseworkRange + "\" !== '4' && data.IsCompleted !== true) || data.AllowMultipleAttempts == true ) && \"" + isGroup + "\" == 'False'  ) { # <a class=\"pointer\" title=\"Take quiz\" type=\"button\" onclick='showCoursework(" + studentId + ",#:data.SectionID#,\"#:data.Type#\",\"#:data.AssignmentID#\",\"#:data.ActivityTypeID#\",\"#:data.LessonActivityID#\",\"#:data.UnitID#\",\"#:data.LessonID#\")'  >#:data.Type#</a> # } else {# <span style=\"text-align: center; cursor:default; color:black;\"> #:data.Type# </span> #} } "
+                        +
+                        "else if( data.Type =='Discussion'){# <span style=\"text-align: center; cursor:default; color:black;\"> #:data.Type# </span> # } #"
+                    ,
+                    width:100
+                },
+                {
+                    field: "DueDate",
+                    title: "Due Date",
+                    width: 100,
+                    attributes: {
+                        style: "text-align: center; cursor:default; color:rgb(64,64,64);"
+                    }
+                },
+                {
+                    title: "Actions",
+                    width: 70,
+                    attributes: {
+                        style: "text-align: center; cursor:default;"
+                    },
+                    hidden: hideActionsColumn,
+                    template: "#if(data.Type == 'Discussion' && data.DiscussionLinkURL == '' && data.DiscussionFilesCount == 0) {# <img src =\"/Images/CustomImages/GotoPage-icon.png\" alt=\"Actions\" title='Go to Discussion' value=\"Actions\" onclick='gotoDiscussionPage(\"#:data.DiscussionTopicID#\",\"#:data.SectionID#\",\"#:data.Class#\")' style=\"cursor:pointer;\"/> #} else {# <img src =\"/Images/CustomImages/3dots-transp.png\" alt=\"Actions\" title='Actions' value=\"Actions\" class=\"courseworkaction\" style=\"cursor:pointer;\"/> #} #"
+                }
+            ]
+        });
+    }
+
+    function gotoDiscussionPage(discussionId, sectionId, sectionName) {
+        var id = getQueryVariable('token');
+        if (userRole === 'CONTACT' && id == undefined) {
+            window.location.href = "/ParentStudentDetails/ParentStudentDetails?id=" + 1728 +
+                "&isProgressReport=" +
+                false +
+                "&token=" +
+                '' + "&discussionId=" + discussionId + "&discussionSectionId=" + sectionId + "&discussionSectionName=" + sectionName;
+        }
+        else {
+            window.scrollTo(0, 0);
+            $("#loading").show();
+            var controllerQuizPath = '/DiscussionBuilder/GotoDiscussionPage';
+            $.ajax({
+                url: controllerQuizPath,
+                type: 'GET',
+                dataType: 'html',
+                data: {
+                    discussionTopicId: discussionId,
+                    sectionId: sectionId,
+                    sectionName: sectionName
+                }
+            })
+                .success(function (result) {
+                    checkTimeout(result);
+                    $("#loading").hide();
+                    $('#target1').html(result);
+                })
+                .error(function (xhr, status) {
+                    alert(xhr.responseText);
+                });
+        }
+    }
+
+    function showCoursework(studentId, sectionId, type, assignmentId, activityTypeId, lessonActivityId, unitId, lessonId) {
+        if (type == 'Assignment' || type == 'Homework') {
+            window.location.href = "/ELocker/index?isFromCourseWork=" + 1 + "&studentId=" + studentId + "&sectionId=" + sectionId + "&assignemntId=" + assignmentId;
+        }
+        else if (type == 'Quiz') {
+            ViewQuiz(this, assignmentId, assignmentId, activityTypeId, lessonActivityId, unitId, lessonId, true, "null", true, studentId, sectionId);
+        }
+    }
+
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] === variable) {
+                return pair[1];
+            }
+        }
+    }
+
+
+    $("#context-menu").kendoContextMenu({
+        open: onOpen,
+        target: "#gridCoursework_" + 1728,
+        filter: ".courseworkaction",
+        showOn: "click",
+        select: function (e) {
+            var index = e.target.parentElement.parentNode.rowIndex;
+            if (e.item.textContent === 'Take Quiz') {
+                var activityId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentID;
+                var quizId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentID;
+                var activityTypeId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].ActivityTypeID;
+                var lessonActivityId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].LessonActivityID;
+                var unitId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].UnitID;
+                var lessonId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].LessonID;
+                var sectionID = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].SectionID;
+                ViewQuiz(this, activityId, quizId, activityTypeId, lessonActivityId, unitId, lessonId, true, "null", true, 1728,sectionID);
+            }
+
+            if (e.item.textContent === 'E-Mail Teacher') {
+                var mailSubject = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].Title;
+                var toMailId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].TeacherMailID;
+                window.location.href = "/Communication/CreateNewMail?staffEmailId=" + toMailId + "&mailSubject=" + mailSubject;
+            }
+
+            if (e.item.textContent === 'Submit Assignment') {
+                var sectionId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].SectionID;
+                var assignmentId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentID;
+                window.location.href = "/ELocker/index?isFromCourseWork=" + 1 + "&studentId=" + 1728 + "&sectionId=" + sectionId + "&assignemntId=" + assignmentId;
+            }
+
+            if (e.item.textContent === 'Mark as Completed') {
+                var assignmentId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentID;
+                ArchiveHW(assignmentId, 1,1728);
+            }
+
+            if (e.item.textContent === 'Mark as Not Completed') {
+                var assignmentId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentID;
+                ArchiveHW(assignmentId, 0,1728);
+            }
+            if (e.item.textContent === 'Go to Discussion') {
+                window.scrollTo(0, 0);
+                $("#loading").show();
+                var grid = $("#gridCoursework_" + 1728).data("kendoGrid");
+                var discussionId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].DiscussionTopicID;
+                var sectionId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index]
+                    .SectionID;
+                var sectionName = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index]
+                    .Class;
+                var id = getQueryVariable('token');
+
+                if (userRole === 'CONTACT' && id == undefined) {
+                    window.location.href = "/ParentStudentDetails/ParentStudentDetails?id=" + 1728 +
+                        "&isProgressReport=" +
+                        false +
+                        "&token=" +
+                        '' + "&discussionId=" + discussionId + '&discussionSectionId=' + sectionId + "&discussionSectionName=" + sectionName;
+                }
+                else{
+                var controllerQuizPath = '/DiscussionBuilder/GotoDiscussionPage';
+                $.ajax({
+                        url: controllerQuizPath,
+                        type: 'GET',
+                        dataType: 'html',
+                        data: {
+                            discussionTopicId: discussionId,
+                            sectionId: sectionId,
+                            sectionName: sectionName
+                        }
+                })
+                .success(function(result) {
+                    checkTimeout(result);
+                    $("#loading").hide();
+                    $('#target1').html(result);
+                })
+                .error(function(xhr, status) {
+                    alert(xhr.responseText);
+                });
+                }
+            }
+            if (e.item.textContent === 'Go to Link') {
+                var linkUrl = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].DiscussionLinkURL;
+                var win = window.open(linkUrl, '_blank');
+                win.focus();
+            }
+            if (e.item.textContent === 'Download Files') {
+                if ($("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].Type === 'Assignment') {
+                    var filesCount = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentFilesCount;
+                    var sectionHomeworkId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentID;
+                    downloadAssignmentFiles(filesCount, sectionHomeworkId);
+                } else {
+                    var filesCount = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].DiscussionFilesCount;
+                    var discussionTopicId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].DiscussionTopicID;
+                    downloadDiscussionFiles(filesCount, discussionTopicId);
+                }
+            }
+
+            if (e.item.textContent === 'Print Assignment') {
+                var filterObjectValue = [];
+                var isGroup = 'False';
+                var title = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].Title;
+                var description = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].Description;
+                var sectionClass = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].Class;
+                var dueDate = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].DueDate;
+                var studentId = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].StudentId;
+
+                filterObjectValue.push({
+                    SectionClass: sectionClass,
+                    Title: title,
+                    Description: description,
+                    DueDate: dueDate
+                });
+
+                var data = {
+                    isGroup: isGroup,
+                    FilteredObject: filterObjectValue,
+                    studentId: studentId
+                }
+
+                var win = window.open('about:blank');
+                with (win.document) {
+                    open();
+                    write("Loading...");
+                    close();
+                }
+                var reqToken = $('[name=__RequestVerificationToken]').val();
+                $.ajax({
+                    url: '/Print/PrintAllHomeworkParent/',
+                    contentType: 'application/json',
+                    type: "POST",
+                    headers: { '__RequestVerificationToken': reqToken },
+                    data: JSON.stringify(data),
+                    success: function (result) {
+                        with (win.document) {
+                            open();
+                            write(result);
+                            close();
+                        }
+                    }
+                });
+            }
+
+        }
+    });
+
+    function downloadDiscussionFiles(filesCount, discussionTopicId) {
+        var controllerPath;
+        if (filesCount === 1) {
+            controllerPath = '/DiscussionBuilder/GetDiscussionFiles/';
+            $.ajax({
+                url: controllerPath,
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: { discussionTopicId: discussionTopicId }
+            })
+                .success(function (result) {
+                    var data = JSON.parse(result);
+                    $("#StorageFilePath").val(data.storageFilePath);
+                    $("#FileName").val(data.fileName);
+                    $("#StorageFileName").val(data.storageFileName);
+                    $("#Token").val(data.token);
+                    $('#btnDownloadClassHW').trigger('click');
+                })
+                .error(function (xhr) {
+                    alert(xhr.responseText);
+                });
+        }
+        else if (filesCount > 1) {
+            controllerPath = '/DiscussionBuilder/GetDiscussionFiles/';
+            $.ajax({
+                url: controllerPath,
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: { discussionTopicId: discussionTopicId }
+            })
+                .success(function (result) {
+                    var notificationFilesWindow = $("#DiscussionFilesWindow").kendoWindow({
+                        width: 400,
+                        height: 'auto',
+                        title: "Download Files",
+                        resizable: false,
+                        modal: true,
+                        close: function () {
+                            $('#DiscussionFilesWindow').empty();
+                        }
+                    });
+                    notificationFilesWindow.data("kendoWindow").center().open();
+
+                    notificationFilesWindow.data("kendoWindow").content(result);
+                    notificationFilesWindow.find("#NtfnfilesbtnCancel")
+                        .click(function () {
+                            notificationFilesWindow.data("kendoWindow").close();
+                        })
+                        .end();
+                })
+                .error(function (xhr) {
+                    alert(xhr.responseText);
+                });
+        }
+    }
+
+    function onOpen(e) {
+
+        var index = e.target.parentElement.parentNode.rowIndex;
+        var type = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].Type;
+        var isEmailTeacherVisible = 'True';
+        var isAssignmentVisible = 'True';
+        var courseworkRange = $("#mCourseworkRangeId_1728").val();
+        var allowMultipleAttempts = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AllowMultipleAttempts;
+        var discussionLinkUrl = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].DiscussionLinkURL;
+        var discussionFilesCount = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].DiscussionFilesCount;
+        var assignmentFilesCount = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].AssignmentFilesCount;
+        var isLocked = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].IsLocked;
+        var isStudentLocked = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].IsStudentLocked;
+        var isCompleted = $("#gridCoursework_" + 1728).data("kendoGrid").dataSource.data()[index].IsCompleted;
+
+        var quizItems;
+        if (courseworkRange === "4" || (courseworkRange === "5" && isCompleted === true)) {
+            if (type === 'Quiz') {
+                quizItems = [];
+                if (isEmailTeacherVisible == 'True') {
+                    quizItems.push({ text: "E-Mail Teacher" });
+                }
+                if (allowMultipleAttempts == true) {
+                    quizItems.push({ text: "Take Quiz" });
+                }
+            }
+            else if (type === 'Assignment' || type === 'Homework') {
+                quizItems = [];
+                if (isEmailTeacherVisible == 'True') {
+                    quizItems.push({ text: "E-Mail Teacher" });
+                }
+
+                quizItems.push({ text: "Mark as Not Completed" });
+                quizItems.push({ text: "Print Assignment" });
+                if (assignmentFilesCount > 0) {
+                    quizItems.push({ text: "Download Files" });
+                }
+            }
+            else if (type === 'Discussion') {
+                if (userRole === "STUDENT" || userRole === 'CONTACT') {
+                    quizItems = [];
+                    quizItems.push({ text: "Go to Discussion" });
+                    if (isLocked === false && isStudentLocked === false) {
+                        if (discussionLinkUrl !== "" && discussionLinkUrl !== null) {
+                            quizItems.push({ text: "Go to Link" });
+                        }
+                        if (discussionFilesCount > 0) {
+                            quizItems.push({ text: "Download Files" });
+                            }
+                    }
+                  }
+            }
+        }
+        else {
+            if (type === 'Quiz') {
+                quizItems = [];
+                if (isEmailTeacherVisible == 'True') {
+                    quizItems.push({ text: "E-Mail Teacher" });
+                }
+                quizItems.push({ text: "Take Quiz" });
+
+            }
+            else if (type === 'Assignment' || type === 'Homework') {
+                quizItems = [];
+                if (isEmailTeacherVisible === 'True') {
+                    quizItems.push({ text: "E-Mail Teacher" });
+                }
+                if (isAssignmentVisible === 'True') {
+                    quizItems.push({ text: "Submit Assignment" });
+                }
+                quizItems.push({ text: "Mark as Completed" });
+                quizItems.push({ text: "Print Assignment" });
+                if (assignmentFilesCount > 0) {
+                    quizItems.push({ text: "Download Files" });
+                }
+            }
+            else if (type === 'Discussion') {
+                if (userRole === "STUDENT" || userRole === 'CONTACT') {
+                    quizItems = [];
+                    quizItems.push({ text: "Go to Discussion" });
+                    if (isLocked === false && isStudentLocked === false) {
+                    if (discussionLinkUrl !== "" && discussionLinkUrl !== null) {
+                        quizItems.push({ text: "Go to Link" });
+                    }
+                    if (discussionFilesCount > 0) {
+                        quizItems.push({ text: "Download Files" });
+                        }
+                    }
+                }
+            }
+        }
+
+        this.setOptions({
+            dataSource: quizItems
+        });
+    }
+
+    $(document).ready(function () {
+        var reqtoken = $('[name=__RequestVerificationToken]').val();
+
+        var sectionDropDown = $('#mCourseId_1728').data('kendoDropDownList');
+        if (sectionDropDown !== null && sectionDropDown !== undefined) {
+            sectionDropDown.dataSource.transport.options.read.beforeSend = function (req) { req.setRequestHeader('__RequestVerificationToken', reqtoken) };
+            sectionDropDown.dataSource.read();
+        }
+
+        var courseworkRangeDropDown = $('#mCourseworkRangeId_1728').data('kendoDropDownList');
+        if (courseworkRangeDropDown !== null && courseworkRangeDropDown !== undefined) {
+            courseworkRangeDropDown.dataSource.read();
+        }
+
+        var courseworkTypeDropDown = $('#mCourseworkTypeId_1728').data('kendoDropDownList');
+        if (courseworkTypeDropDown !== null && courseworkTypeDropDown !== undefined) {
+            courseworkTypeDropDown.dataSource.read();
+        }
+
+        if ('False' == 'False') {
+            if (courseworkTypeDropDown != null && courseworkTypeDropDown != undefined) {
+                var data = courseworkTypeDropDown.dataSource.data();
+                courseworkTypeDropDown.dataSource.remove(data[3]);
+            }
+        }
+
+        try {
+            loadCourseWorkDetailsForStudent(1728,0);
+        }
+        catch (e) { Rollbar.error("Exception: ", e);}
+
+        if ($('#mCourseworkRangeId_1728').data("kendoDropDownList") != undefined && $('#mCourseworkRangeId_1728').data("kendoDropDownList") != null ) {
+            var wrapper = $('#mCourseworkRangeId_1728').data("kendoDropDownList").wrapper;
+            if (wrapper !== null || wrapper !== 'undefined') {
+                wrapper.keydown(function (e) {
+                    if (courseworkDropDownIndex !== -1) {
+                        appendImage(false,1728);
+                        courseworkDropDownIndex = -1;
+                    }
+                });
+            }
+        }
+    });
+
+    var studentID = 1728;
+    $("#gridCoursework_" + studentID).kendoTooltip({
+        filter: "td:nth-child(3)",
+        showOn: 'click',
+        autoHide: false,
+        TooltipPosition: 'top',
+        content: function (e) {
+            var dataItem = $("#gridCoursework_" + studentID).data("kendoGrid").dataItem(e.target.closest("tr"));
+            var controllerPath = '/ParentStudentDetails/ShowAssignmentDetails';
+
+            $.ajax({
+                url: controllerPath,
+                data: {
+                    assignmentId: dataItem.AssignmentID, assignmentType: dataItem.Type,
+                    title: dataItem.Title, description: dataItem.Description, dueDate: dataItem.DueDate
+                },
+                cache: false,
+            })
+                .success(function (result) {
+                checkTimeout(result);
+                $("#gridCoursework_" + studentID + '_tt_active .k-tooltip-content').html(result);
+            })
+            .error(function (xhr, status) {
+                alert(xhr.responseText);
+            });
+        }
+    }).data("kendoTooltip");
+
+    function ArchiveHW(homeworkId, status,studentId) {
+        var controllerPath = '/ParentStudentDetails/ArchiveHomework';
+        var token = $('[name=__RequestVerificationToken]').val();
+        $.ajax({
+            url: controllerPath,
+            contentType: 'application/json',
+            type: 'POST',
+            headers: { '__RequestVerificationToken': token },
+            dataType: 'json',
+            data: JSON.stringify({ homeworkId: homeworkId, hwStatus: status, studentId: studentId})
+        })
+            .success(function (result) {
+            checkTimeout(result);
+            if (result) {
+                if (status === 1)
+                    showMessage("The homework has been set as completed.");
+                else
+                    showMessage("The homework has been set as not completed.");
+
+            var summaryGrid = $('#gridCoursework_' + studentId).data("kendoGrid");
+            summaryGrid.dataSource.read();
+            }
+        })
+        .error(function (xhr, status) {
+            alert(xhr.responseText);
+        });
+    }
+
+    function ViewQuiz(e, activityid, quizId, ActivityTypeID, lessonActivityID, currentUnitId, currentLessonId, allowMultipleAttempts, timeleft, isQuizForSummaryPage, studentId,sectionId) {
+        glb_HideDefaultUnitAndLesson = isQuizForSummaryPage;
+
+        $.ajax({
+            url: '/Quiz/CheckQuizAttempt',
+            contentType: 'application/html;charset=utf-8',
+            type: 'GET',
+            dataType: "JSON",
+            data: {
+                quizId: quizId,
+                studentId: studentId
+            }
+        })
+        .success(function (result) {
+            if (result) {
+                showMessage('You may not attempt this Quiz again as you have already submitted it.');
+            }
+            else {
+                var controllerPath = '/TeacherClassDetails/ViewActivity';
+                $.ajax({
+                        url: controllerPath,
+                        contentType: 'application/html;charset=utf-8',
+                        type: 'GET',
+                        dataType: 'html',
+                        data: {
+                            activityid: activityid,
+                            quizid: quizId,
+                            lessonActivityID: lessonActivityID,
+                            activityType: "Quiz",
+                            activityTypeId: ActivityTypeID,
+                            unitId: currentUnitId,
+                            lessonId: currentLessonId,
+                            timeLeft: timeleft,
+                            allowMultipleAttempts: allowMultipleAttempts,
+                            isFromCourseWork: 1,
+                            studentId: studentId,
+                            sectionId: sectionId
+                        }
+                    })
+                    .success(function (result) {
+                        checkTimeout(result);
+                        var wnd = $("#ActivityWin").data("kendoWindow");
+                        checkTimeout(result);
+                        wnd.content(result);
+                        wnd.center().open();
+                    })
+                    .error(function (xhr, status) {
+                        alert(xhr.responseText);
+                    });
+            }
+        })
+        .error(function (xhr) {
+                alert(xhr.responseText);
+            });
+    }
+
+    $("#tooltipShowCourseWorkInfo").kendoTooltip({
+        content: "All work assigned by your teacher will appear in this box. By default, work due in the next 14 days will appear. You can change what work is shown in the box using the filter dropdowns.",
+        width: 400,
+        height: 40,
+        position: "left",
+        showOn: "mouseenter"
+    });
+
+    function showClasstabs(e) {
+        var grid = $("#gridCoursework_1728").data("kendoGrid");
+        var dataItem = grid.dataItem($(e.parentElement).closest("tr"));
+        selectedCourseID = dataItem.SectionID;
+        IsClassSummary = true;
+        $('#tab-2').trigger("click");
+    }
+
+    function downloadAssignmentFiles(filesCount, sectionHomeworkId) {
+        var controllerPath;
+        if (filesCount === 1) {
+            controllerPath = '/ParentStudentDetails/GetSectionHomeworkFiles/';
+            $.ajax({
+                    url: controllerPath,
+                    contentType: 'application/html;charset=utf-8',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { sectionHomeworkId: sectionHomeworkId }
+                })
+                .success(function(result) {
+                    var data = JSON.parse(result);
+                    $("#StorageFilePath").val(data.storageFilePath);
+                    $("#FileName").val(data.fileName);
+                    $("#Token").val(data.token);
+                    $("#StorageFileName").val(data.storageFileName);
+                    $('#btnDownloadClassHW').trigger('click');
+                })
+                .error(function(xhr) {
+                    alert(xhr.responseText);
+                });
+        } else {
+            controllerPath = '/ParentStudentDetails/GetSectionHomeworkFiles/';
+            $.ajax({
+                    url: controllerPath,
+                    contentType: 'application/html;charset=utf-8',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { sectionHomeworkId: sectionHomeworkId }
+                })
+                .success(function (result) {
+                    var notificationFilesWindow = $("#DiscussionFilesWindow").kendoWindow({
+                        width: 400,
+                        height: 'auto',
+                        title: "Download Files",
+                        resizable: false,
+                        modal: true,
+                        close: function () {
+                            $('#DiscussionFilesWindow').empty();
+                        }
+                    });
+                    notificationFilesWindow.data("kendoWindow").center().open();
+
+                    notificationFilesWindow.data("kendoWindow").content(result);
+                    notificationFilesWindow.find("#NtfnfilesbtnCancel")
+                        .click(function () {
+                            notificationFilesWindow.data("kendoWindow").close();
+                        })
+                        .end();
+                })
+                .error(function (xhr) {
+                    alert(xhr.responseText);
+                });
+        }
+    }
+</script>
+<style>
+    #tooltipShowCourseWorkInfo_tt_active {
+        overflow: hidden;
+    }
+
+    .k-grid tr:hover {
+        background-color: #bdb4af !important;
+    }
+
+    #context-menu {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+        font-size: 14px !important;
+    }
+
+    .k-grid-content {
+        overflow-x: hidden !important;
+    }
+
+    .k-grid-norecords-template {
+        width: 500px;
+    }
+
+    .k-grid-norecords {
+        height: auto;
+    }
+
+    .mark-period-table-cntnr .k-grid-content > .k-grid-norecords > .k-grid-norecords-template {
+        left: 30% !important;
+        border: 0px solid #d5d5d5 !important;
+    }
+
+    .summaryCoursework .mark-period-table-cntnr .k-grid-content > .k-grid-norecords > .k-grid-norecords-template {
+        left: 40% !important;
+        border: 0px solid #d5d5d5 !important;
+    }
+
+    .k-animation-container .k-widget.k-tooltip.k-tooltip-closable.k-popup.k-group.k-reset.k-state-border-up {
+        position: relative;
+        padding: .7em;
+        box-sizing: border-box;
+        background: #fff;
+        box-shadow: 1px 1px 3px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    .k-widget.k-tooltip {
+        border-color: #c5c5c5;
+        background-color: #ffffff;
+        color: #282828;
+    }
+
+    .k-tooltip {
+        background: white !important;
+        width: 300px;
+        height: auto;
+        color: white;
+    }
+
+    .courseworkGridBg .k-grid-header th.k-header {
+        vertical-align: middle !important;
+    }
+
+    #tooltipShowCourseWorkInfo_tt_active {
+        text-align: left;
+    }
+
+    .mark-period-drp-down-cntnr {
+        margin-right: 3px;
+    }
+
+    .blueprint-icon {
+        background-image: url("../../../../Images/CustomImages/icons-blue.png");
+        background-repeat: no-repeat;
+        height: 35px;
+        padding: 0px 10px 0px 11px;
+        border: 0;
+        margin: 0px;
+        background-position: 8px -277px;
+        max-width: 100%;
+        float: right;
+        cursor: pointer;
+    }
+</style>
+</div>
+</div>
+</div>
+
+<div id="HomeworkFilesWindow"></div>
+<div id="HomeworkFilesWindowForScores"></div>
+<div style="display: none">
+<form action="/TeacherClassDetails/GetFileFromDisk" method="post"><input name="__RequestVerificationToken" type="hidden" value="je09cEBC08dvPVRkg3Hyv-iCWvAZz0TXGxtdqvxxD7uaTcv1F64T3u7khLpRDCUOfda9aGIM8tiEZEmDUIxDvNWGQ1s1" /><input id="StorageFilePath" name="StorageFilePath" type="hidden" value /><input id="FileName" name="FileName" type="hidden" value /><input id="StorageFileName" name="StorageFileName" type="hidden" value /><input id="Token" name="Token" type="hidden" value /> <input type="submit" id="btnDownloadClassHW" value="Download" />
+</form></div>
+
+<div class="pull-left max-wdt100" style="width:100%">
+<div class="newboxer pull-left max-wdt100" style="width:100%">
+<div class="max-wdt100 continhd">
+<ul class="conhdw pull-left">
+<li style="float: left; width: 50%;">School Links and Files</li>
+<li style="float: left; width: 30%; position: relative; bottom: 3px;">
+<input id="ddl_ResourcesFolder" name="ddl_ResourcesFolder" style="width:175px;font-size:12px;height:25px;" type="text" /><script>
+	kendo.syncReady(function(){jQuery("#ddl_ResourcesFolder").kendoDropDownList({"dataSource":{"transport":{"read":{"url":"/Admin/ShowFolderForSchoolResource","data":function() { return kendo.ui.DropDownList.requestData(jQuery("#ddl_ResourcesFolder")); }},"prefix":""},"serverFiltering":true,"filter":[],"schema":{"errors":"Errors"}},"dataTextField":"LabelTagDescription","template":" \u003cimg src=\"/Images/CustomImages/folder_closed.gif\" alt=\"Delete\" title=\u0027Delete\u0027 style=\"padding-bottom: 4px;\"/\u003e ${ data.LabelTagDescription }","valueTemplate":"\u003cimg src=\"/Images/CustomImages/folder_closed.gif\" style=\"padding-bottom: 4px;\"/\u003e ${ data.LabelTagDescription }","autoBind":false,"dataValueField":"LabelTagID","index":0});});
+</script>
+</li>
+</ul>
+</div>
+<div>
+<div>
+<div class="k-widget k-grid" id="SchoolLinksAndFilesGrid"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col style="width:400px" /><col style="width:400px" /><col style="width:50px" /></colgroup><thead class="k-grid-header"><tr><th class="k-header k-filterable" data-field="Description" data-index="0" data-title="Description" id="8c1a50a1-aa18-40ed-8800-f0de8c4ba994" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/ParentStudentDetails/GetSchoolLinksNFiles/1728?SchoolLinksAndFilesGrid-sort=Description-asc">Description</a></th><th class="k-header k-filterable" data-field="LinkText" data-index="1" data-title="Links and Files" id="96426025-b0fb-43be-ab22-744db1dec36f" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/ParentStudentDetails/GetSchoolLinksNFiles/1728?SchoolLinksAndFilesGrid-sort=LinkText-asc">Links and Files</a></th><th class="k-header" data-index="2" id="2011b73c-07e9-4f6a-9df6-663e99723414" scope="col"><span class="k-link">View</span></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:197px"><table><colgroup><col style="width:400px" /><col style="width:400px" /><col style="width:50px" /></colgroup><tbody><tr class="k-no-data"><td colspan="3"></td></tr></tbody></table></div><div class="k-pager-wrap k-grid-pager"><a aria-label="Go to the first page" class="k-link k-pager-nav k-state-disabled k-pager-first" data-page="1" href="#" title="Go to the first page"><span class="k-icon k-i-arrow-end-left"></span></a><a aria-label="Go to the previous page" class="k-link k-pager-nav k-state-disabled" data-page="0" href="#" title="Go to the previous page"><span class="k-icon k-i-arrow-60-left"></span></a><ul class="k-pager-numbers k-reset"><li><span class="k-state-selected" data-page="1">1</span></li></ul><a aria-label="Go to the next page" class="k-link k-pager-nav k-state-disabled" data-page="2" href="#" title="Go to the next page"><span class="k-icon k-i-arrow-60-right"></span></a><a aria-label="Go to the last page" class="k-link k-pager-nav k-state-disabled k-pager-last" data-page="1" href="#" title="Go to the last page"><span class="k-icon k-i-arrow-end-right"></span></a><span class="k-pager-sizes k-label"><select><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option></select>Links/Files per page</span><span class="k-pager-info k-label">No Links/Files to display</span></div></div><script>
+	kendo.syncReady(function(){jQuery("#SchoolLinksAndFilesGrid").kendoGrid({"columns":[{"title":"Description","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Description","data-title":"Description"},"width":"400px","field":"Description","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"Links and Files","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"LinkText","data-title":"Links and Files"},"width":"400px","template":"#if (IsLink) { # \u003ca href=\u0027#=LinkURL#\u0027 target=\u0027_blank\u0027\u003e#=LinkText#\u003c/a\u003e # } else { # #=LinkText# # } #","field":"LinkText","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"View","width":"50px","template":"#if (IsLink) { # \u003ca onclick=\"showLinkAndFileDetails(\u0027#= data.ID #\u0027,\u0027link\u0027)\" id=\"LinkAndFile\" class=\"view-grid-img grid-view-btn\" title=\"view\" data-id=\"\u003c#= data.ID #\u003e\"\u003eview\u003c/a\u003e # } else { # \u003ca onclick=\"showLinkAndFileDetails(\u0027#= data.ID #\u0027,\u0027file\u0027)\" id=\"LinkAndFile\" class=\"view-grid-img grid-view-btn\" title=\"view\" data-id=\"\u003c#= data.ID #\u003e\"\u003eview\u003c/a\u003e # } #"}],"pageable":{"autoBind":false,"pageSizes":[10,20,50,100],"buttonCount":10,"messages":{"display":"Displaying {0} - {1} of {2} Links/Files","empty":"No Links/Files to display","itemsPerPage":"Links/Files per page"}},"sortable":true,"filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"scrollable":{"height":"197px"},"messages":{"noRecords":"No records available."},"autoBind":false,"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":"/ParentStudentDetails/GetSchoolLinksNFiles","data":linksFilesParameter},"prefix":""},"pageSize":10,"page":1,"total":0,"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"IsLink":{"type":"boolean"},"LinkText":{"type":"string"},"LinkURL":{"type":"string"},"DateAdded":{"type":"date"},"SchoolID":{"type":"number"},"YearID":{"type":"number"},"IsDeleted":{"type":"boolean"},"ModifiedBy":{"type":"number"},"LastModifiedOn":{"type":"date"},"ID":{"type":"number"},"SectionId":{"type":"number","defaultValue":null},"SectionFileName":{"type":"string"},"Description":{"type":"string"},"Comments":{"type":"string"},"StorageFileName":{"type":"string"},"StorageFilePath":{"type":"string"},"IsArchived":{"type":"boolean"},"resourceType":{"type":"string"}}}}}});});
+</script>
+<div id="LinksAndFilesDetails" style="display:none"></div><script>
+	kendo.syncReady(function(){jQuery("#LinksAndFilesDetails").kendoWindow({"modal":true,"iframe":false,"scrollable":true,"pinned":false,"title":"Details","resizable":false,"width":350,"height":350,"actions":["Close"]});});
+</script>
+</div>
+</div>
+</div>
+</div>
+
+<div class="pull-left max-wdt100" style="width:100%">
+<div class="newboxer pull-left max-wdt100" style="width:100%">
+<div class="max-wdt100 continhd">
+<ul class="conhdw pull-left">
+<li style="float: left; width: 50%;">Calendar</li>
+</ul>
+<ul class="conhdr pull-right">
+<li>
+<a>
+<img src="../../../Images/CustomImages/blank.png" id="idCalendarBx">
+</a>
+</li>
+</ul>
+</div>
+<div>
+<div class="k-widget k-grid" id="CalendarGrid"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col style="width:400px" /><col style="width:380px" /><col style="width:70px" /></colgroup><thead class="k-grid-header"><tr><th class="k-header k-filterable" data-field="Description" data-index="0" data-title="Events" id="04a3673c-2385-422f-a12a-4536e5c95f32" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/ParentStudentDetails/GetCalendarEventsStudent/1728?isGroup=False&amp;CalendarGrid-sort=Description-asc">Events</a></th><th class="k-header k-filterable" data-field="Date" data-index="1" data-title="Date" id="473a93b3-c7de-47c7-a751-ae8fb06224cc" scope="col"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/ParentStudentDetails/GetCalendarEventsStudent/1728?isGroup=False&amp;CalendarGrid-sort=Date-asc">Date</a></th><th class="k-header k-filterable" data-field="EndDate" data-index="2" data-title="End Date" id="de54a67b-8ce9-4429-a3f9-0b1846a5d398" scope="col" style="display:none"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/ParentStudentDetails/GetCalendarEventsStudent/1728?isGroup=False&amp;CalendarGrid-sort=EndDate-asc">End Date</a></th><th class="k-header k-filterable" data-field="CalendarType" data-index="3" data-title="Calendar Type" id="bd6e044d-a2a4-4b5d-94fc-f79c32e813f4" scope="col" style="display:none"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/ParentStudentDetails/GetCalendarEventsStudent/1728?isGroup=False&amp;CalendarGrid-sort=CalendarType-asc">Calendar Type</a></th><th class="k-header k-filterable" data-field="EventIsReccurrence" data-index="4" data-title="Event Is Reccurrence" id="d5488f86-db1e-4603-a2be-3a1cd09197a5" scope="col" style="display:none"><a aria-label="Filter" class="k-grid-filter" href="javascript:void(0)"><span class="k-icon k-i-filter" title="Filter"></span></a><a class="k-link" href="/ParentStudentDetails/GetCalendarEventsStudent/1728?isGroup=False&amp;CalendarGrid-sort=EventIsReccurrence-asc">Event Is Reccurrence</a></th><th class="k-header" data-index="5" id="08faa604-d307-4488-80b9-f486a8eba2e7" scope="col"><span class="k-link">View</span></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:197px"><table><colgroup><col style="width:400px" /><col style="width:380px" /><col style="width:70px" /></colgroup><tbody><tr class="k-no-data"><td colspan="3"></td></tr></tbody></table></div><div class="k-pager-wrap k-grid-pager"><a aria-label="Go to the first page" class="k-link k-pager-nav k-state-disabled k-pager-first" data-page="1" href="#" title="Go to the first page"><span class="k-icon k-i-arrow-end-left"></span></a><a aria-label="Go to the previous page" class="k-link k-pager-nav k-state-disabled" data-page="0" href="#" title="Go to the previous page"><span class="k-icon k-i-arrow-60-left"></span></a><ul class="k-pager-numbers k-reset"><li><span class="k-state-selected" data-page="1">1</span></li></ul><a aria-label="Go to the next page" class="k-link k-pager-nav k-state-disabled" data-page="2" href="#" title="Go to the next page"><span class="k-icon k-i-arrow-60-right"></span></a><a aria-label="Go to the last page" class="k-link k-pager-nav k-state-disabled k-pager-last" data-page="1" href="#" title="Go to the last page"><span class="k-icon k-i-arrow-end-right"></span></a><span class="k-pager-sizes k-label"><select><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="50">50</option></select>Events per page</span><span class="k-pager-info k-label"></span></div></div><script>
+	kendo.syncReady(function(){jQuery("#CalendarGrid").kendoGrid({"columns":[{"title":"Events","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Description","data-title":"Events"},"width":"400px","template":"\u003ca class=\u0027pointer\u0027 title=\u0027Title\u0027 type=\u0027button\u0027\u003e#:data.Description#\u003c/a\u003e","field":"Description","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"Date","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Date","data-title":"Date"},"width":"380px","field":"Date","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"End Date","headerAttributes":{"data-field":"EndDate","data-title":"End Date"},"hidden":true,"field":"EndDate","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"Calendar Type","headerAttributes":{"data-field":"CalendarType","data-title":"Calendar Type"},"hidden":true,"field":"CalendarType","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"Event Is Reccurrence","headerAttributes":{"data-field":"EventIsReccurrence","data-title":"Event Is Reccurrence"},"hidden":true,"field":"EventIsReccurrence","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"encoded":true},{"title":"View","width":"70px","template":"#if(EventIsReccurrence){# \u003ca onclick=\"showCalendarDetails(#= data.MessageId #, \u0027#= data.ParsedRecurrenceStartDate #\u0027, \u0027#= data.ParsedRecurrenceEndDate #\u0027, \u0027#= data.GoogleCalendarName #\u0027, \u0027#= data.GoogleCalendarId  #\u0027, \u0027#= data.CalendarType  #\u0027)\" id=\"summaryflip\" class=\"view-grid-img grid-view-btn\" title=\"view\" data-id=\"\u003c#= data.MessageId #\u003e\"\u003eview\u003c/a\u003e #}else {# \u003ca onclick=\"showCalendarDetails(#= data.MessageId #, null, null, \u0027#= data.GoogleCalendarName #\u0027, \u0027#= data.GoogleCalendarId  #\u0027, \u0027#= data.CalendarType  #\u0027)\" id=\"summaryflip\" class=\"view-grid-img grid-view-btn\" title=\"view\" data-id=\"\u003c#= data.MessageId #\u003e\"\u003eview\u003c/a\u003e #}#"}],"pageable":{"autoBind":false,"pageSizes":[5,10,20,50],"buttonCount":6,"messages":{"display":"","empty":"","itemsPerPage":"Events per page"}},"sortable":true,"filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"},"operators":{"string":{"contains":"Contains","doesnotcontain":"Does not contain","eq":"Equal to","neq":"Not equal to","startswith":"Starts with","endswith":"Ends with"}}},"scrollable":{"height":"197px"},"messages":{"noRecords":"No records available."},"autoBind":false,"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":"/ParentStudentDetails/GetCalendarEventsStudent?isGroup=False"},"prefix":""},"pageSize":5,"page":1,"total":0,"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"MessageId":{"type":"number"},"Title":{"type":"string"},"Description":{"type":"string"},"Date":{"type":"string"},"EndDate":{"type":"string"},"IsAlert":{"type":"boolean"},"NotificationFilesCount":{"type":"number"},"NotificationFiles":{"type":"object"},"GoogleCalendarId":{"type":"string"},"GoogleCalendarName":{"type":"string"},"EventIsReccurrence":{"type":"boolean"},"IsAllDayEvent":{"type":"boolean"},"ParsedRecurrenceStartDate":{"type":"string"},"ParsedRecurrenceEndDate":{"type":"string"},"EventStartDate":{"type":"date"},"CalendarType":{"type":"string"}}}}}});});
+</script>
+</div>
+</div>
+</div>
+
+<div class="span3 align-newbox margin-right15 algnboxs spacing" style="margin-right:15px">
+<div class="category">
+<div class="container continhd">
+<ul class="conhdw pull-left">
+<li>Notifications and Alerts</li>
+</ul>
+<ul class="conhdr pull-right">
+<li>
+<a>
+<img src="../../../Images/CustomImages/blank.png" id="idNotifyBx">
+</a>
+</li>
+</ul>
+</div>
+<div class="bgf9">
+<div class="k-widget k-grid" id="NotificationGrid"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col/><col/><col style="width:80px" /></colgroup><thead class="k-grid-header"><tr><th class="k-header" data-field="Title" data-index="0" data-title="Title" id="c8536982-984a-41c4-83bf-4b983d37e96c" scope="col"><span class="k-link">Title</span></th><th class="k-header" data-field="Description" data-index="1" data-title="Description" id="6f352abd-3d49-4634-9d0e-56dadac036eb" scope="col"><span class="k-link">Description</span></th><th class="k-header" data-index="2" id="4119aa60-cbae-4dad-90a6-21475fadbe31" scope="col"><span class="k-link">View</span></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:198px"><table><colgroup><col/><col/><col style="width:80px" /></colgroup><tbody><tr class="k-no-data"><td colspan="3"></td></tr></tbody></table></div></div><script>
+	kendo.syncReady(function(){jQuery("#NotificationGrid").kendoGrid({"columns":[{"title":"Title","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Title","data-title":"Title"},"field":"Title","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true},{"title":"Description","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Description","data-title":"Description"},"field":"Description","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true},{"title":"View","width":"80px","template":"#if (data.NotificationFilesCount != null \u0026\u0026 data.NotificationFilesCount \u003e 0) { # \u003cimg src=\"/Images/CustomImages/download.png\" style=\u0027float:left; margin-top: 2px;\u0027 alt=\"Download\" value=\"Download\" title=\u0027Download\u0027 class=\"pointer\" onclick=\"downloadClassNotfn(this)\" /\u003e # }else { # \u003cimg src=\"/Images/CustomImages/blank.png\" style=\u0027width:21px; float:left; margin-top: 2px;\u0027/\u003e # }#\u003ca onclick=\"showCategoryDetails(#= data.MessageId #)\" id=\"summaryflip\" class=\"view-grid-img grid-view-btn\" style=\u0027display: inline-block !Important; float:left;\u0027 title=\"view\" data-id=\"\u003c#= data.MessageId #\u003e\"\u003eview\u003c/a\u003e"}],"scrollable":{"height":"198px"},"messages":{"noRecords":"No records available."},"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":""},"prefix":""},"serverPaging":true,"serverSorting":true,"serverFiltering":true,"serverGrouping":true,"serverAggregates":true,"filter":[],"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"MessageId":{"type":"number"},"Title":{"type":"string"},"Description":{"type":"string"},"Date":{"type":"string"},"EndDate":{"type":"string"},"IsAlert":{"type":"boolean"},"NotificationFilesCount":{"type":"number"},"NotificationFiles":{"type":"object"},"GoogleCalendarId":{"type":"string"},"GoogleCalendarName":{"type":"string"},"EventIsReccurrence":{"type":"boolean"},"IsAllDayEvent":{"type":"boolean"},"ParsedRecurrenceStartDate":{"type":"string"},"ParsedRecurrenceEndDate":{"type":"string"},"EventStartDate":{"type":"date"},"CalendarType":{"type":"string"}}}},"data":{"Data":[],"Total":0,"AggregateResults":null}},"rowTemplate":" # if (IsAlert) { # \u003ctr style=\u0027color:red;\u0027\u003e # } else { # \u003ctr\u003e # } #\u003ctd class=\"txtovflw\" \u003e#: Title #\u003c/td\u003e\u003ctd class=\"txtovflw\" \u003e #: Description #\u003c/td\u003e\u003ctd \u003e#if (data.NotificationFilesCount != null \u0026\u0026 data.NotificationFilesCount \u003e 0) { # \u003cimg src=\"/Images/CustomImages/download.png\" style=\u0027float:left; margin-top: 2px;\u0027 alt=\"Download\" value=\"Download\" title=\u0027Download\u0027 class=\"pointer\" onclick=\"downloadClassNotfn(this)\" /\u003e # }else { # \u003cimg src=\"/Images/CustomImages/blank.png\" style=\u0027width:21px; float:left; margin-top: 2px;\u0027/\u003e # }#\u003ca onclick=\"showCategoryDetails(#= data.MessageId #)\" id=\"summaryflip\" class=\"view-grid-img grid-view-btn\" style=\u0027display: inline-block !Important; float:left;\u0027 title=\"view\" data-id=\"\u003c#= data.MessageId #\u003e\"\u003eview\u003c/a\u003e\u003c/td\u003e\u003c/tr\u003e"});});
+</script>
+</div>
+</div>
+</div>
+
+<div class="span3 align-newbox algnboxs spacing" style="margin-right:-15px">
+<div class="category">
+<div class="container continhd">
+<ul class="conhdw pull-left">
+<li>School Announcements</li>
+</ul>
+<ul class="conhdr pull-right">
+<li>
+<a>
+<img src="../../../Images/CustomImages/blank.png" id="idAnnouncementBx">
+</a>
+</li>
+</ul>
+</div>
+<div class="bgf9">
+<div class="k-widget k-grid" id="SchoolAnnouncementGrid"><div class="k-grid-header"><div class="k-grid-header-wrap"><table><colgroup><col style="width:165px" /><col/><col style="width:80px" /></colgroup><thead class="k-grid-header"><tr><th class="k-header" data-field="Title" data-index="0" data-title="Title" id="95d20687-fb7d-486e-b4b9-164e2617b8e5" scope="col"><span class="k-link">Title</span></th><th class="k-header" data-field="Description" data-index="1" data-title="Description" id="c744623a-5588-4a30-a54d-8dfd0bd54536" scope="col"><span class="k-link">Description</span></th><th class="k-header" data-index="2" id="e72819e2-258f-4c20-a536-c7ba0cf7e615" scope="col"><span class="k-link">View</span></th></tr></thead></table></div></div><div class="k-grid-content k-auto-scrollable" style="height:186px"><table><colgroup><col style="width:165px" /><col/><col style="width:80px" /></colgroup><tbody><tr class="k-no-data"><td colspan="3"></td></tr></tbody></table></div></div><script>
+	kendo.syncReady(function(){jQuery("#SchoolAnnouncementGrid").kendoGrid({"columns":[{"title":"Title","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Title","data-title":"Title"},"width":"165px","field":"Title","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true},{"title":"Description","attributes":{"class":"txtovflw"},"headerAttributes":{"data-field":"Description","data-title":"Description"},"field":"Description","filterable":{"messages":{"additionalOperator":"Additional operator","additionalValue":"Additional value"}},"encoded":true},{"title":"View","width":"80px","template":"#if (data.NotificationFilesCount != null \u0026\u0026 data.NotificationFilesCount \u003e 0) { # \u003cimg src=\"/Images/CustomImages/download.png\" style=\u0027float:left; margin-top: 2px;\u0027 alt=\"Download\" value=\"Download\" title=\u0027Download\u0027  class=\"pointer moz-pointer\" onclick=\"downloadClassAnnomnts(this)\" /\u003e # }else { # \u003cimg src=\"/Images/CustomImages/blank.png\" style=\u0027width:21px; float:left; margin-top: 2px;\u0027/\u003e # }#\u003ca onclick=\"showCategoryDetails(#= data.MessageId #)\" id=\"summaryflip\" class=\"view-grid-img grid-view-btn\"  style=\u0027display: inline-block !Important; float:left;\u0027 title=\"view\" data-id=\"\u003c#= data.MessageId #\u003e\"\u003eview\u003c/a\u003e"}],"scrollable":{"height":"186px"},"messages":{"noRecords":"No records available."},"dataSource":{"type":(function(){if(kendo.data.transports['aspnetmvc-ajax']){return 'aspnetmvc-ajax';} else{throw new Error('The kendo.aspnetmvc.min.js script is not included.');}})(),"transport":{"read":{"url":""},"prefix":""},"serverPaging":true,"serverSorting":true,"serverFiltering":true,"serverGrouping":true,"serverAggregates":true,"filter":[],"schema":{"data":"Data","total":"Total","errors":"Errors","model":{"fields":{"MessageId":{"type":"number"},"Title":{"type":"string"},"Description":{"type":"string"},"Date":{"type":"string"},"EndDate":{"type":"string"},"IsAlert":{"type":"boolean"},"NotificationFilesCount":{"type":"number"},"NotificationFiles":{"type":"object"},"GoogleCalendarId":{"type":"string"},"GoogleCalendarName":{"type":"string"},"EventIsReccurrence":{"type":"boolean"},"IsAllDayEvent":{"type":"boolean"},"ParsedRecurrenceStartDate":{"type":"string"},"ParsedRecurrenceEndDate":{"type":"string"},"EventStartDate":{"type":"date"},"CalendarType":{"type":"string"}}}},"data":{"Data":[],"Total":0,"AggregateResults":null}}});});
+</script>
+</div>
+</div>
+</div>
+
+<div id="NotificationFilesWindow"></div>
+<div style="display: none">
+<form action="/TeacherClassDetails/GetFileFromDisk" method="post"><input name="__RequestVerificationToken" type="hidden" value="-3XzMSWp_dOAyxdcT3wfxYcjlxTSOhfcu6FNz0SvD5ZBOvYKXTvWahLZoFO68u8WjE9cwzGdbRFPYXaubz5nPtcIc8U1" /><input id="StorageFilePath" name="StorageFilePath" type="hidden" value /><input id="FileName" name="FileName" type="hidden" value /><input id="StorageFileName" name="StorageFileName" type="hidden" value /><input id="Token" name="Token" type="hidden" value /> <input type="submit" id="btnDownload" value="Download" />
+</form></div>
+<div>
+<div id="Details" style="display:none"></div><script>
+	kendo.syncReady(function(){jQuery("#Details").kendoWindow({"modal":true,"iframe":false,"scrollable":true,"pinned":false,"title":"Details","resizable":false,"height":350,"actions":["Close"]});});
+</script>
+</div>
+<input id="hdnGradeLevl" name="hdnGradeLevl" type="hidden" value />
+<script>
+    var model = {"StudentId":1728,"StudentName":"Ben Whiting","AbsentCount":0,"TardyCount":0,"DismissalCount":0,"IncidentCount":0,"UnReadAlertCount":0,"UnReadEventCount":19,"UnReadMessageCount":0,"UnReadNotificationCount":0,"IsStudentInGradeLevel":false,"Guid":"10323E3F0FF8472A8256F39506871F47","Token":"EC082F41CF23221A7402FC7ACA3A62DB947B09AFCA2ADD68265C2E03CA26F4B4","IsDailyAttendance":false,"ReportAndScorePermission":false,"ShowAttendance":false,"ShowDiscipline":false,"ShowScores":false,"ShowReports":false,"IsProgressBoxVisible":false,"IsShowEMailIcon":false,"ShowAttendanceDetails":false,"Index":0,"IsNewYearTransitionMode":false,"GradeLevel":"116","isShowClassPage":false,"isShowLessonPlans":false,"ParentMailId":null};
+</script>
+<script type="text/javascript">
+
+
+
+    function showCalendarDetails(id, startDate, endDate, calendarFeedName, calendarFeedEvtId, calendarType) {
+    var controllerPath = '/Home/ShowCommunicationDetails/'
+    $.ajax({
+        url: controllerPath,
+        contentType: 'application/html;charset=utf-8',
+        type: 'GET',
+        dataType: 'html',
+        data: {
+            id: id, type: "calendar", calendarFeedName: calendarFeedName, calendarFeedEvtId: calendarFeedEvtId,
+            StartDate: startDate,
+            EndDate: endDate,
+            isGroup: 'False',
+            calendarType: calendarType
+        }
+    })
+        .success(function (result) {
+            checkTimeout(result);
+            var wnd = $("#Details").data("kendoWindow");
+            wnd.setOptions({
+                width: 350
+            });
+            wnd.content(result);
+            wnd.center().open();
+        })
+        .error(function (xhr, status) {
+            alert(xhr.responseText);
+        });
+    }
+
+    $(document).ready(function () {
+        var gradeLevel = '';
+        gradeLevel = model.GradeLevel
+
+        $('#hdnGradeLevl').val(gradeLevel);
+
+        var resFldr = $('#ddl_ResourcesFolder').data('kendoDropDownList');
+        var reqToken = $('[name=__RequestVerificationToken]').val();
+        if (resFldr !== undefined && resFldr !== null) {
+            resFldr.dataSource.transport.options.read.beforeSend = function (req) { req.setRequestHeader('__RequestVerificationToken', reqToken) }
+            resFldr.dataSource.read();
+        }
+        var meetingsGrid = $('#gridMeetings').data('kendoGrid');
+        if (meetingsGrid !== undefined && meetingsGrid !== null) {
+            meetingsGrid.dataSource.transport.options.read.beforeSend = function (req) { req.setRequestHeader('__RequestVerificationToken', reqToken) }
+            meetingsGrid.dataSource.read({ showAllMeetings: false, includeGroupMeetings: false });
+        }
+        var markingPeroidDropDown = $('#CurrentMarkingPeriodId').data('kendoDropDownList');
+        if (markingPeroidDropDown !== undefined && markingPeroidDropDown !== null)
+        {
+            markingPeroidDropDown.dataSource.transport.options.read.beforeSend = function (req) { req.setRequestHeader('__RequestVerificationToken', reqToken) };
+            markingPeroidDropDown.dataSource.read();
+        }
+            var gridCalendar = $('#CalendarGrid').data('kendoGrid');
+        if (gridCalendar !== undefined && gridCalendar!== null)
+        {
+            gridCalendar.dataSource.transport.options.read.beforeSend = function (req) { req.setRequestHeader('__RequestVerificationToken', reqToken) };
+            gridCalendar.dataSource.read();
+        }
+
+        $("#CalendarGrid").kendoTooltip({
+        filter: "td:nth-child(1)",
+        showOn: 'click',
+            autoHide: false,
+            height: '240px',
+        TooltipPosition: 'top',
+            content: function (e) {
+                var dataItem = $("#CalendarGrid").data("kendoGrid").dataItem(e.target.closest("tr"));
+                var controllerPath = '/Calendar/ShowUpcomingEventDetails';
+                $.ajax({
+                    url: controllerPath,
+                    data: { eventId: dataItem.MessageId, googleCalendarId: dataItem.GoogleCalendarId, googleCalendarName: dataItem.GoogleCalendarName, RecurrenceStartDate: dataItem.ParsedRecurrenceStartDate, RecurrenceEndDate: dataItem.ParsedRecurrenceEndDate, calendarType: dataItem.CalendarType },
+                    cache: false,
+                })
+                    .success(function (result) {
+                        checkTimeout(result);
+                        $('.k-tooltip-content').html(result);
+                    })
+                    .error(function (xhr, status) {
+                        alert(xhr.responseText);
+                    });
+            }
+        }).data("kendoTooltip");
+
+
+            if ('False' == 'False')
+            {
+                var gridAbsentTotals = $('#GridAbsentTotals').data('kendoGrid');
+                if (gridAbsentTotals !== undefined && gridAbsentTotals !== null) {
+                    gridAbsentTotals.dataSource.transport.options.read.beforeSend = function (req) { req.setRequestHeader('__RequestVerificationToken', reqToken) };
+                    gridAbsentTotals.dataSource.read();
+                }
+            }
+            var gridSchoolLinksAndFiles = $('#SchoolLinksAndFilesGrid').data('kendoGrid');
+            if (gridSchoolLinksAndFiles !== undefined && gridSchoolLinksAndFiles !== null)
+            {
+                gridSchoolLinksAndFiles.dataSource.transport.options.read.beforeSend = function (req) { req.setRequestHeader('__RequestVerificationToken', reqToken) };
+                gridSchoolLinksAndFiles.dataSource.read();
+            }
+        try {
+            $("#idCalendarBx").click(function () {
+                $("#loading").show();
+                window.location.href = "/Calendar/Calendar";
+            });
+            $("#idNotifyBx").click(function () {
+                $("#loading").show();
+                window.location.href = "/Announcement/Announcements";
+            });
+            $("#idAnnouncementBx").click(function () {
+                $("#loading").show();
+                window.location.href = "/Announcement/Announcements";
+            });
+        }
+        catch (e) { Rollbar.error("Exception: ", e);}
+    });
+
+    function PrintProgress() {
+        var url = '/Print/PrintAllProgress/?id=0&IsGroup=False';
+        window.open(url, '_blank');
+    }
+
+    $(function () {
+        var studentDropDown = $('#meetingsStudentFilterddl').data("kendoDropDownList");
+        if (studentDropDown != null) {
+            studentDropDown.bind("change", function () {
+                filterMeetings(studentDropDown.selectedIndex, $("#includeGroupMeetings").prop('checked'));
+            });
+        }
+
+        var ddl = $('#ddl_ResourcesFolder').data("kendoDropDownList");
+        if (ddl != null) {
+            ddl.bind("change", function () {
+                ResourceGridFilteration();
+            });
+        }
+    });
+
+    function PrintCourseworkFromSummary() {
+        var courseworkRange = $("#mCourseworkRangeId_" + 1728).val();
+        var courseworkType = $("#mCourseworkTypeId_" + 1728).data("kendoDropDownList").text();
+        var sectionId = $("#mCourseId_" + 1728).val();
+
+        var win = window.open('about:blank');
+        with (win.document) {
+            open();
+            write("Loading...");
+            close();
+        }
+
+        var grid = $("#gridCoursework_" + 1728).data("kendoGrid");
+        var parameterMap = grid.dataSource.transport.parameterMap;
+        var data = parameterMap({ sort: grid.dataSource.sort(), filter: grid.dataSource.filter(), group: grid.dataSource.group() });
+
+        var reqToken = $('[name=__RequestVerificationToken]').val();
+        $.ajax({
+            url: '/Print/PrintCoursework/',
+            contentType: 'application/json',
+            type: "POST",
+            headers: { '__RequestVerificationToken': reqToken },
+            data: JSON.stringify({ studentId: 1728, sectionId: sectionId, courseworkRange: courseworkRange, courseworkType: courseworkType, sortValues: data.sort}),
+            success: function (result) {
+                with (win.document) {
+                    open();
+                    write(result);
+                    close();
+                }
+            }
+        });
+    }
+
+</script>
+<style scoped>
+    .k-grid td {
+        border-bottom: 1px solid #c5c5c5;
+    }
+
+    .ie10 .k-grid td {
+        line-height: 1.45em !important;
+    }
+
+    .ui-front {
+        z-index: 8;
+    }
+
+    input.k-textbox {
+        height: 3.17em !important;
+    }
+
+    .mark-period-drp-down-cntnr {
+        margin: 5px;
+    }
+
+    .coursework-drop-downs ul li:first-child .mark-period-drp-down-cntnr {
+        margin-left: 10px;
+    }
+
+    .mark-period-drp-down-cntnr span.k-widget.k-dropdown span.k-input {
+        margin-top: 2px !important;
+        font-weight: bold !important;
+    }
+
+    .mark-period-drp-down-cntnr span.k-widget.k-dropdown > span {
+        background: #efefef;
+        border: none;
+        border-radius: 0;
+        padding: 5px;
+    }
+
+    .mark-period-drp-down-cntnr .k-i-arrow-60-down {
+        margin-top: 8px;
+    }
+
+    .courseworkGridBg {
+        background-color: #ffffff;
+    }
+
+    .courseWorkBoxerbg {
+        background-color: #ffffff !important;
+    }
+
+    .mark-period-table-cntnr .k-grid-header th.k-header {
+        background: #efefef !important;
+        padding: 7px !important;
+    }
+
+    .mark-period-table-cntnr .k-grid table tr td > a {
+        color: #007fa1 !important;
+    }
+
+    .mark-period-drp-down-cntnr .k-dropdown .k-input {
+        color: #616161;
+    }
+
+    .courseworkGridBg .mark-period-table-cntnr .k-grid.k-widget.k-display-block .k-grid-content.k-auto-scrollable {
+        height: 197px !important;
+    }
+
+    .course-dropdownList {
+        margin-top: 5px;
+    }
+
+    .k-tooltip.k-popup {
+        overflow-y: auto;
+    }
+</style>
+<!--[if IE]>
+    <style scoped>
+        .k-grid td
+            {
+                line-height: 1.45em !important;
+            }
+        .align-newbox-revis
+            {
+                width:733px !important;
+            }
+    </style>
+<![endif]-->
+</div>
+<div class="panel" id="tbDemographics"></div>
+<div class="panel" id="tbClasses"></div>
+<div class="panel" id="tbAttendance"></div>
+<div class="panel" id="tbScores"></div>
+<div class="panel" id="tbGrades"></div>
+<div class="panel" id="tbLessonPlan"></div>
+<div class="panel" id="tbSchedule"></div>
+<div class="panel" id="tbDicipline"></div>
+<div class="panel" id="tbReports"></div>
+</div>
+<div>
+<div id="TeacherListsForStudent" style="display:none"></div><script>
+	kendo.syncReady(function(){jQuery("#TeacherListsForStudent").kendoWindow({"close":onClose,"modal":true,"iframe":false,"scrollable":true,"pinned":false,"title":"TeacherListsForStudent","resizable":false,"width":650,"height":180,"actions":["Close"]});});
+</script>
+</div>
+<div id="HomeworkWin" style="display:none"></div><script>
+	kendo.syncReady(function(){jQuery("#HomeworkWin").kendoWindow({"modal":true,"iframe":false,"scrollable":true,"pinned":false,"title":"View Homework","resizable":false,"width":400,"actions":["Close"]});});
+</script>
+<input type="hidden" value id="discussionSectionName" />
+</section>
+<link href="/Content/themes/Customcss/flip.css" rel="stylesheet" />
+<link href="/Content/themes/Customcss/Rewrite-1.0.css" rel="stylesheet" />
+<link href="/Content/themes/Customcss/schedule/small.css" rel="stylesheet" />
+<link href="/Content/themes/Customcss/slider/elastislide.css" rel="stylesheet" />
+<script src="/Scripts/CustomScripts/slider/modernizr.custom.17475.js"></script>
+<script src="/Scripts/CustomScripts/slider/jquerypp.custom.js"></script>
+<script src="/Scripts/CustomScripts/slider/jquery.elastislide.js"></script>
+<script src="/Scripts/CustomScripts/flip.js"></script>
+<script src="/Scripts/CustomScripts/sliding-content.js"></script>
+<link href="/parentstudentdetails/css?v=wE2ccyLoy6u4vjEF_vQ-1l4KHw0uoO-2L9AOucj6h6s1" rel="stylesheet" />
+<script src="/parentstudentdetails/js?v=-_R7fSM93yyqmsHNG2XOjXR2whNfTzrLIILn-sT8gx01"></script>
+<script type="text/javascript">
+
+    function startQuiz() {
+        $("#classroom").trigger('click');
+        $("#tab-2").trigger('click');
+        $.ajax({
+            url: '/Quiz/GetQuizAndCategories/',
+            contentType: 'application/html;charset=utf-8',
+            type: 'GET',
+            dataType: 'html',
+            data:
+            {
+                quizid: 0,
+                id: 0,
+                lessonActivityId: 0,
+                activityType: "Quiz",
+                activityTypeId: 0,
+                unitId: 0,
+                lessonId: 0,
+                isFromCourseWork:0,
+                studentId : 1728,
+            }
+        })
+            .success(function (result) {
+                checkTimeout(result);
+                $("#loading").hide();
+
+                if ($('ul li.active a.panel').attr('id') == 'tab-10') {
+                    $('#tbLessonPlan').html(result);
+                }
+                else if ($('ul li.active a.panel').attr('id') == 'tab-2') {
+                    $('#tbClasses').html(result);
+                }
+            })
+            .error(function (xhr, status) {
+                alert(xhr.responseText);
+            });
+    }
+
+    var IsClassSummary;
+    var IsPerformanceSummary;
+    var Role = 'STUDENT';
+    var selectedCourseID; // this is global javascript variable used for navigating between class tab ans scores tab.
+    var isProgressReport='False';
+    var isFromCourseWork = 0;
+    var selectedSectionID = 0;
+    var teacherListPopupClose = false;
+    var discussionId = '';
+    var discussionSectionId = 0;
+    
+
+    $(document).ready(function () {
+       
+
+        if (Role === 'STUDENT') {
+            $('#divMaintenance').show();
+        }
+
+        if (discussionId !== "") {
+            
+            var controllerQuizPath = '/DiscussionBuilder/GotoDiscussionPage';
+            $.ajax({
+                    url: controllerQuizPath,
+                    type: 'GET',
+                    dataType: 'html',
+                    data: {
+                        discussionTopicId: discussionId,
+                        sectionId: discussionSectionId,
+                        sectionName: $("#discussionSectionName").val()
+                    }
+                })
+                .success(function(result) {
+                    checkTimeout(result);
+                    $("#loading").hide();
+                    $('#target1').html(result);
+                })
+                .error(function(xhr) {
+                    alert(xhr.responseText);
+                });
+        }
+
+        if (isFromCourseWork == 1) {
+            startQuiz();
+        }
+        var checkddlgroups = $('#ddlgroups').data("kendoDropDownList");
+        var isGroup = false;
+        if (checkddlgroups != null) {
+            isGroup = true;
+        }
+
+        function GetParameterValues(param) {
+            var url = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for (var i = 0; i < url.length; i++) {
+                var urlparam = url[i].split('=');
+                if (urlparam[0] == param) {
+                    return urlparam[1];
+                }
+            }
+        }
+
+        $("#loading").hide();
+        if ($('ul.main-tab').is(':visible') || $(window).width() > 979) {
+            var ddl = $("#ddlSection").data("kendoDropDownList");
+            if (ddl !== undefined && ddl != null) {
+                ddl.dataSource.transport.options.read.url = "/ParentStudentDetails/LoadSectionDropdown?&isGroup=" + isGroup;
+                ddl.dataSource.read();
+            }
+        }
+        else {
+            var ddlIPad = $("#ddlIpadSection").data("kendoDropDownList");
+            if (ddlIPad !== undefined && ddlIPad != null) {
+                ddlIPad.dataSource.transport.options.read.url = "/ParentStudentDetails/LoadSectionDropdown?&isGroup=" + isGroup;
+                ddlIPad.dataSource.read();
+            }
+        }
+
+        //Classes menu
+        $("#tab-2").click(function () {                 
+            if ($('ul.main-tab').is(':visible') || $(window).width() > 979) {
+                var ddl = $("#ddlSection").data("kendoDropDownList");
+                dataItem = ddl.dataItem(ddl.selectedIndex);
+                if (isFromCourseWork == 1) {
+                    dataItem.CourseId = selectedSectionID;
+                }
+                var index = ddl.selectedIndex - 1;
+                if (index >= 0) {
+                    selectedCourseID = ddl.dataSource._pristineData[index].CourseId;
+                }
+                //currentClassMain = dataItem.CourseId;
+                if (dataItem.CourseId == "" && selectedCourseID !== 0 && selectedCourseID !== "" && selectedCourseID !== null) {
+                    dataItem.CourseId = selectedCourseID;
+                    //$("#ddlSection").data("kendoDropDownList").value(selectedCourseID);
+                    //ddl.trigger("change");
+                    //currentClassMain = selectedCourseID;
+                }
+
+                if (IsClassSummary) {
+                    //$("#ddlSection").data("kendoDropDownList").value(selectedCourseID);
+                    dataItem.CourseId = selectedCourseID;
+                }
+
+                if (isFromCourseWork == 1) {
+                    $("#ddlSection").data("kendoDropDownList").value(dataItem.CourseId);
+                }
+
+                if (selectedCourseID == null || selectedCourseID == "") {
+                    $("#ddlSection").data("kendoDropDownList").select(1);
+                    dataItem = ddl.dataItem(ddl.selectedIndex);
+                    selectedCourseID = dataItem.CourseId;
+                }
+                currentTabIpad = 'tab-2';
+                currentTabMain = 'tab-2';               
+                currentClassMain = dataItem.CourseId;
+                currentClassIpad = dataItem.CourseId;
+           
+            }
+            else {
+                var ddlIpad = $("#ddlIpadSection").data("kendoDropDownList");
+                dataItem = ddlIpad.dataItem(ddlIpad.selectedIndex);
+                if (dataItem.CourseId == "" && selectedCourseID !== 0 && selectedCourseID !== "") {
+                    dataItem.CourseId = selectedCourseID;
+                    //currentClassIpad = selectedCourseID;
+                }
+
+                if (selectedCourseID == null) {
+                    $("#ddlIpadSection").data("kendoDropDownList").select(1);
+                    dataItem = ddlIpad.dataItem(ddlIpad.selectedIndex);
+                    selectedCourseID = dataItem.CourseId;
+                }
+
+                if (IsClassSummary) {
+                    //$("#ddlSection").data("kendoDropDownList").value(selectedCourseID);
+                    dataItem.CourseId = selectedCourseID;
+                }
+
+                var ddlMenu = $("#ddlMenus").data("kendoDropDownList");
+                $("#ddlMenus").data("kendoDropDownList").value('tab-2');
+                $('#divSubMenu').show();
+                $("#ddlIpadSection").data("kendoDropDownList").value(dataItem.CourseId);
+                currentTabIpad = 'tab-2';
+                currentClassIpad = dataItem.CourseId;
+                ddlIpad.trigger("dataBound");
+            }
+            if (isFromCourseWork == 0) {
+                $('#tbClasses').html('');
+            }
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+
+                $.ajax({
+                    url: '/ParentStudentDetails/ShowClassesIndex?_=' + (new Date()).getTime(),
+                    contentType: 'application/html;charset=utf-8',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: {
+                        isGroup: isGroup,
+                        SelectedCourseID: selectedCourseID,
+                        groupId: 0
+                    }
+                    })
+                    .success(function (result) {
+                        checkTimeout(result);
+                        $("#loading").hide();
+                        $("html, body").animate({ scrollTop: 0 }, 200);
+                        if (isFromCourseWork == 0) {
+                            $('#tbClasses').html(result);
+                        }
+                    })
+                    .error(function (xhr, status) {
+                        alert(xhr.responseText);
+                    });
+                });
+
+        //Attendance menu
+        $("#tab-3").click(function () {
+            $('#tbAttendance').html('');
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+            currentTabIpad = 'tab-3';
+            currentTabMain = 'tab-3'; 
+            $.ajax({
+                url: '/ParentStudentDetails/ShowAttendanceInfo?_=' + (new Date()).getTime(),
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: {}
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+
+                   // Display the section contents.
+                   $('#tbAttendance').html(result);
+
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        //Scores menu
+        $("#tab-4").click(function () {
+
+            if ($('ul.main-tab').is(':visible') || $(window).width() > 979) {
+                var ddl = $("#ddlSection").data("kendoDropDownList");
+                dataItem = ddl.dataItem(ddl.selectedIndex);
+                //currentClassMain = dataItem.CourseId;
+                if (dataItem.CourseId == "" && selectedCourseID !== 0 && selectedCourseID !== "" && selectedCourseID !== null) {
+                    dataItem.CourseId = selectedCourseID;
+                    //ddl.trigger("change");
+                    //$("#ddlSection").data("kendoDropDownList").value(selectedCourseID);
+                    //currentClassMain = selectedCourseID;
+                }
+
+                if (IsPerformanceSummary) {
+                    //$("#ddlSection").data("kendoDropDownList").value(selectedCourseID);
+                    dataItem.CourseId = selectedCourseID;
+                }
+
+                if (selectedCourseID == null || selectedCourseID == "") {
+                    $("#ddlSection").data("kendoDropDownList").select(1);
+                    dataItem = ddl.dataItem(ddl.selectedIndex);
+                    selectedCourseID = dataItem.CourseId;
+                }
+
+                $("#ddlSection").data("kendoDropDownList").value(dataItem.CourseId);
+
+                currentTabIpad = 'tab-4';
+                currentTabMain = 'tab-4';
+                currentClassMain = dataItem.CourseId;
+                currentClassIpad = dataItem.CourseId;
+            }
+            else {
+                var ddlIpad = $("#ddlIpadSection").data("kendoDropDownList");
+                dataItem = ddlIpad.dataItem(ddlIpad.selectedIndex);
+                if (dataItem.CourseId == "" && selectedCourseID !== 0 && selectedCourseID !== "") {
+                    dataItem.CourseId = selectedCourseID;
+                    //currentClassIpad = selectedCourseID;
+                }
+                if (selectedCourseID == null || selectedCourseID == "") {
+                    $("#ddlIpadSection").data("kendoDropDownList").select(1);
+                    dataItem = ddlIpad.dataItem(ddlIpad.selectedIndex);
+                    selectedCourseID = dataItem.CourseId;
+                }
+
+                if (IsPerformanceSummary) {
+                    //$("#ddlSection").data("kendoDropDownList").value(selectedCourseID);
+                    dataItem.CourseId = selectedCourseID;
+                }
+
+                var ddlMenu = $("#ddlMenus").data("kendoDropDownList");
+                $("#ddlMenus").data("kendoDropDownList").value('tab-4');
+                $('#divSubMenu').show();
+                $("#ddlIpadSection").data("kendoDropDownList").value(dataItem.CourseId);
+                currentTabIpad = 'tab-4';
+                currentClassIpad = dataItem.CourseId;
+                ddlIpad.trigger("dataBound");
+            }
+
+            $('#tbScores').html('');
+            $("#skillWindow").remove();
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+
+            $.ajax({
+                url: '/ParentStudentDetails/ShowScoresIndex?_=' + (new Date()).getTime(),
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: {
+                    isGroup: isGroup,
+                    SelectedCourseID: selectedCourseID,
+                    groupId: 0
+                }
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+
+                   // Display the section contents.
+                   $('#tbScores').html(result);
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        //Grades menu
+        $("#tab-5").click(function () {
+            $('#tbGrades').html('');
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+            currentTabIpad = 'tab-5';
+            currentTabMain = 'tab-5'; 
+            $.ajax({
+                url: '/ParentStudentDetails/ShowGrades?_=' + (new Date()).getTime(),
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: { isGroup: "False" }
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+                   // Display the section contents.
+                   $('#tbGrades').html(result);
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        //Schedule menu
+        $("#tab-6").click(function () {
+            $('#tbSchedule').html('');
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+            currentTabIpad = 'tab-6';
+            currentTabMain = 'tab-6'; 
+            $.ajax({
+                url: '/ParentStudentDetails/ShowScheduleTab?_=' + (new Date()).getTime(),
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: {}
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+                   // Display the section contents.
+                   $('#tbSchedule').html(result);
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        //Dicipline menu
+        $("#tab-7").click(function () {
+            $('#tbDicipline').html('');
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+            currentTabIpad = 'tab-7';
+            currentTabMain = 'tab-7'; 
+            $.ajax({
+                url: '/ParentStudentDetails/ShowDisciplineInfo?_=' + (new Date()).getTime(),
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: {}
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+
+                   // Display the section contents.
+                   $('#tbDicipline').html(result);
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        //Demographics menu
+        $("#tab-8").click(function () {
+            $('#tbDemographics').html('');
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+            currentTabIpad = 'tab-8';
+            currentTabMain = 'tab-8'; 
+
+            var prntGroupValue = $('#hdnParentGroup').val();
+            var grpId = 0;
+
+            if (prntGroupValue == "false") {//When parent selects My Groups
+                grpId = $('#ddlgroups_for_Parents').data("kendoDropDownList") != null ? $('#ddlgroups_for_Parents').val() : 0;
+            }
+            else {
+                grpId = $('#ddlgroups').data("kendoDropDownList") != null ? $('#ddlgroups').val() : 0;
+            }
+
+            $.ajax({
+                url: '/ParentStudentDetails/ShowStudentDempgraphics?_=' + (new Date()).getTime(),
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: { role: Role, groupId: grpId }
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+                   // Display the section contents.
+                   $('#tbDemographics').html(result);
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        //Reports tab
+        $("#tab-9").click(function () {
+            if (selectedCourseID == null || selectedCourseID == "") {
+
+                var dropdownlist = $("#ddlSection").data("kendoDropDownList");
+                $("#ddlSection").data("kendoDropDownList").select(1);
+                dataItem = dropdownlist.dataItem(dropdownlist.selectedIndex);
+                selectedCourseID = dataItem.CourseId;
+                dropdownlist.value(selectedCourseID);
+            }
+
+            currentTabIpad = 'tab-9';
+            currentTabMain = 'tab-9';            
+            currentClassIpad = selectedCourseID;
+            currentClassMain = selectedCourseID;
+
+            $('#tbReports').html('');
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+            var token = $('[name=__RequestVerificationToken]').val();
+            $.ajax({
+                url: '/ParentStudentDetails/ShowProgressReports?_=' + (new Date()).getTime(),
+                contentType: 'application/json',
+                type: 'POST',
+                dataType: 'html',
+                headers: { '__RequestVerificationToken': token },
+                data: JSON.stringify({
+                    isGroup: isGroup,
+                    SelectedCourseID: selectedCourseID,
+                    groupId: 0
+                })
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+                   // Display the report contents.
+                   $('#tbReports').html(result);
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        //LessonPlan tab
+        $("#tab-10").click(function () {
+            if (selectedCourseID == null || selectedCourseID == "") {
+
+                var dropdownlist = $("#ddlSection").data("kendoDropDownList");
+                $("#ddlSection").data("kendoDropDownList").select(1);
+                dataItem = dropdownlist.dataItem(dropdownlist.selectedIndex);
+                selectedCourseID = dataItem.CourseId;
+                dropdownlist.value(selectedCourseID);
+            }
+            currentTabIpad = 'tab-10';
+            currentTabMain = 'tab-10';
+            currentClassMain = selectedCourseID;
+            currentClassIpad = selectedCourseID;
+
+            $('#tbLessonPlan').html('');
+            $("html, body").animate({ scrollTop: 0 }, 200);
+            $("#loading").show();
+
+            $.ajax({
+                url: '/LessonPlan/LessonPlan?_=' + (new Date()).getTime(),
+                contentType: 'application/html;charset=utf-8',
+                type: 'GET',
+                dataType: 'html',
+                data: {
+                    isGroup: isGroup,
+                    SelectedCourseID: selectedCourseID
+                }
+            })
+               .success(function (result) {
+                   checkTimeout(result);
+                   $("#loading").hide();
+                   $("html, body").animate({ scrollTop: 0 }, 200);
+                   // Display the report contents.
+                   $('#tbLessonPlan').html(result);
+               })
+               .error(function (xhr, status) {
+                   alert(xhr.responseText);
+               });
+        });
+
+        $("#idProgressBx").click(function () {
+            $("#loading").show();
+            $('#tab-4').trigger('click');
+        });
+
+        $("#idScoresBx").click(function () {
+            $("#loading").show();
+            $('#tab-4').trigger('click');
+        });
+
+        $("#idAttendanceBx").click(function () {
+            $("#loading").show();
+            $('#tab-3').trigger('click');
+        });
+
+        $("#idDisciplineBx").click(function () {
+            $("#loading").show();
+            $('#tab-7').trigger('click');
+        });
+
+        $("#idHomeWorkBx").click(function () {
+            $("#loading").show();
+            $('#tab-2').trigger('click');
+        });
+
+        if (isProgressReport === 'True') {
+            $('#tab-9').trigger('click');
+        }
+
+        var Progress = GetParameterValues('Progress');
+        var Scores = GetParameterValues('Scores');
+
+        if (Progress == "true") {
+             selectedCourseID = GetParameterValues('selectedCourseID');
+             $('#tab-2').trigger('click');
+             $('.tab-summary').addClass("tab-summary wdt48 pdn-0-5 inactive");
+             $('.tab-classes').removeClass("inactive");
+             $('.tab-classes').addClass("active");
+        }
+        else if (Scores == "true") {
+            selectedCourseID = GetParameterValues('selectedCourseID');
+            $('#tab-4').trigger('click');
+            $('.tab-summary').addClass("tab-summary wdt48 pdn-0-5 inactive");
+            $('.tab-assignment').removeClass("inactive");
+            $('.tab-assignment').addClass("active");
+        }
+
+        if ('False' === 'True' && 'True' === 'True' && 'False' === 'False') {
+            var teacherListsWindow = $("#TeacherListsForStudent").data("kendoWindow");
+
+            teacherListsWindow.content("<div style=\"text-align:left;\"><div style=\"margin-bottom:10px;\"><img src=\"../../Images/CustomImages/TeacherLists-logo.png\" onclick=\"window.location.href = '/Account/TeacherListUser?type=Home';\" style=\"margin-top:-5px; cursor: pointer;\" alt=\"TeacherLists\" width=\"25\" height=\"25\"><a href=\"/Account/TeacherListUser?type=Home\" style=\"text-decoration:none; margin-left:2px;cursor: pointer;\">TeacherLists</a></div><p style=\"text-align: justify; margin-bottom:20px;\";> Clicking this button will bring you to your school's supply list. From there, you will be able to purchase all of your supplies from a single page. It's easy and convenient!</p>"
+                + "<p></p></div>"
+                + "<div><input type=\"checkbox\"  style=\"float:left; margin-right:5px; margin-top:0px;\"   id=\"chkDonotremind\" value=\"Do not remind me again\" \><span>Do not remind me again</span>"
+                + "</div>"
+                + "<hr style='margin-top:20px;'/>"
+                + "<button id=\"btnClose\" onclick = \"closeWindow()\" style='margin-left:285px;'>Close</button>");
+
+            teacherListsWindow.title("TeacherLists Notification");
+            $("#TeacherListsForStudent").prev().find(".k-window-title").css("font-weight", "bold");
+            teacherListsWindow.center().open();
+        }
+    });
+
+    function closeWindow() {
+        var wnd = $("#TeacherListsForStudent").data("kendoWindow");
+        var isChecked = $('#chkDonotremind').is(':checked');
+        if (isChecked) {
+            teacherListPopupClose = true;
+            UpdateTeacherListsNotification();
+        }
+
+        wnd.close();
+    }
+
+    function onClose() {
+        var isChecked = $('#chkDonotremind').is(':checked');
+        if (isChecked && !teacherListPopupClose) {
+            UpdateTeacherListsNotification();
+        }
+    }
+
+    function onCloseNotification() {
+        location.reload(true);
+    }
+
+    function UpdateTeacherListsNotification() {
+        var verficationToken = $('[name=__RequestVerificationToken]').val();
+
+        $.ajax({
+            url: '/ParentStudentDetails/UpdateTeacherListsNotification',
+            headers: { '__RequestVerificationToken': verficationToken },
+            contentType: 'application/json',
+            type: 'POST'
+        })
+            .success(function (result) {
+                checkTimeout(result);
+            })
+            .error(function (xhr, status) {
+                alert("Error" + xhr.responseText);
+            });
+    }
+
+    function tabeventclick() {
+        isFromCourseWork = 0;
+        selectedCourseID = selectedSectionID;
+        flag = true;
+        $("#tab-1").trigger('click');
+    }
+
+</script>
+<script type="text/javascript">
+    $('#carousel').elastislide();
+</script>
+<style type="text/css">
+    .main-cont {
+        padding: 0 !important;
+    }
+    .k-widget #TeacherLists  {
+        height : auto !important;
+    }  
+</style>
+</div>
+<div id="back-top">
+<a href="#top"><span></span>Back to Top</a>
+</div>
+</div>
+</section>
+</div>
+<footer>
+<div class="container footerbg">
+<div id="copyright">
+Copyright &copy; 2023 Rediker Software, Inc. All rights reserved.
+<span style="margin-left: 20px">
+<a href="/Home/ShowPrivacypolicy" style="color:#fff; text-decoration: none;">Privacy Policy</a> |
+<a href="/Home/ShowTermsofuse" style="color:#fff; text-decoration: none;">Terms of Use</a>
+</span>
+<div style="float: right">
+<b>Translate </b>
+<div id="google_translate_element" style="display: inline-block; width: auto;"></div>
+</div>
+</div>
+</div>
+<div id="tbScheduleModal"></div>
+</footer>
+<div style="display: none" class="acceptanceTermsFooter">
+<div>
+<div class="divAcceptanceWindow">
+<span>
+PlusPortals uses cookies to improve our website and deliver relevant content to you. You may disable cookies in your browser. By clicking "Accept Terms," you acknowledge that you consent to our <a href="/Home/ShowPrivacypolicy" style="color:#0000ff; text-decoration: none;">Privacy Policy</a> and <a href="/Home/ShowTermsofuse" style="color:#0000ff; text-decoration: none;">Terms of Use</a>.
+</span>
+<button type="button" class="btn btn-primary margin-right20" id="acceptTerms" onclick="onAcceptTermsClick()">Accept Terms</button>
+</div>
+<script>
+    function onAcceptTermsClick() {
+        var reqToken = $('[name=__RequestVerificationToken]').val();
+        $.ajax({
+            url: '/Admin/SaveAcceptanceTerms/',
+            contentType: 'application/json',
+            type: 'POST',
+            headers: { '__RequestVerificationToken': reqToken }
+        })
+        .success(function () {
+            $(".acceptanceTermsFooter").hide();
+        })
+        .error(function (xhr) {
+            alert(xhr.responseText);
+        });
+    }
+</script>
+<style>
+    #acceptTerms {
+        padding: 8px 18px;
+        border: 1px solid #127c8d;
+        background-color: transparent;
+        color: #1591a6;
+        border-radius: 4PX;
+        margin-left: 20px;
+        display: block;
+        margin: 5px auto;
+    }
+
+    #acceptTerms:hover{
+      color:#000;
+    }
+    .divAcceptanceWindow {
+        padding: 0 25px;
+    }
+    
+</style>
+</div>
+</div>
+<script src="/Scripts/CustomScripts/plusportals.js"></script>
+</body>
+</html>
+<style>
+	.acceptanceTermsFooter {
+		height: auto;
+		text-align: center;
+		position: fixed;
+		bottom: 0px;
+		width: 100%;
+		background-color: #d1ecf1;
+		border: 1px solid #bee5eb;
+		color: #0c5460;
+		z-index: 1000;
+		left: 0;
+		right: 0;
+	}
+
+
+	@media only screen and (max-width: 768px) {
+		.acceptanceTermsFooter {
+			width: 100%;
+		}
+	}
+</style>
+<link href="/Content/sessiontimeout-alert.css" rel="stylesheet" />
+<script>
+    var inactiveTimeInMinutes = 45;
+    var timeoutInMilliseconds = (1000 * 60) * inactiveTimeInMinutes;
+</script>
+<div id="divPopupTimeOut">
+<div class="col-md-12 timeoutTitle">
+<div class="col-md-8"><strong id="timeoutHeader">Session Timeout Warning</strong></div>
+</div>
+<hr class="timeoutSeparator">
+<br/>
+<div style="padding-left:8px;">
+<div class="leftWarningImg">
+<img src="/Images/warning-image.png" />
+</div>
+<div class="rightWarningTxt">
+For security purposes you will be logged out in
+<b><span id="spCountDown"></span></b>
+due to inactivity. Do you want to stay signed in?
+</div>
+</div>
+<br/>
+<hr class="timeoutSeparator">
+<div class="timeoutEvents">
+<div class="pull-right margin-right5">
+<input type="button" class="okbuttonforWarning" value="Log out now" onclick="SessionTimeout.logOut();" />
+<input type="button" class="okbuttonforWarning" value="Stay signed in" onclick="SessionTimeout.keepAlive();" />
+</div>
+</div>
+</div>
+<script src="/Scripts/CustomScripts/sessiontimeout-alert-1.0.js"></script>
