@@ -1,0 +1,66 @@
+{
+    "studyAreaList": [
+        [1, "Business & Management"],
+        [2, "Cybersecurity"],
+        [3, "Data Analytics"],
+        [4, "Healthcare & Science"],
+        [5, "Liberal Arts & Communications"],
+        [6, "Public Safety"],
+        [7, "IT & Computer Science"]
+    ],
+
+    "programList": {
+        "Business & Management": [
+            "Accounting", 
+            "Business Administration",
+            "Finance", 
+            "Human Resource Management",
+            "Management Studies",
+            "Marketing"
+        ],
+        "Cybersecurity": [
+            "Cybersecurity Management and Policy",
+            "Cybersecurity Technology"
+        ],
+        "Data Analytics": [
+            "Data Science"
+        ],
+        "Healthcare & Science": [
+            "Biotechnology",
+            "Environmental Health & Safety",
+            "Gerontology and Aging Services",
+            "Health Services Management",
+            "Laboratory Management",
+            "Nursing (RN to BSN)",
+            "Psychology",
+            "Social Science",
+        ],
+        "Liberal Arts & Communications": [
+
+          
+        ],
+        "Public Safety": [
+          
+        ],
+        "IT & Computer Science": [
+          
+        ],
+        "Language": ["French", "German", "Spanish"]
+    }
+}
+
+Associate of Arts - General Studies
+Bachelor of Arts - Communication Studies
+Bachelor of Arts - East Asian Studies
+Bachelor of Arts - English
+Bachelor of Arts - Graphic Communication
+Bachelor of Arts - History
+Bachelor of Arts - Humanities
+Doctor of Business Administration - Business Administration
+Doctor of Management - Management: Community College Policy & Administration
+Master of Arts in Teaching - Teaching
+Master of Business Administration - Business Administration
+Master of Distance Education - Distance Education & E-Learning
+Master of Education - Instructional Technology
+
+Strategic Human Resource Management

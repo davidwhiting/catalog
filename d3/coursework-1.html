@@ -55,7 +55,7 @@ var tickmarks = {};
 // Define drag behavior
 var drag = d3.drag()
   .on("start", dragstarted)
-  .on("drag", dragged4);
+  .on("drag", dragged0);
 
 function dragstarted(d) {
   d3.select(this)
@@ -315,15 +315,6 @@ bin.push(bin[4] + 14 + box_width);
 bin.push(bin[5] + 14 + box_width);
 bin.push(bin[6] + 14 + box_width);
 
-var bin_1 = 12;
-var bin_2 = bin_1 + 13 + box_width;
-var bin_3 = bin_2 + 14 + box_width;
-var bin_4 = bin_3 + 14 + box_width;
-var bin_5 = bin_4 + 14 + box_width;
-var bin_6 = bin_5 + 14 + box_width;
-var bin_7 = bin_6 + 14 + box_width;
-var bin_8 = bin_7 + 14 + box_width;
-
 var box_space = box_height + y_gap + 2;
 var x_axis_height = screen_height - 54;
 
@@ -360,301 +351,52 @@ row.push(x_axis_height - 7*box_space)
 
 //my_rectangle(tick_2, 1*box_space, 'BMGT 495 (3)', 'blue');
 
-//import { data } from './data.js';
+my_rectangle(bin[0], row[5], 'PACE 111B (3)', 'green');
+my_rectangle(bin[0], row[4], 'LIBS 150 (1)', 'green');
+my_rectangle(bin[0], row[3], 'WRTG 111 (3)', 'green');
+my_rectangle(bin[0], row[2], 'WRTG 112 (3)', 'green');
+my_rectangle(bin[0], row[1], 'NUTR 100 (3)', 'green');
+my_rectangle(bin[0], row[0], 'BMGT 110 (3)', 'blue');
 
-data = [
-  {
-    seq: 1,
-    name: 'PACE 111B (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq:  2,
-    name: 'LIBS 150 (1)',
-    credits: 1,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq:  3,
-    name: 'WRTG 111 (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq:  4,
-    name: 'WRTG 112 (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq:  5,
-    name: 'NUTR 100 (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq:  6,
-    name: 'BMGT 110 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { 
-    seq:  7,
-    name: 'SPCH 100 (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq:  8,
-    name: 'STAT 200 (3)',
-    credits: 3,
-    color: 'red',
-    textcolor: 'white'
-  },
-  { 
-    seq:  9,
-    name: 'IFSM 300 (3)',
-    credits: 3,
-    color: 'red',
-    textcolor: 'white'
-  },
-  { 
-    seq: 10,
-    name: 'ACCT 220 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { 
-    seq: 11,
-    name: 'HUMN 100 (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq: 12,
-    name: 'BIOL 103 (4)',
-    credits: 4,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq: 13,
-    name: 'ECON 201 (3)',
-    credits: 3,
-    color: 'red',
-    textcolor: 'white'
-  },
-  { 
-    seq: 14,
-    name: 'ARTH 334 (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { 
-    seq: 15,
-    name: 'ELECTIVE 1 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { 
-    seq: 16,
-    name: 'ECON 203 (3)',
-    credits: 3,
-    color: 'red',
-    textcolor: 'white'
-  },
-  { 
-    seq: 17,
-    name: 'ACCT 221 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 18,
-    name: 'ELECTIVE 2 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 19,
-    name: 'BMGT 364 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 20,
-    name: 'ELECTIVE 3 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 21,
-    name: 'BMGT 365 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 22,
-    name: 'ELECTIVE 4 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 23,
-    name: 'MRKT 310 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 24,
-    name: 'WRTG 394 (3)',
-    credits: 3,
-    color: 'green',
-    textcolor: 'white'
-  },
-  { seq: 25,
-    name: 'ELECTIVE 5 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 26,
-    name: 'BMGT 380 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 27,
-    name: 'ELECTIVE 6 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 28,
-    name: 'ELECTIVE 7 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 29,
-    name: 'HRMN 300 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 30,
-    name: 'ELECTIVE 8 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 31,
-    name: 'ELECTIVE 9 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 32,
-    name: 'FINC 330 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 33,
-    name: 'ELECTIVE 10 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 34,
-    name: 'ELECTIVE 11 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 35,
-    name: 'BMGT 496 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 36,
-    name: 'ELECTIVE 12 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 37,
-    name: 'ELECTIVE 13 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 38,
-    name: 'ELECTIVE 14 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 39,
-    name: 'ELECTIVE 15 (3)',
-    credits: 3,
-    color: 'yellow',
-    textcolor: 'black'
-  },
-  { seq: 40,
-    name: 'BMGT 495 (3)',
-    credits: 3,
-    color: 'blue',
-    textcolor: 'white'
-  },
-  { seq: 41,
-    name: 'CAPSTONE (1)',
-    credits: 1,
-    color: 'yellow',
-    textcolor: 'black'
-  }
-];
+my_rectangle(bin[1], row[5], 'SPCH 100 (3)', 'green');
+my_rectangle(bin[1], row[4], 'STAT 200 (3)', 'red');
+my_rectangle(bin[1], row[3], 'IFSM 300 (3)', 'red');
+my_rectangle(bin[1], row[2], 'ACCT 220 (3)', 'blue');
+my_rectangle(bin[1], row[1], 'HUMN 100 (3)', 'green');
+my_rectangle(bin[1], row[0], 'BIOL 103 (4)', 'green');
 
-////let x = 0;
-////let y = 0;
-//
-//for (let x = 0; x <= 7; x++) {
-//  for (let y = 0; y <= 5; y++) {
-//    seq = x*5 + y;
-//    item = data[seq];
-//    if (item !== undefined) {
-//      my_rectangle(bin[x], row[y], item.name, item.color, item.textcolor);
-//    } else {
-//      console.log('error: data[${seq}] does not exist');
-//    }
-//  }
-//}
+my_rectangle(bin[2], row[5], 'ECON 201 (3)', 'red');
+my_rectangle(bin[2], row[4], 'ARTH 334 (3)', 'green');
+my_rectangle(bin[2], row[3], 'ELECTIVE 1 (3)', 'yellow', 'black');
+my_rectangle(bin[2], row[2], 'ECON 203 (3)', 'red');
+my_rectangle(bin[2], row[1], 'ACCT 221 (3)', 'blue');
+my_rectangle(bin[2], row[0], 'ELECTIVE 2 (3)', 'yellow', 'black');
 
-// Instead loop over data
+my_rectangle(bin[3], row[5], 'BMGT 364 (3)', 'blue');
+my_rectangle(bin[3], row[4], 'ELECTIVE 3 (3)', 'yellow', 'black');
+my_rectangle(bin[3], row[3], 'BMGT 365 (3)', 'blue');
+my_rectangle(bin[3], row[2], 'ELECTIVE 4 (3)', 'yellow', 'black');
+my_rectangle(bin[3], row[1], 'MRKT 310 (3)', 'blue');
+my_rectangle(bin[3], row[0], 'WRTG 394 (3)', 'green');
 
-for (let i = 0; i < data.length; i++) {
-  let x = Math.floor(i/6); // calculate bin index
-  let y = i % 6; // calculate row index
-  item = data[i];
-  if (item !== undefined) {
-    my_rectangle(bin[x], row[y], item.name, item.color, item.textcolor);
-  } else {
-    console.log('error: data[${seq}] does not exist');
-  }
-}
+my_rectangle(bin[4], row[5], 'ELECTIVE 5 (3)', 'yellow', 'black');
+my_rectangle(bin[4], row[4], 'BMGT 380 (3)', 'blue');
+my_rectangle(bin[4], row[3], 'ELECTIVE 6 (3)', 'yellow', 'black');
+my_rectangle(bin[4], row[2], 'ELECTIVE 7 (3)', 'yellow', 'black');
+my_rectangle(bin[4], row[1], 'HRMN 300 (3)', 'blue');
+my_rectangle(bin[4], row[0], 'ELECTIVE 8 (3)', 'yellow', 'black');
 
+my_rectangle(bin[5], row[5], 'ELECTIVE 9 (3)', 'yellow', 'black');
+my_rectangle(bin[5], row[4], 'FINC 330 (3)', 'blue');
+my_rectangle(bin[5], row[3], 'ELECTIVE 10 (3)', 'yellow', 'black');
+my_rectangle(bin[5], row[2], 'ELECTIVE 11 (3)', 'yellow', 'black');
+my_rectangle(bin[5], row[1], 'BMGT 496 (3)', 'blue');
+my_rectangle(bin[5], row[0], 'ELECTIVE 12 (3)', 'yellow', 'black');
+
+my_rectangle(bin[6], row[5], 'ELECTIVE 13 (3)', 'yellow', 'black');
+my_rectangle(bin[6], row[4], 'ELECTIVE 14 (3)', 'yellow', 'black');
+my_rectangle(bin[6], row[3], 'ELECTIVE 15 (3)', 'yellow', 'black');
+my_rectangle(bin[6], row[2], 'BMGT 495 (3)', 'blue');
+my_rectangle(bin[6], row[1], 'ELECTIVE 16 (1)', 'yellow', 'black');
 
 </script>

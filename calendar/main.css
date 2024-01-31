@@ -1,0 +1,63 @@
+html { font-family: sans-serif; }
+body { margin: 0; }
+
+#app header {
+  position: fixed;
+  width: 100%;
+  box-shadow: 0 0 15px 0 #777777;
+  /* Firefox 3.6+ */
+  background-image: -moz-linear-gradient(#eeeeee, rgba(238, 238, 238, 0.5));
+  /* Safari 4+, Chrome 1+ */
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#eeeeee), to(rgba(238, 238, 238, 0.5)));
+  /* Safari 5.1+, Chrome 10+ */
+  background-image: -webkit-linear-gradient(#eeeeee, rgba(238, 238, 238, 0.5));
+  /* Opera 11.10+ */
+  background-image: -o-linear-gradient(#eeeeee, rgba(238, 238, 238, 0.5));
+  height: 50px;
+  top: -50px; }
+  #app header #axis-top {
+    position: absolute;
+    left: 0;
+    bottom: 0; }
+
+#app .background {
+  fill: none;
+  cursor: col-resize;
+  pointer-events: all; }
+
+#app #grid path,
+#app #grid line {
+  fill: none;
+  stroke: none;
+  shape-rendering: crispEdges; }
+#app #grid .tick.major line {
+  stroke: #eee; }
+#app #grid .tick.minor {
+  stroke: #eee; }
+#app #grid .weekend {
+  fill: #eee;
+  fill-opacity: 0.5; }
+#app #grid .month-ticks {
+  opacity: 0.5; }
+  #app #grid .month-ticks .tick {
+    stroke: #000; }
+#app .axis path,
+#app .axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges; }
+#app .axis .domain {
+  display: none; }
+#app .axis.days text {
+  transition: font-size 0.15s;
+  font-size: 11px;
+  fill: #333;
+  text-shadow: 0px 1px 1px white; }
+#app .axis.months .month-names {
+  opacity: 0.1; }
+  #app .axis.months .month-names .name {
+    font-size: 60px;
+    font-variant: small-caps;
+    font-weight: bold; }
+#app .axis.months .month-ticks {
+  opacity: 0.5; }
