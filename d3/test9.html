@@ -394,13 +394,41 @@ console.log(data);
 //data = result.data;
 drawSchedule(result.data, 7);
 
-
 //let summary = creditSummary(result.data);
 //let maxCount = maxCourseCount(summary);
 
 //console.log(summary); // Outputs the summary object
 //console.log(maxCount);
 
+// Slider
+// Create the slider
+var slider = d3
+  .sliderBottom()
+  .min(4)
+  .max(18)
+  .step(1)
+  .width(300)
+  .default(12)
+  .on('onchange', val => {
+    
+    redraw(val);
+  });
+
+var gSlider = d3
+  .select('div#slider')
+  .append('svg')
+  .attr('width', 500)
+  .attr('height', 100)
+  .append('g')
+  .attr('transform', 'translate(30,30)');
+
+gSlider.call(slider);
+
+
 console.log('This should work!');
 
 </script>
+
+<div id="slider"></div>
+
+
