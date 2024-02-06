@@ -1,0 +1,2 @@
+[console_scripts]
+wave-university = h2o_wave_university.cli:main

@@ -18,12 +18,14 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 
 @on('#page1')
 async def page1(q: Q):
+
     q.page['sidebar'].value = '#page1'
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
     menu_width = '250px'
 
     # To do: 
-    # Load menus from json
+    # Load menus from json (or wavedb)
+    # make nested menus possible (entries depend on prior menu choice)
 
     q.page['controls'] = ui.form_card(
         box='horizontal',
@@ -83,9 +85,29 @@ async def page1(q: Q):
 #    if q.args.area_of_study:
 #        q.page['controls'].items[2].disabled = False
 
-    for i in range(3):
-        add_card(q, f'info{i}', ui.tall_info_card(box='horizontal', name='', title='Speed',
-                                                  caption='The models are performant thanks to...', icon='SpeedHigh'))
+#    for i in range(2):
+    add_card(q, 'courses_completed', ui.wide_gauge_stat_card(
+        box='horizontal',
+        title='Courses Completed',
+        value='={{intl foo minimum_fraction_digits=0 maximum_fraction_digits=0}}',
+        aux_value='={{intl bar style="percent" minimum_fraction_digits=1 maximum_fraction_digits=1}}',
+        plot_color='$red',
+        progress=0.56,
+        data=dict(foo=123, bar=0.56)
+        ))
+    add_card(q, 'finish_date', ui.wide_gauge_stat_card(
+        box='horizontal',
+        title='Estimated Completion Date',
+        value='={{intl foo minimum_fraction_digits=0 maximum_fraction_digits=0}}',
+        aux_value='={{intl bar style="percent" minimum_fraction_digits=1 maximum_fraction_digits=1}}',
+        plot_color='$red',
+        progress=0.56,
+        data=dict(foo=123, bar=0.56)
+        ))
+    add_card(q, 'speed', ui.tall_info_card(
+        box='horizontal', name='', title='Speed',
+        caption='The models are performant thanks to...', icon='SpeedHigh'
+        ))
     add_card(q, 'article', ui.tall_article_preview_card(
         box=ui.box('vertical', height='600px'), title='How does magic work',
         image='https://images.pexels.com/photos/624015/pexels-photo-624015.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
@@ -93,6 +115,7 @@ async def page1(q: Q):
 Lorem ipsum dolor sit amet,         '''
         )
     )
+
 
 ## Debug later, this should work but isn't
 ## Look at 
