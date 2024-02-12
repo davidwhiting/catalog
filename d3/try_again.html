@@ -136,7 +136,7 @@
     let data = originalData;
 //    let data = transferData;
 
-function assignBins(data, maxCredits=9) {
+    function assignBins(data, maxCredits=9) {
       // Initialize an array to keep track of the total credits in each bin
       let binCredits = [0];
     
@@ -206,32 +206,6 @@ function assignBins(data, maxCredits=9) {
     var textOffsetY = 25;
     var sessionOffset = 35;
 
-    function drawRectangleNew(x, y, name, color, textcolor, description='', boxWidth = 110, boxHeight = 40, textOffsetX = 10, textOffsetY = 25) {
-      var g = zoomable.append("g");
-      
-      g.append("rect")
-        .attr("x", x)
-        .attr("y", y)
-        .attr("width", boxWidth)
-        .attr("height", boxHeight)
-        .style("fill", color)
-        .classed("movable", true); // Add the "movable" class
-      
-      g.append("text")
-        .attr("x", x + textOffsetX)
-        .attr("y", y + textOffsetY)
-        .text(name)
-        .attr("fill", textcolor)
-        .style("font-size", "12px")
-        .style("font-family", "Arial")
-        .style("font-weight", "bold")
-        .classed("movable", true); // Add the "movable" class
-    
-      // Add a tooltip
-      g.append("description")
-        .text(description);
-    }
-
     function drawHeader(x, y, name, color, textcolor, description='', boxWidth = 110, boxHeight = 40, textOffsetX = 10, textOffsetY = 25, sessionOffset = 35) {
       var g = zoomable.append("g");
       
@@ -263,26 +237,6 @@ function assignBins(data, maxCredits=9) {
       }
     }
 
-    function drawColumnOld(period, data, transfer=false) {
-      let filteredData = data.filter(item => item.period === period);
-      let anyItem = false;
-//      let totalCredits = 0;
-      for (let j = 0; j < data.length; j++) {
-        let offset = (j % 3 - 1) * sessionOffset;
-        let item = filteredData[j];
-        if (item !== undefined) {
-          anyItem = true;
-//          let totalCredits = totalCredits + item.credits; 
-          let fullname = `${item.name} (${item.credits})`;
-//          let fullname = `${summary.totalCredits[period+1]} (${summary.courseCount[period+1]}`;
-          drawRectangleNew(bin[period]+offset, row[j], fullname, item.color, item.textcolor);
-        }
-      }
-      if (anyItem) {
-        drawHeader(bin[period], 20, semesterData[period-1], 'lightgray', 'black');
-      }
-    }
-
     function drawColumn(period, data, transfer=false) {
       let filteredData = data.filter(item => item.period === period);
       let anyItem = false;
@@ -307,51 +261,35 @@ function assignBins(data, maxCredits=9) {
       console.log(data);
     }
 
-    function calculateColumn(period, data, transfer=false) {
-      let filteredData = data.filter(item => item.period === period);
-      let anyItem = false;
-      for (let j = 0; j < data.length; j++) {
-        let offset = (j % 3 - 1) * sessionOffset;
-        let item = filteredData[j];
-        if (item !== undefined) {
-          anyItem = true;
-          let fullname = `${item.name} (${item.credits})`;
-          item.x = bin[period]+offset;
-          item.y = row[j];
-          item.fullname = fullname;
-        //  drawRectangleNew(item.x, item.y, item.fullname, item.color, item.textcolor);
-        }
-      }
-      //// need to save these headers
-      //if (anyItem) {
-      //  drawHeader(bin[period], 20, semesterData[period-1], 'lightgray', 'black');
-      //}
-      //console.log(data);
-    }
-
     function calculateSchedule(data) {
-      // find max 
+      // 
       var maxPeriod = Math.max(...data.map(item => item.period));
+      function calculateColumn(period, data) {
+        let filteredData = data.filter(item => item.period === period);
+        let anyItem = false;
+        for (let j = 0; j < data.length; j++) {
+          let offset = (j % 3 - 1) * sessionOffset;
+          let item = filteredData[j];
+          if (item !== undefined) {
+            anyItem = true;
+            let fullname = `${item.name} (${item.credits})`;
+            item.x = bin[period]+offset;
+            item.y = row[j];
+            item.fullname = fullname;
+          }
+        }
+        //// need to save these headers
+        //if (anyItem) {
+        //  drawHeader(bin[period], 20, semesterData[period-1], 'lightgray', 'black');
+        //}
+        //console.log(data);
+      }
+
       for (let j = 0; j <= maxPeriod; j++) {
         calculateColumn(j, data);
       }
     }
 
-    function drawSchedule(data) {
-      // find max 
-      var maxPeriod = Math.max(...data.map(item => item.period));
-      for (let j = 0; j <= maxPeriod; j++) {
-        drawColumn(j, data);
-      }
-    }
-
-    function drawTransferSchedule(data) {
-      // find max 
-      var maxPeriod = Math.max(...data.map(item => item.period));
-      for (let j = 1; j <= maxPeriod; j++) {
-        drawColumn(j, data, transfer=true);
-      }
-    }
     
     function calculateAll(data, maxCredits=9) {
       assignBins(data, maxCredits=maxCredits);
@@ -381,35 +319,42 @@ function assignBins(data, maxCredits=9) {
     }
 
     // Presume data at this point is input 
-
-    function renderRectangle(item, boxWidth = 110, boxHeight = 40, textOffsetX = 10, textOffsetY = 25) {
-      var g = zoomable.append("g");
-      
-      g.append("rect")
-        .attr("x", item.x)
-        .attr("y", item.y)
-        .attr("width", boxWidth)
-        .attr("height", boxHeight)
-        .style("fill", item.color)
-        .classed("movable", true); // Add the "movable" class
-      
-      g.append("text")
-        .attr("x", item.x + textOffsetX)
-        .attr("y", item.y + textOffsetY)
-        .text(item.fullname)
-        .attr("fill", item.textcolor)
-        .style("font-size", "12px")
-        .style("font-family", "Arial")
-        .style("font-weight", "bold")
-        .classed("movable", true); // Add the "movable" class
-    
-      //// Add a tooltip
-      //g.append("description")
-      //  .text(description);
+    function clearAll() {
+       zoomable.selectAll(".movable").remove();
     }
+
     function render(data) {
-      data.forEach(renderRectangle);
-      console.log(data);
+      // Function to draw all class rectangles
+      // Need to add all headers
+      function renderCourseRectangles(item, boxWidth=110, boxHeight=40, textOffsetX=10, textOffsetY=25) {
+        // Function to draw individual course rectangles
+        var g = zoomable.append("g");
+        
+        g.append("rect")
+          .attr("x", item.x)
+          .attr("y", item.y)
+          .attr("width", boxWidth)
+          .attr("height", boxHeight)
+          .style("fill", item.color)
+          .classed("movable", true); // Add the "movable" class
+        
+        g.append("text")
+          .attr("x", item.x + textOffsetX)
+          .attr("y", item.y + textOffsetY)
+          .text(item.fullname)
+          .attr("fill", item.textcolor)
+          .style("font-size", "12px")
+          .style("font-family", "Arial")
+          .style("font-weight", "bold")
+          .classed("movable", true); // Add the "movable" class
+      
+        //// Add a tooltip
+        //g.append("description")
+        //  .text(description);
+      }
+
+      data.forEach(renderCourseRectangles);
+//      console.log(data);
     }
 
     // define y coordinates for header rectangles
@@ -431,9 +376,6 @@ function assignBins(data, maxCredits=9) {
       }
     }
 
-    function clearAll() {
-       zoomable.selectAll(".movable").remove();
-    }
 
     // end D3 script insertion
 
@@ -444,7 +386,7 @@ function assignBins(data, maxCredits=9) {
     var h1 = body.append("h1");
 
     // Set the text of the h1
-    h1.text("Student Curriculum Explorer");
+    // h1.text("Student Curriculum Explorer");
 
     // DROPDOWN MENUS
 
