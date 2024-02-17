@@ -319,13 +319,16 @@
     }
 
     // Presume data at this point is input 
-    function clearAll() {
-       zoomable.selectAll(".movable").remove();
-    }
+
+    // All data preprocessing is done
 
     function render(data) {
       // Function to draw all class rectangles
       // Need to add all headers
+      function clearAll() {
+        // Clear rectangles before redrawing
+        zoomable.selectAll(".movable").remove();
+    }
       function renderCourseRectangles(item, boxWidth=110, boxHeight=40, textOffsetX=10, textOffsetY=25) {
         // Function to draw individual course rectangles
         var g = zoomable.append("g");
@@ -353,6 +356,7 @@
         //  .text(description);
       }
 
+      clearAll();
       data.forEach(renderCourseRectangles);
 //      console.log(data);
     }

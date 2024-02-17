@@ -1,6 +1,7 @@
 
-# map sequence to database
+# From DB, map name to credits, prerequisites (other than ELECTIVE)
 # seq #, name, type are all that are needed
+
 deptSequence = [
     { "seq":  1, "name": "PACE 111B", "type": "general" },
     { "seq":  2, "name": "LIBS 150",  "type": "general" },
@@ -43,8 +44,6 @@ deptSequence = [
     { "seq": 39, "name": "ELECTIVE",  "type": "elective"},
     { "seq": 40, "name": "BMGT 495",  "type": "major"   },
     { "seq": 41, "name": "CAPSTONE",  "type": "elective"}
-]
-
 ]
 
 deptRecommended = [
