@@ -1,8 +1,0 @@
-conda create -n mysql python=3.9 jupyter mysql
-conda activate mysql
-conda install conda=23.11.0
-mkdir /opt/homebrew/Caskroom/miniforge/base/envs/mysql/data
-mysqld --initialize-insecure
-mysqld_safe --datadir=/opt/homebrew/Caskroom/miniforge/base/envs/mysql/data
-mysqladmin -u root password "root"
-
