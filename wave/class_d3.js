@@ -113,11 +113,3 @@ var zoom = d3.zoom()
     zoomable.attr("transform", d3.event.transform);
   });
 svg.call(zoom);
-
-//// Load the data from a JSON file
-//d3.json('data.json').then(function(data) {
-//  // Use the loaded data
-//  render(data);
-//}).catch(function(error) {
-//  console.log('Error loading data: ' + error);
-//});

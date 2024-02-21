@@ -1,9 +1,9 @@
 default: start
 
 activate:
-	source venv/bin/activate
+	bash -c "source venv/bin/activate"
 
-start:
+run:
 	venv/bin/wave run app.py
 
 db: 
