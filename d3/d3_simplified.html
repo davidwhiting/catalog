@@ -23,69 +23,99 @@
     var transferCredits = false;    
 
     const screenWidth = 800;
-    const boxWidth = 110;
+
+    const boxWidth = 120;
     const boxHeight = 40;
-    const textOffsetX = 10; 
-    const textOffsetY = 25;
-    const sessionOffset = 35;
-    const headerRow = 20;
-
-    // Define x coordinates for rectangles
-    var bin = [10];
-    // if sessions, then 1.75*boxWidth else boxWidth
-    for (let k=0; k <=30; k++) {
-        bin.push(bin[k] + 20 + 1.75*boxWidth);
-    }
     
-    // Define y coordinates for rectangles
-    const yGap = 4;
-    const boxSpace = boxHeight + yGap;
-    var row = [80];
-    for (let k=0; k <=10; k++) {
-        row.push(row[k] + boxSpace);
-    }
+    const textOffsetX = 20;
+    const textOffsetY = 25;
+    
+    const headerRow = 10;
+    const sessionOffset = 40;
+    const termSpace = 40;
+    const wideHeader = 260;
+    const narrowHeader = 190;
+    const summerDiff = 70;
 
-    var semesterData = [];
+//    var semesterData = [];
+//    const seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL'];
+//    for (let year = 2024; year <= 2040; year++) {
+//      for (let season of seasons) {
+//        semesterData.push(`${season} ${year}`);
+//      }
+//    }
+
     const seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL'];
+    var semesterData = [];
+    var x0 = [];
+    var space = 0;
+    var i = 0;
     for (let year = 2024; year <= 2040; year++) {
       for (let season of seasons) {
         semesterData.push(`${season} ${year}`);
+        if (i > 0) {
+          space = x0[i-1] + termSpace + wideHeader;
+          if (season === 'FALL') {
+            space -= summerDiff;
+          }
+        } else {
+          space = 10;
+        }
+        x0.append(space);
+        i += 1;
       }
     }
-    
-    function render(data) {
-      // Start Nested Functions
-      function drawColumn(period, data) {
-        var filteredData = data.filter(item => item.period === period);
-        var anyItem = false;
-        for (let j = 0; j < data.length; j++) {
-          let offset = (j % 3 - 1) * sessionOffset;
-          let item = filteredData[j];
-          if (item !== undefined) {
-            anyItem = true;
-            let fullname = `${item.name} (${item.credits})`;
-            drawRectangle(bin[period]+offset, row[j], fullname, item.color, item.textcolor);
-          }
-        }
-        if (anyItem) {
-          drawHeader(bin[period], 20, semesterData[period-1], 'lightgray', 'black');
-        }
-      }
-      function drawRectangle(x, y, name, color, textcolor, description='') {
+
+    // Text offset multipliers
+    const courseMult = 1; // course text offset
+    const wideMult = 3;   // header 3 sessions
+    const narrowMult = 2; // header 2 sessions
+
+    // Move the logic to python
+
+    var x0 = [10]; // Spring
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Summer
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader - 70); // Fall
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Winter
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Spring
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Summer
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader - 70); // Fall
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Winter
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Spring
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Summer
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader - 70); // Fall
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Winter
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Spring
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Summer
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader - 70); // Fall
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Winter
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Spring
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Summer
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader - 70); // Fall
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Winter
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Spring
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Summer
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader - 70); // Fall
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Winter
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Spring
+    x0.push(x0[x0.length-1] + sessionOffset + wideHeader);      // Summer
+
+
+    function drawRect(x, y, width, name, color, textcolor, offset=1, fontsize='12px', description='') {
         var g = zoomable.append("g");
         g.append("rect")
           .attr("x", x)
           .attr("y", y)
-          .attr("width", boxWidth)
+          .attr("width", width) // was boxWidth
           .attr("height", boxHeight)
           .style("fill", color)
           .classed("movable", true); // Add the "movable" class
         g.append("text")
-          .attr("x", x + textOffsetX)
+          .attr("x", x + offset*textOffsetX)
           .attr("y", y + textOffsetY)
           .text(name)
           .attr("fill", textcolor)
-          .style("font-size", "12px")
+          .style("font-size", fontsize)
           .style("font-family", "Arial")
           .style("font-weight", "bold")
           .classed("movable", true); // Add the "movable" class
@@ -93,35 +123,20 @@
         g.append("description")
           .text(description);
       }
-      function drawHeader(x, y, name, color, textcolor, description='') {
-        var g = zoomable.append("g");
-        g.append("rect")
-          .attr("x", x - sessionOffset)
-          .attr("y", y)
-          .attr("width", boxWidth + 2 * sessionOffset)
-          .attr("height", boxHeight)
-          .style("fill", color)
-          .classed("movable", true); // Add the "movable" class
-        g.append("text")
-          .attr("x", x - sessionOffset + 2*textOffsetX)
-          .attr("y", y + textOffsetY)
-          .text(name)
-          .attr("fill", textcolor)
-          .style("font-size", "14px")
-          .style("font-family", "Arial")
-          .style("font-weight", "bold")
-          .classed("movable", true); // Add the "movable" class
-        // Add a tooltip
-        g.append("description")
-          .text(description);
-      }
-      // End of Nested Functions
-      zoomable.selectAll(".movable").remove();
-      var maxPeriod = Math.max(...data.map(item => item.period));
-      for (let j = 0; j <= maxPeriod; j++) {
-        drawColumn(j, data);
-      }
+  function render(data) {
+    for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        if (item.x === undefined || 
+            item.y === undefined || 
+            item.name === undefined || 
+            item.color === undefined || 
+            item.textcolor === undefined) {
+              console.error('Error: Missing property in item ' + i);
+              continue;
+        }
+        drawRect(item.x, item.y, item.name, item.color, item.textcolor);
     }
+  }
 
     // Select the body
     var body = d3.select("body");
@@ -138,13 +153,71 @@
       });
     svg.call(zoom);
 
-    // Load the data from a JSON file
-    d3.json('data.json').then(function(data) {
-      // Use the loaded data
-      render(data);
-    }).catch(function(error) {
-      console.log('Error loading data: ' + error);
-    });
+    //var x0 = 10;
+    var y0 = 70;
+
+    function xVal(session, x0=10) {
+      var result = x0 + 70*(session-1);
+      return (result);
+    }
+    function yVal(line) {
+      if (line < 1) {
+        var result = headerRow;
+      } else {
+        result = y0 + 45*(line-1);
+      }
+      return (result);
+    }
+
+
+    console.log(x0);
+
+    console.log([yVal(0), yVal(1), yVal(2), yVal(3), yVal(4), yVal(5), yVal(6)]);
+
+    drawRect(xVal(1, x0[0]), yVal(0), wideHeader,   'SPRING 2024 (10)', 'lightgray', 'black', wideMult,   true);
+    drawRect(xVal(1, x0[1]), yVal(0), narrowHeader, 'SUMMER 2024 (6)',  'lightgray', 'black', narrowMult, true);
+    drawRect(xVal(1, x0[2]), yVal(0), wideHeader,   'FALL 2024 (10)',   'lightgray', 'black', wideMult,   true);
+    drawRect(xVal(1, x0[3]), yVal(0), wideHeader,   'WINTER 2025 (10)', 'lightgray', 'black', wideMult,   true);
+    drawRect(xVal(1, x0[4]), yVal(0), wideHeader,   'SPRING 2025 (10)', 'lightgray', 'black', wideMult,   true);
+    drawRect(xVal(1, x0[5]), yVal(0), narrowHeader, 'SUMMER 2025 (6)',  'lightgray', 'black', narrowMult, true);
+    drawRect(xVal(1, x0[6]), yVal(0), wideHeader,   'FALL 2025 (10)',   'lightgray', 'black', wideMult,   true);
+    drawRect(xVal(1, x0[7]), yVal(0), wideHeader,   'WINTER 2026 (10)', 'lightgray', 'black', wideMult,   true);
+    drawRect(xVal(1, x0[8]), yVal(0), wideHeader,   'SPRING 2026 (10)', 'lightgray', 'black', wideMult,   true);
+
+    drawRect(xVal(1, x0[0]), yVal(1), boxWidth, 'STAT 100 (3)', "orange", "black", courseMult, false);
+    drawRect(xVal(2, x0[0]), yVal(2), boxWidth, 'STAT 200 (4)', "blue",   "white", courseMult, false);
+    drawRect(xVal(3, x0[0]), yVal(3), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+    drawRect(xVal(1, x0[1]), yVal(1), boxWidth, 'MATH 100 (3)', "purple", "white", courseMult, false);
+    drawRect(xVal(2, x0[1]), yVal(2), boxWidth, 'MATH 200 (3)', "blue",   "white", courseMult, false);
+    drawRect(xVal(1, x0[2]), yVal(1), boxWidth, 'STAT 100 (3)', "red",    "white", courseMult, false);
+    drawRect(xVal(1, x0[2]), yVal(2), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+    drawRect(xVal(2, x0[2]), yVal(3), boxWidth, 'STAT 200 (4)', "blue",   "white", courseMult, false);
+    drawRect(xVal(3, x0[2]), yVal(4), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+    drawRect(xVal(1, x0[3]), yVal(1), boxWidth, 'STAT 100 (3)', "red",    "white", courseMult, false);
+    drawRect(xVal(2, x0[3]), yVal(2), boxWidth, 'STAT 200 (4)', "blue",   "white", courseMult, false);
+    drawRect(xVal(3, x0[3]), yVal(3), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+    drawRect(xVal(1, x0[4]), yVal(1), boxWidth, 'STAT 100 (3)', "red",    "white", courseMult, false);
+    drawRect(xVal(2, x0[4]), yVal(2), boxWidth, 'STAT 200 (4)', "blue",   "white", courseMult, false);
+    drawRect(xVal(3, x0[4]), yVal(3), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+    drawRect(xVal(1, x0[5]), yVal(1), boxWidth, 'MATH 100 (3)', "purple", "white", courseMult, false);
+    drawRect(xVal(2, x0[5]), yVal(2), boxWidth, 'MATH 200 (3)', "blue",   "white", courseMult, false);
+    drawRect(xVal(1, x0[6]), yVal(1), boxWidth, 'STAT 100 (3)', "red",    "white", courseMult, false);
+    drawRect(xVal(2, x0[6]), yVal(3), boxWidth, 'STAT 200 (4)', "blue",   "white", courseMult, false);
+    drawRect(xVal(3, x0[6]), yVal(4), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+    drawRect(xVal(1, x0[7]), yVal(1), boxWidth, 'STAT 100 (3)', "red",    "white", courseMult, false);
+    drawRect(xVal(2, x0[7]), yVal(2), boxWidth, 'STAT 200 (4)', "blue",   "white", courseMult, false);
+    drawRect(xVal(3, x0[7]), yVal(3), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+    drawRect(xVal(1, x0[8]), yVal(1), boxWidth, 'STAT 100 (3)', "red",    "white", courseMult, false);
+    drawRect(xVal(2, x0[8]), yVal(2), boxWidth, 'STAT 200 (4)', "blue",   "white", courseMult, false);
+    drawRect(xVal(3, x0[8]), yVal(3), boxWidth, 'STAT 300 (3)', "green",  "white", courseMult, false);
+
+//    // Load the data from a JSON file
+//    d3.json('data.json').then(function(data) {
+//      // Use the loaded data
+//      render(data);
+//    }).catch(function(error) {
+//      console.log('Error loading data: ' + error);
+//    });
   
   </script>
 
