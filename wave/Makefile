@@ -6,6 +6,9 @@ activate:
 run:
 	venv/bin/wave run app.py
 
+server:
+	venv/bin/waved
+
 db: 
 	venv/bin/wavedb -access-key-id uzer -access-key-secret pa55word
 

@@ -51,11 +51,6 @@ next_term_cost = "${:,}".format(credits_next_term * cost_per_credit)
 # Plug JSON-serialized data into our html template
 # example_html = html_template_example.format(script_path=d3_js_script_path, data=json.dumps(example_data))
 
-def get_form_items(value: Optional[float]):
-    return [
-        ui.text(f'spinbox_trigger={value}'),
-        ui.spinbox(name='spinbox_trigger', label='Credits', trigger=True),
-    ]
 
 @app('/')
 async def serve(q: Q):
@@ -78,10 +73,10 @@ async def serve(q: Q):
 
 #    # spinbox w/ trigger
 #    if not q.client.initialized:
-#        q.page['spinbox'] = ui.form_card(box='slider', items=get_form_items(None))
+#        q.page['spinbox'] = ui.form_card(box='slider', items=utils.get_form_items(None))
 #        q.client.initialized = True
 #    if q.args.spinbox_trigger is not None:
-#        q.page['spinbox'].items = get_form_items(q.args.spinbox_trigger)
+#        q.page['spinbox'].items = utils.get_form_items(q.args.spinbox_trigger)
 
     if q.args.show_inputs:
         q.page['spinbox'].items = [
@@ -96,10 +91,10 @@ async def serve(q: Q):
 
 #    # spinbox w/ trigger
 #    if not q.client.initialized:
-#        q.page['spinbox'] = ui.form_card(box='slider', items=get_form_items(None))
+#        q.page['spinbox'] = ui.form_card(box='slider', items=utils.get_form_items(None))
 #        q.client.initialized = True
 #    if q.args.spinbox_trigger is not None:
-#        q.page['spinbox'].items = get_form_items(q.args.spinbox_trigger)
+#        q.page['spinbox'].items = utils.get_form_items(q.args.spinbox_trigger)
 
     # slider
     if q.args.show_inputs:

@@ -6,6 +6,13 @@ import templates
 import pandas as pd
 import numpy as np
 
+#def get_form_items(value: Optional[float]):
+#    return [
+#        ui.text(f'spinbox_trigger={value}'),
+#        ui.spinbox(name='spinbox_trigger', label='Credits', trigger=True),
+#    ]
+
+
 def prepare_d3_data(df, start_term='SPRING 2024'):
 
     def set_colors(row):
@@ -74,7 +81,7 @@ def prepare_d3_data(df, start_term='SPRING 2024'):
                    'fontsize', 'period', 'name', 'credits', 'description']]
 
     # Prepare data for the D3 figure
-    
+
     max_period = max(df['period'])
     headers = generate_header_data(start_term, max_period)
 
