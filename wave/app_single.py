@@ -187,8 +187,6 @@ async def init(q: Q) -> None:
     q.page['toggle'] = cards.toggle
     q.page['footer'] = cards.footer
 
-#    html_template = templates.html_code.format(javascript=templates.javascript_insert, data=json_data)
-
     # Convert to json for passing along to our d3 function
     df_json = df.to_json(orient='records')
     headers_json = headers.to_json(orient='records')
@@ -209,33 +207,37 @@ async def init(q: Q) -> None:
 #    q.page['stats'] = cards.stats(stats_dict)
 
     q.page['stats'] = ui.form_card(box='horizontal', items=[
-        ui.stats(justify='between', items=[
-            ui.stat(
-                label='Credits', 
-                value=str(total_credits_remaining), 
-                caption='Credits Remaining', 
-                icon='Education'),            
-            ui.stat(
-                label='Tuition', 
-                value=next_term_cost, 
-                caption='Estimated Tuition', 
-                icon='Money'),
-            ui.stat(
-                label='Terms Remaining', 
-                value=str(terms_remaining), 
-                caption='Terms Remaining', 
-                icon='Education'),
-            ui.stat(
-                label='Finish Date', 
-                value=completion_date, 
-                caption='(Estimated)', 
-                icon='SpecialEvent'),
-            ui.stat(
-                label='Total Tuition', 
-                value=total_cost_remaining, 
-                caption='Estimated Tuition', 
-                icon='Money'),
-        ])
+        ui.stats(justify='between', 
+            items=[
+                ui.stat(
+                    label='Tuition', 
+                    value=next_term_cost, 
+                    caption='Next Term Tuition', 
+                    icon='Money'),
+#            ], 
+#            items=[
+                ui.stat(
+                    label='Credits', 
+                    value=str(total_credits_remaining), 
+                    caption='Credits Remaining', 
+                    icon='Education'),            
+                ui.stat(
+                    label='Terms Remaining', 
+                    value=str(terms_remaining), 
+                    caption='Terms Remaining', 
+                    icon='Education'),
+                ui.stat(
+                    label='Finish Date', 
+                    value=completion_date, 
+                    caption='(Estimated)', 
+                    icon='SpecialEvent'),
+                ui.stat(
+                    label='Total Tuition', 
+                    value=total_cost_remaining, 
+                    caption='Estimated Tuition', 
+                    icon='Money'),
+            ]
+        )
     ])
 
     q.page['markdown'] = cards.markdown
@@ -245,12 +247,16 @@ async def home(q: Q):
     clear_cards(q)
     add_card(q, 'form', ui.form_card(box='vertical', items=[ui.text('This is my app!')]))
 
-# Use for cards that should be deleted on calling `clear_cards`. Useful for routing and page updates.
+# Use for page cards that should be removed when navigating away.
+# For pages that should be always present on screen use q.page[key] = ...
 def add_card(q, name, card) -> None:
     q.client.cards.add(name)
     q.page[name] = card
 
-def clear_cards(q, ignore=[]) -> None:
+# Remove all the cards related to navigation.
+def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
+    if not q.client.cards:
+        return
     for name in q.client.cards.copy():
         if name not in ignore:
             del q.page[name]

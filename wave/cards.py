@@ -55,18 +55,31 @@ footer = ui.footer_card(
 )
 
 markdown = ui.form_card(
-    box='rightnote',
+    box='leftnote',
     items=[ui.text(templates.sample_markdown)]
 )
 
 #image_path, = await q.site.upload(['umgc-logo.png'])
 
-def header(image_path):
+def header(image_path, q=Q):
     result = ui.header_card(    
         box='header',
         title='UMGC Curriculum Assistant',
         subtitle="Title TBD",
         image=image_path,
+        secondary_items=[
+            ui.tabs(name='tabs', 
+#                    value=f'#{q.args["#"]}' if q.args['#'] else '#page0', 
+                    value='#page1', 
+#                    link=True, 
+                    items=[
+                ui.tab(name='#page0', label='Home'),
+                ui.tab(name='#page1', label='Select Major'),
+                ui.tab(name='#page2', label='Schedule Courses'),
+                ui.tab(name='#page3', label='Electives'),
+                ui.tab(name='#page4', label='Student Info'),
+            ]),
+        ],
         items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)]
     )
     return result
