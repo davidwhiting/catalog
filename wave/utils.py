@@ -12,6 +12,10 @@ def get_form_items(value):
         ui.spinbox(name='spinbox_trigger', label='Credits', trigger=True),
     ]
 
+
+## For some reason, this function works in the app.py file but not in the included utils.py file.
+## Need to figure out why this is.
+
 #def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 #    if not q.client.cards:
 #        return

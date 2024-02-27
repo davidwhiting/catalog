@@ -265,7 +265,7 @@ def stats(D):
                 ui.stat(label='Credits', 
                         value=str(D['total_credits_remaining']), 
                         caption='Credits Remaining', 
-                        icon='Education'),            
+                        icon='LearningTools'),            
                 ui.stat(label='Tuition', 
                         value=D['next_term_cost'], 
                         caption='Estimated Tuition', 

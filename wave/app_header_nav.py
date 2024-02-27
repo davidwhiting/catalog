@@ -146,28 +146,7 @@ async def courses(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
     add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
     add_card(q, 'd3plot', cards.d3plot_new(html_template, 'd3'))
-
-#    add_card(q, 'sessions', 
-#        ui.form_card(
-#            box=ui.box('grid', width='400px'),
-#            items=[
-#                ui.checklist(
-#                    name='checklist', 
-#                    label='Sessions Attending',
-#                    choices=[ui.choice(name=x, label=x) for x in ['Session 1', 'Session 2', 'Session 3']]),
-#            #    ui.button(name='show_inputs', label='Submit', primary=True),
-#        ])
-#    )
     
-#    add_card(q, 'spinbox', 
-#        ui.form_card(
-#            box=ui.box('grid', width='400px'),
-#            items=[
-#                ui.spinbox(name='spinbox', label='Courses per Session', min=1, max=5, step=1, value=1),
-#            #    ui.button(name='show_inputs', label='Submit', primary=True),
-#            ]
-#        )
-#    )
     Sessions = ['Session 1', 'Session 2', 'Session 3']
     add_card(q, 'sessions_spin', 
         ui.form_card(
@@ -204,6 +183,40 @@ async def courses(q: Q):
         )
     )
     add_card(q, 'table', cards.test_table())
+
+    add_card(q, 'stats', ui.form_card(box='dashboard', items=[
+        ui.stats(justify='between', 
+            items=[
+                ui.stat(
+                    label='Tuition', 
+                    value=next_term_cost, 
+                    caption='Next Term Tuition', 
+                    icon='Money'),
+#            ], 
+#            items=[
+                ui.stat(
+                    label='Credits', 
+                    value=str(total_credits_remaining), 
+                    caption='Credits Remaining', 
+                    icon='LearningTools'),            
+                ui.stat(
+                    label='Terms Remaining', 
+                    value=str(terms_remaining), 
+                    caption='Terms Remaining', 
+                    icon='Education'),
+                ui.stat(
+                    label='Finish Date', 
+                    value=completion_date, 
+                    caption='(Estimated)', 
+                    icon='SpecialEvent'),
+                ui.stat(
+                    label='Total Tuition', 
+                    value=total_cost_remaining, 
+                    caption='Estimated Tuition', 
+                    icon='Money'),
+            ]
+        )
+    ]))
 
 @on('#electives')
 async def electives(q: Q):

@@ -374,7 +374,7 @@ javascript_insert_double = '''
         .call(zoom.transform, d3.zoomIdentity.scale(0.80).translate(-160, 0));
 '''
 
-## javascript_insert is currently the one being used !!!!
+## javascript_minimal is currently the one being used !!!!
 javascript_insert = '''
     const screenWidth = 800;
     const boxWidth = 110;

@@ -8,9 +8,6 @@ import cards
 import templates
 import utils
 
-### Note: This loading of the javascript file is not working for me for some reason.
-###       It did work for the previous D3 example.
-###       Debug later
 ## The example D3 Javascript file is located in the same directory as this example; get its path
 ##d3_js_script_filename = os.path.join(os.path.dirname(__file__), 'plot_d3.js')
 #d3_js_script_filename = os.path.join(os.path.dirname(__file__), 'class_d3.js')
@@ -186,8 +183,10 @@ async def init(q: Q) -> None:
     df_json = df.to_json(orient='records')
     headers_json = headers.to_json(orient='records')
 
-    html_template = templates.html_code_minimal.format(javascript=templates.javascript_minimal, 
-                                                       headers=headers_json, data=df_json)
+    html_template = templates.html_code_minimal.format(
+        javascript=templates.javascript_minimal, 
+        headers=headers_json, 
+        data=df_json)
 #    html_template = templates.html_code.format(javascript=d3_js_script_path, data=json_data)
     q.page['d3plot'] = cards.d3plot(html_template)
 
