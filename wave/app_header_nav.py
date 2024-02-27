@@ -1,13 +1,59 @@
-from h2o_wave import main, app, Q, ui, on, run_on, data
+#from h2o_wave import main, app, Q, ui, on, run_on, data
+from h2o_wave import main, app, Q, site, ui, on, run_on, data, graphics as g
 from typing import Optional, List
+import logging
+
+import pandas as pd
+import json
+import os.path
+
+import templates
+import cards
+import utils
 
 
-# Use for page cards that should be removed when navigating away.
-# For pages that should be always present on screen use q.page[key] = ...
-def add_card(q, name, card) -> None:
-    q.client.cards.add(name)
-    q.page[name] = card
+from utils import add_card
 
+# Set up logging
+logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
+
+
+# Import the json file into a dataframe
+# eventually we will extract this from the database
+df = pd.DataFrame(templates.data_json_new)
+
+# pick up start_term from the form
+start_term = 'SPRING 2024'
+
+df, headers = utils.prepare_d3_data(df, start_term.upper())
+
+terms_remaining = max(headers.period)
+completion_date = headers.loc[headers['period'] == terms_remaining, 'name'].values[0].capitalize()
+total_credits_remaining = df['credits'].sum()
+credits_next_term = headers.loc[headers['period'] == 1, 'credits'].values[0]
+
+# Convert to json for passing along to our d3 function
+#json_data = df.to_json(orient='records')
+
+tuition = {
+    'in_state': 324,
+    'out_of_state': 499,
+    'military': 250
+}
+
+cost_per_credit = tuition['military']
+total_cost_remaining = "${:,}".format(total_credits_remaining * cost_per_credit)
+next_term_cost = "${:,}".format(credits_next_term * cost_per_credit)
+
+# Convert to json for passing along to our d3 function
+df_json = df.to_json(orient='records')
+headers_json = headers.to_json(orient='records')
+
+html_template = templates.html_code_minimal.format(
+    javascript=templates.javascript_minimal, 
+    headers=headers_json, 
+    data=df_json)
+#    html_template = templates.html_code.format(javascript=d3_js_script_path, data=json_data)
 
 # Remove all the cards related to navigation.
 def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
@@ -19,63 +65,57 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
             q.client.cards.remove(name)
 
 
-@on('#page1')
-async def page1(q: Q):
+@on('#home')
+async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
-    for i in range(3):
-        add_card(q, f'info{i}', ui.tall_info_card(box='horizontal', name='', title='Speed',
-                                                  caption='The models are performant thanks to...', icon='SpeedHigh'))
-    add_card(q, 'article', ui.tall_article_preview_card(
-        box=ui.box('vertical', height='600px'), title='How does magic work',
-        image='https://images.pexels.com/photos/624015/pexels-photo-624015.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        content='''
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ac sodales felis. Duis orci enim, iaculis at augue vel, mattis imperdiet ligula. Sed a placerat lacus, vitae viverra ante. Duis laoreet purus sit amet orci lacinia, non facilisis ipsum venenatis. Duis bibendum malesuada urna. Praesent vehicula tempor volutpat. In sem augue, blandit a tempus sit amet, tristique vehicula nisl. Duis molestie vel nisl a blandit. Nunc mollis ullamcorper elementum.
-Donec in erat augue. Nullam mollis ligula nec massa semper, laoreet pellentesque nulla ullamcorper. In ante ex, tristique et mollis id, facilisis non metus. Aliquam neque eros, semper id finibus eu, pellentesque ac magna. Aliquam convallis eros ut erat mollis, sit amet scelerisque ex pretium. Nulla sodales lacus a tellus molestie blandit. Praesent molestie elit viverra, congue purus vel, cursus sem. Donec malesuada libero ut nulla bibendum, in condimentum massa pretium. Aliquam erat volutpat. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer vel tincidunt purus, congue suscipit neque. Fusce eget lacus nibh. Sed vestibulum neque id erat accumsan, a faucibus leo malesuada. Curabitur varius ligula a velit aliquet tincidunt. Donec vehicula ligula sit amet nunc tempus, non fermentum odio rhoncus.
-Vestibulum condimentum consectetur aliquet. Phasellus mollis at nulla vel blandit. Praesent at ligula nulla. Curabitur enim tellus, congue id tempor at, malesuada sed augue. Nulla in justo in libero condimentum euismod. Integer aliquet, velit id convallis maximus, nisl dui porta velit, et pellentesque ligula lorem non nunc. Sed tincidunt purus non elit ultrices egestas quis eu mauris. Sed molestie vulputate enim, a vehicula nibh pulvinar sit amet. Nullam auctor sapien est, et aliquet dui congue ornare. Donec pulvinar scelerisque justo, nec scelerisque velit maximus eget. Ut ac lectus velit. Pellentesque bibendum ex sit amet cursus commodo. Fusce congue metus at elementum ultricies. Suspendisse non rhoncus risus. In hac habitasse platea dictumst.
-        '''
-    ))
+    add_card(q, f'step1_of_n', 
+        ui.tall_info_card(
+            box=ui.box('horizontal', width='25%'), 
+            name='Name', 
+            title='Login',
+            caption='The first step is to log in', 
+            icon='Signin')
+    )
+    add_card(q, f'step2_of_n', 
+        ui.tall_info_card(
+            box=ui.box('horizontal', width='25%'), 
+            name='', 
+            title='Import Information',
+            caption='Import student information from RDBMS. Information includes tuition type (military, in-state, out-of-state), persona, transfer credits, major chosen, classes completed, etc.', 
+            icon='Import')
+    )
+    add_card(q, f'step3_of_n', 
+        ui.tall_info_card(
+            box=ui.box('horizontal', width='25%'), 
+            name='', 
+            title='Update Information',
+            caption='Details to be filled in.', 
+            icon='SpeedHigh')
+    )
+    add_card(q, f'step4_of_n', 
+        ui.tall_info_card(
+            box=ui.box('horizontal', width='25%'), 
+            name='', 
+            title='Personalization',
+            caption='Details to be filled in.', 
+            icon='UserFollowed')
+    )
 
+# credits remaining icon: LearningTools
+    
+    add_card(q, 'home_markdown', 
+        ui.form_card(
+            box=ui.box('vertical', height='600px'),
+            items=[ui.text(templates.home_markdown)]
+        )
+    )
 
-@on('#page2')
-async def page2(q: Q):
+@on('#major')
+async def major(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    add_card(q, 'chart1', ui.plot_card(
-        box='horizontal',
-        title='Chart 1',
-        data=data('category country product price', 10, rows=[
-            ('G1', 'USA', 'P1', 124),
-            ('G1', 'China', 'P2', 580),
-            ('G1', 'USA', 'P3', 528),
-            ('G1', 'China', 'P1', 361),
-            ('G1', 'USA', 'P2', 228),
-            ('G2', 'China', 'P3', 418),
-            ('G2', 'USA', 'P1', 824),
-            ('G2', 'China', 'P2', 539),
-            ('G2', 'USA', 'P3', 712),
-            ('G2', 'USA', 'P1', 213),
-        ]),
-        plot=ui.plot([ui.mark(type='interval', x='=product', y='=price', color='=country', stack='auto',
-                              dodge='=category', y_min=0)])
-    ))
-    add_card(q, 'chart2', ui.plot_card(
-        box='horizontal',
-        title='Chart 2',
-        data=data('date price', 10, rows=[
-            ('2020-03-20', 124),
-            ('2020-05-18', 580),
-            ('2020-08-24', 528),
-            ('2020-02-12', 361),
-            ('2020-03-11', 228),
-            ('2020-09-26', 418),
-            ('2020-11-12', 824),
-            ('2020-12-21', 539),
-            ('2020-03-18', 712),
-            ('2020-07-11', 213),
-        ]),
-        plot=ui.plot([ui.mark(type='line', x_scale='time', x='=date', y='=price', y_min=0)])
-    ))
-    add_card(q, 'table', ui.form_card(box='vertical', items=[ui.table(
+    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
+    add_card(q, 'table1', ui.form_card(box='vertical', items=[ui.table(
         name='table',
         downloadable=True,
         resettable=True,
@@ -101,20 +141,84 @@ async def page2(q: Q):
         ])
     ]))
 
-
-@on('#page3')
-async def page3(q: Q):
+@on('#courses')
+async def courses(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
+    add_card(q, 'd3plot', cards.d3plot_new(html_template, 'd3'))
 
-    for i in range(12):
+#    add_card(q, 'sessions', 
+#        ui.form_card(
+#            box=ui.box('grid', width='400px'),
+#            items=[
+#                ui.checklist(
+#                    name='checklist', 
+#                    label='Sessions Attending',
+#                    choices=[ui.choice(name=x, label=x) for x in ['Session 1', 'Session 2', 'Session 3']]),
+#            #    ui.button(name='show_inputs', label='Submit', primary=True),
+#        ])
+#    )
+    
+#    add_card(q, 'spinbox', 
+#        ui.form_card(
+#            box=ui.box('grid', width='400px'),
+#            items=[
+#                ui.spinbox(name='spinbox', label='Courses per Session', min=1, max=5, step=1, value=1),
+#            #    ui.button(name='show_inputs', label='Submit', primary=True),
+#            ]
+#        )
+#    )
+    Sessions = ['Session 1', 'Session 2', 'Session 3']
+    add_card(q, 'sessions_spin', 
+        ui.form_card(
+            box=ui.box('d3', width='300px'), # min width 200px
+            items=[
+            #    ui.dropdown(
+            #        name='first', 
+            #        label='Start Term', 
+            #        value=q.args.start_term,
+            #        trigger=True,
+            #        width='250px',
+            #        choices=[
+            #            ui.choice(label="Spring 2024"),
+            #            ui.choice(label="Summer 2024"),
+            #            ui.choice(label="Fall 2024"),
+            #            ui.choice(label="Winter 2025"),
+            #        ]
+            #    ),
+                ui.checklist(
+                    name='checklist', 
+                    label='Sessions Attending',
+                    choices=[ui.choice(name=x, label=x) for x in Sessions],
+                    values=Sessions, # set default
+                ),
+                ui.spinbox(
+                    name='spinbox', 
+                    label='Courses per Session', 
+                    width='150px',
+                    min=1, max=5, step=1, value=1),
+#                ui.separator(label=''),
+                ui.slider(name='slider', label='Max Credits per Term', min=1, max=15, step=1, value=9),
+                ui.button(name='show_inputs', label='Submit', primary=True),
+            ]
+        )
+    )
+    add_card(q, 'table', cards.test_table())
+
+@on('#electives')
+async def electives(q: Q):
+    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    add_card(q, 'table', cards.test_table())
+
+    for i in range(4):
         add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
                                                   caption='Lorem ipsum dolor sit amet'))
 
 
-@on('#page4')
-@on('page4_reset')
-async def page4(q: Q):
-    q.page['sidebar'].value = '#page4'
+@on('#student')
+@on('student_reset')
+async def student(q: Q):
+    q.page['sidebar'].value = '#student'
     # When routing, drop all the cards except of the main ones (header, sidebar, meta).
     # Since this page is interactive, we want to update its card
     # instead of recreating it every time, so ignore 'form' card on drop.
@@ -129,13 +233,12 @@ async def page4(q: Q):
         ]),
         ui.textbox(name='textbox1', label='Textbox 1'),
         ui.buttons(justify='end', items=[
-            ui.button(name='page4_step2', label='Next', primary=True),
+            ui.button(name='student_step2', label='Next', primary=True),
         ]),
     ]))
 
-
 @on()
-async def page4_step2(q: Q):
+async def student_step2(q: Q):
     # Just update the existing card, do not recreate.
     q.page['form'].items = [
         ui.stepper(name='stepper', items=[
@@ -145,13 +248,12 @@ async def page4_step2(q: Q):
         ]),
         ui.textbox(name='textbox2', label='Textbox 2'),
         ui.buttons(justify='end', items=[
-            ui.button(name='page4_step3', label='Next', primary=True),
+            ui.button(name='student_step3', label='Next', primary=True),
         ])
     ]
 
-
 @on()
-async def page4_step3(q: Q):
+async def student_step3(q: Q):
     # Just update the existing card, do not recreate.
     q.page['form'].items = [
         ui.stepper(name='stepper', items=[
@@ -161,51 +263,108 @@ async def page4_step3(q: Q):
         ]),
         ui.textbox(name='textbox3', label='Textbox 3'),
         ui.buttons(justify='end', items=[
-            ui.button(name='page4_reset', label='Finish', primary=True),
+            ui.button(name='student_reset', label='Finish', primary=True),
         ])
     ]
 
+async def handle_fallback(q: Q):
+    """
+    Handle fallback cases.
+    """
 
-async def init(q: Q) -> None:
-    q.page['meta'] = ui.meta_card(box='', layouts=[ui.layout(breakpoint='xs', min_height='100vh', zones=[
-        ui.zone('header'),
-        ui.zone('content', zones=[
-            # Specify various zones and use the one that is currently needed. Empty zones are ignored.
-            ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
-            ui.zone('vertical'),
-            ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center')
-        ]),
-    ])])
-    q.page['header'] = ui.header_card(
-        box='header', title='My app', subtitle="Let's conquer the world",
-        image='https://wave.h2o.ai/img/h2o-logo.svg',
-        secondary_items=[
-            ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#page1', link=True, items=[
-                ui.tab(name='#page1', label='Home'),
-                ui.tab(name='#page2', label='Charts'),
-                ui.tab(name='#page3', label='Grid'),
-                ui.tab(name='#page4', label='Form'),
-            ]),
-        ],
-        items=[
-            ui.persona(title='John Doe', subtitle='Developer', size='xs',
-                       image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'),
-        ]
-    )
-    # If no active hash present, render page1.
+    logging.info('Adding fallback page')
+
+    q.page['fallback'] = cards.fallback
+
+    await q.page.save()
+
+async def initialize_client_old(q: Q) -> None:
+    q.page['meta'] = cards.meta_new
+    image_path, = await q.site.upload(['umgc-logo.png'])
+    q.page['header'] = cards.header_new(image_path, q)
+    q.page['footer'] = cards.footer
+
+    # If no active hash present, render home.
     if q.args['#'] is None:
-        await page1(q)
+        await home(q)
+
+#        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
+
+async def show_error(q: Q, error: str):
+    """
+    Displays errors.
+    """
+## Fix in the future
+## Need to adapt from Waveton
+#    logging.error(error)
+#
+#    # Clear all cards
+#    clear_cards(q, q.app.cards)
+#
+#    # Format and display the error
+#    q.page['error'] = cards.crash_report(q)
+#
+#    await q.page.save()
 
 
 @app('/')
 async def serve(q: Q):
-    # Run only once per client connection.
-    if not q.client.initialized:
-        q.client.cards = set()
-        await init(q)
-        q.client.initialized = True
+    """
+    Main entry point. All queries pass through this function.
+    """
+
+    try:
+        # Run only once per client connection.
+        if not q.client.initialized:
+            q.client.cards = set()
+            await initialize_client_old(q)
+            q.client.initialized = True
+
+        # Adding this condition to help in identifying bugs
+        else:
+            await handle_fallback(q)
+
+    except Exception as error:
+        await show_error(q, error=str(error))
 
     # Handle routing.
     await run_on(q)
     await q.page.save()
 
+#@app('/')
+#async def serve(q: Q):
+#    """
+#    Main entry point. All queries pass through this function.
+#    """
+#
+#    try:
+#        # Initialize the app if not already
+#        if not q.app.initialized:
+#            await initialize_app(q)
+#
+#        # Initialize the client if not already
+#        if not q.client.initialized:
+#            await initialize_client(q)
+#
+#        # Update theme if toggled
+#        elif q.args.theme_dark is not None and q.args.theme_dark != q.client.theme_dark:
+#            await update_theme(q)
+#
+#        # Update table if query is edited
+#        elif q.args.query is not None and q.args.query != q.client.query:
+#            await apply_query(q)
+#
+#        # Update dataset if changed
+#        elif q.args.dataset is not None and q.args.dataset != q.client.dataset:
+#            await update_dataset(q)
+#
+#        # Delegate query to query handlers
+#        elif await handle_on(q):
+#            pass
+#
+#        # Adding this condition to help in identifying bugs
+#        else:
+#            await handle_fallback(q)
+#
+#    except Exception as error:
+#        await show_error(q, error=str(error))

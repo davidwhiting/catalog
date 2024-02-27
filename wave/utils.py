@@ -1,17 +1,30 @@
 import sys
 import traceback
-from h2o_wave import Q, expando_to_dict, ui, graphics as g
+from h2o_wave import Q, ui, graphics as g
 import templates
 
 import pandas as pd
 import numpy as np
 
-#def get_form_items(value: Optional[float]):
-#    return [
-#        ui.text(f'spinbox_trigger={value}'),
-#        ui.spinbox(name='spinbox_trigger', label='Credits', trigger=True),
-#    ]
+def get_form_items(value):
+    return [
+        ui.text(f'spinbox_trigger={value}'),
+        ui.spinbox(name='spinbox_trigger', label='Credits', trigger=True),
+    ]
 
+#def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
+#    if not q.client.cards:
+#        return
+#    for name in q.client.cards.copy():
+#        if name not in ignore:
+#            del q.page[name]
+#            q.client.cards.remove(name)
+
+# Use for page cards that should be removed when navigating away.
+# For pages that should be always present on screen use q.page[key] = ...
+def add_card(q, name, card) -> None:
+    q.client.cards.add(name)
+    q.page[name] = card
 
 def prepare_d3_data(df, start_term='SPRING 2024'):
 

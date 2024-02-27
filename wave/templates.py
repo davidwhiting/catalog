@@ -2,6 +2,48 @@ import sys
 import traceback
 from h2o_wave import Q, expando_to_dict, ui, graphics as g
 
+home_markdown = '''
+# Notes
+
+We need to allow for a view with exploration before someone logs in (suppose this is used by somebody not yet enrolled). We will add additional views for those that are logged in. E.g., completed courses, transfer credits, etc.
+
+_**We assume someone is logged in at this point.**_
+
+_**Need to add a few example students to our DB to demo the web tool.**_
+
+Once logged in, the home page will show important dashboard.
+
+
+## Tab Steps Above (Currently Disabled)
+### Login
+
+1. This is where the notes will go.
+1. This is where the notes will go.
+
+### Import information
+
+1. This is where the notes will go.
+
+### Update Information
+
+1. This is where  the notes will go.
+
+### Personalization
+
+1. This is where the notes will go.
+
+## Philosophy
+
+- For this prototype, we will assume we have access to appropriate student information.
+  -  What information that entails we will fill in as we go.
+
+- For this prototype, we will save the student information in a sqlite3 db to be retrieved in course
+- We will keep track of the steps, and show different "Home" pages depending on what has already been filled in by the student. 
+- We will also allow the student to navigate to previous steps to update or fix information.
+- The most important information is included as tabs in the top of the webpage.
+
+'''
+
 sample_markdown = '''
 ## Notes and To Do's:
 
@@ -12,14 +54,6 @@ To Do:
 - Add menus for elective exploration and selection
 - Add menus for minor exploration and selection
 - Add checkbox or toggle switch for adding completed credits
-
-Table:
-
-| Column 1 | Column 2 | Column 3 |
-| -------- | -------- | -------- |
-| Item 1   | Item 2   | Item 3   |
-| Item 1   | Item 2   | Item 3   |
-| Item 1   | Item 2   | Item 3   |
 '''
 
 ## Escape curly brackets {} with {{}} so that substitution within Python works properly
@@ -461,7 +495,7 @@ javascript_insert = '''
 '''
 
 javascript_minimal = '''
-    const screenWidth = 800;
+    const screenWidth = 1200;
     const boxHeight = 40;
     const textOffsetX = 20;
     const textOffsetY = 25;
