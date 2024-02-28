@@ -1,4 +1,3 @@
-#from h2o_wave import main, app, Q, ui, on, run_on, data
 from h2o_wave import main, app, Q, site, ui, on, run_on, data, graphics as g
 from typing import Optional, List
 import logging

@@ -204,7 +204,7 @@ def header(image_path, q):
     )
     return result
 
-def header_new(image_path, q):
+def header_new_old(image_path, q):
     result = ui.header_card(
         box='header', 
         title='UMGC Programs',
@@ -216,7 +216,7 @@ def header_new(image_path, q):
                 ui.tab(name='#major', label='Select Major'),
                 ui.tab(name='#courses', label='Schedule Courses'),
                 ui.tab(name='#electives', label='Electives'),
-                ui.tab(name='#student', label='Student Info'),
+#                ui.tab(name='#student', label='Student Info'),
             ]),
         ],
 #        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
@@ -226,6 +226,57 @@ def header_new(image_path, q):
         ]
     )
     return result
+
+def header_new(image_path, q):
+    image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'
+
+    result = ui.header_card(
+        box='header', 
+        title='UMGC Programs',
+        subtitle="Registration Assistant",
+        image=image_path,
+        secondary_items=[
+            ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
+                ui.tab(name='#home', label='Home'),
+                ui.tab(name='#major', label='Select Major'),
+                ui.tab(name='#courses', label='Schedule Courses'),
+                ui.tab(name='#electives', label='Electives'),
+#                ui.tab(name='#student', label='Student Info'),
+            ]),
+        ],
+#        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
+        items=[
+            ui.persona(title='John Doe', subtitle='Student', size='xs', image=image),
+        ]
+    )
+    return result
+
+#person_image = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'
+#header_menu_commands = [
+#    ui.command(name='profile', label='Profile', icon='Contact'),
+#    ui.command(name='preferences', label='Preferences', icon='Settings'),
+#    ui.command(name='logout', label='Logout', icon='SignOut'),
+#]
+
+#async def serve(q: Q):
+#    if not q.client.initialized:
+#        q.page['example'] = ui.form_card(box='1 1 2 3', items=[])
+#        q.client.initialized = True
+#    if 'profile' in q.args and not q.args.show_form:
+#        q.page['example'].items = [
+#            ui.text(f'profile={q.args.profile}'),
+#            ui.text(f'preferences={q.args.preferences}'),
+#            ui.text(f'logout={q.args.logout}'),
+#            ui.button(name='show_form', label='Back', primary=True),
+#        ]
+#    else:
+#        q.page['example'].items = [
+#            ui.menu(image=image, items=commands),
+#            ui.menu(icon='Add', items=commands),
+#            ui.menu(label='App', items=commands),
+#            ui.menu(items=commands)
+#        ]
+#    await q.page.save()
 
 def d3plot(html):
     result = ui.frame_card(
