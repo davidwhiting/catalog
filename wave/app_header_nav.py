@@ -101,20 +101,20 @@ async def home(q: Q):
             icon='UserFollowed')
     )
     
-    for i in range(4):
-        add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='300px'), name='', title='Tile',
-                                                  caption='Lorem ipsum dolor sit amet'))
+    #for i in range(4):
+    #    add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='250px'), name='', title='Tile',
+    #                                              caption='Lorem ipsum dolor sit amet'))
     add_card(q, 'home_markdown1', 
         ui.form_card(
 #            box=ui.box('vertical', height='600px'),
-            box=ui.box('grid', width='600px'),
+            box=ui.box('grid', width='400px'),
            items=[ui.text(templates.home_markdown1)]
         )
     )
     add_card(q, 'home_markdown2', 
         ui.form_card(
 #            box=ui.box('vertical', height='600px'),
-            box=ui.box('grid', width='600px'),
+            box=ui.box('grid', width='400px'),
            items=[ui.text(templates.home_markdown2)]
         )
     )
@@ -182,12 +182,12 @@ async def major(q: Q):
         title='Recommend Major - People like me',
         caption='Suggest Major(s) based on recommendation engine.')
     )
-    add_card(q, 'major_step5', ui.wide_info_card(
-        box=ui.box('grid', width='400px'), 
-        name='major_step5', 
-        title='Title',
-        caption='Lorem ipsum dolor sit amet')
-    )
+#    add_card(q, 'major_step5', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='major_step5', 
+#        title='Title',
+#        caption='Lorem ipsum dolor sit amet')
+#    )
 
     #for i in range(4):
     #    add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
@@ -199,7 +199,21 @@ async def major(q: Q):
 @on('#courses')
 async def courses(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
+#    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
+    # Generate the following automatically
+    selected_degree = "Bachelor's"
+    selected_program = "Business Administration"
+    add_card(q, 'selected_major', 
+        ui.form_card(
+            box='horizontal',
+            items=[
+                ui.text(
+                    selected_degree + ' in ' + selected_program,
+                    size=ui.TextSize.XL
+                )
+            ]
+        )
+    )
     add_card(q, 'd3plot', cards.d3plot_new(html_template, 'd3'))
     
     Sessions = ['Session 1', 'Session 2', 'Session 3']
@@ -238,9 +252,20 @@ async def courses(q: Q):
         )
     )
 #    add_card(q, 'table', cards.test_table())
-    for i in range(3):
-        add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
-                                                  caption='Lorem ipsum dolor sit amet'))
+    
+    add_card(q, 'edit_sequence', ui.wide_info_card(
+        box=ui.box('grid', width='400px'), 
+        name='', 
+        title='Edit Sequence',
+        caption='Add per-term control of course selection and sequence.'
+    ))
+
+    add_card(q, 'lock_courses', ui.wide_info_card(
+        box=ui.box('grid', width='600px'), 
+        name='', 
+        title='Advice',
+        caption='Add hints and advice from counselors, e.g., "Not scheduling a class for session 2 will delay your graduation by x terms"'
+    ))
 
     add_card(q, 'stats', ui.form_card(box='dashboard', items=[
         ui.stats(
