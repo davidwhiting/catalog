@@ -100,45 +100,101 @@ async def home(q: Q):
             caption='Details to be filled in.', 
             icon='UserFollowed')
     )
-
-# credits remaining icon: LearningTools
     
-    add_card(q, 'home_markdown', 
+    for i in range(4):
+        add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='300px'), name='', title='Tile',
+                                                  caption='Lorem ipsum dolor sit amet'))
+    add_card(q, 'home_markdown1', 
         ui.form_card(
-            box=ui.box('vertical', height='600px'),
-            items=[ui.text(templates.home_markdown)]
+#            box=ui.box('vertical', height='600px'),
+            box=ui.box('grid', width='600px'),
+           items=[ui.text(templates.home_markdown1)]
         )
     )
+    add_card(q, 'home_markdown2', 
+        ui.form_card(
+#            box=ui.box('vertical', height='600px'),
+            box=ui.box('grid', width='600px'),
+           items=[ui.text(templates.home_markdown2)]
+        )
+    )
+
 
 @on('#major')
 async def major(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
     add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
-    add_card(q, 'table1', ui.form_card(box='vertical', items=[ui.table(
-        name='table',
-        downloadable=True,
-        resettable=True,
-        groupable=True,
-        columns=[
-            ui.table_column(name='text', label='Process', searchable=True),
-            ui.table_column(name='tag', label='Status', filterable=True, cell_type=ui.tag_table_cell_type(
-                name='tags',
-                tags=[
-                    ui.tag(label='FAIL', color='$red'),
-                    ui.tag(label='DONE', color='#D2E3F8', label_color='#053975'),
-                    ui.tag(label='SUCCESS', color='$mint'),
-                ]
-            ))
-        ],
-        rows=[
-            ui.table_row(name='row1', cells=['Process 1', 'FAIL']),
-            ui.table_row(name='row2', cells=['Process 2', 'SUCCESS,DONE']),
-            ui.table_row(name='row3', cells=['Process 3', 'DONE']),
-            ui.table_row(name='row4', cells=['Process 4', 'FAIL']),
-            ui.table_row(name='row5', cells=['Process 5', 'SUCCESS,DONE']),
-            ui.table_row(name='row6', cells=['Process 6', 'DONE']),
-        ])
+    add_card(q, 'stats1', ui.form_card(box='dashboard', items=[
+        ui.stats(
+#            justify='between', 
+            items=[
+                ui.stat(
+                    label='Credits', 
+                    value=str(total_credits_remaining), 
+                    caption='Credits Remaining', 
+                    icon='LearningTools'),            
+                ui.stat(
+                    label='Terms Remaining', 
+                    value=str(terms_remaining), 
+                    caption='Terms Remaining', 
+                    icon='Education'),
+                ui.stat(
+                    label='Finish Date', 
+                    value=completion_date, 
+                    caption='(Estimated)', 
+                    icon='SpecialEvent'),
+                ui.stat(
+                    label='Total Tuition', 
+                    value=total_cost_remaining, 
+                    caption='Estimated Tuition', 
+                    icon='Money'),
+            ]
+        )
     ]))
+
+    add_card(q, 'major_step0', ui.wide_info_card(
+        box=ui.box('grid', width='400px'), 
+        name='major_step0', 
+        title="Populate BA/BS Database",
+        caption="Add all Bachelor's Programs to database. Note discrepancies between UMGC website and catalog.")
+    )
+    add_card(q, 'major_step1', ui.wide_info_card(
+        box=ui.box('grid', width='400px'), 
+        name='major_step1', 
+        title='Connect Database',
+        caption='Connect backend database of major programs to menus.')
+    )
+    add_card(q, 'major_step2', ui.wide_info_card(
+        box=ui.box('grid', width='400px'), 
+        name='major_step2', 
+        title='Browse Majors',
+        caption='Add a "Browse Majors" functionality. Comparison shop majors. "Compare up to 3", etc.')
+    )
+    add_card(q, 'major_step3', ui.wide_info_card(
+        box=ui.box('grid', width='400px'), 
+        name='major_step3', 
+        title='Recommend Major - Shortest',
+        caption='Suggest Major(s) based on quickest/cheapest to finish.')
+    )
+    add_card(q, 'major_step4', ui.wide_info_card(
+        box=ui.box('grid', width='400px'), 
+        name='major_step4', 
+        title='Recommend Major - People like me',
+        caption='Suggest Major(s) based on recommendation engine.')
+    )
+    add_card(q, 'major_step5', ui.wide_info_card(
+        box=ui.box('grid', width='400px'), 
+        name='major_step5', 
+        title='Title',
+        caption='Lorem ipsum dolor sit amet')
+    )
+
+    #for i in range(4):
+    #    add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
+    #                                              caption='Lorem ipsum dolor sit amet'))
+
+
+#    add_card(q, 'table0', cards.test_table())
 
 @on('#courses')
 async def courses(q: Q):
@@ -181,10 +237,14 @@ async def courses(q: Q):
             ]
         )
     )
-    add_card(q, 'table', cards.test_table())
+#    add_card(q, 'table', cards.test_table())
+    for i in range(3):
+        add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
+                                                  caption='Lorem ipsum dolor sit amet'))
 
     add_card(q, 'stats', ui.form_card(box='dashboard', items=[
-        ui.stats(justify='between', 
+        ui.stats(
+            #justify='between', 
             items=[
                 ui.stat(
                     label='Tuition', 
@@ -220,7 +280,7 @@ async def courses(q: Q):
 @on('#electives')
 async def electives(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    add_card(q, 'table', cards.test_table())
+#    add_card(q, 'table', cards.test_table())
 
     for i in range(4):
         add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
