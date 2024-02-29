@@ -10,7 +10,7 @@ server:
 	./bin/waved
 
 db: 
-	./bin/wavedb -access-key-id uzer -access-key-secret pa55word -dir ./db
+	./bin/wavedb -access-key-id uzer -access-key-secret pa55word -dir db
 
 copy_venv:
 	venv/bin/pip freeze > requirements_venv.txt
