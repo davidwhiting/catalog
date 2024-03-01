@@ -12,6 +12,16 @@ def get_form_items(value):
         ui.spinbox(name='spinbox_trigger', label='Credits', trigger=True),
     ]
 
+def single_query(query, cursor):
+    # convenience function for sqlite3 db queries that return one value
+    cursor.execute(query)
+    q_result = cursor.fetchone()
+    if q_result is not None:
+        result = q_result[0]
+    else:
+        result = None
+
+    return result
 
 ## For some reason, this function works in the app.py file but not in the included utils.py file.
 ## Need to figure out why this is.
