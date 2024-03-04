@@ -29,7 +29,7 @@ student_info_id = 1
 
 ## Using vanilla sqlite3, convert to wavedb later
 
-conn = sqlite3.connect('db/UMGC.db')
+conn = sqlite3.connect('UMGC.db')
 
 student_name_query = '''
     SELECT users.firstname || ' ' || users.lastname AS 'name'
