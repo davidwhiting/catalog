@@ -9,10 +9,10 @@ run:
 server:
 	./bin/waved
 
-wavedb_secure: 
+wavedb: 
 	./bin/wavedb -access-key-id uzer -access-key-secret pa55word
 
-wavedb: 
+wavedb_test: 
 	./bin/wavedb
 
 copy_venv:
