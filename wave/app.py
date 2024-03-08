@@ -14,22 +14,25 @@ import utils
 
 from utils import add_card, single_query
 
+## May be useful for creating tables from dataframe
+## Rewrite my courses table below to try this out
+def df_to_rows(df: pd.DataFrame):
+    return [ui.table_row(str(row['ID']), [str(row[name]) for name in column_names]) for i, row in df.iterrows()]
+
+def search_df(df: pd.DataFrame, term: str):
+    str_cols = df.select_dtypes(include=[object])
+    return df[str_cols.apply(lambda column: column.str.contains(term, case=False, na=False)).any(axis=1)]
+
 # Set up logging
 logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
 
-## Create a database connection using wave
-#connection = connect(key_id='uzer', key_secret='pa55word')
-# Automatically creates a new database if it does not exist.
-#db = connection["UMGC"]
-
 # Pick this up from login activity
-student_info_id = 0 # Guest profile
+student_info_id = 0 # Guest profile, default
 
 student_info_id = 1
 
-## Using vanilla sqlite3, convert to wavedb later
-
 conn = sqlite3.connect('UMGC.db')
+cur = conn.cursor()
 
 student_name_query = '''
     SELECT users.firstname || ' ' || users.lastname AS 'name'
@@ -37,35 +40,25 @@ student_name_query = '''
         INNER JOIN student_info ON users.id = student_info.user_id 
         WHERE student_info.id = {}
 '''
-
-cur = conn.cursor()
-
-#def single_query(query, cursor):
-#    # convenience function for sqlite3 db queries that return one value
-#    cursor.execute(query)
-#    q_result = cursor.fetchone()
-#    if q_result is not None:
-#        result = q_result[0]
-#    else:
-#        result = None
-#
-#    return result
-
-student_name = single_query(student_name_query.format(student_info_id), cur)
-
+student_name = single_query(student_name_query.format(student_info_id), cur)    
 student_progress_query = 'SELECT * FROM student_progress WHERE student_info_id={}'.format(student_info_id)
 
-df = pd.read_sql_query(student_progress_query, conn)
-
-# Import the json file into a dataframe
-# Backup 
-#df = pd.DataFrame(templates.data_json_new)
-
+# reading student progress directly into pandas
+df0 = pd.read_sql_query(student_progress_query, conn)
 
 # pick up start_term from the form
 start_term = 'SPRING 2024'
 
-df, headers = utils.prepare_d3_data(df, start_term.upper())
+# may need to rewrite this for later
+# df and headers contain information for the d3 diagram
+df, headers = utils.prepare_d3_data(df0, start_term.upper())
+
+# df0 contains information for the class table in courses tab
+# I am currently converting to a dictionary, perhaps not needed
+df0 = df0.merge(headers[['period', 'name']].rename(columns={'name': 'term'}), on='period', how='left')
+student_progress_records = df0.to_dict('records')
+
+
 
 terms_remaining = max(headers.period)
 completion_date = headers.loc[headers['period'] == terms_remaining, 'name'].values[0].capitalize()
@@ -103,7 +96,6 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
         if name not in ignore:
             del q.page[name]
             q.client.cards.remove(name)
-
 
 @on('#home')
 async def home(q: Q):
@@ -159,7 +151,6 @@ async def home(q: Q):
            items=[ui.text(templates.home_markdown2)]
         )
     )
-
 
 @on('#major')
 async def major(q: Q):
@@ -237,6 +228,23 @@ async def major(q: Q):
 
 #    add_card(q, 'table0', cards.test_table())
 
+# Create columns for our courses table
+course_columns = [
+    ui.table_column(name='seq', label='Seq', sortable=True, data_type='number'),
+    ui.table_column(name='name', label='Course', sortable=True, searchable=True, max_width='300', cell_overflow='wrap'),
+    ui.table_column(name='credits', label='Credits'),
+    ui.table_column(name='type', label='Type', min_width='170px', 
+        cell_type=ui.tag_table_cell_type(name='type', tags=[
+            ui.tag(label='MAJOR', color='$blue'),
+            ui.tag(label='REQUIRED', color='$red'),
+            ui.tag(label='GENERAL', color='$green'),
+            ui.tag(label='ELECTIVE', color='$yellow')
+        ])
+    ),
+    ui.table_column(name='term', label='Term', searchable=True),
+    ui.table_column(name='session', label='Session', data_type='number')
+]
+
 @on('#courses')
 async def courses(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
@@ -293,7 +301,59 @@ async def courses(q: Q):
         )
     )
 #    add_card(q, 'table', cards.test_table())
-    
+
+    # automatically group by term?
+    # see https://wave.h2o.ai/docs/examples/table-groups
+    add_card(q, 'course_table', ui.form_card(box='vertical', items=[
+        ui.table(
+            name='table',
+            downloadable=True,
+            resettable=True,
+            groupable=False,
+            columns=[
+                #ui.table_column(name='seq', label='Seq', data_type='number'),
+                ui.table_column(name='text', label='Course', searchable=True),
+                ui.table_column(name='credits', label='Credits', data_type='number'),
+                ui.table_column(
+                    name='tag', 
+                    label='Course Type', 
+                    filterable=True, 
+                    cell_type=ui.tag_table_cell_type(
+                        name='tags',
+                        tags=[
+                            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                            ui.tag(label='REQUIRED', color='$red'),
+                            ui.tag(label='GENERAL', color='#046A38'),
+                            ui.tag(label='MAJOR', color='#1565C0'),
+                        ]
+                    )
+                ),
+                ui.table_column(name='term', label='Term', filterable=True),
+                ui.table_column(name='session', label='Session', data_type='number'),
+                ui.table_column(name='actions', label='Actions',
+                    cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                        ui.command(name='reschedule', label='Change Schedule'),
+                        ui.command(name='prerequisites', label='Prerequisites'),
+                        ui.command(name='description', label='Course Description'),
+                        #ui.command(name='delete', label='Delete'),
+                    ])
+                )
+
+            ],
+            rows=[ui.table_row(
+                name=str(record['seq']),
+                cells=[
+                    #str(record['seq']), 
+                    record['name'], 
+                    str(record['credits']), 
+                    record['type'].upper(), 
+                    record['term'], 
+                    str(record['session'])
+                ]
+            ) for record in student_progress_records]
+        )
+    ]))
+
     add_card(q, 'edit_sequence', ui.wide_info_card(
         box=ui.box('grid', width='400px'), 
         name='', 

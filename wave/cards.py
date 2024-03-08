@@ -228,7 +228,12 @@ def header_new_old(image_path, q):
     return result
 
 def header_new(image_path, q):
-    image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'
+    persona_image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'
+    commands = [
+        ui.command(name='profile', label='Profile', icon='Contact'),
+        ui.command(name='preferences', label='Preferences', icon='Settings'),
+        ui.command(name='logout', label='Logout', icon='SignOut'),
+    ]
 
     result = ui.header_card(
         box='header', 
@@ -245,18 +250,9 @@ def header_new(image_path, q):
             ]),
         ],
 #        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
-        items=[
-            ui.persona(title='John Doe', subtitle='Student', size='xs', image=image),
-        ]
+        items=[ui.persona(title='John Doe', subtitle='Student', size='xs', image=persona_image)]
     )
     return result
-
-#person_image = 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'
-#header_menu_commands = [
-#    ui.command(name='profile', label='Profile', icon='Contact'),
-#    ui.command(name='preferences', label='Preferences', icon='Settings'),
-#    ui.command(name='logout', label='Logout', icon='SignOut'),
-#]
 
 #async def serve(q: Q):
 #    if not q.client.initialized:
@@ -278,13 +274,13 @@ def header_new(image_path, q):
 #        ]
 #    await q.page.save()
 
-def d3plot(html):
-    result = ui.frame_card(
-        box=ui.box('midgrid', height='600px', width='1000px'),
-        title='Tentative Course Schedule',
-        content=html
-    )
-    return result
+#def d3plot(html):
+#    result = ui.frame_card(
+#        box=ui.box('midgrid', height='400px', width='1000px'),
+#        title='Tentative Course Schedule',
+#        content=html
+#    )
+#    return result
 
 def d3plot_new(html, location='horizontal'):
     result = ui.frame_card(
