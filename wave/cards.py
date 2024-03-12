@@ -90,47 +90,6 @@ def dropdown_menus(q):
 
 # A meta card to hold the app's title, layouts, dialogs, theme and other meta information
 meta = ui.meta_card(
-    box='',
-    title='UMGC Wave App',
-    theme='ember',
-    layouts=[
-        ui.layout(
-            breakpoint='xs',
-            min_height='100vh',
-#           max_width='1200px',
-            max_width='100vw',
-            zones=[
-                ui.zone('header'),
-                ui.zone('content', size='1', zones=[
-                    ui.zone('horizontal', direction=ui.ZoneDirection.COLUMN, justify='center'),
-                    ui.zone('horizontal2', direction=ui.ZoneDirection.ROW, size='1', 
-                        zones=[
-                           ui.zone('left1',  size='25%', direction=ui.ZoneDirection.COLUMN),
-                           ui.zone('left2',  size='25%', direction=ui.ZoneDirection.COLUMN),
-                           ui.zone('right1', size='49%', direction=ui.ZoneDirection.COLUMN),
-                           ui.zone('right2', size= '1%', direction=ui.ZoneDirection.COLUMN),
-                    ]),
-                    ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center', 
-                        zones=[
-                        #   ui.zone('leftgrid', size='5%'),
-                           ui.zone('midgrid', size='80%'),
-                           ui.zone('rightgrid', size='20%', direction=ui.ZoneDirection.COLUMN),
-                    ]),
-                    ui.zone('slider', direction=ui.ZoneDirection.ROW, justify='center'),
-                    ui.zone('notes', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center', 
-                        zones=[
-                           ui.zone('leftnote',  size='70%'),
-                           ui.zone('rightnote', size='30%'),
-                    ]),
-                    
-                ]),
-                ui.zone(name='footer'),
-            ]
-        )
-    ]
-)
-
-meta_new = ui.meta_card(
         box='', 
         title='UMGC Wave App',
         theme='ember',
@@ -141,7 +100,8 @@ meta_new = ui.meta_card(
                 zones=[
                     ui.zone('header'),
                     ui.zone('content', zones=[
-                        # Specify various zones and use the one that is currently needed. Empty zones are ignored.
+                        # Specify various zones and use the one that is currently needed. 
+                        # Empty zones are ignored.
                         ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
                         ui.zone('dashboard', direction=ui.ZoneDirection.ROW),
                         ui.zone('d3', direction=ui.ZoneDirection.ROW),
@@ -149,6 +109,7 @@ meta_new = ui.meta_card(
 #                            ui.zone('display_left', width='80%'),
 #                            ui.zone('display_right', width='20%')
 #                        ]),
+                        ui.zone('dashboard2', direction=ui.ZoneDirection.ROW),
                         ui.zone('vertical'),
                         ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center')
                     ]),
@@ -181,28 +142,28 @@ markdown = ui.form_card(
 
 #image_path, = await q.site.upload(['umgc-logo.png'])
 
-def header(image_path, q):
-    result = ui.header_card(    
-        box='header',
-        title='UMGC Programs',
-        subtitle="Registration Assistant",
-        image=image_path,
-        secondary_items=[
-            ui.tabs(name='tabs', 
-#                    value=f'#{q.args["#"]}' if q.args['#'] else '#page0', 
-                    value='#page1', 
-#                    link=True, 
-                    items=[
-                ui.tab(name='#page0', label='Home'),
-                ui.tab(name='#page1', label='Select Major'),
-                ui.tab(name='#page2', label='Schedule Courses'),
-                ui.tab(name='#page3', label='Electives'),
-                ui.tab(name='#page4', label='Student Info'),
-            ]),
-        ],
-        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)]
-    )
-    return result
+#def header(image_path, q):
+#    result = ui.header_card(    
+#        box='header',
+#        title='UMGC Programs',
+#        subtitle="Registration Assistant",
+#        image=image_path,
+#        secondary_items=[
+#            ui.tabs(name='tabs', 
+##                    value=f'#{q.args["#"]}' if q.args['#'] else '#page0', 
+#                    value='#page1', 
+##                    link=True, 
+#                    items=[
+#                ui.tab(name='#page0', label='Home'),
+#                ui.tab(name='#page1', label='Select Major'),
+#                ui.tab(name='#page2', label='Schedule Courses'),
+#                ui.tab(name='#page3', label='Electives'),
+#                ui.tab(name='#page4', label='Student Info'),
+#            ]),
+#        ],
+#        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)]
+#    )
+#    return result
 
 def header_new_old(image_path, q):
     result = ui.header_card(
@@ -213,10 +174,10 @@ def header_new_old(image_path, q):
         secondary_items=[
             ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
                 ui.tab(name='#home', label='Home'),
+                ui.tab(name='#student', label='Student Info'),
                 ui.tab(name='#major', label='Select Major'),
                 ui.tab(name='#courses', label='Schedule Courses'),
                 ui.tab(name='#electives', label='Electives'),
-#                ui.tab(name='#student', label='Student Info'),
             ]),
         ],
 #        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
@@ -243,14 +204,14 @@ def header_new(image_path, q):
         secondary_items=[
             ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
                 ui.tab(name='#home', label='Home'),
+                ui.tab(name='#student', label='Student Info'),
                 ui.tab(name='#major', label='Select Major'),
                 ui.tab(name='#courses', label='Schedule Courses'),
                 ui.tab(name='#electives', label='Electives'),
-#                ui.tab(name='#student', label='Student Info'),
             ]),
         ],
-#        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
-        items=[ui.persona(title='John Doe', subtitle='Student', size='xs', image=persona_image)]
+        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
+#        items=[ui.persona(title='John Doe', subtitle='Student', size='xs', image=persona_image)]
     )
     return result
 
@@ -274,15 +235,8 @@ def header_new(image_path, q):
 #        ]
 #    await q.page.save()
 
-#def d3plot(html):
-#    result = ui.frame_card(
-#        box=ui.box('midgrid', height='400px', width='1000px'),
-#        title='Tentative Course Schedule',
-#        content=html
-#    )
-#    return result
 
-def d3plot_new(html, location='horizontal'):
+def d3plot(html, location='horizontal'):
     result = ui.frame_card(
         box=ui.box(location, height='500px', width='100%'),
         title='Tentative Course Schedule',
@@ -343,56 +297,22 @@ def stats(D):
 #        ]
 #    )
 
-def chart1(box='horizontal'): 
-    return ui.plot_card(
-        box=box,
-        title='Chart 1',
-        data=data('category country product price', 10, rows=[
-            ('G1', 'USA', 'P1', 124),
-            ('G1', 'China', 'P2', 580),
-            ('G1', 'USA', 'P3', 528),
-            ('G1', 'China', 'P1', 361),
-            ('G1', 'USA', 'P2', 228),
-            ('G2', 'China', 'P3', 418),
-            ('G2', 'USA', 'P1', 824),
-            ('G2', 'China', 'P2', 539),
-            ('G2', 'USA', 'P3', 712),
-            ('G2', 'USA', 'P1', 213),
-        ]),
-        plot=ui.plot([ui.mark(type='interval', x='=product', y='=price', color='=country', stack='auto',
-                              dodge='=category', y_min=0)])
-)
-
-def test_table(location='vertical'):
-    return ui.form_card(box=location, items=[
-        ui.table(
-            name='table',
-            downloadable=True,
-            resettable=True,
-            groupable=True,
-            columns=[
-                ui.table_column(name='text', label='Process', searchable=True),
-                ui.table_column(
-                    name='tag', 
-                    label='Status', 
-                    filterable=True, 
-                    cell_type=ui.tag_table_cell_type(
-                        name='tags',
-                        tags=[
-                            ui.tag(label='FAIL', color='$red'),
-                            ui.tag(label='DONE', color='#D2E3F8', label_color='#053975'),
-                            ui.tag(label='SUCCESS', color='$mint'),
-                        ]
-                    )
-                )
-            ],
-            rows=[
-                ui.table_row(name='row1', cells=['Process 1', 'FAIL']),
-                ui.table_row(name='row2', cells=['Process 2', 'SUCCESS,DONE']),
-                ui.table_row(name='row3', cells=['Process 3', 'DONE']),
-                ui.table_row(name='row4', cells=['Process 4', 'FAIL']),
-                ui.table_row(name='row5', cells=['Process 5', 'SUCCESS,DONE']),
-                ui.table_row(name='row6', cells=['Process 6', 'DONE']),
-            ]
-        )
-    ])
+#def chart1(box='horizontal'): 
+#    return ui.plot_card(
+#        box=box,
+#        title='Chart 1',
+#        data=data('category country product price', 10, rows=[
+#            ('G1', 'USA', 'P1', 124),
+#            ('G1', 'China', 'P2', 580),
+#            ('G1', 'USA', 'P3', 528),
+#            ('G1', 'China', 'P1', 361),
+#            ('G1', 'USA', 'P2', 228),
+#            ('G2', 'China', 'P3', 418),
+#            ('G2', 'USA', 'P1', 824),
+#            ('G2', 'China', 'P2', 539),
+#            ('G2', 'USA', 'P3', 712),
+#            ('G2', 'USA', 'P1', 213),
+#        ]),
+#        plot=ui.plot([ui.mark(type='interval', x='=product', y='=price', color='=country', stack='auto',
+#                              dodge='=category', y_min=0)])
+#)

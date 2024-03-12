@@ -26,13 +26,10 @@ def search_df(df: pd.DataFrame, term: str):
 # Set up logging
 logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
 
-# Pick this up from login activity
-student_info_id = 0 # Guest profile, default
-
-student_info_id = 1
-
 conn = sqlite3.connect('UMGC.db')
-cur = conn.cursor()
+c = conn.cursor()
+
+#c.execute("SELECT * FROM progress WHERE student_id=?", (student_id_value,))
 
 student_name_query = '''
     SELECT users.firstname || ' ' || users.lastname AS 'name'
@@ -40,33 +37,44 @@ student_name_query = '''
         INNER JOIN student_info ON users.id = student_info.user_id 
         WHERE student_info.id = {}
 '''
-student_name = single_query(student_name_query.format(student_info_id), cur)    
+
+# Pick this up from login activity
+student_info_id = 0 # Guest profile, default
+student_info_id = 3 # student with transfer credit
+student_info_id = 1 # new student
+
+student_name = single_query(student_name_query.format(student_info_id), c)    
 student_progress_query = 'SELECT * FROM student_progress WHERE student_info_id={}'.format(student_info_id)
 
 # reading student progress directly into pandas
-df0 = pd.read_sql_query(student_progress_query, conn)
+df_raw = pd.read_sql_query(student_progress_query, conn)
+#df = pd.read_sql_query("SELECT * FROM student_progress WHERE student_id=?", conn, params=(student_id_value,))
+
+course_summary = df_raw.groupby(['type','completed']).agg(
+    n=('credits', 'count'),
+    total=('credits', 'sum')
+).reset_index()
 
 # pick up start_term from the form
 start_term = 'SPRING 2024'
 
 # may need to rewrite this for later
 # df and headers contain information for the d3 diagram
-df, headers = utils.prepare_d3_data(df0, start_term.upper())
+df_d3, headers = utils.prepare_d3_data(df_raw, start_term.upper())
 
-# df0 contains information for the class table in courses tab
+# df_raw contains information for the class table in courses tab
 # I am currently converting to a dictionary, perhaps not needed
-df0 = df0.merge(headers[['period', 'name']].rename(columns={'name': 'term'}), on='period', how='left')
-student_progress_records = df0.to_dict('records')
+df_raw = df_raw.merge(headers[['period', 'name']].rename(columns={'name': 'term'}), on='period', how='left')
 
-
+student_progress_records = df_raw.to_dict('records')
 
 terms_remaining = max(headers.period)
 completion_date = headers.loc[headers['period'] == terms_remaining, 'name'].values[0].capitalize()
-total_credits_remaining = df['credits'].sum()
+total_credits_remaining = df_d3['credits'].sum()
 credits_next_term = headers.loc[headers['period'] == 1, 'credits'].values[0]
 
 # Convert to json for passing along to our d3 function
-#json_data = df.to_json(orient='records')
+#json_data = df_d3.to_json(orient='records')
 
 tuition = {
     'in_state': 324,
@@ -79,7 +87,7 @@ total_cost_remaining = "${:,}".format(total_credits_remaining * cost_per_credit)
 next_term_cost = "${:,}".format(credits_next_term * cost_per_credit)
 
 # Convert to json for passing along to our d3 function
-df_json = df.to_json(orient='records')
+df_json = df_d3.to_json(orient='records')
 headers_json = headers.to_json(orient='records')
 
 html_template = templates.html_code_minimal.format(
@@ -263,7 +271,7 @@ async def courses(q: Q):
             ]
         )
     )
-    add_card(q, 'd3plot', cards.d3plot_new(html_template, 'd3'))
+    add_card(q, 'd3plot', cards.d3plot(html_template, 'd3'))
     
     Sessions = ['Session 1', 'Session 2', 'Session 3']
     add_card(q, 'sessions_spin', 
@@ -309,7 +317,7 @@ async def courses(q: Q):
             name='table',
             downloadable=True,
             resettable=True,
-            groupable=False,
+            groupable=True,
             columns=[
                 #ui.table_column(name='seq', label='Seq', data_type='number'),
                 ui.table_column(name='text', label='Course', searchable=True),
@@ -333,7 +341,7 @@ async def courses(q: Q):
                 ui.table_column(name='actions', label='Actions',
                     cell_type=ui.menu_table_cell_type(name='commands', commands=[
                         ui.command(name='reschedule', label='Change Schedule'),
-                        ui.command(name='prerequisites', label='Prerequisites'),
+                        ui.command(name='prerequisites', label='Show Prerequisites'),
                         ui.command(name='description', label='Course Description'),
                         #ui.command(name='delete', label='Delete'),
                     ])
@@ -477,7 +485,7 @@ async def handle_fallback(q: Q):
     await q.page.save()
 
 async def initialize_client_old(q: Q) -> None:
-    q.page['meta'] = cards.meta_new
+    q.page['meta'] = cards.meta
     image_path, = await q.site.upload(['umgc-logo.png'])
     q.page['header'] = cards.header_new(image_path, q)
     q.page['footer'] = cards.footer
