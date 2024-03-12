@@ -192,6 +192,19 @@ async def major(q: Q):
         )
     ]))
 
+    new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
+    add_card(q, 'example_program_template', ui.image_card(
+        box=ui.box('d3', height='500px', width='80%'),
+#        box=ui.box('vertical', width='100%', height='400px'), 
+        type='png',
+        title="Bachelor's in Business Administration Program Overview",
+        #caption='Lorem ipsum dolor sit amet consectetur adipisicing elit.',
+        #category='Category',
+        #label='Click me',
+        #image='https://images.pexels.com/photos/3225517/pexels-photo-3225517.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+        path=new_image_path,
+    ))
+
     add_card(q, 'major_step0', ui.wide_info_card(
         box=ui.box('grid', width='400px'), 
         name='major_step0', 
@@ -484,9 +497,10 @@ async def handle_fallback(q: Q):
 
     await q.page.save()
 
-async def initialize_client_old(q: Q) -> None:
+async def initialize_client(q: Q) -> None:
     q.page['meta'] = cards.meta
-    image_path, = await q.site.upload(['umgc-logo.png'])
+    image_path, = await q.site.upload(['images/umgc-logo.png'])
+    tmp_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
     q.page['header'] = cards.header_new(image_path, q)
     q.page['footer'] = cards.footer
 
@@ -523,7 +537,7 @@ async def serve(q: Q):
         # Run only once per client connection.
         if not q.client.initialized:
             q.client.cards = set()
-            await initialize_client_old(q)
+            await initialize_client(q)
             q.client.initialized = True
 
         # Adding this condition to help in identifying bugs
