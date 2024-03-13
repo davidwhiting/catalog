@@ -107,7 +107,7 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 
 @on('#home')
 async def home(q: Q):
-    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    clear_cards(q)  # When routing, drop all the cards except (header, footer, meta).
 
     add_card(q, f'step1_of_n', 
         ui.tall_info_card(
@@ -162,35 +162,123 @@ async def home(q: Q):
 
 @on('#major')
 async def major(q: Q):
-    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
-    add_card(q, 'stats1', ui.form_card(box='dashboard', items=[
+    clear_cards(q)  
+
+    career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
+
+
+    add_card(q, 'dropdown_menus', cards.dropdown_menus(q, location='horizontal'))
+
+    add_card(q, 'major_dashboard', ui.form_card(box='dashboard', items=[
         ui.stats(
 #            justify='between', 
             items=[
                 ui.stat(
-                    label='Credits', 
+                    label='Total Credits', 
                     value=str(total_credits_remaining), 
-                    caption='Credits Remaining', 
-                    icon='LearningTools'),            
+                    caption='Total Credits Remaining', 
+                    icon='Education'),   
                 ui.stat(
-                    label='Terms Remaining', 
-                    value=str(terms_remaining), 
-                    caption='Terms Remaining', 
-                    icon='Education'),
+                    label='Major Credits', 
+                    value=str(33), 
+                    caption='Major Credits Remaining', 
+                    icon='Trackers'),   
                 ui.stat(
-                    label='Finish Date', 
-                    value=completion_date, 
-                    caption='(Estimated)', 
-                    icon='SpecialEvent'),
+                    label='Required Credits', 
+                    value=str(12), 
+                    caption='Required Credits Remaining', 
+                    icon='News'),   
                 ui.stat(
-                    label='Total Tuition', 
-                    value=total_cost_remaining, 
-                    caption='Estimated Tuition', 
-                    icon='Money'),
+                    label='GE Credits', 
+                    value=str(41), 
+                    caption='General Education Credits Remaining', 
+                    icon='TestBeaker'),   
+                ui.stat(
+                    label='Elective Credits', 
+                    value=str(46), 
+                    caption='Elective Credits Remaining', 
+                    icon='Media'),   
+
+#                ui.stat(
+#                    label='Terms Remaining', 
+#                    value=str(terms_remaining), 
+#                    caption='Terms Remaining', 
+#                    icon='Education'),
+#                ui.stat(
+#                    label='Finish Date', 
+#                    value=completion_date, 
+#                    caption='(Estimated)', 
+#                    icon='SpecialEvent'),
+#                ui.stat(
+#                    label='Total Tuition', 
+#                    value=total_cost_remaining, 
+#                    caption='Estimated Tuition', 
+#                    icon='Money'),
             ]
         )
     ]))
+
+    add_card(q, 'major_section', ui.form_card(
+        box=ui.box('grid', width='400px'),
+        items=[
+            ui.text(
+                f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
+                #size=ui.TextSize.L
+            ),
+          ]
+    ))
+
+    add_card(q, 'recommendations', 
+        ui.form_card(
+            box=ui.box('grid', width='300px'),
+            #box=ui.box('d3', width='300px'), # min width 200px
+            items=[
+            #    ui.dropdown(
+            #        name='first', 
+            #        label='Start Term', 
+            #        value=q.args.start_term,
+            #        #trigger=True,
+            #        #width='250px',
+            #        choices=[
+            #            ui.choice(label="Spring 2024"),
+            #            ui.choice(label="Summer 2024"),
+            #            ui.choice(label="Fall 2024"),
+            #            ui.choice(label="Winter 2025"),
+            #        ]
+            #    ),
+            #    ui.separator(label=''),
+                ui.choice_group(
+                    name='recommendation_group', 
+                    label='Recommend a major based on ...', 
+                    choices=[
+                        ui.choice('A', label='My interests'),
+                        ui.choice('B', label='My skills'),
+                        ui.choice('C', label='Students like me'),
+                        ui.choice('D', label='The shortest time to graduate'),
+                ]),
+#                ui.slider(name='slider', label='Max Credits per Term', min=1, max=15, step=1, value=9),
+                ui.inline(
+                    items=[
+                        ui.button(name='show_recommendations', label='Submit', primary=True),
+                        ui.button(name='clear_recommendations', label='Clear', primary=False), # enable this
+                    ]
+                )
+            ]
+        )
+    )
+
+#    # select a major
+#    add_card(q, 'major_recommendations', ui.form_card(
+#        box=ui.box('vertical'),
+#    ))
+#            items=[
+#                ui.checkbox(name='major_checkbox_1', label='Recommend based on interests', disabled=False),
+#                ui.checkbox(name='major_checkbox_2', label='Recommend based on skills', disabled=False),
+#                ui.checkbox(name='major_checkbox_3', label='Recommend based on students like me', disabled=False),
+#                ui.checkbox(name='major_checkbox_4', label='Recommend based on shortest time to finish', disabled=False),
+#            ],
+#        ]
+#    ))
 
     new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
     add_card(q, 'example_program_template', ui.image_card(
@@ -205,36 +293,43 @@ async def major(q: Q):
         path=new_image_path,
     ))
 
-    add_card(q, 'major_step0', ui.wide_info_card(
-        box=ui.box('grid', width='400px'), 
-        name='major_step0', 
-        title="Populate BA/BS Database",
-        caption="Add all Bachelor's Programs to database. Note discrepancies between UMGC website and catalog.")
-    )
-    add_card(q, 'major_step1', ui.wide_info_card(
-        box=ui.box('grid', width='400px'), 
-        name='major_step1', 
-        title='Connect Database',
-        caption='Connect backend database of major programs to menus.')
-    )
-    add_card(q, 'major_step2', ui.wide_info_card(
-        box=ui.box('grid', width='400px'), 
-        name='major_step2', 
-        title='Browse Majors',
-        caption='Add a "Browse Majors" functionality. Comparison shop majors. "Compare up to 3", etc.')
-    )
-    add_card(q, 'major_step3', ui.wide_info_card(
-        box=ui.box('grid', width='400px'), 
-        name='major_step3', 
-        title='Recommend Major - Shortest',
-        caption='Suggest Major(s) based on quickest/cheapest to finish.')
-    )
-    add_card(q, 'major_step4', ui.wide_info_card(
-        box=ui.box('grid', width='400px'), 
-        name='major_step4', 
-        title='Recommend Major - People like me',
-        caption='Suggest Major(s) based on recommendation engine.')
-    )
+#    add_card(q, 'major_step0', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='major_step0', 
+#        title="Populate BA/BS Database",
+#        caption="Add all Bachelor's Programs to database. Note discrepancies between UMGC website and catalog.")
+#    )
+#    add_card(q, 'major_step1', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='major_step1', 
+#        title='Connect Database',
+#        caption='Connect backend database of major programs to menus.')
+#    )
+#    add_card(q, 'major_step2', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='major_step2', 
+#        title='Browse Majors',
+#        caption='Add a "Browse Majors" functionality. Comparison shop majors. "Compare up to 3", etc.')
+#    )
+#    add_card(q, 'major_step3', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='major_step3', 
+#        title='Recommend Major - Shortest',
+#        caption='Suggest Major(s) based on quickest/cheapest to finish.')
+#    )
+#    add_card(q, 'major_step4', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='major_step4', 
+#        title='Recommend Major - People like me',
+#        caption='Suggest Major(s) based on recommendation engine.')
+#    )
+#    add_card(q, 'major_choices', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='major_recommendations', 
+#        title='Recommend Major - People like me',
+#        caption='Suggest Major(s) based on recommendation engine.')
+#    )
+
 #    add_card(q, 'major_step5', ui.wide_info_card(
 #        box=ui.box('grid', width='400px'), 
 #        name='major_step5', 
@@ -268,7 +363,8 @@ course_columns = [
 
 @on('#courses')
 async def courses(q: Q):
-    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    clear_cards(q)  
+
 #    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
     # Generate the following automatically
     selected_degree = "Bachelor's"
@@ -426,46 +522,124 @@ async def courses(q: Q):
 
 @on('#electives')
 async def electives(q: Q):
-    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    clear_cards(q)  
 #    add_card(q, 'table', cards.test_table())
 
     for i in range(4):
         add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
                                                   caption='Lorem ipsum dolor sit amet'))
 
+#@on('#careers')
+#async def careers(q: Q):
+#    clear_cards(q)
+#    add_card(q, 'careers', 
+#        ui.frame_card(
+#            box=ui.box('grid', width='100%', height='600px'),
+#            title='Interest Assessment',
+#            path='https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx',
+#        )
+#    )
+
+interview_questions = [
+    'Have you ever attended a college or university before?',
+    'Are you enrolling full-time or part-time?',
+    '[If part-time]: Are you working full-time?',
+    '[If part-time & working full-time]: Are you attending evening classes?',
+    'Are you in-state, out-of-state, or military?'
+]
 
 @on('#student')
 @on('student_reset')
 async def student(q: Q):
     q.page['sidebar'].value = '#student'
-    # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+
     # Since this page is interactive, we want to update its card
     # instead of recreating it every time, so ignore 'form' card on drop.
     clear_cards(q, ['form'])
 
+    add_card(q, 'student_section', ui.form_card(
+        box='vertical',
+        items=[
+            ui.text('Please answer the following questions to personalize your experience:', 
+                size=ui.TextSize.L)
+        ]
+    ))
+
+#    add_card(q, 'student_section', ui.section_card(
+#        box='vertical',
+#        title='Your title',
+#        subtitle='Your subtitle',
+#        items=[
+#            ui.toggle(name='search', label='Search', value=True),
+#            ui.dropdown(name='distribution', label='', value='option0', choices=[
+#                ui.choice(name=f'option{i}', label=f'Option {i}') for i in range(5)
+#            ]),
+#            ui.date_picker(name='target_date', label='', value='2020-12-25'),
+#        ],
+#    )    
+
     # If first time on this page, create the card.
-    add_card(q, 'form', ui.form_card(box='vertical', items=[
-        ui.stepper(name='stepper', items=[
-            ui.step(label='Step 1'),
-            ui.step(label='Step 2'),
-            ui.step(label='Step 3'),
-        ]),
-        ui.textbox(name='textbox1', label='Textbox 1'),
-        ui.buttons(justify='end', items=[
-            ui.button(name='student_step2', label='Next', primary=True),
-        ]),
-    ]))
+    add_card(q, 'form', 
+        ui.form_card(
+            box='vertical', 
+            items=[
+                ui.stepper(name='stepper', 
+                    items=[
+                        ui.step(label='Question 1'),
+                        ui.step(label='Question 2'),
+                        ui.step(label='Question 3'),
+                        ui.step(label='Question 4'),
+                        ui.step(label='Question 5'),
+                ]),
+                ui.textbox(name='textbox1', label=interview_questions[0]),
+                ui.buttons(
+                    justify='end', 
+                    items=[
+                        ui.button(name='student_step2', label='Next', primary=True),
+                ]),
+        ])
+    )
+    add_card(q, 'student_questions', ui.wide_info_card(
+        box=ui.box('grid', width='300px'), 
+        name='', 
+        icon='AccountActivity',
+        title='Questions',
+        caption='Appropriate questions will be asked here to help profile student. These are TBD.'
+    ))
+    add_card(q, 'student_guest', ui.wide_info_card(
+        box=ui.box('grid', width='300px'), 
+        name='', 
+        icon='Contact',
+        title='Guest Mode',
+        caption='If not logged in, user can explore in Guest mode. We will add the ability to download results for later use.'
+    ))
+    add_card(q, 'student_login', ui.wide_info_card(
+        box=ui.box('grid', width='300px'), 
+        name='', 
+        icon='ContactLock',
+        title='Logged In',
+        caption='Student information will be saved for future use.'
+    ))
+    add_card(q, 'student_api', ui.wide_info_card(
+        box=ui.box('grid', width='300px'), 
+        name='', 
+        icon='Import',
+        title='Import',
+        caption='Student information can be imported from available data sources. Student will be allowed to update information for this tool.'
+    ))
 
 @on()
 async def student_step2(q: Q):
     # Just update the existing card, do not recreate.
     q.page['form'].items = [
         ui.stepper(name='stepper', items=[
-            ui.step(label='Step 1', done=True),
-            ui.step(label='Step 2'),
-            ui.step(label='Step 3'),
+            ui.step(label='Question 1', done=True),
+            ui.step(label='Question 2'),
+            ui.step(label='Question 3'),
+            ui.step(label='Question 4'),
+            ui.step(label='Question 5'),
         ]),
-        ui.textbox(name='textbox2', label='Textbox 2'),
+        ui.textbox(name='textbox2', label=interview_questions[1]),
         ui.buttons(justify='end', items=[
             ui.button(name='student_step3', label='Next', primary=True),
         ])
@@ -476,11 +650,47 @@ async def student_step3(q: Q):
     # Just update the existing card, do not recreate.
     q.page['form'].items = [
         ui.stepper(name='stepper', items=[
-            ui.step(label='Step 1', done=True),
-            ui.step(label='Step 2', done=True),
-            ui.step(label='Step 3'),
+            ui.step(label='Question 1', done=True),
+            ui.step(label='Question 2', done=True),
+            ui.step(label='Question 3'),
+            ui.step(label='Question 4'),
+            ui.step(label='Question 5'),
         ]),
-        ui.textbox(name='textbox3', label='Textbox 3'),
+        ui.textbox(name='textbox3', label=interview_questions[2]),
+        ui.buttons(justify='end', items=[
+            ui.button(name='student_step4', label='Next', primary=True),
+        ])
+    ]
+
+@on()
+async def student_step4(q: Q):
+    # Just update the existing card, do not recreate.
+    q.page['form'].items = [
+        ui.stepper(name='stepper', items=[
+            ui.step(label='Question 1', done=True),
+            ui.step(label='Question 2', done=True),
+            ui.step(label='Question 3', done=True),
+            ui.step(label='Question 4'),
+            ui.step(label='Question 5'),
+        ]),
+        ui.textbox(name='textbox4', label=interview_questions[3]),
+        ui.buttons(justify='end', items=[
+            ui.button(name='student_step5', label='Next', primary=True),
+        ])
+    ]
+
+@on()
+async def student_step5(q: Q):
+    # Just update the existing card, do not recreate.
+    q.page['form'].items = [
+        ui.stepper(name='stepper', items=[
+            ui.step(label='Question 1', done=True),
+            ui.step(label='Question 2', done=True),
+            ui.step(label='Question 3', done=True),
+            ui.step(label='Question 4', done=True),
+            ui.step(label='Question 5'),
+        ]),
+        ui.textbox(name='textbox5', label=interview_questions[4]),
         ui.buttons(justify='end', items=[
             ui.button(name='student_reset', label='Finish', primary=True),
         ])
@@ -501,7 +711,7 @@ async def initialize_client(q: Q) -> None:
     q.page['meta'] = cards.meta
     image_path, = await q.site.upload(['images/umgc-logo.png'])
     tmp_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
-    q.page['header'] = cards.header_new(image_path, q)
+    q.page['header'] = cards.get_header(image_path, q)
     q.page['footer'] = cards.footer
 
     # If no active hash present, render home.
@@ -510,7 +720,7 @@ async def initialize_client(q: Q) -> None:
 
 #        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
 
-async def show_error(q: Q, error: str):
+#async def show_error(q: Q, error: str):
     """
     Displays errors.
     """
@@ -527,7 +737,8 @@ async def show_error(q: Q, error: str):
 #    await q.page.save()
 
 
-@app('/')
+## need to fix so broadcast and multicast work correctly
+@app('/', mode='unicast')
 async def serve(q: Q):
     """
     Main entry point. All queries pass through this function.
@@ -551,43 +762,6 @@ async def serve(q: Q):
     await run_on(q)
     await q.page.save()
 
-#@app('/')
-#async def serve(q: Q):
-#    """
-#    Main entry point. All queries pass through this function.
-#    """
-#
-#    try:
-#        # Initialize the app if not already
-#        if not q.app.initialized:
-#            await initialize_app(q)
-#
-#        # Initialize the client if not already
-#        if not q.client.initialized:
-#            await initialize_client(q)
-#
-#        # Update theme if toggled
-#        elif q.args.theme_dark is not None and q.args.theme_dark != q.client.theme_dark:
-#            await update_theme(q)
-#
-#        # Update table if query is edited
-#        elif q.args.query is not None and q.args.query != q.client.query:
-#            await apply_query(q)
-#
-#        # Update dataset if changed
-#        elif q.args.dataset is not None and q.args.dataset != q.client.dataset:
-#            await update_dataset(q)
-#
-#        # Delegate query to query handlers
-#        elif await handle_on(q):
-#            pass
-#
-#        # Adding this condition to help in identifying bugs
-#        else:
-#            await handle_fallback(q)
-#
-#    except Exception as error:
-#        await show_error(q, error=str(error))
 
 # close the connection 
 conn.close()
