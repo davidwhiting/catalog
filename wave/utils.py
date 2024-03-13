@@ -36,6 +36,7 @@ def single_query(query, cursor):
 
 # Use for page cards that should be removed when navigating away.
 # For pages that should be always present on screen use q.page[key] = ...
+# should this be q.user.cards instead of q.client.cards?
 def add_card(q, name, card) -> None:
     q.client.cards.add(name)
     q.page[name] = card

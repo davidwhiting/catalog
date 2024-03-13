@@ -12,6 +12,8 @@ import templates
 import cards
 import utils
 
+## ^^^ Done through here ^^^ 
+
 from utils import add_card, single_query
 
 ## May be useful for creating tables from dataframe
