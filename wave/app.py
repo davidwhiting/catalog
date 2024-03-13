@@ -1,4 +1,4 @@
-from h2o_wave import main, app, Q, site, ui, on, run_on, data, connect, graphics as g
+from h2o_wave import main, app, Q, site, ui, on, run_on, data, connect, copy_expando, graphics as g
 
 from typing import Optional, List
 import logging
@@ -163,6 +163,13 @@ async def home(q: Q):
 @on('#major')
 async def major(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    # this is still not working, how to maintain dropdown values while navigating app
+    if 'degree' in q.args:
+        q.client.degree = q.args.degree
+    if 'area_of_study' in q.args:
+        q.client.area_of_study = q.args.area_of_study
+    if 'major' in q.args:
+        q.client.major = q.args.major
     add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
     add_card(q, 'stats1', ui.form_card(box='dashboard', items=[
         ui.stats(
@@ -195,13 +202,8 @@ async def major(q: Q):
     new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
     add_card(q, 'example_program_template', ui.image_card(
         box=ui.box('d3', height='500px', width='80%'),
-#        box=ui.box('vertical', width='100%', height='400px'), 
         type='png',
         title="Bachelor's in Business Administration Program Overview",
-        #caption='Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-        #category='Category',
-        #label='Click me',
-        #image='https://images.pexels.com/photos/3225517/pexels-photo-3225517.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
         path=new_image_path,
     ))
 
@@ -497,6 +499,17 @@ async def handle_fallback(q: Q):
 
     await q.page.save()
 
+async def initialize_app(q: Q) -> None:
+    q.page['meta'] = cards.meta
+    image_path, = await q.site.upload(['images/umgc-logo.png'])
+    tmp_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
+    q.page['header'] = cards.header_new(image_path, q)
+    q.page['footer'] = cards.footer
+
+    # If no active hash present, render home.
+    if q.args['#'] is None:
+        await home(q)
+
 async def initialize_client(q: Q) -> None:
     q.page['meta'] = cards.meta
     image_path, = await q.site.upload(['images/umgc-logo.png'])
@@ -527,13 +540,22 @@ async def show_error(q: Q, error: str):
 #    await q.page.save()
 
 
-@app('/')
+# mode='broadcast' if we want to sync across all users 
+#       (e.g., counselor and student logged in simultaneously)
+# mode='multicast' if we want to sync all tabs for one user
+@app('/', mode='multicast')
 async def serve(q: Q):
     """
     Main entry point. All queries pass through this function.
     """
-
     try:
+
+    #    # Initialize the app if not already
+    #    if not q.app.initialized:
+    #        q.app.cards = set()
+    #        await initialize_app(q)
+    #        q.app.initialized = True
+
         # Run only once per client connection.
         if not q.client.initialized:
             q.client.cards = set()
@@ -558,9 +580,6 @@ async def serve(q: Q):
 #    """
 #
 #    try:
-#        # Initialize the app if not already
-#        if not q.app.initialized:
-#            await initialize_app(q)
 #
 #        # Initialize the client if not already
 #        if not q.client.initialized:

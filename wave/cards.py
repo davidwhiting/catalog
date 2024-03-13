@@ -40,7 +40,7 @@ def dropdown_menus(q):
                     ui.dropdown(
                         name='degree', 
                         label='Degree', 
-                        value=q.args.degree,
+                        value=q.client.degree if hasattr(q.client, 'degree') else q.args.degree,
                         trigger=True,
                         width=menu_width,
                         choices=[
@@ -54,7 +54,7 @@ def dropdown_menus(q):
                     ui.dropdown(
                         name='area_of_study', 
                         label='Area of Study', 
-                        value=q.args.area_of_study,
+                        value=q.client.area_of_study if hasattr(q.client, 'area_of_study') else q.args.area_of_study,
                         trigger=False,
                         disabled=False,
                         width=menu_width,
@@ -71,7 +71,7 @@ def dropdown_menus(q):
                     ui.dropdown(
                         name='major', 
                         label='Major', 
-                        value=q.args.major,
+                        value=q.client.major if hasattr(q.client, 'major') else q.args.major,
                         trigger=False,
                         disabled=False,
                         width=menu_width,
