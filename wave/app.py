@@ -167,7 +167,8 @@ async def major(q: Q):
     career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
 
 
-    add_card(q, 'dropdown_menus', cards.dropdown_menus(q, location='horizontal'))
+    add_card(q, 'dropdown_menus', cards.dropdown_menus(q, location='middle_vertical'))
+#    add_card(q, 'dropdown_menus', cards.dropdown_menus(q, location='middle_vertical'))
 
 
     add_card(q, 'major_section', ui.form_card(
@@ -220,18 +221,18 @@ async def major(q: Q):
     )
 
 
-    new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
-    add_card(q, 'example_program_template', ui.image_card(
-        box=ui.box('d3', height='600px', width='80%'),
-#        box=ui.box('vertical', width='100%', height='400px'), 
-        type='png',
-        title="Bachelor's in Business Administration Program Overview",
-        #caption='Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-        #category='Category',
-        #label='Click me',
-        #image='https://images.pexels.com/photos/3225517/pexels-photo-3225517.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-        path=new_image_path,
-    ))
+#    new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
+#    add_card(q, 'example_program_template', ui.image_card(
+#        box=ui.box('d3', height='600px', width='80%'),
+##        box=ui.box('vertical', width='100%', height='400px'), 
+#        type='png',
+#        title="Bachelor's in Business Administration Program Overview",
+#        #caption='Lorem ipsum dolor sit amet consectetur adipisicing elit.',
+#        #category='Category',
+#        #label='Click me',
+#        #image='https://images.pexels.com/photos/3225517/pexels-photo-3225517.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+#        path=new_image_path,
+#    ))
 
 #    add_card(q, 'major_step0', ui.wide_info_card(
 #        box=ui.box('grid', width='400px'), 
@@ -531,6 +532,7 @@ async def courses(q: Q):
     # automatically group by term?
     # see https://wave.h2o.ai/docs/examples/table-groups
     add_card(q, 'course_table_major', ui.form_card(box='middle_horizontal', items=[
+        ui.text('Major Required Courses', size=ui.TextSize.XL),        
         ui.table(
             name='table',
             downloadable=False,
@@ -578,6 +580,7 @@ async def courses(q: Q):
     # automatically group by term?
     # see https://wave.h2o.ai/docs/examples/table-groups
     add_card(q, 'course_table_required', ui.form_card(box='middle_horizontal', items=[
+        ui.text('Related Required Courses', size=ui.TextSize.XL),        
         ui.table(
             name='table',
             downloadable=False,
@@ -624,6 +627,7 @@ async def courses(q: Q):
 
     # see https://wave.h2o.ai/docs/examples/table-groups
     add_card(q, 'course_table_general', ui.form_card(box='d3', items=[
+        ui.text('Select General Education Courses', size=ui.TextSize.XL),
         ui.table(
             name='table',
             downloadable=False,
@@ -669,6 +673,7 @@ async def courses(q: Q):
     ]))    
 
     add_card(q, 'course_table_elective', ui.form_card(box='d3', items=[
+        ui.text('Select Elective Courses', size=ui.TextSize.XL),
         ui.table(
             name='table',
             downloadable=False,

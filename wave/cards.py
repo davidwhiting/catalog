@@ -15,7 +15,7 @@ def select_semester(q, location='horizontal'):
         box=location,
         items=[
             ui.dropdown(
-                name='first', 
+                name='start_term', 
                 label='Start Term', 
                 value=q.args.start_term,
                 trigger=True,
@@ -250,9 +250,9 @@ def get_header(image_path, q):
             ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
                 ui.tab(name='#home', label='Home'),
                 ui.tab(name='#student', label='Student Info'),
-                ui.tab(name='#major', label='Majors'),
-                ui.tab(name='#courses', label='Courses'),
-                ui.tab(name='#schedule', label='Schedule'),
+                ui.tab(name='#major', label='Select Major'),
+                ui.tab(name='#courses', label='Select Courses'),
+                ui.tab(name='#schedule', label='Set Schedule'),
             ]),
         ],
         items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
