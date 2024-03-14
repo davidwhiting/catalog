@@ -169,57 +169,9 @@ async def major(q: Q):
 
     add_card(q, 'dropdown_menus', cards.dropdown_menus(q, location='horizontal'))
 
-    add_card(q, 'major_dashboard', ui.form_card(box='dashboard', items=[
-        ui.stats(
-#            justify='between', 
-            items=[
-                ui.stat(
-                    label='Total Credits', 
-                    value=str(total_credits_remaining), 
-                    caption='Total Credits Remaining', 
-                    icon='Education'),   
-                ui.stat(
-                    label='Major Credits', 
-                    value=str(33), 
-                    caption='Major Credits Remaining', 
-                    icon='Trackers'),   
-                ui.stat(
-                    label='Required Credits', 
-                    value=str(12), 
-                    caption='Required Credits Remaining', 
-                    icon='News'),   
-                ui.stat(
-                    label='GE Credits', 
-                    value=str(41), 
-                    caption='General Education Credits Remaining', 
-                    icon='TestBeaker'),   
-                ui.stat(
-                    label='Elective Credits', 
-                    value=str(46), 
-                    caption='Elective Credits Remaining', 
-                    icon='Media'),   
-
-#                ui.stat(
-#                    label='Terms Remaining', 
-#                    value=str(terms_remaining), 
-#                    caption='Terms Remaining', 
-#                    icon='Education'),
-#                ui.stat(
-#                    label='Finish Date', 
-#                    value=completion_date, 
-#                    caption='(Estimated)', 
-#                    icon='SpecialEvent'),
-#                ui.stat(
-#                    label='Total Tuition', 
-#                    value=total_cost_remaining, 
-#                    caption='Estimated Tuition', 
-#                    icon='Money'),
-            ]
-        )
-    ]))
 
     add_card(q, 'major_section', ui.form_card(
-        box=ui.box('grid', width='400px'),
+        box=ui.box('top_horizontal', width='400px'),
         items=[
             ui.text(
                 f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
@@ -230,7 +182,7 @@ async def major(q: Q):
 
     add_card(q, 'recommendations', 
         ui.form_card(
-            box=ui.box('grid', width='300px'),
+            box=ui.box('top_horizontal', width='350px'),
             #box=ui.box('d3', width='300px'), # min width 200px
             items=[
             #    ui.dropdown(
@@ -267,22 +219,10 @@ async def major(q: Q):
         )
     )
 
-#    # select a major
-#    add_card(q, 'major_recommendations', ui.form_card(
-#        box=ui.box('vertical'),
-#    ))
-#            items=[
-#                ui.checkbox(name='major_checkbox_1', label='Recommend based on interests', disabled=False),
-#                ui.checkbox(name='major_checkbox_2', label='Recommend based on skills', disabled=False),
-#                ui.checkbox(name='major_checkbox_3', label='Recommend based on students like me', disabled=False),
-#                ui.checkbox(name='major_checkbox_4', label='Recommend based on shortest time to finish', disabled=False),
-#            ],
-#        ]
-#    ))
 
     new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
     add_card(q, 'example_program_template', ui.image_card(
-        box=ui.box('d3', height='500px', width='80%'),
+        box=ui.box('d3', height='600px', width='80%'),
 #        box=ui.box('vertical', width='100%', height='400px'), 
         type='png',
         title="Bachelor's in Business Administration Program Overview",
@@ -361,8 +301,8 @@ course_columns = [
     ui.table_column(name='session', label='Session', data_type='number')
 ]
 
-@on('#courses')
-async def courses(q: Q):
+@on('#schedule')
+async def schedule(q: Q):
     clear_cards(q)  
 
 #    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
@@ -520,14 +460,287 @@ async def courses(q: Q):
         )
     ]))
 
-@on('#electives')
-async def electives(q: Q):
+@on('#courses')
+async def courses(q: Q):
     clear_cards(q)  
-#    add_card(q, 'table', cards.test_table())
 
-    for i in range(4):
-        add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
-                                                  caption='Lorem ipsum dolor sit amet'))
+    # Generate the following automatically
+    selected_degree = "Bachelor's"
+    selected_program = "Business Administration"
+    add_card(q, 'selected_major', 
+        ui.form_card(
+            box='top_vertical',
+            items=[
+                ui.text(
+                    selected_degree + ' in ' + selected_program,
+                    size=ui.TextSize.XL
+                )
+            ]
+        )
+    )
+
+    add_card(q, 'major_dashboard', ui.form_card(box='top_vertical', items=[
+        ui.stats(
+#            justify='between', 
+            items=[
+                ui.stat(
+                    label='Total Credits', 
+                    value=str(total_credits_remaining), 
+                    caption='Total Credits Remaining', 
+                    icon='Education'),   
+                ui.stat(
+                    label='Major Credits', 
+                    value=str(33), 
+                    caption='Major Credits Remaining', 
+                    icon='Trackers'),   
+                ui.stat(
+                    label='Required Credits', 
+                    value=str(12), 
+                    caption='Required Credits Remaining', 
+                    icon='News'),   
+                ui.stat(
+                    label='GE Credits', 
+                    value=str(41), 
+                    caption='General Education Credits Remaining', 
+                    icon='TestBeaker'),   
+                ui.stat(
+                    label='Elective Credits', 
+                    value=str(46), 
+                    caption='Elective Credits Remaining', 
+                    icon='Media'),   
+
+#                ui.stat(
+#                    label='Terms Remaining', 
+#                    value=str(terms_remaining), 
+#                    caption='Terms Remaining', 
+#                    icon='Education'),
+#                ui.stat(
+#                    label='Finish Date', 
+#                    value=completion_date, 
+#                    caption='(Estimated)', 
+#                    icon='SpecialEvent'),
+#                ui.stat(
+#                    label='Total Tuition', 
+#                    value=total_cost_remaining, 
+#                    caption='Estimated Tuition', 
+#                    icon='Money'),
+            ]
+        )
+    ]))
+
+    # automatically group by term?
+    # see https://wave.h2o.ai/docs/examples/table-groups
+    add_card(q, 'course_table_major', ui.form_card(box='middle_horizontal', items=[
+        ui.table(
+            name='table',
+            downloadable=False,
+            resettable=False,
+            groupable=False,
+            columns=[
+                #ui.table_column(name='seq', label='Seq', data_type='number'),
+                ui.table_column(name='text', label='Course', searchable=False),
+                ui.table_column(name='credits', label='Credits', data_type='number'),
+                ui.table_column(
+                    name='tag', 
+                    label='Course Type', 
+                    filterable=True, 
+                    cell_type=ui.tag_table_cell_type(
+                        name='tags',
+                        tags=[
+                            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                            ui.tag(label='REQUIRED', color='$red'),
+                            ui.tag(label='GENERAL', color='#046A38'),
+                            ui.tag(label='MAJOR', color='#1565C0'),
+                        ]
+                    )
+                ),
+                ui.table_column(name='actions', label='Actions',
+                    cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                        ui.command(name='description', label='Course Description'),
+                        ui.command(name='prerequisites', label='Show Prerequisites'),
+                        #ui.command(name='delete', label='Delete'),
+                    ])
+                )
+
+            ],
+            rows=[ui.table_row(
+                name=str(record['seq']),
+                cells=[
+                    #str(record['seq']), 
+                    record['name'], 
+                    str(record['credits']), 
+                    record['type'].upper(), 
+                ]
+            ) for record in student_progress_records if record['type'].upper() in ['MAJOR']]
+        )
+    ]))
+
+    # automatically group by term?
+    # see https://wave.h2o.ai/docs/examples/table-groups
+    add_card(q, 'course_table_required', ui.form_card(box='middle_horizontal', items=[
+        ui.table(
+            name='table',
+            downloadable=False,
+            resettable=False,
+            groupable=False,
+            columns=[
+                #ui.table_column(name='seq', label='Seq', data_type='number'),
+                ui.table_column(name='text', label='Course', searchable=False),
+                ui.table_column(name='credits', label='Credits', data_type='number'),
+                ui.table_column(
+                    name='tag', 
+                    label='Course Type', 
+                    filterable=True, 
+                    cell_type=ui.tag_table_cell_type(
+                        name='tags',
+                        tags=[
+                            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                            ui.tag(label='REQUIRED', color='$red'),
+                            ui.tag(label='GENERAL', color='#046A38'),
+                            ui.tag(label='MAJOR', color='#1565C0'),
+                        ]
+                    )
+                ),
+                ui.table_column(name='actions', label='Actions',
+                    cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                        ui.command(name='description', label='Course Description'),
+                        ui.command(name='prerequisites', label='Show Prerequisites'),
+                        #ui.command(name='delete', label='Delete'),
+                    ])
+                )
+
+            ],
+            rows=[ui.table_row(
+                name=str(record['seq']),
+                cells=[
+                    #str(record['seq']), 
+                    record['name'], 
+                    str(record['credits']), 
+                    record['type'].upper(), 
+                ]
+            ) for record in student_progress_records if record['type'].upper() in ['REQUIRED']]
+        )
+    ]))    
+
+    # see https://wave.h2o.ai/docs/examples/table-groups
+    add_card(q, 'course_table_general', ui.form_card(box='d3', items=[
+        ui.table(
+            name='table',
+            downloadable=False,
+            resettable=False,
+            groupable=False,
+            columns=[
+                #ui.table_column(name='seq', label='Seq', data_type='number'),
+                ui.table_column(name='text', label='Course', searchable=False),
+                ui.table_column(name='credits', label='Credits', data_type='number'),
+                ui.table_column(
+                    name='tag', 
+                    label='Course Type', 
+                    filterable=True, 
+                    cell_type=ui.tag_table_cell_type(
+                        name='tags',
+                        tags=[
+                            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                            ui.tag(label='REQUIRED', color='$red'),
+                            ui.tag(label='GENERAL', color='#046A38'),
+                            ui.tag(label='MAJOR', color='#1565C0'),
+                        ]
+                    )
+                ),
+                ui.table_column(name='actions', label='Actions',
+                    cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                        ui.command(name='description', label='Course Description'),
+                        ui.command(name='prerequisites', label='Show Prerequisites'),
+                        #ui.command(name='delete', label='Delete'),
+                    ])
+                )
+
+            ],
+            rows=[ui.table_row(
+                name=str(record['seq']),
+                cells=[
+                    #str(record['seq']), 
+                    record['name'], 
+                    str(record['credits']), 
+                    record['type'].upper(), 
+                ]
+            ) for record in student_progress_records if record['type'].upper() in ['GENERAL']]
+        )
+    ]))    
+
+    add_card(q, 'course_table_elective', ui.form_card(box='d3', items=[
+        ui.table(
+            name='table',
+            downloadable=False,
+            resettable=False,
+            groupable=False,
+            columns=[
+                #ui.table_column(name='seq', label='Seq', data_type='number'),
+                ui.table_column(name='text', label='Course', searchable=False),
+                ui.table_column(name='credits', label='Credits', data_type='number'),
+                ui.table_column(
+                    name='tag', 
+                    label='Course Type', 
+                    filterable=True, 
+                    cell_type=ui.tag_table_cell_type(
+                        name='tags',
+                        tags=[
+                            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                            ui.tag(label='REQUIRED', color='$red'),
+                            ui.tag(label='GENERAL', color='#046A38'),
+                            ui.tag(label='MAJOR', color='#1565C0'),
+                        ]
+                    )
+                ),
+                ui.table_column(name='actions', label='Actions',
+                    cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                        ui.command(name='select', label='Select Course'),                        
+                        ui.command(name='description', label='Course Description'),
+                        ui.command(name='prerequisites', label='Show Prerequisites'),
+                        #ui.command(name='delete', label='Delete'),
+                    ])
+                )
+
+            ],
+            rows=[ui.table_row(
+                name=str(record['seq']),
+                cells=[
+                    #str(record['seq']), 
+                    record['name'], 
+                    str(record['credits']), 
+                    record['type'].upper(), 
+                ]
+            ) for record in student_progress_records if record['type'].upper() in ['ELECTIVE']]
+        )
+    ]))    
+
+
+#    for i in range(4):
+#        add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
+#                                                  caption='Lorem ipsum dolor sit amet'))
+    add_card(q, 'ge_tile', 
+        ui.wide_info_card(
+            box=ui.box('grid', width='400px'), 
+            name='', 
+            title='Explore General Education',
+            caption='Explore and select GE courses'
+    ))
+
+    add_card(q, 'electives_tile', 
+        ui.wide_info_card(
+            box=ui.box('grid', width='400px'), 
+            name='', 
+            title='Explore Electives',
+            caption='Explore and perhaps recommend electives',
+    ))
+
+    add_card(q, 'minors_tile', 
+        ui.wide_info_card(
+            box=ui.box('grid', width='400px'), 
+            name='', 
+            title='Explore Minors',
+            caption='Explore and perhaps recommend minors',
+    ))
 
 #@on('#careers')
 #async def careers(q: Q):

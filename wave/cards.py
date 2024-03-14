@@ -160,16 +160,28 @@ meta = ui.meta_card(
                     ui.zone('content', zones=[
                         # Specify various zones and use the one that is currently needed. 
                         # Empty zones are ignored.
-                        ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
-                        ui.zone('dashboard', direction=ui.ZoneDirection.ROW),
-                        ui.zone('d3', direction=ui.ZoneDirection.ROW),
-#                        ui.zone('display', zones=[
-#                            ui.zone('display_left', width='80%'),
-#                            ui.zone('display_right', width='20%')
-#                        ]),
-                        ui.zone('dashboard2', direction=ui.ZoneDirection.ROW),
-                        ui.zone('vertical'),
-                        ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center')
+                        ui.zone('top', zones=[
+                            ui.zone('top_vertical'),
+                            ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
+                            ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
+                            ui.zone('dashboard', direction=ui.ZoneDirection.ROW),
+                        ]),
+                        ui.zone('middle', zones=[
+                            ui.zone('middle_vertical'),
+                            ui.zone('middle_horizontal', direction=ui.ZoneDirection.ROW, wrap='stretch'),
+                            ui.zone('d3', direction=ui.ZoneDirection.ROW),
+#                           ui.zone('display', zones=[
+#                               ui.zone('display_left', width='80%'),
+#                               ui.zone('display_right', width='20%')
+#                           ]),
+                            #ui.zone('dashboard2', direction=ui.ZoneDirection.ROW),
+                        ]),
+                        ui.zone('bottom', zones=[
+                            ui.zone('bottom_vertical'),
+                            ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
+                            ui.zone('vertical'),
+                            ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center')
+                        ]),
                     ]),
                     ui.zone(name='footer'),
                 ]
@@ -198,28 +210,28 @@ markdown = ui.form_card(
     items=[ui.text(templates.sample_markdown)]
 )
 
-def header_new_old(image_path, q):
-    result = ui.header_card(
-        box='header', 
-        title='UMGC Programs',
-        subtitle="Registration Assistant",
-        image=image_path,
-        secondary_items=[
-            ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
-                ui.tab(name='#home', label='Home'),
-                ui.tab(name='#student', label='Student Info'),
-                ui.tab(name='#major', label='Select Major'),
-                ui.tab(name='#courses', label='Schedule Courses'),
-                ui.tab(name='#electives', label='Electives'),
-            ]),
-        ],
-#        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
-        items=[
-            ui.persona(title='John Doe', subtitle='Student', size='xs',
-                       image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'),
-        ]
-    )
-    return result
+#def header_new_old(image_path, q):
+#    result = ui.header_card(
+#        box='header', 
+#        title='UMGC Programs',
+#        subtitle="Registration Assistant",
+#        image=image_path,
+#        secondary_items=[
+#            ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
+#                ui.tab(name='#home', label='Home'),
+#                ui.tab(name='#student', label='Student Info'),
+#                ui.tab(name='#major', label='Major'),
+#                ui.tab(name='#electives', label='Courses'),
+#                ui.tab(name='#courses', label='Schedule'),
+#            ]),
+#        ],
+##        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
+#        items=[
+#            ui.persona(title='John Doe', subtitle='Student', size='xs',
+#                       image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'),
+#        ]
+#    )
+#    return result
 
 def get_header(image_path, q):
     persona_image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'
@@ -238,9 +250,9 @@ def get_header(image_path, q):
             ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
                 ui.tab(name='#home', label='Home'),
                 ui.tab(name='#student', label='Student Info'),
-                ui.tab(name='#major', label='Select Major'),
-                ui.tab(name='#courses', label='Schedule Courses'),
-                ui.tab(name='#electives', label='Electives'),
+                ui.tab(name='#major', label='Majors'),
+                ui.tab(name='#courses', label='Courses'),
+                ui.tab(name='#schedule', label='Schedule'),
             ]),
         ],
         items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
