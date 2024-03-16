@@ -6,8 +6,6 @@ import templates
 import pandas as pd
 import numpy as np
 
-
-
 def get_form_items(value):
     return [
         ui.text(f'spinbox_trigger={value}'),

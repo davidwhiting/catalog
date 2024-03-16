@@ -9,38 +9,17 @@ We need to allow for a view with exploration before someone logs in (suppose thi
 
 _**We assume someone is logged in at this point.**_
 
-_**Need to add a few example students to our DB to demo the web tool.**_
-
 Once logged in, the home page will show important dashboard.
 
 
 ## Tab Steps Above (Currently Disabled)
 ### Login
 
-1. This is where the notes will go.
-1. This is where the notes will go.
-
 ### Import information
-
-1. This is where the notes will go.
 
 ### Update Information
 
-1. This is where  the notes will go.
-
 ### Personalization
-
-1. This is where the notes will go.
-
-## Philosophy
-
-- For this prototype, we will assume we have access to appropriate student information.
-  -  What information that entails we will fill in as we go.
-
-- For this prototype, we will save the student information in a sqlite3 db to be retrieved in course
-- We will keep track of the steps, and show different "Home" pages depending on what has already been filled in by the student. 
-- We will also allow the student to navigate to previous steps to update or fix information.
-- The most important information is included as tabs in the top of the webpage.
 
 '''
 
