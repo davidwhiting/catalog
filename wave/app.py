@@ -17,17 +17,15 @@ import utils
 
 from utils import add_card, single_query
 
-def on_startup():
+async def on_startup():
     # Set up logging
     logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
 
-    # connect sqlite3
-    conn = sqlite3.connect('UMGC.db')
-    c = conn.cursor()
+#def on_shutdown():
 
-def on_shutdown():
-    # close the sqlite3 connection 
-    conn.close()
+# connect sqlite3
+conn = sqlite3.connect('UMGC.db')
+c = conn.cursor()
 
 ## May be useful for creating tables from dataframe
 ## Rewrite my courses table below to try this out
@@ -37,7 +35,6 @@ def df_to_rows(df: pd.DataFrame):
 def search_df(df: pd.DataFrame, term: str):
     str_cols = df.select_dtypes(include=[object])
     return df[str_cols.apply(lambda column: column.str.contains(term, case=False, na=False)).any(axis=1)]
-
 
 #c.execute("SELECT * FROM progress WHERE student_id=?", (student_id_value,))
 
@@ -155,9 +152,6 @@ df_raw = df_raw.merge(headers[['period', 'name']].rename(columns={'name': 'term'
 # need to fix the logic
 
 student_progress_records = df_raw.to_dict('records')
-
-
-
 student_records_no_schedule = df2.to_dict('records')
 
 terms_remaining = max(headers.period)
@@ -745,8 +739,23 @@ async def schedule(q: Q):
             groupable=True,
             columns=[
                 #ui.table_column(name='seq', label='Seq', data_type='number'),
-                ui.table_column(name='text', label='Course', searchable=True, max_width='100'),
-                ui.table_column(name='title', label='Title', searchable=True, max_width='200', cell_overflow='wrap'),
+                ui.table_column(
+                    name='course', 
+                    label='Course', 
+                    searchable=True, 
+                    sortable=True,
+                    min_width='50', # check this
+                    max_width='100', #check this
+                    link=True
+                ),
+                ui.table_column(
+                    name='title', 
+                    label='Title', 
+                    searchable=True, 
+                    min_width='100', # check this
+                    max_width='200', 
+                    cell_overflow='wrap'
+                ),
                 #ui.table_column(name='description', label='Description', searchable=True, max_width='200',
                 #    #cell_overflow='tooltip', 
                 #    cell_overflow='wrap', 
@@ -755,16 +764,26 @@ async def schedule(q: Q):
                 ui.table_column(name='credits', label='Credits', data_type='number', max_width='50', align='center'),
                 cards.render_tag_column('150'),
                 ui.table_column(name='term', label='Term', filterable=True, max_width='120'),
-                ui.table_column(name='session', label='Session', data_type='number', max_width='80', align='center'),
-                ui.table_column(name='actions', label='Menu', max_width='100', align='left',
-                    cell_type=ui.menu_table_cell_type(name='commands', commands=[
-                        ui.command(name='reschedule', label='Move Class'),
-                        ui.command(name='prerequisites', label='Show Prerequisites'),
-                        ui.command(name='description', label='Course Description'),
-                        #ui.command(name='delete', label='Delete'),
+                ui.table_column(
+                    name='session', 
+                    label='Session', 
+                    data_type='number', 
+                    max_width='80', # check this
+                    align='center'),
+                ui.table_column(
+                    name='actions', 
+                    label='Menu', 
+                    max_width='100', 
+                    align='left',
+                    cell_type=ui.menu_table_cell_type(
+                        name='commands', 
+                        commands=[
+                            ui.command(name='reschedule', label='Move Class'),
+                            ui.command(name='prerequisites', label='Show Prerequisites'),
+                            ui.command(name='description', label='Course Description'),
+                            #ui.command(name='delete', label='Delete'),
                     ])
                 )
-
             ],
             rows=[ui.table_row(
                 name=str(record['seq']),
@@ -879,7 +898,8 @@ async def initialize_client(q: Q) -> None:
 #    await q.page.save()
 
 ## need to fix so broadcast and multicast work correctly
-@app('/', mode='unicast', on_startup=on_startup, on_shutdown=on_shutdown)
+
+@app('/', mode='unicast', on_startup=on_startup)
 async def serve(q: Q):
     """
     Main entry point. All queries pass through this function.
@@ -903,5 +923,8 @@ async def serve(q: Q):
     await run_on(q)
     await q.page.save()
 
+
+# close the sqlite3 connection 
+conn.close()
 
 
