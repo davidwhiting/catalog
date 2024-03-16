@@ -4,10 +4,10 @@ activate:
 	bash -c "source venv/bin/activate"
 
 run:
-	venv/bin/wave run catalog-app/app.py
+	venv/bin/wave run app
 
-server:
-	./bin/waved
+#server:
+#	./bin/waved
 
 #wavedb: 
 #	./bin/wavedb -access-key-id uzer -access-key-secret pa55word
@@ -20,4 +20,4 @@ copy_venv:
 
 clone_venv:
 	venv/bin/pip install -r requirements_venv.txt
-	cp bin/wavedb venv/bin/
+#	cp bin/wavedb venv/bin/
