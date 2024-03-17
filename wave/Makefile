@@ -16,8 +16,7 @@ run:
 #	./bin/wavedb
 
 copy_venv:
-	venv/bin/pip freeze > requirements_venv.txt
+	venv/bin/pip freeze > requirements.txt
 
 clone_venv:
-	venv/bin/pip install -r requirements_venv.txt
-#	cp bin/wavedb venv/bin/
+	venv/bin/pip install -r requirements.txt

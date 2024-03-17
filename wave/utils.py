@@ -6,6 +6,24 @@ import templates
 import pandas as pd
 import numpy as np
 
+def find_or_add_user(q):
+    # If the username is in the system, get the id and role_id
+    q.app.c.execute("SELECT id, role_id FROM users WHERE username = ?", (q.user.username,))
+    row = q.app.c.fetchone()
+
+    if row is None:
+        # If the username is not in the system, add the user as a student
+        q.app.c.execute(
+            "INSERT INTO users (role_id, username, firstname, lastname) VALUES (?, ?, ?, ?)",
+            (1, q.user.username, q.user.firstname, q.user.lastname)
+        )
+        q.app.conn.commit()
+        row = [q.app.c.lastrowid, 1]
+
+    ## set the q.user parameters in the app (easier to keep track)
+    #q.user.user_id, q.user.role_id = row
+    return row
+
 def get_form_items(value):
     return [
         ui.text(f'spinbox_trigger={value}'),
@@ -22,6 +40,15 @@ def single_query(query, cursor):
         result = None
 
     return result
+
+## May be useful for creating tables from dataframe
+## Rewrite my courses table below to try this out
+def df_to_rows(df: pd.DataFrame):
+    return [ui.table_row(str(row['ID']), [str(row[name]) for name in column_names]) for i, row in df.iterrows()]
+
+def search_df(df: pd.DataFrame, term: str):
+    str_cols = df.select_dtypes(include=[object])
+    return df[str_cols.apply(lambda column: column.str.contains(term, case=False, na=False)).any(axis=1)]
 
 ## For some reason, this function works in the app.py file but not in the included utils.py file.
 ## Need to figure out why this is.

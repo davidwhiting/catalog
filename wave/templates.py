@@ -2,6 +2,73 @@ import sys
 import traceback
 from h2o_wave import Q, expando_to_dict, ui, graphics as g
 
+
+complete_records_query = '''
+    SELECT 
+        a.seq,
+        a.name,
+        a.program_id,
+        a.class_id,
+        a.course_type_id,
+        b.title,
+        b.description,
+        b.prerequisites
+    FROM 
+        program_sequence a
+    JOIN 
+        classes b
+    ON 
+        a.class_id = b.id
+    WHERE 
+        a.program_id = ?
+'''
+
+complete_student_records_query_old = '''
+    SELECT 
+        a.seq,
+        a.name,
+        a.credits,
+        a.type,
+        a.completed,
+        a.period,
+        a.session,
+        a.prerequisite,
+        IFNULL(b.title, '') AS title,
+        IFNULL(b.description, '') AS description,
+        IFNULL(b.prerequisites, '') as prereq_full
+    FROM 
+        student_progress a
+    LEFT JOIN 
+        classes b
+    ON 
+        a.name = b.name
+    WHERE 
+        a.student_info_id = ?
+'''
+
+complete_student_records_query = '''
+    SELECT 
+        a.seq,
+        a.name,
+        a.credits,
+        a.type,
+        a.completed,
+        a.prerequisite,
+        IFNULL(b.title, '') AS title,
+        IFNULL(b.description, '') AS description,
+        IFNULL(b.prerequisites, '') as prerequisites,
+        IFNULL(b.pre, '') as pre_classes,
+        IFNULL(b.pre_credits, '') as pre_credits
+    FROM 
+        student_progress a
+    LEFT JOIN 
+        classes b
+    ON 
+        a.name = b.name
+    WHERE 
+        a.student_info_id = ?
+'''
+
 home_markdown = '''
 # Notes
 

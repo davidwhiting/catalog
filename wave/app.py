@@ -5,6 +5,7 @@ import logging
 
 import sqlite3
 import pandas as pd
+import jwt
 import json
 import os.path
 
@@ -23,101 +24,22 @@ async def on_startup():
 
 #def on_shutdown():
 
+# Moved to q.app
 # connect sqlite3
 conn = sqlite3.connect('UMGC.db')
 c = conn.cursor()
 
-## May be useful for creating tables from dataframe
-## Rewrite my courses table below to try this out
-def df_to_rows(df: pd.DataFrame):
-    return [ui.table_row(str(row['ID']), [str(row[name]) for name in column_names]) for i, row in df.iterrows()]
-
-def search_df(df: pd.DataFrame, term: str):
-    str_cols = df.select_dtypes(include=[object])
-    return df[str_cols.apply(lambda column: column.str.contains(term, case=False, na=False)).any(axis=1)]
 
 #c.execute("SELECT * FROM progress WHERE student_id=?", (student_id_value,))
-
-student_name_query = '''
-    SELECT users.firstname || ' ' || users.lastname AS 'name'
-        FROM users 
-        INNER JOIN student_info ON users.id = student_info.user_id 
-        WHERE student_info.id = {}
-'''
 
 # Pick this up from login activity
 student_info_id = 0 # Guest profile, default
 student_info_id = 3 # student with transfer credit
 student_info_id = 1 # new student
 
-student_name = single_query(student_name_query.format(student_info_id), c)    
+#student_name = q.user.name
+
 student_progress_query = 'SELECT * FROM student_progress WHERE student_info_id={}'.format(student_info_id)
-
-complete_student_records_query_old = '''
-    SELECT 
-        a.seq,
-        a.name,
-        a.credits,
-        a.type,
-        a.completed,
-        a.period,
-        a.session,
-        a.prerequisite,
-        IFNULL(b.title, '') AS title,
-        IFNULL(b.description, '') AS description,
-        IFNULL(b.prerequisites, '') as prereq_full
-    FROM 
-        student_progress a
-    LEFT JOIN 
-        classes b
-    ON 
-        a.name = b.name
-    WHERE 
-        a.student_info_id = ?
-'''
-
-complete_student_records_query = '''
-    SELECT 
-        a.seq,
-        a.name,
-        a.credits,
-        a.type,
-        a.completed,
-        a.prerequisite,
-        IFNULL(b.title, '') AS title,
-        IFNULL(b.description, '') AS description,
-        IFNULL(b.prerequisites, '') as prerequisites,
-        IFNULL(b.pre, '') as pre_classes,
-        IFNULL(b.pre_credits, '') as pre_credits
-    FROM 
-        student_progress a
-    LEFT JOIN 
-        classes b
-    ON 
-        a.name = b.name
-    WHERE 
-        a.student_info_id = ?
-'''
-
-complete_records_query = '''
-    SELECT 
-        a.seq,
-        a.name,
-        a.program_id,
-        a.class_id,
-        a.course_type_id,
-        b.title,
-        b.description,
-        b.prerequisites
-    FROM 
-        program_sequence a
-    JOIN 
-        classes b
-    ON 
-        a.class_id = b.id
-    WHERE 
-        a.program_id = ?
-'''
 ##program_id = 10
 #
 ##c.execute(complete_records_query, (program_id,))
@@ -126,8 +48,8 @@ complete_records_query = '''
 # reading student progress directly into pandas
 #df_raw = pd.read_sql_query(student_progress_query, conn)
 
-df2 = pd.read_sql_query(complete_student_records_query, conn, params=(student_info_id,))
-df_raw = pd.read_sql_query(complete_student_records_query_old, conn, params=(student_info_id,))
+df2 = pd.read_sql_query(templates.complete_student_records_query, conn, params=(student_info_id,))
+df_raw = pd.read_sql_query(templates.complete_student_records_query_old, conn, params=(student_info_id,))
 
 #df = pd.read_sql_query("SELECT * FROM student_progress WHERE student_id=?", conn, params=(student_id_value,))
 
@@ -193,9 +115,39 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 
 ###############################################################################
 
+
+# Now user_details is a dictionary containing the user information
 @on('#home')
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except (header, footer, meta).
+
+    # This is probably not the right place to do this.
+    # Decode the access token without verifying the signature
+    user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
+    q.user.username = user_details['preferred_username']
+    q.user.name = user_details['name']
+    q.user.firstname = user_details['given_name']
+    q.user.lastname = user_details['family_name']
+
+    add_card(q, 'params', ui.markdown_card(
+        box='d3',
+        title='Debugging Information',
+        content=f'''
+
+### All parameters?
+{q}
+
+### App Parameters
+{q.app}
+
+### User Parameters
+{q.user}
+
+### Client Parameters
+{q.client}
+
+    ''',
+    ))
 
     add_card(q, f'step1_of_n', 
         ui.tall_info_card(
@@ -868,23 +820,66 @@ async def handle_fallback(q: Q):
 
     await q.page.save()
 
+async def initialize_app(q: Q):
+    """
+    Initialize the app.
+    """
+    logging.info('Initializing app')
+
+    q.app.umgc_logo, = await q.site.upload(['images/umgc-logo.png'])
+    q.app.conn = sqlite3.connect('UMGC.db')
+    q.app.c = q.app.conn.cursor()
+    q.app.initialized = True
+
+async def initialize_user(q: Q) -> None:
+    """
+    Initialize the app.
+    """
+    logging.info('Initializing user')
+
+    # Decode the access token without verifying the signature
+    # Connects SSO to our user and student_info tables
+    user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
+
+    q.user.username = user_details['preferred_username']
+    q.user.name = user_details['name']
+    q.user.firstname = user_details['given_name']
+    q.user.lastname = user_details['family_name']
+
+    # check whether user is in the sqlite3 db
+    # if so, get role and id
+    # if not, add user to db as a new student
+    q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
+
+
+    # if a student, get information from the student_info table
+    query = ''' 
+        SELECT resident_status_id, transfer_credits, financial_aid, stage, program_id, profile, notes
+        FROM student_info WHERE user_id = ?
+    '''
+    if q.user.role_id == 1:
+        q.user.student = True
+        q.app.c.execute(query, (q.user.user_id,))
+        row = q.app.c.fetchone()
+        if row is not None:
+            (q.user.resident_status_id, q.user.transfer_credits, q.user.financial_aid, q.user.stage, q.user.program_id,
+             q.user.profile, q.user.notes) = row
+
+    q.user.initialized = True
+
 async def initialize_client(q: Q) -> None:
     q.page['meta'] = cards.meta
-    image_path, = await q.site.upload(['images/umgc-logo.png'])
-    tmp_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
-    q.page['header'] = cards.get_header(image_path, q)
+    q.page['header'] = cards.get_header(q.app.umgc_logo, q)
     q.page['footer'] = cards.footer
 
     # If no active hash present, render home.
     if q.args['#'] is None:
         await home(q)
 
-#        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
-
 #async def show_error(q: Q, error: str):
-    """
-    Displays errors.
-    """
+#    """
+#    Displays errors.
+#    """
 ## Fix in the future
 ## Need to adapt from Waveton
 #    logging.error(error)
@@ -904,9 +899,15 @@ async def serve(q: Q):
     """
     Main entry point. All queries pass through this function.
     """
-
     try:
-        # Run only once per client connection.
+
+        if not q.app.initialized:
+            await initialize_app(q)
+
+        if not q.user.initialized:
+            await initialize_user(q)
+
+        # Run only once per client (browser tab) connection.
         if not q.client.initialized:
             q.client.cards = set()
             await initialize_client(q)
@@ -926,5 +927,3 @@ async def serve(q: Q):
 
 # close the sqlite3 connection 
 conn.close()
-
-
