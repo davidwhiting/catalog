@@ -29,7 +29,6 @@ async def on_startup():
 conn = sqlite3.connect('UMGC.db')
 c = conn.cursor()
 
-
 #c.execute("SELECT * FROM progress WHERE student_id=?", (student_id_value,))
 
 # Pick this up from login activity
@@ -120,34 +119,7 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 @on('#home')
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except (header, footer, meta).
-
-    # This is probably not the right place to do this.
-    # Decode the access token without verifying the signature
-    user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
-    q.user.username = user_details['preferred_username']
-    q.user.name = user_details['name']
-    q.user.firstname = user_details['given_name']
-    q.user.lastname = user_details['family_name']
-
-    add_card(q, 'params', ui.markdown_card(
-        box='d3',
-        title='Debugging Information',
-        content=f'''
-
-### All parameters?
-{q}
-
-### App Parameters
-{q.app}
-
-### User Parameters
-{q.user}
-
-### Client Parameters
-{q.client}
-
-    ''',
-    ))
+    add_card(q, 'params', cards.render_debug_card(q, location='d3'))
 
     add_card(q, f'step1_of_n', 
         ui.tall_info_card(
@@ -181,21 +153,6 @@ async def home(q: Q):
             caption='Details to be filled in.', 
             icon='UserFollowed')
     )
-    
-#    add_card(q, 'home_markdown1', 
-#        ui.form_card(
-##            box=ui.box('vertical', height='600px'),
-#            box=ui.box('grid', width='400px'),
-#           items=[ui.text(templates.home_markdown1)]
-#        )
-#    )
-#    add_card(q, 'home_markdown2', 
-#        ui.form_card(
-##            box=ui.box('vertical', height='600px'),
-#            box=ui.box('grid', width='400px'),
-#           items=[ui.text(templates.home_markdown2)]
-#        )
-#    )
 
 ###############################################################################
 
@@ -357,51 +314,151 @@ async def student_step5(q: Q):
 
 ###############################################################################
 
+query = '''
+    SELECT 
+        id,
+        course, 
+        course_type AS type,
+        course_type_id,
+        title,
+        credits,
+        description,
+        pre,
+        pre_credits,
+        substitutions
+    FROM program_requirements_view 
+    WHERE program_requirements_id = (
+        SELECT id FROM program_requirements WHERE program_id = ?
+    )
+'''
+df_major = pd.read_sql_query(query, conn, params=(10,))
+# not sure whether I need all this conversion
+major_records = df_major.to_dict('records')
+
+def render_major_table_group(group_name, record_type, records, collapsed):
+    return ui.table_group(group_name, [
+        ui.table_row(
+            name=str(record['id']),
+            cells=[
+                record['course'],
+                record['title'],
+                str(record['credits']),
+                #record['description'],
+                record['type'].upper(),
+            ]
+        ) for record in records if record['type'].upper() == record_type
+    ], collapsed=collapsed)
+
+
 @on('#major')
 async def major(q: Q):
-    clear_cards(q)  
+    clear_cards(q)
+    #add_card(q, 'title3',
+    #    ui.form_card(
+    #        box=ui.box('top_vertical'),
+    #        items=[ui.text('Browse Majors', size=ui.TextSize.XL),
+    #]))
+    add_card(q, 'dropdown_menus_vertical', cards.dropdown_menus_vertical(q, location='top_horizontal'))
+    add_card(q, 'major_recommendations', cards.major_recommendation_card)
 
     career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
-
-
-    add_card(q, 'dropdown_menus', cards.dropdown_menus(q, location='middle_vertical'))
-#    add_card(q, 'dropdown_menus', cards.dropdown_menus(q, location='middle_vertical'))
-
-
     add_card(q, 'major_section', ui.form_card(
         box=ui.box('top_horizontal', width='400px'),
         items=[
             ui.text(
                 f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
-                size=ui.TextSize.L
+                #size=ui.TextSize.L
             ),
           ]
     ))
 
-    add_card(q, 'recommendations', 
-        ui.form_card(
-            box=ui.box('top_horizontal', width='350px'),
-            #box=ui.box('d3', width='300px'), # min width 200px
-            items=[
-                ui.choice_group(
-                    name='recommendation_group', 
-                    label='Recommend a major based on ...', 
-                    choices=[
-                        ui.choice('A', label='My interests'),
-                        ui.choice('B', label='My skills'),
-                        ui.choice('C', label='Students like me'),
-                        ui.choice('D', label='The shortest time to graduate'),
-                ]),
-#                ui.slider(name='slider', label='Max Credits per Term', min=1, max=15, step=1, value=9),
-                ui.inline(
-                    items=[
-                        ui.button(name='show_recommendations', label='Submit', primary=True),
-                        ui.button(name='clear_recommendations', label='Clear', primary=False), # enable this
-                    ]
-                )
-            ]
-        )
-    )
+    add_card(q, 'my_test_table', ui.form_card(
+        #        box=ui.box(location, width=table_width, height=table_height),
+        box=ui.box('middle_vertical'),
+        items=[
+            # ui.text(title, size=ui.TextSize.L),
+            ui.table(
+                name='table',
+                downloadable=False,
+                resettable=False,
+                groupable=False,
+                # height='800px',
+                columns=[
+                    # ui.table_column(name='seq', label='Seq', data_type='number'),
+                    ui.table_column(name='course', label='Course', searchable=True, min_width='100'),
+                    ui.table_column(name='title', label='Title', searchable=True, min_width='180', max_width='300',
+                                    cell_overflow='wrap'),
+                    ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
+                                    align='center'),
+                    ui.table_column(
+                        name='tag',
+                        label='Type',
+                        #min_width='100',
+                        filterable=True,
+                        cell_type=ui.tag_table_cell_type(
+                            name='tags',
+                            tags=[
+                                ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                                ui.tag(label='REQUIRED', color='$red'),
+                                ui.tag(label='GENERAL', color='#046A38'),
+                                ui.tag(label='MAJOR', color='#1565C0'),
+                            ]
+                        )
+                    ),
+                    #ui.table_column(name='menu', label='Menu', max_width='150',
+                    #                cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                    #                    ui.command(name='description', label='Course Description'),
+                    #                    ui.command(name='prerequisites', label='Show Prerequisites'),
+                    #                    # ui.command(name='delete', label='Delete'),
+                    #                ])
+                    #                )
+                ],
+
+                #rows=[ui.table_row(
+                #    name=str(record['id']),
+                #    cells=[
+                #        # str(record['seq']),
+                #        record['course'],
+                #        record['title'],
+                #        str(record['credits']),
+                #        record['type'].upper(),
+                #        #record['description'],
+                #    ]
+                #) for record in major_records] # if record['type'].upper() in which]
+
+                groups=[
+                    render_major_table_group(
+                        'Required Major Core Courses',
+                        'MAJOR',
+                        major_records,
+                        False),
+                    render_major_table_group(
+                        'Required Related Courses/General Education',
+                        'REQUIRED,GENERAL',
+                        major_records,
+                        True),
+                    render_major_table_group(
+                        'Required Related Courses/Electives',
+                        'REQUIRED,ELECTIVE',
+                        major_records,
+                        True),
+                    render_major_table_group(
+                        'General Education',
+                        'GENERAL',
+                        major_records,
+                        True),
+                    render_major_table_group(
+                        'Electives',
+                        'ELECTIVE',
+                        major_records,
+                        True)
+                ]
+            )
+        ]
+    ))
+
+                    #add_card(q, 'dropdown_menus_vertical2', cards.dropdown_menus_vertical(q, location='middle_horizontal'))
+    #add_card(q, 'dropdown_menus_vertical3', cards.dropdown_menus_vertical(q, location='middle_horizontal'))
 
 
 #    new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
@@ -417,30 +474,7 @@ async def major(q: Q):
 #        path=new_image_path,
 #    ))
 
-#    add_card(q, 'major_step0', ui.wide_info_card(
-#        box=ui.box('grid', width='400px'), 
-#        name='major_step0', 
-#        title="Populate BA/BS Database",
-#        caption="Add all Bachelor's Programs to database. Note discrepancies between UMGC website and catalog.")
-#    )
-#    add_card(q, 'major_step1', ui.wide_info_card(
-#        box=ui.box('grid', width='400px'), 
-#        name='major_step1', 
-#        title='Connect Database',
-#        caption='Connect backend database of major programs to menus.')
-#    )
-#    add_card(q, 'major_step2', ui.wide_info_card(
-#        box=ui.box('grid', width='400px'), 
-#        name='major_step2', 
-#        title='Browse Majors',
-#        caption='Add a "Browse Majors" functionality. Comparison shop majors. "Compare up to 3", etc.')
-#    )
-#    add_card(q, 'major_step3', ui.wide_info_card(
-#        box=ui.box('grid', width='400px'), 
-#        name='major_step3', 
-#        title='Recommend Major - Shortest',
-#        caption='Suggest Major(s) based on quickest/cheapest to finish.')
-#    )
+
 
 ###############################################################################
 
@@ -486,6 +520,9 @@ program_id = 10
 #c.execute(complete_records_query, (program_id,))
 #df2 = pd.read_sql_query(complete_records_query, conn, params=(program_id,))
 
+# change to q.user later
+#q.client.degree_program = 'BS in Business Administration'
+
 def render_degree_program(program='Business Administration', degree="Bachelor's"):
     result = degree + ' in ' + program
     return result
@@ -500,11 +537,9 @@ async def courses(q: Q):
         ui.form_card(
             box='top_vertical',
             items=[ui.text(degree_program, size=ui.TextSize.XL)]
-        )
-    )
+    ))
 
-    ## make into a function
-
+# get results from querying database
     add_card(q, 'major_dashboard', ui.form_card(box='top_vertical', items=[
         ui.stats(
 #            justify='between', 
@@ -541,7 +576,9 @@ async def courses(q: Q):
     # automatically group by term?
     # see https://wave.h2o.ai/docs/examples/table-groups
 
-    cards.render_course_table2(q, student_records_no_schedule, title='B.S. in Business Administration', location='bottom_vertical')
+    cards.render_course_table2(q, student_records_no_schedule,
+                               title='BS in Business Administration',
+                               location='bottom_vertical')
 
 #    cards.render_course_table(q, student_records_no_schedule, 
 #        which=['MAJOR'], 
@@ -592,18 +629,47 @@ async def courses(q: Q):
 
 ###############################################################################
 
+# first query: WRTG 111 or another course
+
+#templates.ge_query_j(params=1)
+
+ge_query_j = '''
+    SELECT 
+        b.id,
+        b.name,
+        b.title,
+        b.credits,
+        b.description,
+        b.pre,
+        b.pre_credits
+    FROM 
+        general_education a
+    LEFT JOIN 
+        classes b
+    ON 
+        a.course_id = b.id
+    WHERE 
+        b.general_education_requirements_id = ?
+'''
 
 
 @on('#ge')
 async def ge(q: Q):
     clear_cards(q)
-    add_card(q, 'careers', 
-        ui.frame_card(
-            box=ui.box('grid', width='100%', height='600px'),
-            title='Interest Assessment',
-            path='https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx',
-        )
+    add_card(q, 'ge_tile',
+        ui.wide_info_card(
+            box=ui.box('grid', width='50%'),
+            name='',
+            title='Explore General Education',
+            caption='Explore and select GE courses'
+    ))
+    cards.render_ge_table(q, student_records_no_schedule,
+        #which=['GENERAL'],
+        #title='Select General Education Courses',
+        location='middle_horizontal',
+        table_width='95%'
     )
+
 
 ###############################################################################
 
@@ -617,7 +683,6 @@ async def electives(q: Q):
             path='https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx',
         )
     )
-
 
 ###############################################################################
 
@@ -837,19 +902,30 @@ async def initialize_user(q: Q) -> None:
     """
     logging.info('Initializing user')
 
-    # Decode the access token without verifying the signature
-    # Connects SSO to our user and student_info tables
-    user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
+    keycloak_implemented = False
+    # temporary until keycloak login fully implemented
+#    if keycloak_implemented:
+        # Decode the access token without verifying the signature
+        # Connects SSO to our user and student_info tables
+#        user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
 
-    q.user.username = user_details['preferred_username']
-    q.user.name = user_details['name']
-    q.user.firstname = user_details['given_name']
-    q.user.lastname = user_details['family_name']
+#        q.user.username = user_details['preferred_username']
+#        q.user.name = user_details['name']
+#        q.user.firstname = user_details['given_name']
+#        q.user.lastname = user_details['family_name']
 
-    # check whether user is in the sqlite3 db
-    # if so, get role and id
-    # if not, add user to db as a new student
-    q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
+        # check whether user is in the sqlite3 db
+        # if so, get role and id
+        # if not, add user to db as a new student
+#        q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
+#    else:
+#        # fake it for now
+    q.user.username = 'johndoe'
+    q.user.name = 'John Doe'
+    q.user.firstname = 'John'
+    q.user.lastname = 'Doe'
+    q.user.user_id = 1
+    q.user.role_id = 1
 
 
     # if a student, get information from the student_info table

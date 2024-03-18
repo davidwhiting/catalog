@@ -6,8 +6,8 @@ activate:
 run:
 	venv/bin/wave run app
 
-#server:
-#	./bin/waved
+server:
+	cd venv && ./waved
 
 #wavedb: 
 #	./bin/wavedb -access-key-id uzer -access-key-secret pa55word

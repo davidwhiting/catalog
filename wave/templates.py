@@ -2,8 +2,29 @@ import sys
 import traceback
 from h2o_wave import Q, expando_to_dict, ui, graphics as g
 
+# query moved to view
+ge_query_j_old_delete_me = '''
+    SELECT 
+        b.id,
+        b.name,
+        b.title,
+        b.credits,
+        b.description,
+        b.pre,
+        b.pre_credits
+    FROM 
+        general_education a
+    LEFT JOIN 
+        classes b
+    ON 
+        a.course_id = b.id
+    WHERE 
+        b.general_education_requirements_id = ?
+'''
 
-complete_records_query = '''
+ge_query_j = 'SELECT * FROM ge_view WHERE ge_id = ?'
+
+complete_records_query_old_delete_me = '''
     SELECT 
         a.seq,
         a.name,
@@ -23,7 +44,10 @@ complete_records_query = '''
         a.program_id = ?
 '''
 
-complete_student_records_query_old = '''
+complete_records_query = 'SELECT * FROM complete_records_view WHERE program_id = ?'
+
+
+complete_student_records_query_old_delete_me = '''
     SELECT 
         a.seq,
         a.name,
@@ -46,7 +70,10 @@ complete_student_records_query_old = '''
         a.student_info_id = ?
 '''
 
-complete_student_records_query = '''
+complete_student_records_query_old = 'SELECT * FROM student_records_view_old WHERE student_info_id = ?'
+
+
+complete_student_records_query_delete_me = '''
     SELECT 
         a.seq,
         a.name,
@@ -68,6 +95,9 @@ complete_student_records_query = '''
     WHERE 
         a.student_info_id = ?
 '''
+
+complete_student_records_query = 'SELECT * FROM student_records_view WHERE student_info_id = ?'
+
 
 home_markdown = '''
 # Notes

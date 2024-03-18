@@ -6,10 +6,49 @@ import utils
 
 from utils import add_card
 
+def render_debug_card(q, location='d3'):
+    content = f'''
+### All parameters?
+{q}
+
+### App Parameters
+{q.app}
+
+### User Parameters
+{q.user}
+
+### Client Parameters
+{q.client}
+    '''
+    return ui.markdown_card(box=location, title='Debugging Information', content=content )
+
 # A fallback card for handling bugs
 fallback = ui.form_card(
     box='fallback',
     items=[ui.text('Uh-oh, something went wrong!')]
+)
+
+major_recommendation_card = ui.form_card(
+    box=ui.box('top_horizontal', width='350px'),
+    # box=ui.box('d3', width='300px'), # min width 200px
+    items=[
+        ui.choice_group(
+            name='recommendation_group',
+            label='Recommend a major based on ...',
+            choices=[
+                ui.choice('A', label='My interests'),
+                ui.choice('B', label='My skills'),
+                ui.choice('C', label='Students like me'),
+                ui.choice('D', label='The shortest time to graduate'),
+            ]),
+        #                ui.slider(name='slider', label='Max Credits per Term', min=1, max=15, step=1, value=9),
+        ui.inline(
+            items=[
+                ui.button(name='show_recommendations', label='Submit', primary=True),
+                ui.button(name='clear_recommendations', label='Clear', primary=False),  # enable this
+            ]
+        )
+    ]
 )
 
 def render_tag_column(width='120'):
@@ -33,7 +72,7 @@ def render_tag_column(width='120'):
 tag_column = ui.table_column(
     name='tag', 
     label='Type', 
-    max_width='120',
+    min_width='100',
     filterable=True,
     cell_type=ui.tag_table_cell_type(
         name='tags',
@@ -54,20 +93,26 @@ def create_table_group(group_name, record_type, records, collapsed):
                 record['name'], 
                 record['title'], 
                 str(record['credits']), 
-                record['description'], 
+                #record['description'],
                 record['type'].upper(), 
             ]
         ) for record in records if record['type'].upper() == record_type
     ], collapsed=collapsed)
 
 
-def render_course_table2(q, records, which=['MAJOR','REQUIRED'], title='', location='middle_horizontal', table_height='100%', table_width='100%'):
+def render_course_table2(q, records,
+                         which=['MAJOR','REQUIRED'],
+                         title='',
+                         location='middle_horizontal',
+                         table_height='100%',
+                         table_width='100%'):
     # Renders a table for the courses tab
 
-    table_name = 'table_' + '_'.join(which)
-
+    #table_name = 'table_' + '_'.join(which)
+    table_name = 'table_render_course2'
     result = add_card(q, table_name, ui.form_card(
-        box=ui.box(location, width=table_width, height=table_height),
+#        box=ui.box(location, width=table_width, height=table_height),
+        box=ui.box(location),
         items=[
             #ui.text(title, size=ui.TextSize.L),        
             ui.table(
@@ -75,17 +120,17 @@ def render_course_table2(q, records, which=['MAJOR','REQUIRED'], title='', locat
                 downloadable=False,
                 resettable=False,
                 groupable=False,
-                height='400px',
+                #height='800px',
                 columns=[
                     #ui.table_column(name='seq', label='Seq', data_type='number'),
-                    ui.table_column(name='text', label='Course', searchable=True, max_width='100'),
-                    ui.table_column(name='title', label='Title', searchable=True, max_width='180', cell_overflow='wrap'),
-                    ui.table_column(name='credits', label='Credits', data_type='number', max_width='50', align ='center'),
-                    ui.table_column(name='description', label='Description', searchable=False, max_width='150',
-                        cell_overflow='tooltip', 
-                        #cell_overflow='wrap', 
-                        #cell_type=ui.markdown_table_cell_type(target='_blank'),
-                    ),
+                    ui.table_column(name='course', label='Course', searchable=True, min_width='100'),
+                    ui.table_column(name='title', label='Title', searchable=True, min_width='180', max_width='300', cell_overflow='wrap'),
+                    ui.table_column(name='credits', label='Credits', data_type='number', min_width='50', align ='center'),
+                    #ui.table_column(name='description', label='Description', searchable=False, max_width='150',
+                    #    cell_overflow='tooltip',
+                    #    #cell_overflow='wrap',
+                    #    #cell_type=ui.markdown_table_cell_type(target='_blank'),
+                    #),
                     tag_column,
                     ui.table_column(name='menu', label='Menu', max_width='150',
                         cell_type=ui.menu_table_cell_type(name='commands', commands=[
