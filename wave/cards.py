@@ -3,6 +3,7 @@ import traceback
 from h2o_wave import Q, expando_to_dict, ui, graphics as g
 import templates
 import utils
+import pandas as pd
 
 from utils import add_card
 
@@ -84,6 +85,138 @@ tag_column = ui.table_column(
         ]
     )
 )
+
+def render_major_table_group(group_name, record_type, records, collapsed):
+    return ui.table_group(group_name, [
+        ui.table_row(
+            name=str(record['id']),
+            cells=[
+                record['course'],
+                record['title'],
+                str(record['credits']),
+                #record['description'],
+                record['type'].upper(),
+            ]
+        ) for record in records if record['type'].upper() == record_type
+    ], collapsed=collapsed)
+
+async def render_major_table(q, records, location='bottom_vertical'):
+    return add_card(q, 'my_test_table', ui.form_card(
+        #        box=ui.box(location, width=table_width, height=table_height),
+        box=ui.box(location, height='350px'),
+        items=[
+            #ui.text(title, size=ui.TextSize.L),
+            ui.table(
+                name='table',
+                downloadable=False,
+                resettable=False,
+                groupable=False,
+                height='350px',
+                columns=[
+                    # ui.table_column(name='seq', label='Seq', data_type='number'),
+                    ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
+                    ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300',
+                                    cell_overflow='wrap'),
+                    ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
+                                    align='center'),
+                    ui.table_column(
+                        name='tag',
+                        label='Type',
+                        min_width='190',
+                        filterable=True,
+                        cell_type=ui.tag_table_cell_type(
+                            name='tags',
+                            tags=[
+                                ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                                ui.tag(label='REQUIRED', color='$red'),
+                                ui.tag(label='GENERAL', color='#046A38'),
+                                ui.tag(label='MAJOR', color='#1565C0'),
+                            ]
+                        )
+                    ),
+                    ui.table_column(name='menu', label='Menu', max_width='150',
+                        cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                            ui.command(name='description', label='Course Description'),
+                            ui.command(name='prerequisites', label='Show Prerequisites'),
+                    #                    # ui.command(name='delete', label='Delete'),
+                        ])
+                                )
+                ],
+                groups=[
+                    render_major_table_group(
+                        'Required Major Core Courses',
+                        'MAJOR',
+                        records,
+                        True),
+                    render_major_table_group(
+                        'Required Related Courses/General Education',
+                        'REQUIRED,GENERAL',
+                        records,
+                        True),
+                    render_major_table_group(
+                        'Required Related Courses/Electives',
+                        'REQUIRED,ELECTIVE',
+                        records,
+                        True),
+                    #render_major_table_group(
+                    #    'General Education',
+                    #    'GENERAL',
+                    #    major_records,
+                    #    True),
+                    #render_major_table_group(
+                    #    'Electives',
+                    #    'ELECTIVE',
+                    #    major_records,
+                    #    True)
+            # ui.text(title, size=ui.TextSize.L),
+
+        ])]
+    ))
+
+
+async def render_major_dashboard(q, title, row, location):
+    '''
+    Renders the dashboard with explored majors
+    :param q: instance of Q for wave query
+    :param title: title to be displayed
+    :param row: result of query to program_requirements table
+    :param location: page location to display
+    :return:
+    '''
+    ge_total = q.app.ge_total
+    return add_card(q, 'major_dashboard', ui.form_card(box=location,
+        items=[
+            ui.text(title + ': Credits', size=ui.TextSize.L),
+            ui.stats(
+                # justify='between',
+                items=[
+                    ui.stat(
+                        label='Major',
+                        value=str(row['major']),
+                        caption='Required Core',
+                        icon='Trackers'),
+                    ui.stat(
+                        label='Required',
+                        value=str(row['related_ge']+row['related_elective']),
+                        caption='Required Related',
+                        icon='News'),
+                    ui.stat(
+                        label='General Education',
+                        value=str(ge_total-row['related_ge']),
+                        caption='Remaining GE',
+                        icon='TestBeaker'),
+                    ui.stat(
+                        label='Elective',
+                        value=str(row['remaining']-(ge_total-row['related_ge'])-row['related_elective']),
+                        caption='Remaining Elective',
+                        icon='Media'),
+                    ui.stat(
+                        label='TOTAL',
+                        value=str(row['total']),
+                        caption='Total Credits',
+                        icon='Education'),
+            ])
+    ]))
 
 def create_table_group(group_name, record_type, records, collapsed):
     return ui.table_group(group_name, [
@@ -217,6 +350,50 @@ def render_course_table(q, records, which=['MAJOR'], title='Major Required Cours
     ))
 
     return result
+
+async def render_majors_discovery(q, program_id):
+    '''
+    Create the bottom half of the majors page given a program_id
+    '''
+    query = '''
+        SELECT b.name || ' in ' || a.name as degree_program
+        FROM programs a, degrees b 
+        WHERE a.id = ? AND a.degree_id = b.id 
+    '''
+    q.app.c.execute(query, (program_id,))
+    q_result = q.app.c.fetchone()
+    if q_result is not None:
+        title = q_result[0]
+    else:
+        title = None
+
+    query = '''
+        SELECT 
+            id,
+            course, 
+            course_type AS type,
+            course_type_id,
+            title,
+            credits,
+            description,
+            pre,
+            pre_credits,
+            substitutions
+        FROM program_requirements_view 
+        WHERE program_requirements_id = (
+            SELECT id FROM program_requirements WHERE program_id = ?
+        )
+    '''
+    df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
+    major_records = df.to_dict('records')
+
+    query = 'SELECT * FROM program_requirements WHERE program_id = ?'
+    df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
+    rows = df.to_dict('records')
+    row = rows[0]
+
+    await render_major_dashboard(q, title, row, 'middle_vertical')
+    await render_major_table(q, major_records, 'bottom_vertical')
 
 
 def render_ge_table(q, records, which=['GENERAL'], title='Select General Education Courses', location='middle_horizontal', table_height='500px', table_width='700px'):

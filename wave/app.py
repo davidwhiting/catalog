@@ -314,41 +314,6 @@ async def student_step5(q: Q):
 
 ###############################################################################
 
-query = '''
-    SELECT 
-        id,
-        course, 
-        course_type AS type,
-        course_type_id,
-        title,
-        credits,
-        description,
-        pre,
-        pre_credits,
-        substitutions
-    FROM program_requirements_view 
-    WHERE program_requirements_id = (
-        SELECT id FROM program_requirements WHERE program_id = ?
-    )
-'''
-df_major = pd.read_sql_query(query, conn, params=(10,))
-# not sure whether I need all this conversion
-major_records = df_major.to_dict('records')
-
-def render_major_table_group(group_name, record_type, records, collapsed):
-    return ui.table_group(group_name, [
-        ui.table_row(
-            name=str(record['id']),
-            cells=[
-                record['course'],
-                record['title'],
-                str(record['credits']),
-                #record['description'],
-                record['type'].upper(),
-            ]
-        ) for record in records if record['type'].upper() == record_type
-    ], collapsed=collapsed)
-
 
 @on('#major')
 async def major(q: Q):
@@ -369,93 +334,53 @@ async def major(q: Q):
                 f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
                 #size=ui.TextSize.L
             ),
+            ui.separator(),
+            ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
           ]
     ))
 
-    add_card(q, 'my_test_table', ui.form_card(
-        #        box=ui.box(location, width=table_width, height=table_height),
-        box=ui.box('middle_vertical'),
-        items=[
-            # ui.text(title, size=ui.TextSize.L),
-            ui.table(
-                name='table',
-                downloadable=False,
-                resettable=False,
-                groupable=False,
-                # height='800px',
-                columns=[
-                    # ui.table_column(name='seq', label='Seq', data_type='number'),
-                    ui.table_column(name='course', label='Course', searchable=True, min_width='100'),
-                    ui.table_column(name='title', label='Title', searchable=True, min_width='180', max_width='300',
-                                    cell_overflow='wrap'),
-                    ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
-                                    align='center'),
-                    ui.table_column(
-                        name='tag',
-                        label='Type',
-                        #min_width='100',
-                        filterable=True,
-                        cell_type=ui.tag_table_cell_type(
-                            name='tags',
-                            tags=[
-                                ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
-                                ui.tag(label='REQUIRED', color='$red'),
-                                ui.tag(label='GENERAL', color='#046A38'),
-                                ui.tag(label='MAJOR', color='#1565C0'),
-                            ]
-                        )
-                    ),
-                    #ui.table_column(name='menu', label='Menu', max_width='150',
-                    #                cell_type=ui.menu_table_cell_type(name='commands', commands=[
-                    #                    ui.command(name='description', label='Course Description'),
-                    #                    ui.command(name='prerequisites', label='Show Prerequisites'),
-                    #                    # ui.command(name='delete', label='Delete'),
-                    #                ])
-                    #                )
-                ],
+    program_id = 10
+    await cards.render_majors_discovery(q, program_id)
+    #query = '''
+    #    SELECT b.name || ' in ' || a.name as degree_program
+    #    FROM programs a, degrees b
+    #    WHERE a.id = ? AND a.degree_id = b.id
+    #'''
+    #q.app.c.execute(query, (program_id,))
+    #q_result = q.app.c.fetchone()
+    #if q_result is not None:
+    #    title = q_result[0]
+    #else:
+    #    title = None
+#
+    #query = '''
+    #    SELECT
+    #        id,
+    #        course,
+    #        course_type AS type,
+    #        course_type_id,
+    #        title,
+    #        credits,
+    #        description,
+    #        pre,
+    #        pre_credits,
+    #        substitutions
+    #    FROM program_requirements_view
+    #    WHERE program_requirements_id = (
+    #        SELECT id FROM program_requirements WHERE program_id = ?
+    #    )
+    #'''
+    #df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
+    #major_records = df.to_dict('records')
+    #
+    #query = 'SELECT * FROM program_requirements WHERE program_id = ?'
+    #df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
+    #rows = df.to_dict('records')
+    #row = rows[0]
+    #
+    #await cards.render_major_dashboard(q, title, row, 'middle_vertical')
+    #await cards.render_major_table(q, major_records, 'bottom_vertical')
 
-                #rows=[ui.table_row(
-                #    name=str(record['id']),
-                #    cells=[
-                #        # str(record['seq']),
-                #        record['course'],
-                #        record['title'],
-                #        str(record['credits']),
-                #        record['type'].upper(),
-                #        #record['description'],
-                #    ]
-                #) for record in major_records] # if record['type'].upper() in which]
-
-                groups=[
-                    render_major_table_group(
-                        'Required Major Core Courses',
-                        'MAJOR',
-                        major_records,
-                        False),
-                    render_major_table_group(
-                        'Required Related Courses/General Education',
-                        'REQUIRED,GENERAL',
-                        major_records,
-                        True),
-                    render_major_table_group(
-                        'Required Related Courses/Electives',
-                        'REQUIRED,ELECTIVE',
-                        major_records,
-                        True),
-                    render_major_table_group(
-                        'General Education',
-                        'GENERAL',
-                        major_records,
-                        True),
-                    render_major_table_group(
-                        'Electives',
-                        'ELECTIVE',
-                        major_records,
-                        True)
-                ]
-            )
-        ]
-    ))
 
                     #add_card(q, 'dropdown_menus_vertical2', cards.dropdown_menus_vertical(q, location='middle_horizontal'))
     #add_card(q, 'dropdown_menus_vertical3', cards.dropdown_menus_vertical(q, location='middle_horizontal'))
@@ -523,13 +448,10 @@ program_id = 10
 # change to q.user later
 #q.client.degree_program = 'BS in Business Administration'
 
-def render_degree_program(program='Business Administration', degree="Bachelor's"):
-    result = degree + ' in ' + program
-    return result
-
 # generate automatically from form inputs
-degree_program = render_degree_program(program='Business Administration', degree="Bachelor's")
 
+degree_program = 'BS in Business Administration'
+#degree_program = q.user.degree_program
 @on('#courses')
 async def courses(q: Q):
     clear_cards(q)  
@@ -570,8 +492,7 @@ async def courses(q: Q):
                     caption='Elective Credits Remaining', 
                     icon='Media'),   
             ]
-        )
-    ]))
+    )]))
 
     # automatically group by term?
     # see https://wave.h2o.ai/docs/examples/table-groups
@@ -580,9 +501,9 @@ async def courses(q: Q):
                                title='BS in Business Administration',
                                location='bottom_vertical')
 
-#    cards.render_course_table(q, student_records_no_schedule, 
-#        which=['MAJOR'], 
-#        title='Required Major Core Courses (33)', 
+#    cards.render_course_table(q, student_records_no_schedule,
+#        which=['MAJOR'],
+#        title='Required Major Core Courses (33)',
 #        location='middle_horizontal',
 #        table_width='48%'
 #    )
@@ -701,10 +622,7 @@ async def schedule(q: Q):
                 ui.text(
                     selected_degree + ' in ' + selected_program,
                     size=ui.TextSize.XL
-                )
-            ]
-        )
-    )
+    )]))
     add_card(q, 'd3plot', cards.d3plot(html_template, 'd3'))
     
     Sessions = ['Session 1', 'Session 2', 'Session 3']
@@ -894,6 +812,7 @@ async def initialize_app(q: Q):
     q.app.umgc_logo, = await q.site.upload(['images/umgc-logo.png'])
     q.app.conn = sqlite3.connect('UMGC.db')
     q.app.c = q.app.conn.cursor()
+    q.app.ge_total = 41 # total ge credits
     q.app.initialized = True
 
 async def initialize_user(q: Q) -> None:
