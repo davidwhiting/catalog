@@ -215,13 +215,57 @@ async def student(q: Q):
                 ]),
         ])
     )
-    add_card(q, 'student_questions', ui.wide_info_card(
-        box=ui.box('grid', width='300px'), 
-        name='', 
+    career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
+    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
+    #add_card(q, 'interest_assessment', ui.form_card(
+    #    box=ui.box('grid', width='400px'),
+    #    items=[
+    #        ui.text(
+    #            f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
+    #            #size=ui.TextSize.L
+    #        ),
+    #        ui.separator(),
+    #        ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
+    #      ]
+    #))
+
+    #add_card(q, 'interest_assessment', ui.wide_info_card(
+    #    box=ui.box('grid', width='600px'),
+    #    name='',
+    #    icon='AccountActivity',
+    #    title='Interest Assessment',
+    #    caption=f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
+    #))
+    add_card(q, 'assessments', ui.wide_info_card(
+        box=ui.box('grid', width='600px'),
+        name='Assessments',
         icon='AccountActivity',
-        title='Questions',
-        caption='Appropriate questions will be asked here to help profile student. These are TBD.'
+        title='Career Assessments',
+        caption=f'Access career assessment tools like **UMGC CareerQuest** or add a page like <a href="{yale_url}" target="_blank">Yale\'s</a> with _Interest_, _Personality_, and _Skills_ assessments.',
     ))
+    add_card(q, 'student_api', ui.wide_info_card(
+        box=ui.box('grid', width='300px'),
+        name='',
+        icon='Import',
+        title='Import',
+        caption='Student information can be imported from available data sources. Student will be allowed to update information for this tool.'
+    ))
+    #add_card(q, 'skills_assessment', ui.wide_info_card(
+    #    box=ui.box('grid', width='600px'),
+    #    name='',
+    #    icon='AccountActivity',
+    #    title='Skills Assessment',
+    #    caption=f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
+    #))
+
+    #add_card(q, 'student_questions_old', ui.wide_info_card(
+    #    box=ui.box('grid', width='300px'),
+    #    name='',
+    #    icon='AccountActivity',
+    #    title='Questions',
+    #    caption='Appropriate questions will be asked here to help profile student. These are TBD.'
+    #))
+
     add_card(q, 'student_guest', ui.wide_info_card(
         box=ui.box('grid', width='300px'), 
         name='', 
@@ -235,13 +279,6 @@ async def student(q: Q):
         icon='ContactLock',
         title='Logged In',
         caption='Student information will be saved for future use.'
-    ))
-    add_card(q, 'student_api', ui.wide_info_card(
-        box=ui.box('grid', width='300px'), 
-        name='', 
-        icon='Import',
-        title='Import',
-        caption='Student information can be imported from available data sources. Student will be allowed to update information for this tool.'
     ))
 
 @on()
@@ -314,7 +351,6 @@ async def student_step5(q: Q):
 
 ###############################################################################
 
-
 @on('#major')
 async def major(q: Q):
     clear_cards(q)
@@ -339,67 +375,10 @@ async def major(q: Q):
           ]
     ))
 
+    # the program id should be returned from the menu
     program_id = 10
+
     await cards.render_majors_discovery(q, program_id)
-    #query = '''
-    #    SELECT b.name || ' in ' || a.name as degree_program
-    #    FROM programs a, degrees b
-    #    WHERE a.id = ? AND a.degree_id = b.id
-    #'''
-    #q.app.c.execute(query, (program_id,))
-    #q_result = q.app.c.fetchone()
-    #if q_result is not None:
-    #    title = q_result[0]
-    #else:
-    #    title = None
-#
-    #query = '''
-    #    SELECT
-    #        id,
-    #        course,
-    #        course_type AS type,
-    #        course_type_id,
-    #        title,
-    #        credits,
-    #        description,
-    #        pre,
-    #        pre_credits,
-    #        substitutions
-    #    FROM program_requirements_view
-    #    WHERE program_requirements_id = (
-    #        SELECT id FROM program_requirements WHERE program_id = ?
-    #    )
-    #'''
-    #df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
-    #major_records = df.to_dict('records')
-    #
-    #query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    #df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
-    #rows = df.to_dict('records')
-    #row = rows[0]
-    #
-    #await cards.render_major_dashboard(q, title, row, 'middle_vertical')
-    #await cards.render_major_table(q, major_records, 'bottom_vertical')
-
-
-                    #add_card(q, 'dropdown_menus_vertical2', cards.dropdown_menus_vertical(q, location='middle_horizontal'))
-    #add_card(q, 'dropdown_menus_vertical3', cards.dropdown_menus_vertical(q, location='middle_horizontal'))
-
-
-#    new_image_path, = await q.site.upload(['images/program_overview_bmgt.png'])
-#    add_card(q, 'example_program_template', ui.image_card(
-#        box=ui.box('d3', height='600px', width='80%'),
-##        box=ui.box('vertical', width='100%', height='400px'), 
-#        type='png',
-#        title="Bachelor's in Business Administration Program Overview",
-#        #caption='Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-#        #category='Category',
-#        #label='Click me',
-#        #image='https://images.pexels.com/photos/3225517/pexels-photo-3225517.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-#        path=new_image_path,
-#    ))
-
-
 
 ###############################################################################
 
