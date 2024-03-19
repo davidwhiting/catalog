@@ -7,6 +7,14 @@ import pandas as pd
 
 from utils import add_card, single_query, query_row
 
+interview_questions = [
+    'Have you ever attended a college or university before?',
+    'Are you enrolling full-time or part-time?',
+    '[If part-time]: Are you working full-time?',
+    '[If part-time & working full-time]: Are you attending evening classes?',
+    'Are you in-state, out-of-state, or military?'
+]
+
 def render_debug_card(q, location='d3'):
     content = f'''
 ### All parameters?

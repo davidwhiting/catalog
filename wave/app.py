@@ -145,8 +145,57 @@ async def home(q: Q):
             icon='UserFollowed')
     )
 
-    # Debug Information
-    add_card(q, 'params', cards.render_debug_card(q, location='d3'))
+    # Progress Table
+    #add_card(q, 'progress_table', ui.form_card(
+    #    box=ui.box(location, height='350px', width='100%'), items=[
+    #        ui.table(
+    #            name='table',
+    #            downloadable=False,
+    #            resettable=False,
+    #            groupable=True,
+    #            #height='350px',
+    #            columns=[
+    #                ui.table_column(name='id', label='id', data_type='number'),
+    #                ui.table_column(name='issue', label='Issue', searchable=False, min_width='100'),
+    #                ui.table_column(name='description', label='Description', searchable=False, min_width='180', max_width='300',
+    #                                cell_overflow='wrap'),
+    #                #ui.table_column(name='credits', label='Credits', data_type='number', min_width='50'),
+    #                #ui.table_column(
+    #                #    name='tag',
+    #                #    label='Type',
+    #                #    min_width='190',
+    #                #    filterable=True,
+    #                #    cell_type=ui.tag_table_cell_type(
+    #                #        name='tags',
+    #                #        tags=[
+    #                #            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+    #                #            ui.tag(label='REQUIRED', color='$red'),
+    #                #            ui.tag(label='GENERAL', color='#046A38'),
+    #                #            ui.tag(label='MAJOR', color='#1565C0'),
+    #                #        ]
+    #                #    )
+    #                #),
+    #                #ui.table_column(name='menu', label='Menu', max_width='150',
+    #                #    cell_type=ui.menu_table_cell_type(name='commands', commands=[
+    #                #        ui.command(name='description', label='Course Description'),
+    #                #        ui.command(name='prerequisites', label='Show Prerequisites'),
+    #                ##                    # ui.command(name='delete', label='Delete'),
+    #                #    ])
+    #                #            )
+    #            ],
+    #            #groups=[
+    #            #    render_major_table_group(
+    #            #        'Required Major Core Courses',
+    #            #        'MAJOR',
+    #            #        records,
+    #            #        True),
+    #            ## ui.text(title, size=ui.TextSize.L),
+    #            #]
+    #    )]
+#
+#
+    ## Debug Information
+    #add_card(q, 'params', cards.render_debug_card(q, location='d3'))
 
     #add_card(q, f'step3_of_n',
     #    ui.tall_info_card(
@@ -163,13 +212,6 @@ async def home(q: Q):
 @on('student_reset')
 async def student(q: Q):
     q.page['sidebar'].value = '#student'
-    interview_questions = [
-        'Have you ever attended a college or university before?',
-        'Are you enrolling full-time or part-time?',
-        '[If part-time]: Are you working full-time?',
-        '[If part-time & working full-time]: Are you attending evening classes?',
-        'Are you in-state, out-of-state, or military?'
-    ]
 
     # Since this page is interactive, we want to update its card
     # instead of recreating it every time, so ignore 'form' card on drop.
@@ -209,7 +251,7 @@ async def student(q: Q):
                         ui.step(label='Question 4'),
                         ui.step(label='Question 5'),
                 ]),
-                ui.textbox(name='textbox1', label=interview_questions[0]),
+                ui.textbox(name='textbox1', label=cards.interview_questions[0]),
                 ui.buttons(
                     justify='end', 
                     items=[
@@ -277,7 +319,7 @@ async def student_step2(q: Q):
             ui.step(label='Question 4'),
             ui.step(label='Question 5'),
         ]),
-        ui.textbox(name='textbox2', label=interview_questions[1]),
+        ui.textbox(name='textbox2', label=cards.interview_questions[1]),
         ui.buttons(justify='end', items=[
             ui.button(name='student_step3', label='Next', primary=True),
         ])
@@ -294,7 +336,7 @@ async def student_step3(q: Q):
             ui.step(label='Question 4'),
             ui.step(label='Question 5'),
         ]),
-        ui.textbox(name='textbox3', label=interview_questions[2]),
+        ui.textbox(name='textbox3', label=cards.interview_questions[2]),
         ui.buttons(justify='end', items=[
             ui.button(name='student_step4', label='Next', primary=True),
         ])
@@ -311,7 +353,7 @@ async def student_step4(q: Q):
             ui.step(label='Question 4'),
             ui.step(label='Question 5'),
         ]),
-        ui.textbox(name='textbox4', label=interview_questions[3]),
+        ui.textbox(name='textbox4', label=cards.interview_questions[3]),
         ui.buttons(justify='end', items=[
             ui.button(name='student_step5', label='Next', primary=True),
         ])
@@ -328,7 +370,7 @@ async def student_step5(q: Q):
             ui.step(label='Question 4', done=True),
             ui.step(label='Question 5'),
         ]),
-        ui.textbox(name='textbox5', label=interview_questions[4]),
+        ui.textbox(name='textbox5', label=cards.interview_questions[4]),
         ui.buttons(justify='end', items=[
             ui.button(name='student_reset', label='Finish', primary=True),
         ])
@@ -574,8 +616,19 @@ async def schedule(q: Q):
                     'BS in Business Administration',
                     size=ui.TextSize.XL
     )]))
+    #add_card(q, 'more_student_info',
+    #    ui.form_card(
+    #        box='top_horizontal',
+    #        items=[
+    #            ui.separator(label='John Doe Profile:'),
+    #            ui.text('Military Tuition'),
+    #            ui.text('Evening School'),
+    #        ]
+    #))
+
     add_card(q, 'd3plot', cards.d3plot(html_template, 'd3'))
 
+    demo = True
     Sessions = ['Session 1', 'Session 2', 'Session 3']
     add_card(q, 'sessions_spin', 
         ui.form_card(
@@ -584,8 +637,7 @@ async def schedule(q: Q):
                 ui.dropdown(
                     name='first_term', 
                     label='First Term', 
-                    #value=q.args.first_term,
-                    value='spring2024',
+                    value='spring2024' if demo else q.args.first_term,
                     trigger=True,
                     width='150px',
                     choices=[
@@ -599,15 +651,15 @@ async def schedule(q: Q):
                     name='checklist', 
                     label='Sessions Attending',
                     choices=[ui.choice(name=x, label=x) for x in Sessions],
-                    values=['Session 1', 'Session 3'], # set default
+                    values=['Session 1', 'Session 2', 'Session 3'], # set default
                 ),
                 ui.spinbox(
                     name='spinbox', 
                     label='Courses per Session', 
                     width='150px',
-                    min=1, max=5, step=1, value=2),
+                    min=1, max=5, step=1, value=1),
 #                ui.separator(label=''),
-                ui.slider(name='slider', label='Max Credits per Term', min=1, max=16, step=1, value=12),
+                ui.slider(name='slider', label='Max Credits per Term', min=1, max=16, step=1, value=9),
                 ui.inline(items=[
                     ui.button(name='show_inputs', label='Submit', primary=True),
                     ui.button(name='reset_sidebar', label='Reset', primary=False),
