@@ -41,6 +41,16 @@ def single_query(query, cursor):
 
     return result
 
+def query_row(query, params, cursor):
+    # convenience function for sqlite3 db queries that return one value
+    cursor.execute(query, params)
+    row = cursor.fetchone()
+    if row is not None:
+        result = row
+    else:
+        result = None
+    return result
+
 ## May be useful for creating tables from dataframe
 ## Rewrite my courses table below to try this out
 def df_to_rows(df: pd.DataFrame):
@@ -74,6 +84,13 @@ def prepare_d3_data(df, start_term='SPRING 2024'):
             return pd.Series(['green', 'white'])
         elif row['type'] == 'major':
             return pd.Series(['blue', 'white'])
+        # hack: fix the following 3 elifs
+        elif row['type'] == 'required,elective':
+            row['type'] = 'required'
+            return pd.Series(['red', 'white'])
+        elif row['type'] == 'required,general':
+            row['type'] = 'required'
+            return pd.Series(['red', 'white'])
         elif row['type'] == 'required':
             return pd.Series(['red', 'white'])
         elif row['type'] == 'elective':

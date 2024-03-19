@@ -2,6 +2,27 @@ import sys
 import traceback
 from h2o_wave import Q, expando_to_dict, ui, graphics as g
 
+# used to be on app, not used now?
+complete_records_query = '''
+    SELECT 
+        a.seq,
+        a.name,
+        a.program_id,
+        a.class_id,
+        a.course_type_id,
+        b.title,
+        b.description,
+        b.prerequisites
+    FROM 
+        program_sequence a
+    JOIN 
+        classes b
+    ON 
+        a.class_id = b.id
+    WHERE 
+        a.program_id = ?
+'''
+
 # query moved to view
 ge_query_j_old_delete_me = '''
     SELECT 

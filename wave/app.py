@@ -16,7 +16,7 @@ import cards
 # utils contains all other functions
 import utils
 
-from utils import add_card, single_query
+from utils import add_card, single_query, query_row
 
 async def on_startup():
     # Set up logging
@@ -39,13 +39,6 @@ student_info_id = 1 # new student
 #student_name = q.user.name
 
 student_progress_query = 'SELECT * FROM student_progress WHERE student_info_id={}'.format(student_info_id)
-##program_id = 10
-#
-##c.execute(complete_records_query, (program_id,))
-#df2 = pd.read_sql_query(complete_records_query, conn, params=(program_id,))
-
-# reading student progress directly into pandas
-#df_raw = pd.read_sql_query(student_progress_query, conn)
 
 df2 = pd.read_sql_query(templates.complete_student_records_query, conn, params=(student_info_id,))
 df_raw = pd.read_sql_query(templates.complete_student_records_query_old, conn, params=(student_info_id,))
@@ -62,6 +55,7 @@ start_term = 'SPRING 2024'
 
 # may need to rewrite this for later
 # df and headers contain information for the d3 diagram
+#need to make this await
 df_d3, headers = utils.prepare_d3_data(df_raw, start_term.upper())
 
 # df_raw contains information for the class table in courses tab
@@ -98,7 +92,7 @@ df_json = df_d3.to_json(orient='records')
 headers_json = headers.to_json(orient='records')
 
 html_template = templates.html_code_minimal.format(
-    javascript=templates.javascript_minimal, 
+    javascript=templates.javascript_minimal,
     headers=headers_json, 
     data=df_json)
 #    html_template = templates.html_code.format(javascript=d3_js_script_path, data=json_data)
@@ -119,62 +113,70 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 @on('#home')
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except (header, footer, meta).
-    add_card(q, 'params', cards.render_debug_card(q, location='d3'))
-
-    add_card(q, f'step1_of_n', 
-        ui.tall_info_card(
-            box=ui.box('horizontal', width='25%'), 
-            name='Name', 
+    add_card(q, 'student_guest', ui.wide_info_card(
+        box=ui.box('top_horizontal', width='25%'),
+        name='',
+        icon='Contact',
+        title='Guests',
+        caption='Login not required to use this app.'
+    ))
+    add_card(q, 'login',
+        ui.wide_info_card(
+            box=ui.box('top_horizontal', width='25%'),
+            name='login',
             title='Login',
-            caption='The first step is to log in', 
+            caption='User roles: *admin*, *coach*, *student*, *prospect*.',
             icon='Signin')
     )
-    add_card(q, f'step2_of_n', 
-        ui.tall_info_card(
-            box=ui.box('horizontal', width='25%'), 
-            name='', 
-            title='Import Information',
-            caption='Import student information from RDBMS. Information includes tuition type (military, in-state, out-of-state), persona, transfer credits, major chosen, classes completed, etc.', 
+    add_card(q, 'import',
+        ui.wide_info_card(
+            box=ui.box('top_horizontal', width='25%'),
+            name='import',
+            title='Import',
+            caption='Future state: Import UMGC student info.',
             icon='Import')
     )
-    add_card(q, f'step3_of_n', 
-        ui.tall_info_card(
-            box=ui.box('horizontal', width='25%'), 
-            name='', 
-            title='Update Information',
-            caption='Details to be filled in.', 
-            icon='SpeedHigh')
-    )
-    add_card(q, f'step4_of_n', 
-        ui.tall_info_card(
-            box=ui.box('horizontal', width='25%'), 
-            name='', 
-            title='Personalization',
-            caption='Details to be filled in.', 
+    add_card(q, 'personalize',
+        ui.wide_info_card(
+            box=ui.box('top_horizontal', width='25%'),
+            name='person',
+            title='Personalize',
+            caption='User adds new info or confirms imported info.',
             icon='UserFollowed')
     )
 
-###############################################################################
+    # Debug Information
+    add_card(q, 'params', cards.render_debug_card(q, location='d3'))
 
-interview_questions = [
-    'Have you ever attended a college or university before?',
-    'Are you enrolling full-time or part-time?',
-    '[If part-time]: Are you working full-time?',
-    '[If part-time & working full-time]: Are you attending evening classes?',
-    'Are you in-state, out-of-state, or military?'
-]
+    #add_card(q, f'step3_of_n',
+    #    ui.tall_info_card(
+    #        box=ui.box('horizontal', width='25%'),
+    #        name='',
+    #        title='Update Information',
+    #        caption='Details to be filled in.',
+    #        icon='SpeedHigh')
+    #)
+
+###############################################################################
 
 @on('#student')
 @on('student_reset')
 async def student(q: Q):
     q.page['sidebar'].value = '#student'
+    interview_questions = [
+        'Have you ever attended a college or university before?',
+        'Are you enrolling full-time or part-time?',
+        '[If part-time]: Are you working full-time?',
+        '[If part-time & working full-time]: Are you attending evening classes?',
+        'Are you in-state, out-of-state, or military?'
+    ]
 
     # Since this page is interactive, we want to update its card
     # instead of recreating it every time, so ignore 'form' card on drop.
     clear_cards(q, ['form'])
 
     add_card(q, 'student_section', ui.form_card(
-        box='vertical',
+        box='middle_vertical',
         items=[
             ui.text('Please answer the following questions to personalize your experience:', 
                 size=ui.TextSize.L)
@@ -197,7 +199,7 @@ async def student(q: Q):
     # If first time on this page, create the card.
     add_card(q, 'form', 
         ui.form_card(
-            box='vertical', 
+            box='middle_vertical',
             items=[
                 ui.stepper(name='stepper', 
                     items=[
@@ -215,41 +217,31 @@ async def student(q: Q):
                 ]),
         ])
     )
-    career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
+    #career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
     yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
-    #add_card(q, 'interest_assessment', ui.form_card(
-    #    box=ui.box('grid', width='400px'),
-    #    items=[
-    #        ui.text(
-    #            f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
-    #            #size=ui.TextSize.L
-    #        ),
-    #        ui.separator(),
-    #        ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
-    #      ]
-    #))
 
-    #add_card(q, 'interest_assessment', ui.wide_info_card(
-    #    box=ui.box('grid', width='600px'),
-    #    name='',
-    #    icon='AccountActivity',
-    #    title='Interest Assessment',
-    #    caption=f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
-    #))
     add_card(q, 'assessments', ui.wide_info_card(
-        box=ui.box('grid', width='600px'),
+        box=ui.box('bottom_horizontal', width='400px'),
         name='Assessments',
         icon='AccountActivity',
         title='Career Assessments',
         caption=f'Access career assessment tools like **UMGC CareerQuest** or add a page like <a href="{yale_url}" target="_blank">Yale\'s</a> with _Interest_, _Personality_, and _Skills_ assessments.',
     ))
-    add_card(q, 'student_api', ui.wide_info_card(
-        box=ui.box('grid', width='300px'),
-        name='',
-        icon='Import',
-        title='Import',
-        caption='Student information can be imported from available data sources. Student will be allowed to update information for this tool.'
+    add_card(q, 'enable_ai', ui.wide_info_card(
+        box=ui.box('bottom_horizontal', width='300px'),
+        name='ai',
+        icon='LightningBolt',
+        title='AI Enablement',
+        caption='*Interest* or *Skills* assessments critical for AI recommendations.'
     ))
+
+    #add_card(q, 'student_api', ui.wide_info_card(
+    #    box=ui.box('grid', width='300px'),
+    #    name='',
+    #    icon='Import',
+    #    title='Import',
+    #    caption='Student information can be imported from available data sources. Student will be allowed to update information for this tool.'
+    #))
     #add_card(q, 'skills_assessment', ui.wide_info_card(
     #    box=ui.box('grid', width='600px'),
     #    name='',
@@ -266,20 +258,13 @@ async def student(q: Q):
     #    caption='Appropriate questions will be asked here to help profile student. These are TBD.'
     #))
 
-    add_card(q, 'student_guest', ui.wide_info_card(
-        box=ui.box('grid', width='300px'), 
-        name='', 
-        icon='Contact',
-        title='Guest Mode',
-        caption='If not logged in, user can explore in Guest mode. We will add the ability to download results for later use.'
-    ))
-    add_card(q, 'student_login', ui.wide_info_card(
-        box=ui.box('grid', width='300px'), 
-        name='', 
-        icon='ContactLock',
-        title='Logged In',
-        caption='Student information will be saved for future use.'
-    ))
+    #add_card(q, 'student_login', ui.wide_info_card(
+    #    box=ui.box('grid', width='300px'),
+    #    name='',
+    #    icon='ContactLock',
+    #    title='Logged In',
+    #    caption='Student information will be saved for future use.'
+    #))
 
 @on()
 async def student_step2(q: Q):
@@ -359,21 +344,21 @@ async def major(q: Q):
     #        box=ui.box('top_vertical'),
     #        items=[ui.text('Browse Majors', size=ui.TextSize.XL),
     #]))
-    add_card(q, 'dropdown_menus_vertical', cards.dropdown_menus_vertical(q, location='top_horizontal'))
     add_card(q, 'major_recommendations', cards.major_recommendation_card)
+    add_card(q, 'dropdown_menus_vertical', cards.dropdown_menus_vertical(q, location='top_horizontal'))
 
-    career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
-    add_card(q, 'major_section', ui.form_card(
-        box=ui.box('top_horizontal', width='400px'),
-        items=[
-            ui.text(
-                f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
-                #size=ui.TextSize.L
-            ),
-            ui.separator(),
-            ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
-          ]
-    ))
+    #career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
+    #add_card(q, 'major_section', ui.form_card(
+    #    box=ui.box('top_horizontal', width='400px'),
+    #    items=[
+    #        ui.text(
+    #            f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
+    #            #size=ui.TextSize.L
+    #        ),
+    #        ui.separator(),
+    #        ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
+    #      ]
+    #))
 
     # the program id should be returned from the menu
     program_id = 10
@@ -382,62 +367,51 @@ async def major(q: Q):
 
 ###############################################################################
 
-# Create columns for our courses table
-course_columns = [
-    ui.table_column(name='seq', label='Seq', sortable=True, data_type='number'),
-    ui.table_column(name='name', label='Course', sortable=True, searchable=True, max_width='300', cell_overflow='wrap'),
-    ui.table_column(name='credits', label='Credits'),
-    ui.table_column(name='type', label='Type', min_width='170px', 
-        cell_type=ui.tag_table_cell_type(name='type', tags=[
-            ui.tag(label='MAJOR', color='$blue'),
-            ui.tag(label='REQUIRED', color='$red'),
-            ui.tag(label='GENERAL', color='$green'),
-            ui.tag(label='ELECTIVE', color='$yellow')
-        ])
-    ),
-    ui.table_column(name='term', label='Term', searchable=True),
-    ui.table_column(name='session', label='Session', data_type='number')
-]
+@on('#major2')
+async def major2(q: Q):
+    clear_cards(q)
+    #add_card(q, 'title3',
+    #    ui.form_card(
+    #        box=ui.box('top_vertical'),
+    #        items=[ui.text('Browse Majors', size=ui.TextSize.XL),
+    #]))
+    add_card(q, 'major_recommendations', cards.major_recommendation_card)
+    add_card(q, 'dropdown_menus_vertical', cards.dropdown_menus_vertical(q, location='top_horizontal'))
+    add_card(q, 'dropdown_menus_vertical2', cards.dropdown_menus_vertical_compare(q, location='top_horizontal'))
 
-table_height = '400px'
+    #career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
+    #add_card(q, 'major_section', ui.form_card(
+    #    box=ui.box('top_horizontal', width='400px'),
+    #    items=[
+    #        ui.text(
+    #            f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
+    #            #size=ui.TextSize.L
+    #        ),
+    #        ui.separator(),
+    #        ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
+    #      ]
+    #))
 
-complete_records_query = '''
-    SELECT 
-        a.seq,
-        a.name,
-        a.program_id,
-        a.class_id,
-        a.course_type_id,
-        b.title,
-        b.description,
-        b.prerequisites
-    FROM 
-        program_sequence a
-    JOIN 
-        classes b
-    ON 
-        a.class_id = b.id
-    WHERE 
-        a.program_id = ?
-'''
-program_id = 10
-#c.execute(complete_records_query, (program_id,))
-#df2 = pd.read_sql_query(complete_records_query, conn, params=(program_id,))
+    # the program id should be returned from the menu
+    program_id = 10
 
-# change to q.user later
-#q.client.degree_program = 'BS in Business Administration'
+    await cards.render_majors_discovery(q, 2)
+    #await cards.render_majors_discovery(q, 10, compare=True)
 
-# generate automatically from form inputs
+###############################################################################
 
-degree_program = 'BS in Business Administration'
-#degree_program = q.user.degree_program
 @on('#courses')
 async def courses(q: Q):
-    clear_cards(q)  
+    clear_cards(q)
+
+    # temp, move to appropriate spot
+    q.user.degree_program = 'BS in Business Administration'
+    #q.user.program_id
+
     add_card(q, 'selected_major', 
         ui.form_card(
             box='top_vertical',
-            items=[ui.text(degree_program, size=ui.TextSize.XL)]
+            items=[ui.text(q.user.degree_program, size=ui.TextSize.XL)]
     ))
 
 # get results from querying database
@@ -477,8 +451,8 @@ async def courses(q: Q):
     # see https://wave.h2o.ai/docs/examples/table-groups
 
     cards.render_course_table2(q, student_records_no_schedule,
-                               title='BS in Business Administration',
-                               location='bottom_vertical')
+                               title=q.user.degree_program,
+                               location='middle_vertical')
 
 #    cards.render_course_table(q, student_records_no_schedule,
 #        which=['MAJOR'],
@@ -489,13 +463,13 @@ async def courses(q: Q):
 #    cards.render_course_table(q, student_records_no_schedule, 
 #        which=['REQUIRED'], 
 #        title='Required Related Courses (12)', 
-#        location='middle_horizontal',
+#        location='bottom_horizontal',
 #        table_width='48%'
 #    )
 #    cards.render_ge_table(q, student_records_no_schedule, 
 #        #which=['GENERAL'], 
 #        #title='Select General Education Courses', 
-#        location='middle_horizontal2',
+#        location='bottom_horizontal',
 #        table_width='48%'
 #    )
 #    cards.render_elective_table(q, student_records_no_schedule, 
@@ -507,21 +481,21 @@ async def courses(q: Q):
 
     add_card(q, 'ge_tile', 
         ui.wide_info_card(
-            box=ui.box('grid', width='400px'), 
+            box=ui.box('grid', width='300px'),
             name='', 
             title='Explore General Education',
             caption='Explore and select GE courses'
     ))
     add_card(q, 'electives_tile', 
         ui.wide_info_card(
-            box=ui.box('grid', width='400px'), 
+            box=ui.box('grid', width='300px'),
             name='', 
             title='Explore Electives',
             caption='Explore and perhaps recommend electives',
     ))
     add_card(q, 'minors_tile', 
         ui.wide_info_card(
-            box=ui.box('grid', width='400px'), 
+            box=ui.box('grid', width='300px'),
             name='', 
             title='Explore Minors',
             caption='Explore and perhaps recommend minors',
@@ -592,18 +566,16 @@ async def schedule(q: Q):
 
 #    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
     # Generate the following automatically
-    selected_degree = "Bachelor's"
-    selected_program = "Business Administration"
-    add_card(q, 'selected_major', 
+    add_card(q, 'selected_major',
         ui.form_card(
-            box='horizontal',
+            box='top_horizontal',
             items=[
-                ui.text(
-                    selected_degree + ' in ' + selected_program,
+                ui.text(#q.user.degree_program,
+                    'BS in Business Administration',
                     size=ui.TextSize.XL
     )]))
     add_card(q, 'd3plot', cards.d3plot(html_template, 'd3'))
-    
+
     Sessions = ['Session 1', 'Session 2', 'Session 3']
     add_card(q, 'sessions_spin', 
         ui.form_card(
@@ -612,7 +584,8 @@ async def schedule(q: Q):
                 ui.dropdown(
                     name='first_term', 
                     label='First Term', 
-                    value=q.args.first_term,
+                    #value=q.args.first_term,
+                    value='spring2024',
                     trigger=True,
                     width='150px',
                     choices=[
@@ -788,11 +761,15 @@ async def initialize_app(q: Q):
     """
     logging.info('Initializing app')
 
-    q.app.umgc_logo, = await q.site.upload(['images/umgc-logo.png'])
+    q.app.umgc_logo, = await q.site.upload(['images/umgc-logo-white.png'])
     q.app.conn = sqlite3.connect('UMGC.db')
     q.app.c = q.app.conn.cursor()
     q.app.ge_total = 41 # total ge credits
+
+    q.app.start_term = 'Spring 2024'
+
     q.app.initialized = True
+
 
 async def initialize_user(q: Q) -> None:
     """
@@ -801,6 +778,7 @@ async def initialize_user(q: Q) -> None:
     logging.info('Initializing user')
 
     keycloak_implemented = False
+    ##### KEYCLOAK CODE ##############
     # temporary until keycloak login fully implemented
 #    if keycloak_implemented:
         # Decode the access token without verifying the signature
@@ -818,26 +796,32 @@ async def initialize_user(q: Q) -> None:
 #        q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
 #    else:
 #        # fake it for now
-    q.user.username = 'johndoe'
-    q.user.name = 'John Doe'
-    q.user.firstname = 'John'
-    q.user.lastname = 'Doe'
+    ##### KEYCLOAK CODE ##############
+
     q.user.user_id = 1
-    q.user.role_id = 1
 
+    # Get user information
+    query = '''
+        SELECT role_id, username, firstname, lastname, 
+            firstname || ' ' || lastname AS name
+        FROM users
+        WHERE id = ?
+    '''
+    row = query_row(query, (q.user.user_id,), q.app.c)
+    (q.user.role_id, q.user.username, q.user.firstname, q.user.lastname, q.user.name) = row
 
-    # if a student, get information from the student_info table
+    # If a student, get information from the student_info table
     query = ''' 
         SELECT resident_status_id, transfer_credits, financial_aid, stage, program_id, profile, notes
         FROM student_info WHERE user_id = ?
     '''
     if q.user.role_id == 1:
         q.user.student = True
-        q.app.c.execute(query, (q.user.user_id,))
-        row = q.app.c.fetchone()
-        if row is not None:
-            (q.user.resident_status_id, q.user.transfer_credits, q.user.financial_aid, q.user.stage, q.user.program_id,
-             q.user.profile, q.user.notes) = row
+        row = query_row(query, (q.user.user_id,), q.app.c)
+        (q.user.resident_status_id, q.user.transfer_credits, q.user.financial_aid, q.user.stage, q.user.program_id,
+         q.user.profile, q.user.notes) = row
+
+    # End of student information
 
     q.user.initialized = True
 
