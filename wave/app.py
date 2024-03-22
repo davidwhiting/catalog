@@ -13,7 +13,7 @@ import os.path
 import templates
 # cards contains static cards and functions that render cards
 import cards
-# utils contains all other functions
+# utils contains all other python functions
 import utils
 
 from utils import add_card, single_query, query_row
@@ -92,7 +92,7 @@ df_json = df_d3.to_json(orient='records')
 headers_json = headers.to_json(orient='records')
 
 html_template = templates.html_code_minimal.format(
-    javascript=templates.javascript_minimal,
+    javascript=templates.javascript_draw_only,
     headers=headers_json, 
     data=df_json)
 #    html_template = templates.html_code.format(javascript=d3_js_script_path, data=json_data)
@@ -106,105 +106,38 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
             del q.page[name]
             q.client.cards.remove(name)
 
+#home_tabs = [
+#    ui.tab(name='email', label='Mail', icon='Mail'),
+#    ui.tab(name='events', label='Events', icon='Calendar'),
+#    ui.tab(name='spam', label='Spam'),
+#]
+
+#def get_tab_content(category: str):
+#    # Return a checklist of dummy items.
+#    items = [f'{category.title()} {i}' for i in range(1, 11)]
+#    return ui.checklist(name='items', choices=[ui.choice(name=item, label=item) for item in items])
+
 ###############################################################################
-
-
-# Now user_details is a dictionary containing the user information
 @on('#home')
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except (header, footer, meta).
-    add_card(q, 'student_guest', ui.wide_info_card(
-        box=ui.box('top_horizontal', width='25%'),
-        name='',
-        icon='Contact',
-        title='Guests',
-        caption='Login not required to use this app.'
-    ))
-    add_card(q, 'login',
-        ui.wide_info_card(
-            box=ui.box('top_horizontal', width='25%'),
-            name='login',
-            title='Login',
-            caption='User roles: *admin*, *coach*, *student*, *prospect*.',
-            icon='Signin')
-    )
-    add_card(q, 'import',
-        ui.wide_info_card(
-            box=ui.box('top_horizontal', width='25%'),
-            name='import',
-            title='Import',
-            caption='Future state: Import UMGC student info.',
-            icon='Import')
-    )
-    add_card(q, 'personalize',
-        ui.wide_info_card(
-            box=ui.box('top_horizontal', width='25%'),
-            name='person',
-            title='Personalize',
-            caption='User adds new info or confirms imported info.',
-            icon='UserFollowed')
-    )
+    await cards.render_home_cards(q)
 
-    # Progress Table
-    #add_card(q, 'progress_table', ui.form_card(
-    #    box=ui.box(location, height='350px', width='100%'), items=[
-    #        ui.table(
-    #            name='table',
-    #            downloadable=False,
-    #            resettable=False,
-    #            groupable=True,
-    #            #height='350px',
-    #            columns=[
-    #                ui.table_column(name='id', label='id', data_type='number'),
-    #                ui.table_column(name='issue', label='Issue', searchable=False, min_width='100'),
-    #                ui.table_column(name='description', label='Description', searchable=False, min_width='180', max_width='300',
-    #                                cell_overflow='wrap'),
-    #                #ui.table_column(name='credits', label='Credits', data_type='number', min_width='50'),
-    #                #ui.table_column(
-    #                #    name='tag',
-    #                #    label='Type',
-    #                #    min_width='190',
-    #                #    filterable=True,
-    #                #    cell_type=ui.tag_table_cell_type(
-    #                #        name='tags',
-    #                #        tags=[
-    #                #            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
-    #                #            ui.tag(label='REQUIRED', color='$red'),
-    #                #            ui.tag(label='GENERAL', color='#046A38'),
-    #                #            ui.tag(label='MAJOR', color='#1565C0'),
-    #                #        ]
-    #                #    )
-    #                #),
-    #                #ui.table_column(name='menu', label='Menu', max_width='150',
-    #                #    cell_type=ui.menu_table_cell_type(name='commands', commands=[
-    #                #        ui.command(name='description', label='Course Description'),
-    #                #        ui.command(name='prerequisites', label='Show Prerequisites'),
-    #                ##                    # ui.command(name='delete', label='Delete'),
-    #                #    ])
-    #                #            )
-    #            ],
-    #            #groups=[
-    #            #    render_major_table_group(
-    #            #        'Required Major Core Courses',
-    #            #        'MAJOR',
-    #            #        records,
-    #            #        True),
-    #            ## ui.text(title, size=ui.TextSize.L),
-    #            #]
-    #    )]
-#
-#
+    #rao_card = cards.rao_table(location='middle_horizontal')
+    #add_card(q, name='rao_table', rao_card)
+
+    # Database
+    # UI
+    # Wave
+    # Code
+    # Data
+
+
+    card = await cards.render_project_table(templates.project_data)
+    add_card(q, 'project_table_location', card)
+
     ## Debug Information
-    #add_card(q, 'params', cards.render_debug_card(q, location='d3'))
-
-    #add_card(q, f'step3_of_n',
-    #    ui.tall_info_card(
-    #        box=ui.box('horizontal', width='25%'),
-    #        name='',
-    #        title='Update Information',
-    #        caption='Details to be filled in.',
-    #        icon='SpeedHigh')
-    #)
+    add_card(q, 'params', cards.render_debug_card(q, location='d3'))
 
 ###############################################################################
 
@@ -791,6 +724,18 @@ async def schedule(q: Q):
 
 ###############################################################################
 
+###############################################################################
+
+@on('#progress_chart')
+async def progress_chart(q: Q):
+    clear_cards(q)
+    add_card(q, 'careers',
+        ui.frame_card(
+            box=ui.box('grid', width='100%', height='600px'),
+            title='Interest Assessment',
+            path='https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx',
+        )
+    )
 
 ###############################################################################
 
@@ -848,6 +793,9 @@ async def initialize_user(q: Q) -> None:
 #        q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
 #    else:
 #        # fake it for now
+
+    ## That works for the entire website, not for an individual login
+    ## See https://docs.h2o.ai/mlops/py-client/py-client-examples/keycloak-authentication-methods
     ##### KEYCLOAK CODE ##############
 
     q.user.user_id = 1
@@ -872,6 +820,7 @@ async def initialize_user(q: Q) -> None:
         row = query_row(query, (q.user.user_id,), q.app.c)
         (q.user.resident_status_id, q.user.transfer_credits, q.user.financial_aid, q.user.stage, q.user.program_id,
          q.user.profile, q.user.notes) = row
+
 
     # End of student information
 
@@ -904,6 +853,10 @@ async def initialize_client(q: Q) -> None:
 
 ## need to fix so broadcast and multicast work correctly
 
+    #@app('/demo')
+    #async def serve(q: Q):
+        #await q.page.save()
+
 @app('/', mode='unicast', on_startup=on_startup)
 async def serve(q: Q):
     """
@@ -929,6 +882,17 @@ async def serve(q: Q):
 
     except Exception as error:
         await show_error(q, error=str(error))
+
+    #if q.args.home_menu:
+    #    q.page['home'].items = [
+    #        ui.tabs(name='home_menu', value=q.args.menu, items=home_tabs),
+    #        get_tab_content(q.args.menu),
+    #    ]
+    #else:
+    #    q.page['home'] = ui.form_card(box='middle_horizontal', items=[
+    #        ui.tabs(name='home_menu', value='email', items=home_tabs),
+    #        get_tab_content('email'),
+    #    ])
 
     # Handle routing.
     await run_on(q)

@@ -4,6 +4,7 @@ node_modules/
 venv/
 wave/venv/
 __pycache__/
+.idea/
 
 package-lock.json
 package.json

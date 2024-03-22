@@ -2,6 +2,99 @@ import sys
 import traceback
 from h2o_wave import Q, expando_to_dict, ui, graphics as g
 
+project_data = [
+    {
+        "id": "1",
+        "rank": "1",
+        "category": "Catalog",
+        "description": "Enter all undergraduate courses into DB",
+        "status": "1.00",
+        "tags": "Database",
+        "group": "Database"
+    },
+    {
+        "id": "2",
+        "rank": "2",
+        "category": "Catalog",
+        "description": "Enter all graduate courses into DB",
+        "status": "0.00",
+        "tags": "Database"
+    },
+    {
+        "id": "3",
+        "rank": "3",
+        "category": "Catalog",
+        "description": "Enter all Associate's programs",
+        "status": str(2 / 50),
+        "tags": "Database"
+    },
+    {
+        "id": "4",
+        "rank": "4",
+        "category": "Catalog",
+        "description": "Enter all Bachelor's Major programs",
+        "status": str(2 / 50),
+        "tags": "Database"
+    },
+    {
+        "id": "5",
+        "rank": "5",
+        "category": "Catalog",
+        "description": "Enter all Bachelor's Minor programs",
+        "status": str(2 / 50),
+        "tags": "Database"
+    },
+    {
+        "id": "6",
+        "rank": "6",
+        "category": "Catalog",
+        "description": "Enter all Undergraduate Certificates",
+        "status": str(2 / 50),
+        "tags": "Database"
+    },
+    {
+        "id": "6",
+        "rank": "6",
+        "category": "Catalog",
+        "description": "Enter all Master's programs",
+        "status": str(2 / 50),
+        "tags": "Database"
+    },
+
+    {
+        "id": "3",
+        "rank": "3",
+        "category": "Wave",
+        "description": "Make table menus active",
+        "status": "0.00",
+        "tags": "Wave"
+    },
+    {
+        "id": "3",
+        "rank": "3",
+        "category": "Wave",
+        "description": "Example Text",
+        "status": "0.90",
+        "tags": "Data,UI"
+    },
+    {
+        "id": "5",
+        "rank": "5",
+        "category": "Example",
+        "description": "Example Text",
+        "status": "0.90",
+        "tags": "Data,UI"
+    },
+    {
+        "id": "4",
+        "rank": "4",
+        "category": "Example",
+        "description": "Example Text",
+        "status": "0.50",
+        "tags": "Code"
+    },
+]
+
 # used to be on app, not used now?
 complete_records_query = '''
     SELECT 
@@ -635,7 +728,10 @@ javascript_insert = '''
         .call(zoom.transform, d3.zoomIdentity.scale(0.80).translate(-160, 0));
 '''
 
-javascript_minimal = '''
+# javascript_draw_only takes coordinates from python rather than computing itself in d3
+# it is the current implementation
+
+javascript_draw_only = '''
     const screenWidth = 1200;
     const boxHeight = 40;
     const textOffsetX = 20;
