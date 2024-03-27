@@ -77,7 +77,6 @@ MINORS
 •  Speech Communication
 •  Terrorism and Critical Infrastructure
 •  Web and Digital Design 
-•  Women, Gender, and Sexuality Studies
 
 ##############################################################
 ##############################################################
@@ -166,14 +165,16 @@ to solving problems. You’ll learn foundational skills in computer
 technology and be able to customize your learning plan based 
 on your individual interests and market-aligned career needs. 
 
+##############################################################
+
+##############################################################
+
 BS IN APPLIED TECHNOLOGY 
 
 General Education Courses    41
 Major Courses                30
 Minor and Elective Courses   49
 Total                       120
-
-
 Major Requirements
 To complete a major in applied technology, you must take a 
 total of 30 credits in required coursework, as follows: 
@@ -186,8 +187,6 @@ least 3 credits of which must be upper level.
 earned in multiple disciplines, even more than two).  
 
 •  APTC 495   Applied Technology Capstone (3)
-
-
 ##############################################################
 ##############################################################
 
@@ -228,16 +227,9 @@ BS IN BIOTECHNOLOGY
 Required Major Core Courses  36
 Required Related Courses     17
 Remaining Courses            67
-
 Total                       120
 
-Credits
-
-36
-17
-67
-
-120
+##############################################################
 
 Major Requirements
 To complete a major in biotechnology, you must take a total  
@@ -289,9 +281,8 @@ molecular biology, physics, and virology
 Course Sequencing
 Contact an advisor or a success coach if you have any questions 
 about your academic advisement report.
-
-
 ##############################################################
+
 ##############################################################
 
 Minor in Business Administration
@@ -317,7 +308,7 @@ For a listing of all the requirements for the bachelor’s degree,
 refer to your major and pp. 32–35.
 
 
-Major core and related requirements are listed in bold.
+##############################################################
 
 BS IN BUSINESS ADMINISTRATION
 Recommended and Required Courses
@@ -337,25 +328,35 @@ ACCT 220
 HUMN 100
 BIOL 103
 
-ECON 201 Principles of 
+ECON 201
+
 ARTH 334
-ECON 203 Principles of 
-ACCT 221 Principles of Accounting II (3) Major
+ECON 203
+ACCT 221
+
 BMGT 364
-Elective (3)
-BMGT 365 Organizational 
-Leadership (3)
-Elective (3)
-MRKT 310 Marketing Principles (3)
-WRTG 394 Advanced  
-Business Writing (3)
-Elective (3)
-BMGT 380 Business Law I (3)
-Elective (3)
-Elective (3)
+Elective
+BMGT 365
+
+Leadersh
+
+Elective
+
+MRKT 310
+
+WRTG 394
+
+Business
+
+Elective
+
+BMGT 380
+
+Elective
+
+Elective
 
 Major
-
 ##############################################################
 ##############################################################
 
@@ -384,12 +385,13 @@ scholarship
 
 ing, using, and delivering information
 
-
-
 Degree Requirements 
 See pp. 32–35 for information on major, general education, 
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree.
+
+##############################################################
+##############################################################
 
 BA IN COMMUNICATION STUDIES
 
@@ -448,7 +450,10 @@ unique to you, based on your previous education. Contact an
 advisor or a success coach if you have any questions about 
 your academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BA IN COMMUNICATION STUDIES
 
@@ -456,12 +461,9 @@ Recommended and Required Courses
 
 Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111C Program and Career 
-Exploration in Communication/
-Humanities (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111C
+WRTG 111
 
 SPCH 100
 NUTR 100
@@ -475,18 +477,15 @@ COMM 202 Media and Society (3)
 
 JOUR 201 Introduction  
 to News Writing (3)
-HUMN 100 Introduction to 
-Humanities (3)
-BIOL 103 Introduction to Biology (4)
+HUMN 100
+BIOL 103
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
 IFSM 201 Concepts and Applications 
 of Information Technology (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 COMM 300 Communication 
 Theory (3)
 Elective (3)
@@ -498,19 +497,12 @@ and Gender (3)
 Elective (3)
 JOUR 330 Public Relations 
 Theory (3)
-
-
 General education/
 communications
 Major
-
-
 Major
 
-
-
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 COMM 400 Mass Media Law (3)
 Elective (3)
@@ -528,10 +520,7 @@ Elective (3)
 Elective (3)
 COMM 495 Communication Studies 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
-
-
+CAPL 398A
 Minor in Communication Studies
 The communication studies minor complements the skills you 
 gain in your major discipline by helping you develop specialized 
@@ -554,76 +543,15 @@ minor. At least 9 credits must be earned in upper-level courses
 For a listing of all the requirements for the bachelor’s degree,  
 refer to your major and pp. 32–35.
 
-
-Computer Science 
-
-You may seek either an academic major or minor in  
-computer science.
-Major in Computer Science
-With a bachelor’s degree in computer science, you’ll be able to 
-plan, design, and optimize computer software and hardware 
-systems for commercial and government environments. This 
-versatile major provides you with a foundation in programming 
-languages, software development, complex algorithms, and 
-graphics and visualization.
-
-What You’ll Learn 
-Through your coursework, you will learn how to 
-•  Develop the analytical and problem-solving skills necessary 
-
-to design, implement, test, and debug computer programs
-•  Apply mathematical principles, computer science theory, 
-
-and software development fundamentals to design and build 
-effective computing-based solutions 
-
-•  Design and implement a computing-based solution to meet  
-
-a given set of requirements, standards, and guidelines 
-
-•  Evaluate alternative computing architectures, algorithms,  
-
-and systems to make informed decisions that optimize  
-system performance
-
-•  Communicate effectively with a range of audiences in a  
-
-variety of professional contexts 
-
-•  Recognize local, national, and international technical stan-
-
-dards and legal, ethical, and intellectual property regulations 
-in computing practice
-
-Accelerated Pathway 
-If you complete your undergraduate degree at UMGC with a 
-major in computer science, an accelerated pathway between 
-UMGC’s undergraduate and graduate programs allows you to 
-reduce your total coursework for the Master of Arts in Teaching 
-by 12 credits (three courses, including the noncredit introductory 
-course UCSP 615). Details are on p. 24.
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree.
+##############################################################
+##############################################################
 
 BS IN COMPUTER SCIENCE 
 
-Required Major Core Courses
-Required Related Courses
-Remaining General Education, Minor,  
-and Elective Courses
-
-Total
-
-Credits
-
-36
-14 
-70
-
-120
+36 Required Major Core Courses
+14 Required Related Courses
+70 Remaining Courses
+120 Total
 
 Major Requirements
 To complete a major in computer science, you must take a total 
@@ -647,35 +575,18 @@ CMSC 451
 CMSC 495
 
 REQUIRED RELATED COURSES (14 CREDITS)
-The following required courses (7 credits) may be applied  
-to general education requirements:
+
+REQUIRED GE (7 credits)
 
 MATH 140
-CMSC 105  
+CMSC 105
 
-Introduction to Problem-Solving  
-and Algorithm Design (3)
+REQUIRED ELECTIVE (7 credits)
 
-The following required courses (7 credits) may be applied  
-to elective requirements:
-
-MATH 141   Calculus II (4)
+MATH 141
 CMSC 150  
 
-Introduction to Discrete Structures (3)
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Course Sequencing
-The following table is designed to provide an optimal order for  
-taking both required and recommended general education, 
-major, and elective courses for this program. Your plan will be 
-unique to you, based on your previous education. Contact an 
-advisor or a success coach if you have any questions about 
-your academic advisement report.
-
-Major core and related requirements are listed in bold.
+##############################################################
 
 BS IN COMPUTER SCIENCE
 
@@ -683,35 +594,27 @@ Recommended and Required Courses
 
 Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111T Program and Career 
-Exploration in Technology (3)
-WRTG 111 Academic Writing I (3)
-CMSC 105 Introduction to Problem-
-Solving and Algorithm Design (3)
+LIBS 150
+PACE 111T
+WRTG 111
+CMSC 105
 NUTR 100
 
-CMSC 115 Introductory 
-Programming (3) 
+CMSC 115 
 SPCH 100
-MATH 140 Calculus I (4)
+MATH 140
 
 WRTG 112
-CMSC 215 Intermediate 
-Programming (3) 
-HIST 125 Technological 
-Transformations (3)
-BIOL 103 Introduction to Biology (4)
+CMSC 215 
+HIST 125
+BIOL 103
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
 CMSC 150 Introduction to  
 Discrete Structures (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 CMSC 310 Computer Systems  
 and Architecture (3) 
 MATH 141 Calculus II (4)
@@ -719,26 +622,16 @@ CMIT 265 Fundamentals of
 Networking (3) 
 
 
-Related and general education/
-research and computing literacy
-
 Major 
 
 
 
-Related and general education/
-mathematics
-
 Major 
 
 
-
-General education/behavioral and 
-social sciences
 
 Related and 
-General education/behavioral and 
-social sciences
+
 Major 
 
 Related and Major
@@ -751,8 +644,7 @@ CMSC 320 Relational Database
 Concepts and Applications (3) 
 CMSC 330 Advanced Programming 
 Languages (3) 
-WRTG 393 Advanced Technical 
-Writing (3)
+WRTG 393
 Elective (3)
 CMSC 335 Object-Oriented and 
 Concurrent Programming (3) 
@@ -776,13 +668,7 @@ Elective (2)
 
 Major
 
-Major 
-
-Major
-
-
-
-Major 
+ 
 
 Major
 
@@ -792,7 +678,8 @@ Major
 
 Major/capstone
 
-
+##############################################################
+##############################################################
 Minor in Computer Science
 The computer science minor complements the skills you gain  
 in your major discipline by providing the foundations for design- 
@@ -807,12 +694,6 @@ following two-course sequence in programming:
 
 CMSC 115  
 CMSC 215  
-
-Introductory Programming (3) 
-Intermediate Programming (3)
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 The remaining 9 credits may be chosen from any upper-level  
 (i.e., numbered 300 or above) CMSC courses.
@@ -834,6 +715,9 @@ Courses in the computer science program may have computing
 needs beyond the minimum technology requirements found on 
 p. 26. Review the course descriptions to determine the tech-
 nology requirements for the classes in which you are enrolling.
+
+##############################################################
+##############################################################
 
 Criminal Justice
 
@@ -882,6 +766,8 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree.
 
+##############################################################
+##############################################################
 
 BS IN CRIMINAL JUSTICE 
 
@@ -902,8 +788,6 @@ Credits
 Major Requirements
 To complete a major in criminal justice, you must take a total of 
 33 credits in required coursework, as follows:
-
-
 
  
 
@@ -940,6 +824,9 @@ CCJS 352
 CCJS 497 
 CCJS 495  
 
+##############################################################
+##############################################################
+
 Course Sequencing
 BS IN CRIMINAL JUSTICE
 
@@ -952,37 +839,32 @@ PACE 111P
 WRTG 111
 IFSM 201 
 NUTR 100 
-
-
 CCJS 100 Introduction to  Criminal Justice (3)
 SPCH 100 Foundations of  Oral Communication (3)
 MATH 105 Topics for  Mathematical Literacy (3)
 WRTG 112
 CCJS 230 Criminal Law in Action (3) Major
-HUMN 100 Introduction to 
-Humanities (3)
-BIOL 103 Introduction to Biology (4)
+HUMN 100
+BIOL 103
 
-BEHS 103 Technology in 
-Contemporary Society (3)
-HIST 125 Technological 
-Transformations (3)
+BEHS 103
+HIST 125
 Elective (3)
-ECON 103 Economics in the 
-Information Age (3)
-CCJS 340 Law Enforcement 
-Administration (3)
+ECON 103
+CCJS 340
 Elective (3)
 Elective (3)
 CCJS 345 Introduction to  
 Security Management (3)
 Elective (3)
 CCJS 350 Juvenile Delinquency (3)
-WRTG 391 Advanced  
-Research Writing (3)
+WRTG 391
 Elective (3)
 CCJS 360 Victimology (3)
 Elective (3)
+
+##############################################################
+##############################################################
 
 Cybersecurity
 Minor in Cybersecurity
@@ -1018,8 +900,6 @@ in Criminal Justice (3)
 Elective (3)
 Elective (3)
 CCJS 341 Criminal Investigation (3) Major
-
-
 Elective (3)
 Elective (3)
 CCJS 352 Drugs and Crime (3)
@@ -1031,8 +911,7 @@ Administration (3)
 Elective (3)
 CCJS 495 Criminal Justice 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major
 Elective 
@@ -1040,6 +919,8 @@ Major
 
 Major/capstone 
 
+##############################################################
+##############################################################
 
 Minor in Criminal Justice
 The criminal justice minor complements the skills you gain in 
@@ -1150,6 +1031,8 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree.
 
+##############################################################
+##############################################################
 
 BS IN CYBERSECURITY MANAGEMENT AND POLICY 
 
@@ -1190,8 +1073,6 @@ CSIA 413
 CSIA 459  
 CMIT 425  
 CSIA 485  
-
-
 Course Sequencing
 The following table is designed to provide an optimal order for  
 taking both required and recommended general education, major, 
@@ -1200,7 +1081,10 @@ you, based on your previous education. Contact an advisor or a
 success coach if you have any questions about your academic 
 advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BS IN CYBERSECURITY MANAGEMENT AND POLICY
 
@@ -1208,55 +1092,39 @@ Recommended and Required Courses
 
 Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111T Program and Career 
-Exploration in Technology (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111T
+WRTG 111
 IFSM 201 Concepts and Applications 
 of Information Technology (3)
 
 NUTR 100
 
-CSIA 300 Cybersecurity for  
-Leaders and Managers (3) 
+CSIA 300 
 SPCH 100
 MATH 107
 WRTG 112
 IFSM 304 Ethics in Information 
 Technology (3) 
-HIST 125 Technological 
-Transformations (3)
-BIOL 103 Introduction to Biology (4)
+HIST 125
+BIOL 103
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
+
+
 
 Prerequisite and general 
 education/research and  
 computing literacy
-General education/biological  
-and physical sciences
+
+Major 
 Major 
 
 
-
-
-Major 
-
-
-General education/biological  
-and physical sciences
-
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
 Elective (3)
-ECON 103 Economics in the 
-Information Age (3)
+ECON 103
 CMIT 265 Fundamentals of 
 Networking (3) 
 Elective (3)
@@ -1291,12 +1159,7 @@ Elective (3)
 CSIA 485 Cybersecurity 
 Management and Policy 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
-
-
-
-
+CAPL 398A
 Major 
 
 Major
@@ -1306,23 +1169,12 @@ Major
 
 General education/
 communications
-Major 
-
-Major
-
-Major 
+ 
 
 Major 
 
 Major/capstone
-
-
 53
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Honor Society
 Information on eligibility for membership in the UMGC chapter 
 of Upsilon Pi Epsilon, the international honor society for the 
@@ -1432,7 +1284,10 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BS IN CYBERSECURITY TECHNOLOGY
 
@@ -1490,11 +1345,9 @@ unique to you, based on your previous education. Contact an
 advisor or a success coach if you have any questions about 
 your academic advisement report.
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111T Program and Career 
-Exploration in Technology (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111T
+WRTG 111
 IFSM 201 Concepts and Applications 
 of Information Technology (3)
 NUTR 100
@@ -1506,17 +1359,14 @@ MATH 107
 WRTG 112
 CMIT 265 Fundamentals  
 of Networking (3) 
-HIST 125 Technological 
-Transformations (3)
-BIOL 103 Introduction to Biology (4)
+HIST 125
+BIOL 103
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 CMIT 291 Introduction to Linux (3) 
 CMIT 320 Network Security (3) 
 Elective (3)
@@ -1526,28 +1376,14 @@ CMIT 351 Switching, Routing,
 and Wireless Essentials (3) 
 Elective (3)
 CMIT 326 Cloud Technologies (3) 
-WRTG 393 Advanced Technical 
-Writing (3)
+WRTG 393
 Elective (3)
 Elective (3)
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
 
 
 Major 
-
-
-
-
 Major 
-
-
-General education/biological  
-and physical sciences
-
 
 
 Major
@@ -1556,17 +1392,10 @@ Major
 Major
 
 Major
-
-
 
 Continued
 
 55
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Cybersecurity Technology, continued
 
 Elective (3)
@@ -1586,8 +1415,7 @@ Elective (3)
 Elective (3)
 CMIT 495 Cybersecurity Technology 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major
 
@@ -1597,31 +1425,15 @@ Major
 
 Major/capstone
 
-
-
-
- 
-
- 
-
-Honor Society
-Information on eligibility for membership in the UMGC chapter 
-of Upsilon Pi Epsilon, the international honor society for the 
-computing and information disciplines, is available on p. 332. 
-
-X
-E
-D
-N
-
-I
-
 Technology Requirements
 Courses in the cybersecurity technology program may have 
 computing needs beyond the minimum technology require-
 ments found on p. 26. Review the course descriptions to 
 determine the technology requirements for the classes in  
 which you are enrolling.
+
+##############################################################
+##############################################################
 
 Data Science
 
@@ -1677,8 +1489,6 @@ ation, model selection, and model validation
 •  Leverage big data analytics and AI technology to create solu-
 tions for stream analytics, text processing, natural language 
 understanding, AI, and cognitive applications
-
-
 INDUSTRY CERTIFICATION 
 This program is designed to help prepare you for the following 
 certification exams, listed in alphabetical order: 
@@ -1700,13 +1510,14 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree.
 
+##############################################################
+##############################################################
 
 BS IN DATA SCIENCE 
 
 Required Major Core Courses
 Required Related Courses
-Remaining General Education, Minor,  
-and Elective Courses
+Remaining Courses
 
 Total
 
@@ -1759,11 +1570,7 @@ The following required courses may be applied to general edu-
 cation requirements: 
 
 DATA 200  
-MATH 115  Pre-Calculus (3) 
-
-Data Literacy Foundations (3)
-
-or a more advanced MATH course
+MATH 115  
 
 Course Sequencing
 The following table is designed to provide an optimal order for 
@@ -1773,7 +1580,7 @@ to you, based on your previous education. Contact an advisor or
 a success coach if you have any questions about your academic 
 advisement report.
 
-Major core and related requirements are listed in bold.
+
 
 Recommended and Required Courses
 
@@ -1781,9 +1588,8 @@ Requirement(s) Fulfilled
 
 LIBS 150 Introduction to 
 Research (1)
-PACE 111T Program and Career 
-Exploration in Technology (3)
-WRTG 111 Academic Writing I (3)
+PACE 111T
+WRTG 111
 
 MATH 115 Pre-Calculus I (3)
 
@@ -1800,21 +1606,14 @@ DATA 230 Mathematics for Data
 Science (3)
 WRTG 112 
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
+
+
 General education/
 communications
-Related and general education/
-mathematics
-Related and general education/
-research and computing literacy
-General education/biological  
-and physical sciences
+
+
+
 Recommended Major 
-
-
 
 Major
 
@@ -1822,8 +1621,6 @@ General education/
 communications
 
 Continued
-
-
 Technology Requirements
 Courses in the data science program may have computing 
 needs beyond the minimum technology requirements found on 
@@ -1852,22 +1649,13 @@ degree, refer to your major and pp. 32–35.
 
 Data Science, continued
 
-DATA 300 Foundations of Data 
-Science (3)
-HIST 125 Technological 
-Transformations (3)
-NSCI 103 Fundamentals of Physical 
-Science (4)
-BEHS 103 Technology in 
-Contemporary Society (3)
+DATA 300
+HIST 125
+NSCI 103
+BEHS 103
 ARTH 334
 
 Major
-
-
-General education/biological  
-and physical sciences
-
 
 
 Major 
@@ -1882,8 +1670,7 @@ Major
 Major
 
 Elective (3)
-ECON 103 Economics in the 
-Information Age (3)
+ECON 103
 CSIA 300 Cybersecurity for Leaders 
 and Managers (3) 
 Elective (3)
@@ -1894,8 +1681,7 @@ IFSM 330 Business Intelligence and
 Data Analytics (3)
 Elective (3)
 DATA 335 Data Visualization (3)
-WRTG 393 Advanced Technical 
-Writing (3)
+WRTG 393
 Elective (3)
 DATA 430 Foundations of Machine 
 Learning (3) 
@@ -1919,13 +1705,14 @@ DATA 495 Data Science Capstone (3) Major/capstone
 
 Major 
 
-
-
+##############################################################
+##############################################################
 Diversity Awareness
 
 East Asian Studies
 
 You may seek an academic minor in diversity awareness.
+
 Minor in Diversity Awareness
 The diversity awareness minor complements the skills you 
 gain in your major discipline by providing an interdisciplinary 
@@ -1965,9 +1752,7 @@ SOCY 423   Race and Ethnicity: A Global Perspective
 SOCY 426  
 SPCH 324   Communication and Gender
 SPCH 482  
-Introduction to Women, Gender, and  
 WMST 200  
-Sexuality Studies
 
 Psychology of Gender
 Cross-Cultural Psychology
@@ -1991,50 +1776,21 @@ Total
 
  
 
-This program is ideal for those who live or work in East Asia, 
-know East Asian languages, or regularly interact with people 
-from East Asian countries.
 
-What You’ll Learn
-Through your coursework, you will learn how to
 
-•  Interpret, communicate, educate, and advise others based  
-
-on your understanding, research, and analysis of the social,  
-historical, and cultural contexts of East Asia
-
-•  Use your knowledge of East Asia to identify, create, facilitate, 
-
-and promote opportunities for interaction and cooperation 
-between East Asia and the global community
-
-•  Apply your knowledge of East Asian diversity, values, and  
-
-expectations to perform in a culturally appropriate way in  
-personal and professional settings
-
-•  Write and speak an East Asian language, integrating inter- 
-
-personal skills and cultural knowledge
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree.
+##############################################################
+##############################################################
 
 BA IN EAST ASIAN STUDIES 
 
-General Education Courses
-Major Core Courses
-Minor and Elective Courses
+41 General Education Courses
+30 Major Core Courses
+49 Minor and Elective Courses
+120 Credits
 
-Credits
 
-41
-30 
-49
+ 
 
-120
 
 
 Major Requirements
@@ -2073,15 +1829,9 @@ History of Japan to 1800
 Japanese Society and Culture
 
 Course Sequencing
-The following table is designed to provide an optimal order for  
-taking both required and recommended general education, major, 
-and elective courses for this program. Your plan will be unique 
-to you, based on your previous education. Alternate options are 
-available for this major based on academic and professional 
-interests. Contact an advisor or a success coach if you have  
-any questions about your academic advisement report.
 
-Major core and related requirements are listed in bold.
+##############################################################
+##############################################################
 
 BA IN EAST ASIAN STUDIES
 
@@ -2089,12 +1839,9 @@ Recommended and Required Courses
 
 Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111C Program and Career 
-Exploration in Communication/
-Humanities (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111C
+WRTG 111
 IFSM 201 Concepts and Applications 
 of Information Technology (3)
 CHIN 111 Elementary Chinese I  
@@ -2116,55 +1863,32 @@ Japanese III (3)
 WRTG 112
 ASTD 285 Introduction to Modern  
 East Asia (3)
-HUMN 100 Introduction  
-to Humanities (3)
-BIOL 103 Introduction to Biology (4)
+HUMN 100
+BIOL 103
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 PHIL 348 Religions of the East (3)
 Elective (3)
 Elective (3)
 Elective (3)
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
 
 
 Major
-
-
 Major
 
 Major
-
-
-
-
 Major
-
-
 Major
-
-
-General education/biological  
-and physical sciences
-
 
 
 Major
 
 Continued
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Economics
 
@@ -2202,8 +1926,7 @@ refer to your major and pp. 32–35.
 East Asian Studies, continued
 
 Elective (3)
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 Elective (3)
 Elective (3)
@@ -2225,20 +1948,11 @@ Elective (3)
 Elective (3)
 ASTD 485 East Asian Studies 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 
-
-Major 
-
-Major
-
-Major
 
 Major/capstone
-
-
 Minor in East Asian Studies
 The East Asian studies minor complements the skills you gain 
 in your major discipline by providing an interdisciplinary study 
@@ -2283,8 +1997,6 @@ Details are on p. 23.
 Courses in the Minor (15 Credits)
 A minor in emergency management requires the completion  
 of the following courses:
-
-
 
  
 
@@ -2356,9 +2068,8 @@ ments for completing a bachelor’s degree.
 
 62
 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
+##############################################################
+##############################################################
 
 BA IN ENGLISH 
 
@@ -2373,7 +2084,10 @@ advisement report.
 
 Credits
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BA IN ENGLISH
 
@@ -2411,8 +2125,6 @@ English Literature Capstone (3)
 Any upper-level ENGL courses (12)—Focused study in American 
 literature or British literature is recommended, as follows:
 
-
-
  
 
  
@@ -2447,14 +2159,10 @@ taking both required and recommended general education, major,
 and elective courses for this program. Your plan will be unique to 
 you, based on your previous education. Contact an advisor or a 
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111C Program and Career 
-Exploration in Communication/
-Humanities (3)
+LIBS 150
+PACE 111C
 WRTG 112
-CMST 301 Digital Media  
-and Society (3)
+CMST 301
 NUTR 100
 
 ENGL 102 Composition and 
@@ -2466,39 +2174,14 @@ ENGL 240 Introduction to Fiction,
 Poetry, and Drama (3)
 ENGL 250 Introduction to  
 Women’s Literature (3)
-HUMN 100 Introduction  
-to Humanities (3)
-BIOL 103 Introduction to Biology (4)
+HUMN 100
+BIOL 103
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
-
-
-
-
-
-
-
-
-Major
-
-Major
-
-General education/arts and  
-humanities
-
-General education/behavioral and 
-social sciences
-
-General education/behavioral and 
-social sciences
-Major
-
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 ENGL 303 Critical Approaches  
 to Literature (3)
 Elective (3)
@@ -2509,28 +2192,7 @@ ENGL 363 African American Authors
 from the Colonial Era to 1900 or 
 ENGL 311 The Long 18th-Century 
 British Literature (3)
-
-Major
-
-
-63
-
-
-Continued
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-English, continued
-
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 ENGL 364 African American Authors 
 from 1900 to the Present or ENGL 312 
@@ -2557,23 +2219,11 @@ ENGL 459 Contemporary Global
 Literatures (3)
 ENGL 495 English Literature 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 
-
-Major
-
-Major
-
-Major
-
-Major
-
-Major 
-
-Major/capstone
-
+##############################################################
+##############################################################
 
 Minor in English
 The English minor complements the skills you gain in your 
@@ -2586,23 +2236,12 @@ following courses:
 
 ENGL 240  
 ENGL 250 
-ENGL 303  
-Any upper-level ENGL courses (6)
+ENGL 303
 
-Introduction to Fiction, Poetry, and Drama (3)
-Introduction to Women’s Literature (3)
-Critical Approaches to Literature (3)
+##############################################################
+##############################################################
 
-Courses already applied toward other degree requirements  
-(e.g., major or general education) may not be applied toward the 
-minor. At least 9 credits must be earned in upper-level courses 
-(numbered 300 or above). Prerequisites apply for all courses.
-
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
-
-Environmental Health  
-and Safety
+Environmental Health and Safety
 
 You may seek either an academic major or minor in environmen-
 tal health and safety. 
@@ -2612,71 +2251,16 @@ In UMGC’s environmental health and safety program, you’ll learn
 to implement evidence-based professional practices to support 
 a safe and healthy work environment.
 
-What You’ll Learn
-Through your coursework, you will learn how to
-
-•  Use information-gathering skills and professional judgment 
-
-to recommend solutions for broadly defined technical or 
-scientific problems in environmental health and safety
-
-•  Apply cognitive and technical skills to anticipate, recognize, 
-
-and critically evaluate hazards and risk factors
-
-•  Select effective control methods to generate practical 
-
-evidence-based solutions while following legislative and 
-industry standards
-
-•  Develop strategies for ongoing professional development and 
-
-learning to inform evidence-based practice in a continually 
-changing global environment
-
-•  Model a range of written and oral communication formats 
-to explain technical information and concepts to various 
-audiences
-
-•  Choose collaborative and ethical practices to build the rela-
-
-tionships necessary to address contemporary environmental 
-health and safety issues
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree.
-
-64
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-
-
  
+##############################################################
+##############################################################
 
- 
+BS IN ENVIRONMENTAL HEALTH AND SAFETY
 
-BS IN ENVIRONMENTAL HEALTH 
-AND SAFETY
-
-Required Major Core Courses
-Required Related Courses
-Remaining General Education, Minor,  
-and Elective Courses
-
-Total
-
-Credits
-
-36
-6
-78
-
-120
+36 Required Major Core Courses
+6  Required Related Courses
+78 Remaining Courses
+120 Total
 
 Major Requirements
 To complete a major in environmental health and safety, you 
@@ -2686,21 +2270,11 @@ Environmental Systems (3)
 Environmental Health and Safety Regulations (3)
 
 REQUIRED MAJOR CORE COURSES (33 CREDITS)
+
 ENHS 300 
 ENHS 305 
-ENHS 310  Hazardous Substances and Toxicology (3)
-Risk Assessment in Environmental Health  
+ENHS 310 
 ENHS 315 
-and Safety (3)
-Incident Response and Investigation (3)
-Fire Prevention and Protection (3)
-Safety and Security Management (3) 
-Occupational Health and Industrial Hygiene (3)
-Environmental Technology and Control (3)
-Ergonomics and Human Factors (3)
-Pollution Prevention Strategies (3)
-Environmental Health and Safety Capstone (3)
-
 ENHS 320 
 ENHS 325 
 ENHS 330 
@@ -2714,10 +2288,8 @@ REQUIRED RELATED COURSES (6 CREDITS)
 The following required courses may be applied to general  
 education requirements. 
 
-CHEM 297   Environmental Chemistry (3)
-MATH 115  Pre-Calculus (3)  
-
-or a more advanced MATH course
+CHEM 297
+MATH 115   
 
 Course Sequencing
 The following table is designed to provide an optimal order for  
@@ -2728,21 +2300,20 @@ unique to you, based on your previous education. Contact an
 advisor or a success coach if you have any questions about 
 your academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BS IN ENVIRONMENTAL HEALTH AND SAFETY
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111S Program and Career 
-Exploration in Health and 
-Sciences (3)
-WRTG 111 Academic Writing I (3)
-SPCH 125 Introduction to 
-Interpersonal Communication (3)
-MATH 115 Pre-Calculus (3)
+LIBS 150
+PACE 111S
+WRTG 111
+SPCH 125
+MATH 115
 
 ENHS 300 Environmental 
 Systems (3)
@@ -2753,39 +2324,26 @@ DATA 200
 Foundations (3)
 ENHS 305 Environmental Health 
 and Safety Regulations (3)
-HUMN 100 Introduction  
-to Humanities (3)
-BIOL 103 Introduction to Biology (4)
+HUMN 100
+BIOL 103
 
 
-
-
-
-Related and general education/
-mathematics
 Major
-
-
 Related and general education/
 biological and physical sciences
 Major
 
 
 
-General education/behavioral and 
-social sciences
-
 humanities
-General education/behavioral and 
-social sciences
+
 Major
 
 PSYC 100 Introduction to 
 Psychology (3)
 ARTT 152 Basics of Photography (3) General education/arts and 
 
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 ENHS 310 Hazardous Substances 
 and Toxicology (3)
 Elective (3)
@@ -2805,8 +2363,6 @@ Major
 Major 
 
 65
-
-
 Continued
 
 
@@ -2815,13 +2371,9 @@ Continued
 
  
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Environmental Health and Safety, continued
 
-WRTG 393 Advanced Technical 
-Writing (3)
+WRTG 393
 Elective (3)
 ENHS 330 Safety and Security 
 Management (3)
@@ -2848,16 +2400,9 @@ Elective (3)
 Elective (3)
 ENHS 495 Environment Health and 
 Safety Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 
-
-Major 
-
-Major
-
-Major
 
 Major
 
@@ -2865,8 +2410,6 @@ Major
 
 Elective 
 Major/capstone
-
-
 Minor in Environmental Health  
 and Safety
 The environmental health and safety minor complements the 
@@ -2948,11 +2491,6 @@ decisions
 tools to solve business problems 
 
 66
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 INDUSTRY CERTIFICATION
 This program is designed to help prepare you for the following 
 certification exams, listed in alphabetical order:
@@ -2968,6 +2506,8 @@ Degree Requirements
 See pp. 32–35 for information on major, general education, 
 and minor and elective requirements, as well as overall 
 requirements for completing a bachelor’s degree.
+
+##############################################################
 
 BS IN FINANCE 
 
@@ -2985,8 +2525,6 @@ Credits
 72
 
 120
-
-
 
  
 
@@ -3008,243 +2546,94 @@ FINC 421
 FINC 430  
 FINC 440  
 FINC 460 
-ECON 430   Money and Banking (3)
+ECON 430
 FINC 495  
 
-Principles of Accounting I (3)
-Principles of Accounting II (3)
-Business Finance (3)
-Fintech, Financial Institutions, and Markets (3)
-Investments (3)
-Risk Management (3)
-Financial Analysis (3)
-Financial Management (3)
-Security Analysis and Valuation (3)
-International Finance (3)
 
-Contemporary Issues in Finance Practice (3)
 
-ECON 201   Principles of Macroeconomics (3)
-ECON 203   Principles of Microeconomics (3)
+ECON 201
+ECON 203
 STAT 200  
 
 Introduction to Statistics (3)
 
 Course Sequencing
 
+##############################################################
+##############################################################
+
 BS IN FINANCE
 
-Recommended and Required Courses Requirement(s) Fulfilled
-
-General education/biological  
-and physical sciences
-
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
-
-General education/research  
-and computing literacy
-
-LIBS 150 Introduction  
-to Research (1)
+LIBS 150
 PACE 111B Program and Career 
 Exploration in Business (3)
-WRTG 111 Academic Writing I (3)
+WRTG 111
 IFSM 201
 Applications of Information 
 Technology (3)
 NUTR 100 
-and NUTR 101 Nutrition  
-Laboratory (1)
+and NUTR 101
 BMGT 364
 WRTG 112
-STAT 200 Introduction  
-to Statistics (3)
-WRTG 293 Introduction to 
-Professional Writing (3)
-ACCT 220 Principles of 
-Accounting I (3)
-HIST 125 Technological 
-Transformations (3)
-NSCI 100 Introduction to Physical 
-Science (4)
-ECON 201 Principles of 
-Macroeconomics (3)
-ARTH 334 General education/arts and 
+STAT 200
+WRTG 293
+ACCT 220
+HIST 125
+NSCI 100
+ECON 201
+ARTH 334
 
 
-
-Related and general education/
-behavioral and social sciences
-
-
-Related and general education/
-mathematics
-
-
-Major
-
-Major
-
-humanities
-
-67
-
-
-Continued
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Finance, continued
-
-Major 
-Major
-
-DATA 200 (3)
-ECON 203 Principles of 
-Microeconomics (3)
-ACCT 221 Principles of 
-Accounting II (3)
-IFSM 330 Business Intelligence and 
-Data Analytics (3)
-FINC 330 Business Finance (3)
-FINC 335 Fintech, Financial 
-Institutions, and Markets (3)
-FINC 340 Investments (3)
-DATA 320 Introduction to Data 
-Analytics (3)
-FINC 351 Risk Management (3)
-WRTG 394 Advanced Business 
-Writing (3)
-DATA 335 Data Visualization (3)
-FINC 421 Financial Analysis (3)
-DATA 300 Foundations of Data 
-Science (3)
-Elective (3)
-FINC 430 Financial Management (3) Major
+DATA 200
+ECON 203
+ACCT 221
+IFSM 330
+FINC 330
+FINC 335
+FINC 340
+DATA 320
+FINC 351
+WRTG 394
+DATA 335
+FINC 421
+DATA 300
+Elective
+FINC 430 
 
 
+Elective
+Elective
+FINC 440
+Elective
+Elective
+FINC 460
+Elective
+Elective
+ECON 430
+Elective
+FINC 495
+CAPL 398A
 
- 
-
- 
-
-Recommended Related and general education/
-behavioral and social sciences
-Major
-
-Recommended 
-Major 
-Recommended 
-Major
-
-
-Recommended Major
-Recommended 
-
-Elective (3)
-Elective (3)
-FINC 440 Security Analysis  
-and Valuation (3)
-Elective (3)
-Elective (3)
-FINC 460 International Finance (3)
-Elective (3)
-Elective (3)
-ECON 430 Money and Banking (3)
-Elective (3)
-FINC 495 Contemporary Issues  
-in Finance Practice (3)
-CAPL 398A Career Planning 
-Management (1)
-
-Major
-
-Major 
-Major 
-Major/capstone 
+##############################################################
 
 
-Minor in Finance
-The finance minor complements the skills you gain in your 
-major discipline by providing a study of the institutions, 
-theory, and practice associated with the allocation of financial 
-resources within the private sector. 
+##############################################################
+
+Fire Service Administration 
 
 Courses in the Minor (15 Credits)
-A minor in finance requires the completion of 15 credits of  
-coursework in finance. All FINC courses apply. It is recom-
-mended that you take FINC 330, FINC 335, and FINC 340 as the 
-first courses in the minor (if you have not already applied the 
-courses toward other degree requirements).
 
-Courses already applied toward other degree requirements  
-(e.g., major or general education) may not be applied toward the 
-minor. At least 9 credits must be earned in upper-level courses 
-(numbered 300 or above). Prerequisites apply for all courses.
-
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
-
-Fire Service 
-Administration 
-
-You may seek an academic minor in fire service administration.
-Minor in Fire Service Administration
-The fire service administration minor complements the skills 
-you gain in your major discipline by providing knowledge of 
-disaster planning and the administration of fire-protection 
-services, including organization, planning, operating procedures, 
-management, and allocation of limited resources.
-
-Courses in the Minor (15 Credits)
-A minor in fire service administration requires the completion of 
-the following courses:
-
-Fire and Emergency Services Administration (3)
 FSCN 302  
-FSCN 304   Personnel Management for Fire and Emergency 
-
-Services (3)
-Fire Prevention Organization and Management (3)
-
+FSCN 304
 FSCN 305  
-FSCN 413   Community Risk Reduction for the Fire  
-
+FSCN 413
 FSCN 416  
 
-and Emergency Services (3)
-Emergency Services Training and Education (3)
+##############################################################
+##############################################################
 
-Courses already applied toward other degree requirements  
-(e.g., major or general education) may not be applied toward the 
-minor. At least 9 credits must be earned in upper-level courses 
-(numbered 300 or above). Prerequisites apply for all courses.
-
-For a listing of all the requirements for the bachelor’s degree, 
-refer to your major and pp. 32–35.
-
-68
-
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Forensics 
-
-General Studies
-
-You may seek an academic minor in forensics. 
 Minor in Forensics
+
 The minor in forensics complements the skills you gain in your 
 major discipline by providing interdisciplinary study in selected 
 areas of criminal justice, natural science, social science, inves-
@@ -3252,6 +2641,9 @@ tigation and security, information and computer systems, psy-
 chology, and sociology. It combines laboratory and field skills 
 in the collection and analysis of physical evidence with further 
 study in the various subfields of forensics.
+
+##############################################################
+##############################################################
 
 You may seek an academic major in general studies.
 Major in General Studies
@@ -3280,14 +2672,10 @@ CCJS 301
 CCJS 302  
 CCJS 342  
 CCJS 390  
-CCJS 420   Medical and Legal Investigations of Death 
+CCJS 420
 CCJS 421  
 CCJS 440  
-CCJS 441  
-
-Principles of Digital Analysis 
-Fingerprint Analysis 
-Firearms and Toolmarks Analysis 
+CCJS 441
 
 It is recommended that you take CCJS 101 and CCJS 234 as the 
 first courses for the minor (if you have not already applied the 
@@ -3299,75 +2687,30 @@ the minor. At least 9 credits must be earned in upper-level
 courses (numbered 300 or above). Prerequisites apply for  
 all courses.
 
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
 
-What You’ll Learn
-Through your coursework, you will learn how to
-
-•  Improve oral and written communication skills 
-•  Apply critical-thinking and problem-solving skills
-•  Analyze insights about personal and professional goals
-•  Apply skills and knowledge from different academic disciplines
-•  Synthesize concepts and theories in core content courses  
-
-and focus areas
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
-
-Overall requirements for a bachelor’s degree in general studies 
-differ slightly from those listed on pp. 32–35. You must 
-meet the 30-credit requirement for coursework taken at UMGC, 
-but those credits may be earned in any combination across 
-major, general education, and elective courses.
+##############################################################
+##############################################################
 
 BS IN GENERAL STUDIES 
 
-General Education Courses
-Major Core Courses
-Minor and Elective Courses
-
-Total
-
- 
-
-Credits
-
-41
-30 
-49
-
-120
-
-69
-
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Major Requirements
-To complete a major in general studies, you must take a total of 
-30 credits in required coursework, as follows
+41 General Education Courses
+30 Major Core Courses
+49 Minor and Elective Courses
+120 Total 
 
 REQUIREMENTS FOR THE MAJOR (30 CREDITS) 
 •  6 credits of coursework in one discipline area (e.g., HRMN)
 •  6 credits from a second discipline area (e.g., PSYC) 
 •  15 credits from any discipline area(s)
 •  CAPL 495  General Studies Capstone (3) 
+
 Note: No more than 21 credits of coursework in a single discipline area may be 
 applied to the major.
 
-Gerontology and  
-Aging Services
+##############################################################
+##############################################################
+
+Gerontology and Aging Services
 
 You may seek either an academic major or minor in gerontology 
 and aging services.
@@ -3380,83 +2723,36 @@ as older adults. You’ll gain hands-on experiences in the aging
 services sector in preparation for a career that improves quality 
 of life for this important and growing segment of the population.
 
-What You’ll Learn
-Through your coursework, you will learn how to
+##############################################################
+##############################################################
 
-•  Access, interpret, and apply research findings related to 
+BS IN GERONTOLOGY AND AGING SERVICES 
 
-biological, psychological, and social processes in the context 
-of aging
-
-•  Analyze the impact of factors such as race, ethnicity, gender, 
-
-and social class on the aging process
-
-•  Analyze the development of policies related to aging and their 
-
-impact on services and organizations for older adults, both 
-locally and nationally
-
-•  Apply knowledge to work with older adults in a chosen area  
-
-of practice
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
-
-BS IN GERONTOLOGY  
-AND AGING SERVICES 
-
-Required Major Core Courses
-Required Related Course
-Remaining General Education, Minor, and 
-Elective Courses
-
-Total
-
-Credits
-
-33
-3 
-84
-
-120
+33 Required Major Core Courses
+3 Required Related Course
+84 Remaining Courses
+120 Total
 
 Major Requirements
 To complete a major in gerontology and aging services, you must 
 take a total of 36 credits in required coursework, as follows: 
 
 REQUIRED MAJOR CORE COURSES (33 CREDITS)
-GERO 100   Contemporary Issues in Aging (3)
-GERO 301   Service/Program Management (3)
-GERO 302   Health and Aging (3)
-GERO 306   Programs, Services, and Policies (3)
-GERO 311   Gender and Aging (3)
-GERO 320   Psychosocial Aspects of Aging (3)
-GERO 338   Health Promotion in Older Adults (3)
+GERO 100
+GERO 301
+GERO 302
+GERO 306
+GERO 311
+GERO 320
+GERO 338
 GERO 342  
 GERO 390  
-GERO 427   Culture and Aging (3)
-GERO 486A   Workplace Learning in Gerontology  
+GERO 427
+GERO 486A
 
-Long-Term Care Administration (3)
-The Business of Aging (3)
-
-and Aging Services (3)
-
-REQUIRED RELATED COURSE (3 CREDITS)
-The following required course may be applied to general educa-
-tion requirements. 
-
-•  Practice within the legal and ethical standards of the aging 
+REQUIRED RELATED COURSE/GE (3 CREDITS)
 
 STAT 200  
-
-Introduction to Statistics (3)
-
-services field
 
 Course Sequencing
 The following table is designed to provide an optimal order for  
@@ -3464,83 +2760,54 @@ taking both required and recommended general education,
 major, and elective courses for this program. Your plan will be 
 
 70
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 unique to you, based on your previous education. Contact an 
 advisor or a success coach if you have any questions about 
 your academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
 
 BS IN GERONTOLOGY AND AGING SERVICES
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111S Program and Career 
-Exploration in Health and 
-Sciences (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111S
+WRTG 111
 IFSM 201
-Applications of Information 
-Technology (3)
 NUTR 100
 
 GERO 100 Contemporary Issues  
 in Aging (3)
 SPCH 100 Foundations of Oral 
 Communication (3)
-STAT 200 Introduction  
-to Statistics (3)
+STAT 200
 WRTG 112
 GERO 301 Service/Program 
 Management (3)
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
-
-
  
 
  
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
 
 
-General education/research  
-and computing literacy
 
-General education/biological  
-and physical sciences
+
+
 Major
 
 
 
-Related and general education/
-mathematics
-
 Major
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
-
-General education/biological  
-and physical sciences
-
-
 humanities
-
-
 Major
 Major 
 
@@ -3549,8 +2816,7 @@ Major
 
 Elective (3)
 
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 GERO 302 Health and Aging (3)
 Elective (3)
 GERO 306 Programs, Services,  
@@ -3561,17 +2827,13 @@ Elective (3)
 GERO 320 Psychosocial Aspects  
 of Aging (3)
 
-
-
 Major 
 
 Major 
 
-WRTG 391 Advanced  
-Research Writing (3)
+WRTG 391
 Elective (3)
-GERO 338 Health Promotion  
-in Older Adults (3)
+GERO 338
 Elective (3)
 Elective (3)
 GERO 342 Long-Term Care 
@@ -3590,18 +2852,12 @@ Elective (3)
 Major
 GERO 486A Workplace Learning in 
 Gerontology and Aging Services (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
+##############################################################
+##############################################################
 
-Minor in Gerontology  
-and Aging Services
-The gerontology and aging services minor complements the 
-skills you gain in your major discipline by examining aging 
-from a multidisciplinary perspective that integrates biological, 
-sociological, psychological, and historical perspectives. It pro-
-vides you with the opportunity to study complex processes and 
-aspects of aging and the field of gerontology.
+Minor in Gerontology and Aging Services
 
 Courses in the Minor (15 Credits) 
 A minor in gerontology and aging services requires the comple-
@@ -3610,29 +2866,14 @@ all GERO courses apply. It is recommended that you take GERO
 100 as the first course in the minor (if you have not already 
 applied the course toward other degree requirements).
 
-Courses already applied toward other degree requirements  
-(e.g., major or general education) may not be applied toward the 
-minor. At least 9 credits must be earned in upper-level courses 
-(numbered 300 or above). Prerequisites apply for all courses.
-
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
-
-71
-
-
-
-
  
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
+##############################################################
+##############################################################
 
 Graphic Communication 
 
 You may seek an academic major in graphic communication.
+
 Major in Graphic Communication
 UMGC’s graphic communication major is a portfolio-intensive  
 program that can help you master the skills and technology 
@@ -3643,44 +2884,15 @@ clients, you can apply your creative streak toward a career in busi-
 ness, government, or industry as a graphic designer, manager, or 
 communications specialist.
 
-What You’ll Learn
-Through your coursework, you will learn how to
-
-•  Produce effective visual communications by applying prin-
-
-ciples of composition, layout, color theory, and context
-
-•  Plan, design, and create interactive solutions, such as user 
-interfaces, motion graphics, mobile applications, and web 
-designs
-
-•  Use professional, analytical, collaborative, and technical 
-
-design skills to support team goals, roles, and responsibilities
-•  Define and direct creative strategy in a business environment 
-by combining scope, messaging, and evaluation of success in 
-an overarching design campaign
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
+##############################################################
+##############################################################
 
 BA IN GRAPHIC COMMUNICATION 
 
-General Education Courses
-Required Major Core Courses
-Minor and Elective Courses
-
-Total
-
-Credits
-
-41
-33 
-46
-
-120
+41 General Education Courses
+33 Required Major Core Courses
+46 Minor and Elective Courses
+120 Total
 
 Major Requirements
 To complete a major in graphic communication, you must take a 
@@ -3691,39 +2903,17 @@ GRCO 100
 ARTT 110  
 ARTT 120  
 ARTT 210  
-GRCO 230   Typography and Layout (3)
+GRCO 230
 GRCO 350  
+GRCO 354
+GRCO 355
+GRCO 450
+GRCO 479
+GRCO 495
 
-Introduction to Graphic Communication (3)
-Introduction to Drawing (3)
-Design I: Arrangement and Color (3)
-Intermediate Drawing (3)
-
-Intermediate Graphic Communication:  
-Portfolio Development (3)
-
-GRCO 354   Digital Media (3)
-GRCO 355   Digital Media II (3)
-GRCO 450   Advanced Graphic Communication:  
-
-Professional Branding (3)
-
-GRCO 479   Motion Graphics (3)
-GRCO 495   Graphic Communication Capstone (3)
+##############################################################
 
 Course Sequencing
-The following table is designed to provide an optimal order for  
-taking both required and recommended general education, 
-major, and elective courses for this program. Your plan will be 
-unique to you, based on your previous education. Contact an 
-advisor or a success coach if you have any questions about 
-your academic advisement report.
-
-72
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Elective (3)
 GRCO 354 Digital Media (3)
@@ -3744,58 +2934,12 @@ Elective (3)
 Elective (3)
 GRCO 495 Graphic Communication 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
-Major
-Major
-Major
-
-Major
-Major/capstone 
-
-
-Major core and related requirements are listed in bold.
-
-BA IN GRAPHIC COMMUNICATION
-
-Recommended and Required Courses Requirement(s) Fulfilled
-
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
-
-
-General education/research  
-and computing literacy
-General education/biological  
-and physical sciences
-Major
-
-
-
-
-
-Major
-
-General education/arts and  
-humanities
-General education/biological  
-and physical sciences
-
-
-
-Major
-
-LIBS 150 Introduction  
-to Research (1)
-PACE 111C Program and Career 
-Exploration in Communication/
-Humanities (3)
-WRTG 111 Academic Writing I (3)
-CMST 301 Digital Media  
-and Society (3)
+LIBS 150
+PACE 111C
+WRTG 111
+CMST 301
 NUTR 100
 
 GRCO 100 Introduction to Graphic 
@@ -3805,23 +2949,18 @@ MATH 105
 WRTG 112
 ARTT 110 Introduction to 
 Drawing (3)
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 375 History of Graphic Art (3)
-
-
 
  
 
  
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 ARTT 120 Design I: Arrangement  
 and Color (3)
 Elective (3)
@@ -3833,27 +2972,14 @@ Elective (3)
 GRCO 350 Intermediate Graphic 
 Communication: Portfolio 
 Development (3)
-WRTG 391 Advanced Research 
-Writing (3)
-
-Major
+WRTG 391
 
 
-
-73
-
-
-
-
+##############################################################
+##############################################################
  
 
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Health Services 
-Management
+Health Services Management
 
 You may seek either an academic major or minor in health  
 services management.
@@ -3868,52 +2994,14 @@ and midcareer professionals.
 What You’ll Learn
 Through your coursework, you will learn how to
 
-•  Exercise sound business and financial management princi-
-ples in healthcare settings through process mapping and  
-strategic planning
+##############################################################
+##############################################################
 
-•  Apply technological advances and emerging trends in the  
-
-U.S. healthcare system to achieve organizational goals  
-and practices
-
-•  Identify, analyze, and evaluate quantitative and qualitative 
-
-healthcare data and information for effective decision-making 
-in various healthcare settings
-
-•  Evaluate legal and ethical issues associated with the planning 
-
-and delivery of healthcare services
-
-•  Analyze policies related to healthcare management
-
-INDUSTRY CERTIFICATION
-This program is designed to help prepare you for the Certified 
-Health Data Analyst (CHDA) exam.
-
-Accelerated Pathway
-If you complete your undergraduate degree at UMGC with a 
-major in health services management, an accelerated pathway 
-between UMGC’s undergraduate and graduate programs allows 
-you to reduce your total coursework for the Master of Science in 
-Healthcare Administration or Health Information Management 
-and Technology at UMGC by 6 credits (two courses). Details  
-are on p. 23.
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
-
-BS IN HEALTH SERVICES 
-MANAGEMENT 
+BS IN HEALTH SERVICES MANAGEMENT 
 
 Required Major Core Courses
 Required Related Courses
-Remaining General Education, Minor,  
-and Elective Courses
-
+Remaining Courses
 Total
 
 Credits
@@ -3921,7 +3009,6 @@ Credits
 33
 6
 81
-
 120
 
 Major Requirements
@@ -3967,83 +3054,37 @@ major, and elective courses for this program. Your plan will be
 unique to you, based on your previous education. Contact an 
 
 74
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 advisor or a success coach if you have any questions about 
 your academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
 
 BS IN HEALTH SERVICES MANAGEMENT
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111S Program and Career 
-Exploration in Health and 
-Sciences (3)
-WRTG 111 Academic Writing I (3)
-IFSM 305 Information Systems  
-in Healthcare Organizations (3)
+LIBS 150
+PACE 111S
+WRTG 111
+IFSM 305
 WRTG 112
-HMGT 300 Introduction to the  
-U.S. Healthcare Sector (3)
+HMGT 300
 SPCH 100
-STAT 200 Introduction  
-to Statistics (3)
+STAT 200
 NUTR 100
+HMGT 307
+HUMN 100
+BIOL 103
 
-
-
- 
-
- 
-
-HMGT 307 Managerial Epidemiology 
-and Decision-Making in 
-Healthcare (3)
-HUMN 100 Introduction  
-to Humanities (3)
-BIOL 103 (4)
-
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
-
-
-Related and general education/
-research and computing literacy
-
-Major
-
-
-
-Related and general education/
-mathematics
-General education/biological  
-and physical sciences
-Major
-
-
-General education/biological  
-and physical sciences
-
-
-humanities
 
 Major
 Recommended 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 HMGT 310 Healthcare Policies (3)
 HRMN 300 Human Resource 
 Management (3)
@@ -4062,8 +3103,6 @@ Major
 Major 
 
 Recommended 
-
-
 Elective (3)
 HMGT 372 Legal and Ethical Issues  
 in Healthcare (3)
@@ -4091,151 +3130,58 @@ BEHS 380 End of Life: Issues
 and Perspectives (3)
 HMGT 495 Strategic Planning  
 and Leadership in Healthcare (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
-Major 
 
-Recommended 
-Major 
-
-Recommended 
-Major 
-
-Recommended 
-Major 
-
-Recommended 
-Recommended 
-Major/capstone
-
+##############################################################
 
 Minor in Health Services Management
-The minor in health services management complements the 
-skills you gain in your major discipline by enhancing the knowl-
-edge, skills, and competencies required by the changing health 
-services environment. The minor covers a wide range of topics 
-designed to help you deal with the challenges of management 
-and leadership in this dynamic field.
 
 Courses in the Minor (15 Credits)
 A minor in health services management requires the comple- 
 tion of 15 credits of coursework in health services manage- 
 ment, chosen from any HMGT courses and GERO 342. It is  
-recommended that you take HMGT 300 as the first course in  
+recommended that you take 
+
+HMGT 300
+
+ as the first course in  
 the minor (if you have not already applied the course toward 
 other degree requirements). 
 
 Courses already applied toward other degree requirements  
 (e.g., major or general education) may not be applied toward the 
-
-75
-
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 minor. At least 9 credits must be earned in upper-level courses 
 (numbered 300 or above). Prerequisites apply for all courses.
 
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
+##############################################################
+##############################################################
 
-Honor Society
-Information on eligibility for membership in the UMGC chapter 
-of Upsilon Phi Delta, the national academic honor society of the 
-Association of University Programs in Health Administration, is 
-available on p. 332.
-
-History
-
-You may seek either an academic major or minor in history.
-Major in History
-Like other liberal arts majors, a major in history offers a solid  
-base of critical thinking on which to build a career or further 
-graduate study. 
-
-One of the very first schools to offer a degree program in history 
-online, UMGC brings you nearly two decades of experience in 
-teaching history in an online environment. Plus, if you’re based 
-in the Washington, D.C., area, you’ll have myriad opportunities to 
-find internships and part-time and full-time jobs in the field via 
-public institutions and federal positions. Our alumni have gone 
-on to work at such agencies as the National Archives and the 
-National Park Service.
-
-What You’ll Learn
-Through your coursework, you will learn how to
-
-•  Research, interpret, and present historical knowledge
-•  Write and speak clearly and appropriately about historical  
-
-information for diverse audiences
-
-•  Engage in history as a moral and ethical practice, recognizing  
-
-a wide range of backgrounds and perspectives
-
-•  Apply historical precedents to contemporary life and develop 
-
-self-reflection
-
-•  Achieve a deep understanding of the different peoples, 
-
-events, and cultures that have shaped human civilization
-
-Accelerated Pathway
-If you complete your undergraduate degree at UMGC with a 
-major in history, an accelerated pathway between UMGC’s 
-undergraduate and graduate programs allows you to reduce 
-your total coursework for the Master of Arts in Teaching at 
-UMGC by 12 credits (three courses, including the noncredit 
-introductory course UCSP 615). Details are on p. 24.
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
+##############################################################
+##############################################################
 
 BA IN HISTORY 
 
-General Education Courses
-Required Major Core Courses
-Minor and Elective Courses
+41 General Education Courses
+33 Required Major Core Courses
+46 Minor and Elective Courses
+120 Total
 
-Total
-
-Credits
-
-41
-33 
-46
-
-120
+##############################################################
 
 Major Requirements
 To complete a major in history you must take a total of 33 cred-
 its in required coursework, as follows: 
 
 REQUIRED MAJOR CORE COURSES (33 CREDITS)
-HIST 115   World History I (3)  
+HIST 115    
 
 or HIST 141 Western Civilization I
 
 HIST 116   World History II (3)  
 
 or HIST 142 Western Civilization II
-History of the United States to 1865 (3)
-History of the United States Since 1865 (3) 
-Historical Methods (3)
-Historical Writing (3)
-History Capstone (3)
+
 
 HIST 156  
 HIST 157  
@@ -4260,64 +3206,36 @@ HIST 337
 HIST 392  
 HIST 480  
 
-The Roman Republic 
-Europe and the World
-History of the Contemporary Middle East 
-History of China to 1912 
-
-76
 
 
-
 
- 
 
- 
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Course Sequencing
-The following table is designed to provide an optimal order  
-for taking both required and recommended general education, 
-major, and elective courses for this program. Your plan will  
-be unique to you, based on your previous education. Contact  
-an advisor or a success coach if you have any questions about 
-your academic advisement report.
-
-Major core and related requirements are listed in bold.
+##############################################################
+##############################################################
 
 BA IN HISTORY
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111C Program and Career 
-Exploration in Communication/
-Humanities (3)
-WRTG 111 Academic Writing I (3)
-CMST 301 Digital Media  
-and Society (3)
+LIBS 150
+PACE 111C
+WRTG 111
+CMST 301
 NUTR 100 
-and NUTR 101 Nutrition  
-Laboratory (1)
-HIST 115 World History I (3)
+and NUTR 101
+HIST 115
 SPCH 100
 MATH 105
 WRTG 112
 HIST 116 World History II (3)
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 GEOL 100 Physical Geology (3)
 
-BEHS 103 Technology in 
-Contemporary Society (3)
-HIST 125 Technological 
-Transformations (3)
+BEHS 103
+HIST 125
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 HIST 156 History of the United 
 States to 1865 (3)
 Elective (3)
@@ -4326,39 +3244,10 @@ States Since 1865 (3)
 Elective (3)
 HIST 289 Historical Methods (3)
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
-
-
-General education/research  
-and computing literacy
-General education/biological  
-and physical sciences
-
-Major
-
-
-
-
-Major
-
-General education/biological  
-and physical sciences
-
-
-
-Major
-
-Major 
-
-Major
 
 Elective (3)
 HIST 309 Historical Writing (3)
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 HIST 316L The American West  
 or HIST 326 The Roman Republic (3)
@@ -4381,21 +3270,8 @@ Elective (3)
 Elective (3)
 Elective (3)
 HIST 495 History Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
-Major
-
-
-Major 
-
-Major
- 
-Major 
-
-Major
-
-Major/capstone 
 
 Minor in History
 The history minor complements the skills you gain in your  
@@ -4416,101 +3292,20 @@ Any upper-level HIST courses (9)
 
 Historical Methods (3)
 
-77
+##############################################################
+##############################################################
 
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Courses already applied toward other degree requirements  
-(e.g., major or general education) may not be applied toward the 
-minor. At least 9 credits must be earned in upper-level courses 
-(numbered 300 or above). Prerequisites apply for all courses.
-
-allows you to reduce your total coursework for the Master of 
-Science in Management or in Information Technology with a 
-specialization in homeland security at UMGC by 6 credits (two 
-courses). Details are on p. 23.
-
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
-
-Homeland Security
-
-You may seek either an academic major or minor in  
-homeland security.
-Major in Homeland Security
-The UMGC homeland security program is uniquely designed to 
-provide you with an understanding of the homeland security  
-sector. The curriculum covers international and domestic terror-
-ism, emerging technologies, cyber threats, infrastructure protec-
-tion, emergency preparedness and response, private-sector part-
-nerships, global pandemics, natural disasters, strategic planning, 
-policies, intelligence operations, and international engagement. 
-In this program, you’ll develop the necessary critical-thinking, 
-ethical decision-making, risk analysis, and communication skills 
-to meet the professional demands of leadership and manage-
-ment in the homeland security profession.
-
-What You’ll Learn
-Through your coursework, you will learn how to
-
-•  Distinguish policies and procedures in the homeland security 
-
-sector that demonstrate leadership and management 
-
-•  Apply professional and ethical decision-making skills to 
-
-increase knowledge of strategic and operational homeland 
-security goals and interface with internal and external  
-stakeholders 
-
-•  Assess the critical technologies essential for the protection 
-
-and recovery of critical infrastructure and for ensuring the 
-nation’s cybersecurity against all hostile threats 
-
-•  Assess terrorist threats, cyber and insider threats, critical 
-
-infrastructure vulnerabilities, and emerging asymmetric 
-threats to U.S. national security
-
-•  Evaluate the roles and relationships of homeland security 
-partners and stakeholders supporting homeland security 
-operations
-
-Accelerated Pathway
-If you complete your undergraduate degree at UMGC with a 
-major in homeland security, an accelerated pathway between 
-UMGC’s undergraduate and graduate programs in that field 
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
+##############################################################
+##############################################################
 
 BS IN HOMELAND SECURITY 
 
-Required Major Core Courses
-Required Related Course 
-Remaining General Education, Minor, and 
-Elective Courses 
+33 Required Major Core Courses
+3 Required Related Course 
+84 Remaining Courses 
+120 Total
 
-Total
-
-Credits
-
-33
-3 
-84
-
-120
+##############################################################
 
 Major Requirements
 To complete a major in homeland security you must take a total 
@@ -4526,58 +3321,33 @@ Legal and Political Issues in Homeland Security (3)
 HMLS 406 
 HMLS 408 
 Infrastructure in Homeland Security (3)
-HMLS 414  Homeland Security and Intelligence (3)
-HMLS 416  Homeland Security and International Relations (3)
+HMLS 414
+HMLS 416
 PSAD 410 
 PSAD 414 
 PSAD 416 
 HMLS 304 
 HMLS 495  Homeland Security Capstone (3)
 
-Public Safety Research and Technology (3)
-Public Safety Administration Ethics (3)
-Public Safety Leadership (3)
-Strategic Planning in Homeland Security (3)
 
-REQUIRED RELATED COURSE (3 CREDITS)
-The following required course may be applied to general educa-
-tion requirements:
+REQUIRED RELATED COURSE/GE (3 CREDITS)
 
 IFSM 300  
 
-Information Systems in Organizations (3)
 
-78
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Course Sequencing
-The following table is designed to provide an optimal order for  
-taking both required and recommended general education, 
-major, and elective courses for this program. Your plan will be 
-unique to you, based on your previous education. Contact an 
-advisor or a success coach if you have any questions about 
-your academic advisement report.
-
-Major core and related requirements are listed in bold.
+##############################################################
 
 BS IN HOMELAND SECURITY
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-
-
  
 
  
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111P Program and Career 
-Exploration in Public Safety (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111P
+WRTG 111
 WRTG 112 
 NUTR 100
 
@@ -4590,43 +3360,25 @@ IFSM 300 Information Systems
 in Organizations (3)
 HMLS 406 Legal and Political 
 Issues in Homeland Security (3) 
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
 
 
-General education/biological  
-and physical sciences
+
 Major
 
-
-
-
-Related and general education/
-research and computing literacy
 Major
-
-
-General education/biological  
-and physical sciences
-
 
 humanities
 
 Major
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 HMLS 310 Homeland Security 
 Response to Critical Incidents (3) 
 Elective (3)
@@ -4635,15 +3387,12 @@ Homeland Security (3)
 Elective (3)
 
 Major
-
-
 HMLS 414 Homeland Security  
 and Intelligence (3) 
 Elective (3)
 HMLS 416 Homeland Security  
 and International Relations (3) 
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 PSAD 410 Public Safety Research  
 and Technology (3)
@@ -4665,26 +3414,17 @@ Elective (3)
 Elective (3)
 HMLS 495 Homeland Security 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major
 
 Major
 
-
-
 Major
 
-Major 
 
-Major
-
-Major
 
 Major/capstone 
-
-
 Minor in Homeland Security
 The homeland security minor complements the skills you gain 
 in your major discipline by providing knowledge of infrastructure 
@@ -4707,19 +3447,17 @@ of Homeland Security (3)
 Infrastructure in Homeland Security (3)
 
 79
-
-
 
 
  
 
  
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 HMLS 414   Homeland Security and Intelligence (3)
 HMLS 416   Homeland Security and International Relations (3)
+
+##############################################################
+##############################################################
 
 BA IN HUMANITIES 
 
@@ -4800,7 +3538,7 @@ Introduction to Philosophy (3)
 Introduction to Moral Philosophy  
 and Ethical Reasoning (3)
 
-HIST 115   World History I (3)  
+HIST 115    
 
 or HIST 116 World History II  
 or HIST 141 Western Civilization I  
@@ -4840,17 +3578,9 @@ a success coach if you have any questions about your academic
 advisement report.
 
 80
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-
-
 Major 
 
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 PHIL 304 Contemporary Social  
 Justice Issues (3)
@@ -4868,32 +3598,27 @@ Elective (3)
 Elective (3)
 Elective (3)
 HUMN 495 Humanities Capstone (3) Major/capstone
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major 
 Major 
 Major 
 
 
-Major core and related requirements are listed in bold.
+##############################################################
+##############################################################
 
 BA IN HUMANITIES
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111C Program and Career 
-Exploration in Communication/
-Humanities (3)
-WRTG 111 Academic Writing I (3)
-CMST 301 Digital Media  
-and Society (3)
+LIBS 150
+PACE 111C
+WRTG 111
+CMST 301
 NUTR 100
 
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 SPCH 100
 MATH 105
 WRTG 112
@@ -4903,23 +3628,9 @@ ENGL 240 Introduction to Fiction,
 Poetry, and Drama (3)
 BIOL 103 (4)
 
-
-
  
 
  
-
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
-
-
-General education/research  
-and computing literacy
-General education/biological 
-and physical sciences
-Major
 
 
 
@@ -4927,28 +3638,23 @@ Major
 
 Major
 
-
-General education/biological  
-and physical sciences
-
+Major
 
 humanities
 General education/behavioral 
 and social sciences
 Major
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 PHIL 140 Introduction to 
 Moral Philosophy and Ethical 
 Reasoning (3) 
 Elective (3)
-HIST 115 World History I (3) 
+HIST 115 
 Elective (3)
 MUSC 210 Music as  
 Cultural Expression (3)
@@ -4962,11 +3668,6 @@ Major
 Major 
 
 81
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Human Resource 
 Management
 
@@ -4988,8 +3689,6 @@ dures—in private- and public-sector settings. Additionally, you’ll
 explore the ways that human behavior, laws, labor relations, and 
 diversity issues can intersect and affect a company’s culture and 
 ultimately its progress.
-
-
 
  
 
@@ -5049,13 +3748,14 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree. 
 
-BS IN HUMAN RESOURCE 
-MANAGEMENT 
+##############################################################
+##############################################################
+
+BS IN HUMAN RESOURCE MANAGEMENT 
 
 Required Major Core Courses
 Required Related Course
-Remaining General Education, Minor,  
-and Elective Courses
+Remaining Courses
 
 Total
 
@@ -5083,10 +3783,7 @@ Management (3)
 82
 
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Major core and related requirements are listed in bold.
+##############################################################
 
 BS IN HUMAN RESOURCE MANAGEMENT
 
@@ -5132,17 +3829,14 @@ unique to you, based on your previous education. Contact an
 advisor or a success coach if you have any questions about your 
 academic advisement report.
 
-
-
  
 
  
 
-LIBS 150 Introduction  
-to Research (1)
+LIBS 150
 PACE 111B Program and Career 
 Exploration in Business (3)
-WRTG 111 Academic Writing I (3)
+WRTG 111
 WRTG 112
 NUTR 100 Elements  
 of Nutrition (3)
@@ -5155,13 +3849,11 @@ IFSM 300 Information Systems
 in Organizations (3)
 HRMN 302 Organizational 
 Communication (3)
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 HRMN 362 Labor Relations (3) 
 Elective (3)
 HRMN 367 Organizational Culture  
@@ -5177,31 +3869,15 @@ WRTG 394 Advanced Business
 Writing (3)
 Elective (3)
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
 
 
-General education/biological  
-and physical sciences
+
 Major
 
-
-
-
-Related and general education/
-research and computing literacy
 Major
-
-
-General education/biological  
-and physical sciences
-
 
 humanities
 
@@ -5211,23 +3887,14 @@ Major
 Major 
 
 Major
-
-
-
-
 Continued
 
 83
-
-
 
 
  
 
  
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Human Resource Management, continued
 
@@ -5254,8 +3921,7 @@ Elective (3)
 HRMN 495 Contemporary Issues 
 in Human Resource Management 
 Practice (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major
 
@@ -5268,8 +3934,6 @@ Major
 Major 
 
 Major/capstone
-
-
 Minor in Human Resource Management
 The human resource management minor complements the 
 skills you gain in your major discipline by examining the human 
@@ -5343,16 +4007,11 @@ community, and the public
 a laboratory manager
 
 84
-
-
 
 
  
 
  
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 •  Monitor and maintain laboratory-related documentation, 
 
@@ -5372,12 +4031,14 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree. 
 
+##############################################################
+##############################################################
+
 BS IN LABORATORY MANAGEMENT 
 
 Required Major Core Courses
 Required Related Courses
-Remaining General Education, Minor,  
-and Elective Courses
+Remaining Courses
 
 Total
 
@@ -5476,16 +4137,11 @@ For a listing of all the requirements for the bachelor’s degree,
 refer to your major and pp. 32–35.
 
 85
-
-
 
 
  
 
  
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Legal Studies
 
@@ -5524,6 +4180,9 @@ Degree Requirements
 See pp. 32–35 for information on major, general education, 
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree. 
+
+##############################################################
+##############################################################
 
 BS IN LEGAL STUDIES
 
@@ -5578,61 +4237,31 @@ be unique to you, based on your previous education. Contact
 an advisor or a success coach if you have any questions about  
 your academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
 
 BS IN LEGAL STUDIES
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111P Program and Career 
-Exploration in Public Safety (3)
-WRTG 111 Academic Writing I (3)
-CMSC 100 Social Networking and 
-Cybersecurity Best Practices (3)
-NUTR 100 Elements of  
-Nutrition (3)
-LGST 101 Introduction to Law (3) 
+LIBS 150
+PACE 111P
+WRTG 111
+CMSC 100
+NUTR 100
+LGST 101
 SPCH 100
 MATH 105
 WRTG 112
 
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
-
-General education/research  
-and computing literacy
-General education/biological  
-and physical sciences
-Major
-
-
-
-
-
-Continued
-
-86
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Legal Studies, continued
-
-LGST 200 Techniques of Legal 
-Research (3) 
-HUMN 100 Introduction to 
-Humanities (3)
+LGST 200
+HUMN 100
 BIOL 103 (4)
 
 Major
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
 Management  
@@ -5687,11 +4316,6 @@ corporate perspectives
 practices in the planning, development, and use of informa-
 tion systems
 
-
-General education/biological  
-and physical sciences
-
-
 humanities
 
 Major
@@ -5699,25 +4323,18 @@ Major
 Major
 
 Major
-
-
 Major
 Major 
 
 Major
 Major
 Major/capstone
-
-
-
-
  
 
  
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 LGST 201 Legal Writing (3) 
 Elective (3)
 LGST 204 Legal Ethics (3) 
@@ -5746,15 +4363,9 @@ Elective (3)
 Elective (3)
 LGST 495 Legal Studies 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 87
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Major Requirements
 To complete a major in management information systems,  
 you must take a total of 36 credits in required coursework,  
@@ -5805,8 +4416,6 @@ to you, based on your previous education. Contact an advisor or
 a success coach if you have any questions about your academic 
 advisement report.
 
-
-
  
 
  
@@ -5850,8 +4459,10 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree. 
 
-BS IN MANAGEMENT 
-INFORMATION SYSTEMS 
+##############################################################
+##############################################################
+
+BS IN MANAGEMENT INFORMATION SYSTEMS 
 
 Required Major Core Courses
 Required Related Course
@@ -5873,91 +4484,53 @@ Credits
 88
 
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Major core and related requirements are listed in bold.
+##############################################################
+##############################################################
 
 BS IN MANAGEMENT INFORMATION SYSTEMS
 
 Recommended and Required Courses Requirement(s) Fulfilled
-
-
-
+Major 
 
 Major 
 
-
-
-
-Related and general education/
-research and computing literacy
-Major 
-
-LIBS 150 Introduction  
-to Research (1)
-PACE 111T Program and Career 
-Exploration in Technology (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111T
+WRTG 111
 WRTG 112 
 NUTR 100
 
 IFSM 300 Information Systems  
 in Organizations (3) 
 SPCH 100
-STAT 200 Introduction  
-to Statistics (3)
-CMSC 105 Introduction to Problem-
-Solving and Algorithm Design (3)
+STAT 200
+CMSC 105
 IFSM 301 Foundations of 
 Management Information 
 Systems (3) 
-HIST 125 Technological 
-Transformations (3)
+HIST 125
 BIOL 103 (4)
 
-
-
  
 
  
 
-BEHS 103 Technology in 
-Contemporary Society (3)
-ARTH 334 General education/arts and 
-
-
-
-General education/behavioral and 
-social sciences
-
-humanities
-General education/behavioral and 
-social sciences
-Major 
-
-Major
-
-Major
-
-
+BEHS 103
+ARTH 334
 
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 IFSM 304 Ethics in Information 
 Technology (3) 
 Elective (3)
-CSIA 300 Cybersecurity for  
-Leaders and Managers (3)
+CSIA 300
 Elective (3)
 Elective (3)
 Elective (3)
 IFSM 310 Software and Hardware 
 Infrastructure Concepts (3) 
-WRTG 393 Advanced Technical 
-Writing (3)
+WRTG 393
 Elective (3)
 
 IFSM 330 Business Intelligence  
@@ -5988,16 +4561,9 @@ Major
 
 Major 
 
-Major 
+/capstone
 
-Major
-
-Major/capstone
-
-CAPL 398A Career Planning 
-Management (1)
-
-
+CAPL 398A
 Honor Society
 Information on eligibility for membership in the UMGC chapter  
 of Upsilon Pi Epsilon, the national academic honor society for the 
@@ -6023,16 +4589,11 @@ For a listing of all the requirements for the bachelor’s degree,
 refer to your major and pp. 32–35.
 
 89
-
-
 
 
  
 
  
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Management Studies
 
@@ -6044,61 +4605,22 @@ multiple disciplines. UMGC’s program in management stud-
 ies can help you gain that expertise through a course of study 
 focused on decision-making, problem-solving, and leadership. 
 
-What You’ll Learn
-Through your coursework, you will learn how to
-
-•  Apply leadership skills to promote communication, ethical 
-
-behavior, and quality performance
-
-•  Implement employment practices, encourage team building, 
-
-and mentor staff members
-
-•  Communicate effectively with culturally diverse audiences 
-
-using a variety of formats and technologies
-
-•  Assess and develop performance measures, feedback,  
-
-and coaching that facilitate employee development
-
-•  Employ self-reflection and mindfulness of individual and  
-
-cultural differences when interacting with others
-
-•  Research, plan, and develop processes and procedures that 
-
-ensure organizational performance
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
+##############################################################
+##############################################################
 
 BS IN MANAGEMENT STUDIES 
 
-Required Major Core Courses
-Required Related Courses
-Remaining General Education, Minor,  
-and Elective Courses
-
-Total
-
-Credits
-
-33
-9
-78
-
-120
+33 Required Major Core Courses
+9 Required Related Courses
+78 Remaining Courses
+120 Total
 
 Major Requirements
 To complete a major in management studies, you must take a 
 total of 42 credits in required coursework, as follows: 
 
 REQUIRED MAJOR CORE COURSES (33 CREDITS)
-BMGT 160   Principles of Management (3)
+BMGT 160   
 ACCT 301 
 
 Accounting for Nonaccounting Managers (3)  
@@ -6149,11 +4671,6 @@ advisor or a success coach if you have any questions about
 your academic advisement report.
 
 90
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Major 
 
 Major 
@@ -6177,39 +4694,30 @@ Elective (3)
 Elective (3)
 Elective (3)
 BMGT 485 Applied Management (3) Major/capstone
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major 
-
-
-
-
  
 
  
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
 
 BS IN MANAGEMENT STUDIES
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
+LIBS 150
 PACE 111B Program and Career 
 Exploration in Business (3)
-WRTG 111 Academic Writing I (3)
+WRTG 111
 WRTG 112
 NUTR 100
-
-
-
-
 Major 
 
-BMGT 160 Principles of 
-Management (3)
+BMGT 160
 COMM 390 Writing for Managers (3) 
 STAT 200 Introduction to 
 Statistics (3)
@@ -6217,28 +4725,20 @@ IFSM 300 Information Systems
 in Organizations (3) 
 ACCT 301 Accounting for 
 Nonaccounting Managers (3)
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
-Related and general education/
-mathematics
-Related and general education/
-research and computing literacy
+
+
 Major
 
 
 
-General education/behavioral and 
-social sciences
-
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
 Elective (3)
-ECON 201 Principles of 
-Macroeconomics (3)
+ECON 201
 BMGT 364 Management  
 and Organization Theory (3)
 Elective (3)
@@ -6250,8 +4750,7 @@ in Organizations (3)
 Elective (3)
 BMGT 305 Knowledge 
 Management (3)
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 Elective (3)
 
@@ -6265,16 +4764,7 @@ Major
 Major 
 
 Major 
-
-
-
-
 91
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Marketing
 
 You may seek either an academic major or minor in marketing.
@@ -6324,11 +4814,11 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree. 
 
-
-
  
 
- 
+##############################################################
+##############################################################
+
 
 BS IN MARKETING
 
@@ -6390,10 +4880,7 @@ academic advisement report.
 92
 
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Major core and related requirements are listed in bold.
+##############################################################
 
 BS IN MARKETING
 
@@ -6403,17 +4890,9 @@ LIBS 150 Introduction to
 Research (1)
 PACE 111B Program and Career 
 Exploration in Business (3)
-WRTG 111 Academic Writing I (3)
+WRTG 111
 WRTG 112
 NUTR 100
-
-General education/research  
-and computing literacy
-General education/research  
-and computing literacy
-
-
-
 
 
 
@@ -6425,30 +4904,19 @@ MATH 105 Topics for Mathematical
 Literacy (3)
 IFSM 300 Information Systems  
 in Organizations (3)
-BMGT 110 Introduction to Business 
-and Management (3) 
-HUMN 100 Introduction to 
-Humanities (3)
+BMGT 110 
+HUMN 100
 BIOL 103 (4)
 
-
-
  
 
  
 
-ECON 201 Principles of 
-Macroeconomics (3)
+ECON 201
 ARTH 334 General education/arts and 
 
-General education/research  
-and computing literacy
+
 Major
-
-
-General education/biological  
-and physical sciences
-
 
 humanities
 
@@ -6459,8 +4927,6 @@ Major
 Major 
 
 Major
-
-
 Elective (3)
 ECON 203 Principles of 
 Microeconomics (3)
@@ -6499,8 +4965,7 @@ Elective (3)
 Elective (3)
 MRKT 495 Strategic Marketing 
 Management (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major
 
@@ -6510,11 +4975,7 @@ Major
 Major 
 
 Major
-
-
 Major/capstone
-
-
 Minor in Marketing
 The marketing minor complements the skills you gain in your 
 major discipline by enhancing the knowledge and skills related 
@@ -6537,11 +4998,6 @@ For a listing of all the requirements for the bachelor’s degree,
 refer to your major and pp. 32–35.
 
 93
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Mathematical Sciences
 
 You may seek an academic minor in mathematical sciences.
@@ -6566,8 +5022,6 @@ all courses.
 
 For a listing of all the requirements for the bachelor’s degree,  
 refer to your major and pp. 32–35.
-
-
 
  
 
@@ -6648,11 +5102,6 @@ personal and professional development as healthcare evolves
 ** See umgc.edu/professional-licensure for more information about professional licensure.
 
 94
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Accreditation
 The baccalaureate degree in nursing for registered nurses at 
 UMGC is accredited by the Commission on Collegiate Nursing 
@@ -6729,12 +5178,9 @@ FOR REGISTERED NURSES
 
 Required Major Core Courses
 Required Related Courses
-Remaining General Education, Minor,  
-and Elective Courses
+Remaining Courses
 
 Total
-
-
 
  
 
@@ -6767,16 +5213,11 @@ You must complete the coursework before you can take the CFP exam. You have five
 degree requirement.
 
 95
-
-
 
 
  
 
  
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 FINC 355  
 FINC 490  
@@ -6886,9 +5327,8 @@ ments for completing a bachelor’s degree.
 
 96
 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
+##############################################################
+##############################################################
 
 BS IN POLITICAL SCIENCE
 
@@ -6924,8 +5364,6 @@ or GVPT 200 International Political Relations
 Introduction to Public Policy and Public 
 Administration (3)
 
-
-
  
 
  
@@ -6951,7 +5389,9 @@ unique to you, based on your previous education. Contact an
 advisor or a success coach if you have any questions about 
 your academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
 
 BS IN POLITICAL SCIENCE
 
@@ -6959,10 +5399,8 @@ Recommended and Required Courses Requirement(s) Fulfilled
 
 LIBS 150 Introduction to 
 Research (1)
-PACE 111C Program and Career 
-Exploration in Communication/
-Humanities (3)
-WRTG 111 Academic Writing I (3)
+PACE 111C
+WRTG 111
 CMSC 100 Social Networking and 
 Cybersecurity Best Practices (3)
 NUTR 100
@@ -6975,17 +5413,13 @@ Literacy (3)
 WRTG 112
 GVPT 101 Introduction to  
 Political Theory (3) 
-HUMN 100 Introduction to 
-Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
-BEHS 103 Technology in 
-Contemporary Society (3)
-HIST 125 Technological 
-Transformations (3)
+BEHS 103
+HIST 125
 Elective (3)
-ECON 103 Economics in the 
-Information Age (3)
+ECON 103
 GVPT 170 American Government (3)  Major 
 Elective (3)
 Major
@@ -6998,41 +5432,21 @@ GVPT 306 Global Political
 Economy (3) 
 Elective (3)
 Elective (3)
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 
+Major
+
+Major
 Major
 
 Major
 
 
-
-
-Major
-
-
-
-
-
-Major
-
-
-
-General education/behavioral and 
-social sciences
-
-General education/behavioral and 
-social sciences
 
 
 
 97
-
-
 Continued
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Political Science, continued
 
@@ -7055,13 +5469,8 @@ Elective (3)
 Elective (3)
 GVPT 495 Political Science 
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
-
-
+CAPL 398A
 Major/capstone
-
-
 
  
 
@@ -7137,23 +5546,17 @@ and minor and elective requirements, as well as overall
 requirements for completing a bachelor’s degree. 
 
 98
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-
-
  
 
+##############################################################
+##############################################################
  
 
 BS IN PSYCHOLOGY
 
 Required Major Core Courses
 Required Related Course
-Remaining General Education, Minor,  
-and Elective Courses
+Remaining Courses
 
 Total
 
@@ -7215,20 +5618,18 @@ unique to you, based on your previous education. Contact an
 advisor or a success coach if you have any questions about your 
 academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
 
 BS IN PSYCHOLOGY
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111S Program and Career 
-Exploration in Health and 
-Sciences (3)
-WRTG 111 Academic Writing I (3)
-CMST 301 Digital Media  
-and Society (3)
+LIBS 150
+PACE 111S
+WRTG 111
+CMST 301
 NUTR 100
 
 PSYC 100 Introduction to 
@@ -7238,38 +5639,17 @@ STAT 200 Introduction to
 Statistics (3)
 WRTG 112
 PSYC 220 Social Psychology (3) 
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
-
-
-
-
 Major
 
 
 
-Related and general education/
-mathematics
-
-Major
-
-
-General education/behavioral and 
-social sciences
-
-humanities
-General education/behavioral and 
-social sciences
-Major 
-
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 PSYC 251 Lifespan Development or 
 any upper-level PSYC course (3) 
 Elective (3)
@@ -7285,28 +5665,14 @@ PSYC 310 Sensation and
 Perception (3) 
 Elective (3)
 
-Major 
-
-Major
-
-Major 
-
-
+ 
 99
-
-
 Continued
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Psychology, continued
 
-
-
 PSYC 335 Theories of Personality (3)  Major
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 PSYC 341 Memory and Cognition (3)  Major 
 Elective (3)
@@ -7321,14 +5687,9 @@ Elective (3)
 Elective (3)
 Elective (3)
 PSYC 495 Psychology Capstone (3) Major/capstone
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major 
-
-
-
-
 
  
 
@@ -7421,24 +5782,19 @@ and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree. 
 
 100
-
-
 
 
  
 
+##############################################################
+##############################################################
  
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-BS IN PUBLIC SAFETY 
-ADMINISTRATION
+BS IN PUBLIC SAFETY ADMINISTRATION
 
 Required Major Core Courses
 Required Related Course
-Remaining General Education, Minor,  
-and Elective Courses
+Remaining Courses
 
 Total
 
@@ -7489,17 +5845,18 @@ to you, based on your previous education. Contact an advisor or
 a success coach if you have any questions about your academic 
 advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BS IN PUBLIC SAFETY ADMINISTRATION
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111P Program and Career 
-Exploration in Public Safety (3)
-WRTG 111 Academic Writing I (3)
+LIBS 150
+PACE 111P
+WRTG 111
 WRTG 112
 NUTR 100
 
@@ -7513,17 +5870,14 @@ IFSM 300 Information Systems
 in Organizations (3) 
 PSAD 304 Contemporary Public 
 Safety Practices (3) 
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 PSAD 306 Public Safety 
 Planning (3) 
 Elective (3)
@@ -7535,88 +5889,24 @@ and Technology (3)
 Elective (3)
 PSAD 414 Public Safety 
 Administration Ethics (3) 
-WRTG 391 Advanced Research 
-Writing (3)
-
-
-
-
+WRTG 391
 Major
 
 
 
+Small Business Management and Entrepreneurship
 
-Related and general education/
-research and computing literacy
-Major
-
-
-
-General education/behavioral and 
-social sciences
-
-General education/behavioral and 
-social sciences
-Major
-
-Major
-
-Major
-
-Major
-
-
-
-Continued
-
-101
-
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Small Business 
-Management and 
-Entrepreneurship
-
-You may seek an academic minor in small business manage-
-ment and entrepreneurship.
-Minor in Small Business Management 
-and Entrepreneurship
-The small business management and entrepreneurship minor 
-complements the skills you gain in your major discipline by  
-helping you develop your ability to start and operate a successful 
-small business and look for opportunities to create patterns of 
-innovation within your organization. If you are planning to start or 
-manage a small business, such as a family-owned business, a 
-franchise, a virtual business, or a home enterprise, you’ll find  
-this minor helpful.
 
 Courses in the Minor (15 Credits)
 A minor in small business management and entrepreneurship 
 requires the completion of the following courses:
 
-BMGT 304   Managing E-Commerce in Organizations (3)
-BMGT 330   Entrepreneurship and New Venture Planning (3)
-BMGT 335   Small Business Management (3)
-BMGT 364   Management and Organization Theory (3)
+BMGT 304
+BMGT 330
+BMGT 335
+BMGT 364
 FINC 328  
 
-Small Business Finance (3)
-
-Courses already applied toward other degree requirements  
-(e.g., major or general education) may not be applied toward the 
-minor. At least 9 credits must be earned in upper-level courses 
-(numbered 300 or above). Prerequisites apply for all courses.
-
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
 
 Public Safety Administration, continued
 
@@ -7640,24 +5930,13 @@ Elective (3)
 Elective (3)
 Elective (3)
 Elective (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major
 
-Major 
-
-Major
-
-Major/capstone
-
-
+/capstone
 Minor in Public Safety Administration
-The public safety administration minor complements the skills 
-you gain in your major discipline by providing a background in  
-the field of public safety. The minor exposes you to the prin-
-ciples of strategic planning, risk management, public policy, and 
-ethics as related to public safety administration.
+
 
 Courses in the Minor (15 Credits)
 A minor in public safety administration requires the completion 
@@ -7674,86 +5953,16 @@ minor. At least 9 credits must be earned in upper-level courses
 For a listing of all the requirements for the bachelor’s degree,  
 refer to your major and pp. 32–35.
 
-102
-
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Social Science
-
-You may seek an academic major in social science.
-Major in Social Science
-In UMGC’s bachelor’s degree program in social science, you’ll 
-gain a breadth of knowledge through interdisciplinary study 
-that encompasses perspectives from the fields of anthropology, 
-behavioral sciences, gerontology, psychology, and sociology.  
-You’ll also have the opportunity to drill down and focus closely  
-on one of these fields.
-
-What You’ll Learn
-Through your coursework, you will learn how to
-
-•  Analyze how quantitative and qualitative methods are used in 
-
-social science research 
-
-•  Communicate social science concepts and research findings 
-
-effectively to a variety of audiences 
-
-•  Examine how micro- and macro-level factors are linked in the 
-
-social lives of individuals, communities, and societies 
-
-•  Analyze complex social issues using theoretical approaches, 
-
-critical-thinking skills, information literacy, technology, or 
-interdisciplinary perspectives 
-
-•  Evaluate social science research using ethical principles and 
-
-standards for professional conduct 
-
-•  Apply concepts of diversity, social factors, and global multi-
-cultural perspectives to examine practical problems in the 
-workplace and society
-
-Accelerated Pathway
-If you complete your undergraduate degree at UMGC with  
-a major in social science, an accelerated pathway between  
-UMGC’s undergraduate and graduate programs allows you to 
-reduce your total coursework for the Master of Arts in Teaching 
-by 12 credits (three courses, including the noncredit introductory 
-course UCSP 615). Details are on p. 24.
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall 
-requirements for completing a bachelor’s degree. 
+##############################################################
+##############################################################
 
 BS IN SOCIAL SCIENCE
 
-Required Major Core Courses
-Required Related Course
-Remaining General Education, Minor,  
-and Elective Courses
+30 Required Major Core Courses
+3  Required Related Course
+87 Remaining Courses
+120 Total
 
-Total
-
-Credits
-
-30
-3 
-87
-
-120
 
 Major Requirements
 To complete a major in social science, you must take a total of  
@@ -7762,26 +5971,20 @@ To complete a major in social science, you must take a total of
 REQUIRED MAJOR CORE COURSES (30 CREDITS)
 Two of the following introductory (100-level) social science 
 courses (6):
+
 ANTH 102  
-GERO 100   Contemporary Issues in Aging
+GERO 100
 PSYC 100  
 SOCY 100  
 
-Introduction to Psychology
-Introduction to Sociology
-
-Introduction to Cultural Anthropology
-
 The following courses:
-BEHS 210  
-BEHS 300   Research Methods in Social Sciences (3)
-BEHS 495   Social Sciences Capstone (3)
-
-Introduction to Social Sciences (3)
+BEHS 210
+BEHS 300
+BEHS 495
 
 One of the following courses (3): 
-BEHS 220   Diversity Awareness 
-BEHS 250   Social Justice Movements 
+BEHS 220
+BEHS 250
 
 Four upper-level ANTH, BEHS, GERO, PSYC, and SOCY courses 
 (12)—Focused study in anthropology, gerontology, psychology, 
@@ -7796,20 +5999,17 @@ ANTH 351   Anthropology in Forensic Investigations
 103
 
 
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Major core and related requirements are listed in bold.
+##############################################################
 
 BS IN SOCIAL SCIENCE
 
 Recommended and Required Courses Requirement(s) Fulfilled
 
 Gerontology
-GERO 302   Health and Aging
-GERO 311   Gender and Aging
-GERO 427   Culture and Aging 
-GERO 320   Psychosocial Aspects of Aging 
+GERO 302
+GERO 311
+GERO 427
+GERO 320
 
 Psychology
 PSYC 338  
@@ -7817,50 +6017,28 @@ PSYC 354
 PSYC 386 
 PSYC 437 
 
-Psychology of Gender
-Cross-Cultural Psychology 
-Psychology of Stress
-Positive Psychology
-
 Sociology
-SOCY 313  
-SOCY 325  
-SOCY 423   Race and Ethnicity: A Global Perspective 
-SOCY 350   Contemporary Social Problems 
-
-The Individual and Society
-The Sociology of Gender 
+SOCY 313
+SOCY 325
+SOCY 423
+SOCY 350
 
 REQUIRED RELATED COURSE (3 CREDITS)
 The following required course may be applied to general educa-
 tion requirements:
 
-STAT 200  
-
-Introduction to Statistics (3)
+STAT 200
 
 Course Sequencing
-The following table is designed to provide an optimal order for  
-taking both required and recommended general education, major, 
-and elective courses for this program. Your plan will be unique  
-to you, based on your previous education. Contact an advisor or 
-a success coach if you have any questions about your academic 
-advisement report.
-
-
 
  
 
  
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111S Program and Career 
-Exploration in Health and 
-Sciences (3)
-WRTG 111 Academic Writing I (3)
-CMST 301 Digital Media  
-and Society (3)
+LIBS 150
+PACE 111S
+WRTG 111
+CMST 301
 NUTR 100
 
 ANTH 102 Introduction to Cultural 
@@ -7870,8 +6048,7 @@ or PSYC 100 Introduction
 to Psychology or SOCY 100 
 Introduction to Sociology (3)
 SPCH 100
-STAT 200 Introduction  
-to Statistics (3)
+STAT 200
 WRTG 112
 ANTH 102 Introduction to  
 Cultural Anthropology or  
@@ -7879,13 +6056,11 @@ GERO 100 Contemporary Issues
 in Aging or PSYC 100 Introduction  
 to Psychology or SOCY 100 
 Introduction to Sociology (3)
-HUMN 100 Introduction  
-to Humanities (3)
+HUMN 100
 BIOL 103 (4)
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 BEHS 210 Introduction to  
 Social Sciences (3) 
 Elective (3)
@@ -7894,49 +6069,30 @@ or BEHS 250 Social Justice
 Movements (3) 
 Elective (3)
 
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334 General education/arts and 
-
-
-
-
 Major
  
 
 
 
-Related and general education/
-mathematics
-
 Major 
 
 
 
-General education/behavioral and 
-social sciences
-
 humanities
-General education/behavioral and 
-social sciences
+
 Major 
 
 Major
-
-
 Continued
 
 104
-
-
 
 
  
 
  
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Sociology
 
@@ -7973,8 +6129,7 @@ Archaeology or GERO 302 Health
 and Aging or PSYC 338 Psychology 
 of Gender or SOCY 313 The 
 Individual and Society (3)
-WRTG 391 Advanced Research 
-Writing (3)
+WRTG 391
 Elective (3)
 ANTH 346 Anthropology of 
 Language and Communication or 
@@ -8003,8 +6158,6 @@ Major
 Major 
  
 
-
-
 Major 
 
 Major 
@@ -8020,18 +6173,10 @@ Elective (3)
 Elective (3)
 BEHS 495 Social Sciences 
 Capstone (3) 
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major/capstone
-
-
 105
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Software Development 
 and Security
 
@@ -8052,8 +6197,6 @@ Agency and the Department of Homeland Security.
 
 What You’ll Learn 
 Through your coursework, you will learn how to 
-
-
 
  
 
@@ -8081,8 +6224,10 @@ See pp. 32–35 for information on major, general education,
 and minor and elective requirements, as well as overall require-
 ments for completing a bachelor’s degree. 
 
-BS IN SOFTWARE DEVELOPMENT 
-AND SECURITY
+##############################################################
+##############################################################
+
+BS IN SOFTWARE DEVELOPMENT AND SECURITY
 
 General Education Courses
 Required Major Core Courses
@@ -8134,16 +6279,11 @@ advisor or a success coach if you have any questions about
 your academic advisement report.
 
 106
-
-
 
 
  
 
  
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
 
 Elective (3)
 Elective (3)
@@ -8163,8 +6303,7 @@ Elective (3)
 Elective (3)
 CMSC 495 Computer Science  
 Capstone (3)
-CAPL 398A Career Planning 
-Management (1)
+CAPL 398A
 
 Major
 
@@ -8173,8 +6312,6 @@ Major
 Major 
 
 Major/capstone
-
-
 Honor Society
 Information on eligibility for membership in the UMGC chapter  
 of Upsilon Pi Epsilon, the international honor society for the 
@@ -8187,7 +6324,10 @@ requirements found on p. 26. Review the course descriptions
 to determine the technology requirements for the classes in 
 which you are enrolling. 
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BS IN SOFTWARE DEVELOPMENT AND SECURITY
 
@@ -8195,31 +6335,23 @@ Recommended and Required Courses Requirement(s) Fulfilled
 
 LIBS 150 Introduction to 
 Research (1)
-PACE 111T Program and Career 
-Exploration in Technology (3)
-WRTG 111 Academic Writing I (3)
-CMSC 105 Introduction to Problem-
-Solving and Algorithm Design (3)
+PACE 111T
+WRTG 111
+CMSC 105
 NUTR 100
 
-CMSC 115 Introductory 
-Programming (3) 
+CMSC 115 
 SPCH 100
 MATH 107
 WRTG 112
-CMSC 215 Intermediate 
-Programming (3) 
-HIST 125 Technological 
-Transformations (3)
-NSCI 103 Fundamentals of Physical 
-Science (4)
-BEHS 103 Technology in 
-Contemporary Society (3)
+CMSC 215 
+HIST 125
+NSCI 103
+BEHS 103
 ARTH 334
 
 Elective (3)
-ECON 103 Economics in the 
-Information Age (3)
+ECON 103
 CMSC 320 Relational Database 
 Concepts and Applications (3) 
 Elective (3)
@@ -8230,47 +6362,25 @@ SDEV 325 Detecting Software
 Vulnerabilities (3) 
 Elective (3)
 SDEV 350 Database Security (3) 
-WRTG 393 Advanced Technical 
-Writing (3)
+WRTG 393
 Elective (3)
 SDEV 360 Secure Software 
 Engineering (3) 
-
-
 Prerequisite and general education/
 research and computing literacy
 
 Major 
+Major 
+
+
 
 
 
 
 Major 
-
-
-
-General education/behavioral and 
-social sciences
-
-General education/behavioral and 
-social sciences
-Major 
-
-Major
-
-Major
-
-Major 
-
-
 Major 
 
 107
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
 Speech Communication
 
 You may seek an academic minor in speech communication if  
@@ -8294,8 +6404,6 @@ Courses already applied toward other degree requirements
 (e.g., major or general education) may not be applied toward the 
 minor. At least 9 credits must be earned in upper-level courses 
 (numbered 300 or above). Prerequisites apply for all courses.
-
-
 
  
 
@@ -8351,140 +6459,59 @@ minor. At least 9 credits must be earned in upper-level courses
 For a listing of all the requirements for the bachelor’s degree,  
 refer to your major and pp. 32–35.
 
-108
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
+##############################################################
+##############################################################
 
 Web and Digital Design
 
 You may seek either an academic major or minor in web and 
 digital design. 
-Major in Web and Digital Design
-You can follow your interests and prepare for a career in digital 
-design with UMGC’s bachelor’s degree program in web and digi-
-tal design, which allows you to explore design using various dig-
-ital media and web technologies. In this major, you’ll learn how 
-to create digital works using industry-standard software and 
-incorporating design theory and efficient workflows. Through 
-your coursework, you can gain hands-on experience in web 
-design, virtual reality, augmented reality, electronic publishing, 
-motion graphics, multimedia, animation, and graphic design.
 
-What You’ll Learn 
-Through your coursework, you will learn how to 
-
-•  Create digital products, such as graphics, interactive digital 
-media, and web applications, that utilize current or emerging 
-technologies to meet customer requirements and usability 
-standards
-
-
-
- 
-
- 
-
-•  Apply sound business principles and project management 
-
-techniques to manage a digital media or web design project 
-from conceptualization to deployment
-
-•  Utilize scripting and programming languages to develop inter-
-active digital media or web applications that meet technical 
-specifications and quality standards
-
-•  Assess the cultural, ethical, and legal implications of pro- 
-
-ducing and distributing interactive digital media, products,  
-or platforms
-
-•  Communicate clearly and effectively with diverse stakehold-
-
-ers about technology and digital media
-
-Degree Requirements 
-See pp. 32–35 for information on major, general education, 
-and minor and elective requirements, as well as overall require-
-ments for completing a bachelor’s degree. 
+##############################################################
 
 BS IN WEB AND DIGITAL DESIGN 
 
-General Education Courses
-Required Major Core Courses
-Minor and Elective Courses
+41 General Education Courses
+30 Required Major Core Courses
+49 Minor and Elective Courses
+120 Total
 
-Total
-
-Credits
-
-41
-30 
-49
-
-120
 
 Major Requirements
-To complete a major in web and digital design, you must take a 
-total of 30 credits in required coursework, as follows: 
-
-Introduction to Interactive Design (3)
 
 REQUIRED MAJOR CORE COURSES (30 CREDITS) 
 CMST 290  
-CMST 295   Fundamentals of Digital Design (3)
-CMST 495   Web and Digital Design Capstone (3)
-Any upper-level CMST courses (21)—Focused study in 
-web design, digital design, or augmented/virtual reality is 
-recommended, as follows:
+CMST 295
+CMST 495
 
-Web Design
-CMST 385   Principles of Web Design and Technology I 
-CMST 386   Principles of Web Design and Technology II 
+Any upper-level CMST courses (21)
+
+Focus: Web Design (21)
+CMST 385
+CMST 386
 CMST 325  
 CMST 320  
 CMST 355 
-CMST 388   Fundamentals of JavaScript
-CMST 488   Advanced JavaScript
+CMST 388
+CMST 488
 
-Image Editing
-Illustration Graphics
-Content Management Systems
-
-Digital Design
-CMST 310   Fundamentals of Electronic Publishing
-CMST 311   Advanced Electronic Publishing
+Focus: Digital Design (21)
+CMST 310
+CMST 311
 CMST 325  
 CMST 320  
-CMST 425   Advanced Image Editing 
-CMST 341   Principles of Multimedia I
-CMST 351   Motion Graphics I
+CMST 425
+CMST 341
+CMST 351
 
-Image Editing 
-Illustration Graphics
-
-109
-
-
-
-
- 
-
- 
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
-Augmented/Virtual Reality
-CMST 308  User Experience and Interface Design 
-CMST 315   Game Design I
-CMST 330   Virtual Reality Design I
-CMST 331   Augmented Reality Design I
+Focus: Augmented/Virtual Reality (21)?
+CMST 308
+CMST 315
+CMST 330
+CMST 331
 CMST 390 
 
-3D Modeling
-
+##############################################################
 Course Sequencing
 The following table is designed to provide an optimal order for  
 taking both required and recommended general education, 
@@ -8493,7 +6520,10 @@ unique to you, based on your previous education. Contact an
 advisor or a success coach if you have any questions about 
 your academic advisement report.
 
-Major core and related requirements are listed in bold.
+
+
+##############################################################
+##############################################################
 
 BS IN WEB AND DIGITAL DESIGN
 
@@ -8501,13 +6531,10 @@ Recommended and Required Courses
 
 Requirement(s) Fulfilled
 
-LIBS 150 Introduction  
-to Research (1)
-PACE 111T Program and Career 
-Exploration in Technology (3)
-WRTG 111 Academic Writing I (3)
-CMST 301 Digital Media  
-and Society (3)
+LIBS 150
+PACE 111T
+WRTG 111
+CMST 301
 NUTR 100
 
 CMST 290 Introduction to  
@@ -8517,33 +6544,20 @@ MATH 107
 WRTG 112
 CMST 295 Fundamentals of  
 Digital Design (3) 
-HIST 125 Technological 
-Transformations (3)
+HIST 125
 BIOL 103 (4)
-BEHS 103 Technology in 
-Contemporary Society (3)
+BEHS 103
 ARTH 334
 
 Elective (3)
-ECON 103 Economics in  
-the Information Age (3)
+ECON 103 
 
-
-
+Major 
 Major 
 
 
 
 
-Major 
-
-
-
-General education/behavioral and 
-social sciences
-
-General education/behavioral and 
-social sciences
 
 CMST 385 Principles of Web  
 Design and Technology I or  
@@ -8561,8 +6575,7 @@ Elective (3)
 CMST 325 Image Editing (3)
 Elective (3)
 CMST 320 Illustration Graphics (3)
-WRTG 393 Advanced Technical 
-Writing (3)
+WRTG 393
 Elective (3)
 CMST 388 Fundamentals of 
 JavaScript or CMST 425 Advanced 
@@ -8589,13 +6602,7 @@ Elective (3)
 Elective (3)
 Elective (3)
 Elective (3)
-CAPL 398A Career Planning 
-Management (1)
-
-
-BACHELOR’S DEGREE PROGRAMS  
-CURRICULA
-
+CAPL 398A
 Honor Society
 Information on eligibility for membership in the UMGC chapter 
 of Upsilon Pi Epsilon, the international honor society for the 
@@ -8619,8 +6626,6 @@ A minor in web and digital design requires the completion of
 plete either CMST 290 or CMST 295. The remaining credits may 
 be chosen from any CMST courses.
 
-
-
  
 
  
@@ -8634,61 +6639,5 @@ Technology requirements are the same as for the major (see
 above). For a listing of all the requirements for the bachelor’s 
 degree, refer to your major and pp. 32–35.
 
-Women, Gender, and 
-Sexuality Studies
+##############################################################
 
-You may seek an academic minor in women, gender, and sexual-
-ity studies.
-Minor in Women, Gender,  
-and Sexuality Studies
-The women, gender, and sexuality studies minor complements 
-the skills you gain in your major discipline by providing an  
-interdisciplinary study of the history, status, and experiences  
-of women. 
-
-Courses in the Minor (15 Credits)
-A minor in women, gender, and sexuality studies requires the 
-completion of 15 credits of coursework in women, gender, and 
-sexuality studies, chosen from the following courses:
-
-Social Justice Movements
-
-Any WMST courses
-BEHS 220   Diversity Awareness
-BEHS 250 
-BEHS 343   Parenting Today
-BEHS 453   Domestic Violence
-ENGL 250  
-GERO 311 
-HIST 377  
-PSYC 332 
-PSYC 338  
-SOCY 325  
-SOCY 443  
-SOCY 462   Women in the Military
-SPCH 324   Communication and Gender
-
-Introduction to Women’s Literature
-Gender and Aging
-U.S. Women’s History: 1870 to 2000
-Psychology of Human Sexuality
-Psychology of Gender
-The Sociology of Gender
-Sociology of the Family
-
-It is recommended that you take WMST 200 as the first course 
-for the minor (if you have not already applied the course toward 
-other degree requirements).
-
-Courses already applied toward other degree requirements  
-(e.g., major or general education) may not be applied toward the 
-minor. At least 9 credits must be earned in upper-level courses 
-(numbered 300 or above). Prerequisites apply for all courses.
-
-For a listing of all the requirements for the bachelor’s degree,  
-refer to your major and pp. 32–35.
-
-111
-
-
-

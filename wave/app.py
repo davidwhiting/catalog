@@ -26,6 +26,7 @@ async def on_startup():
 
 # Moved to q.app
 # connect sqlite3
+
 conn = sqlite3.connect('UMGC.db')
 c = conn.cursor()
 
@@ -122,16 +123,6 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except (header, footer, meta).
     await cards.render_home_cards(q)
-
-    #rao_card = cards.rao_table(location='middle_horizontal')
-    #add_card(q, name='rao_table', rao_card)
-
-    # Database
-    # UI
-    # Wave
-    # Code
-    # Data
-
 
     card = await cards.render_project_table(templates.project_data)
     add_card(q, 'project_table_location', card)
@@ -322,21 +313,8 @@ async def major(q: Q):
     add_card(q, 'major_recommendations', cards.major_recommendation_card)
     add_card(q, 'dropdown_menus_vertical', cards.dropdown_menus_vertical(q, location='top_horizontal'))
 
-    #career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
-    #add_card(q, 'major_section', ui.form_card(
-    #    box=ui.box('top_horizontal', width='400px'),
-    #    items=[
-    #        ui.text(
-    #            f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
-    #            #size=ui.TextSize.L
-    #        ),
-    #        ui.separator(),
-    #        ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
-    #      ]
-    #))
-
     # the program id should be returned from the menu
-    program_id = 10
+    program_id = 5
 
     await cards.render_majors_discovery(q, program_id)
 
@@ -368,9 +346,10 @@ async def major2(q: Q):
     #))
 
     # the program id should be returned from the menu
-    program_id = 10
+    program_id = 5
 
-    await cards.render_majors_discovery(q, 2)
+    await cards.render_major_dashboard(q, program_id, location='middle_vertical')
+    #await cards.render_majors_discovery(q, program_id)
     #await cards.render_majors_discovery(q, 10, compare=True)
 
 ###############################################################################
@@ -482,28 +461,9 @@ async def courses(q: Q):
 
 #templates.ge_query_j(params=1)
 
-ge_query_j = '''
-    SELECT 
-        b.id,
-        b.name,
-        b.title,
-        b.credits,
-        b.description,
-        b.pre,
-        b.pre_credits
-    FROM 
-        general_education a
-    LEFT JOIN 
-        classes b
-    ON 
-        a.course_id = b.id
-    WHERE 
-        b.general_education_requirements_id = ?
-'''
-
-
 @on('#ge')
 async def ge(q: Q):
+
     clear_cards(q)
     add_card(q, 'ge_tile',
         ui.wide_info_card(
@@ -512,12 +472,103 @@ async def ge(q: Q):
             title='Explore General Education',
             caption='Explore and select GE courses'
     ))
-    cards.render_ge_table(q, student_records_no_schedule,
-        #which=['GENERAL'],
-        #title='Select General Education Courses',
-        location='middle_horizontal',
-        table_width='95%'
+
+    #def render_major_table_group(group_name, record_type, records, collapsed):
+    #return ui.table_group(group_name, [
+    #    ui.table_row(
+    #        name=str(record['id']),
+    #        cells=[
+    #            record['course'],
+    #            record['title'],
+    #            str(record['credits']),
+    #            #record['description'],
+    #            record['type'].upper(),
+    #        ]
+    #    ) for record in records if record['type'].upper() == record_type
+    #], collapsed=collapsed)
+    add_card(q, 'ge_table',
+        ui.form_card(
+            box=ui.box('middle_vertical'),
+            items=[
+                ui.text('Requirement 1: Communications'),
+                # + 'WRTG 111 or another writing course'),
+                ui.table(
+                    name='ge_requirements',
+                    columns=[
+                        ui.table_column(name='course', label='Course'),
+                        ui.table_column(name='title', label='Title'),
+                    ],
+    #                ui.table_group('WRTG 111 or another writing course', [
+                    rows=[
+                        ui.table_row(
+                            name='first',
+                            cells=['WRTG 111', 'Intro to Writing ???']
+                        ),
+                        ui.table_row(
+                            name='first',
+                            cells=['WRTG 112', 'Intro to Writing 2 ???']
+                        ),
+                    ]
+                )
+            ]
+        )
     )
+
+    #                    ui.table_row(
+    #                        name='second',
+    #                        cells=[
+    #                            'WRTG 112', 
+    #                            'Intro to Writing 2 ???'
+    #                        ]
+    #                    ),
+    #                ])
+    #
+    #                    name=, 
+    #                    rows=[
+    #                        ui.table_row(name='row1', cells=['WRTG 111', 'Intro to Writing ???']),
+    #                        ui.table_row(name='row2', cells=['WRTG 113', 'Intro to Writing 2 ???']),
+    #                    ]
+    #                ),
+    #                rows=[
+    #                    ui.table_row(name='row1', cells=['John', 'Doe']),
+    #                    ui.table_row(name='row2', cells=['Alice', 'Smith']),
+    #                ]
+    #            ),
+    #            ui.text('General Education Requirements'),
+    #            ui.table(
+    #                name='ge_requirements',
+    #                columns=[
+    #                    ui.table_column(name='name', label='Name'),
+    #                    ui.table_column(name='surname', label='Surname'),
+    #                ],
+    #                rows=[
+    #                    ui.table_row(name='row1', cells=['John', 'Doe']),
+    #                    ui.table_row(name='row2', cells=['Alice', 'Smith']),
+    #                    ui.table_row(name='row3', cells=['Bob', 'Adams']),
+    #                ]
+    #            ),
+    #            ui.text('General Education Requirements'),
+    #            ui.table(
+    #                name='ge_requirements',
+    #                columns=[
+    #                    ui.table_column(name='name', label='Name'),
+    #                    ui.table_column(name='surname', label='Surname'),
+    #                ],
+    #                rows=[
+    #                    ui.table_row(name='row1', cells=['John', 'Doe']),
+    #                    ui.table_row(name='row2', cells=['Alice', 'Smith']),
+    #                    ui.table_row(name='row3', cells=['Bob', 'Adams']),
+    #                ]
+    #            ),
+    #        ]
+    #    )
+    #)
+    #cards.render_ge_table(q, student_records_no_schedule,
+    #    #which=['GENERAL'],
+    #    #title='Select General Education Courses',
+    #    location='middle_horizontal',
+    #    table_width='95%'
+    #)
 
 
 ###############################################################################
@@ -765,8 +816,11 @@ async def initialize_app(q: Q):
 
     q.app.start_term = 'Spring 2024'
 
-    q.app.initialized = True
+    # Load default General Education information
+    df = pd.read_sql_query('SELECT * FROM ge_view', q.app.conn)
+    q.app.ge_records = df.to_dict('records')
 
+    q.app.initialized = True
 
 async def initialize_user(q: Q) -> None:
     """
@@ -798,7 +852,11 @@ async def initialize_user(q: Q) -> None:
     ## See https://docs.h2o.ai/mlops/py-client/py-client-examples/keycloak-authentication-methods
     ##### KEYCLOAK CODE ##############
 
-    q.user.user_id = 1
+    q.user.logged_in = True
+    if q.user.logged_in:
+        q.user.user_id = 1 # for the time being
+    else:
+        q.user.user_id = 0 # guest login, by default
 
     # Get user information
     query = '''
@@ -820,6 +878,11 @@ async def initialize_user(q: Q) -> None:
         row = query_row(query, (q.user.user_id,), q.app.c)
         (q.user.resident_status_id, q.user.transfer_credits, q.user.financial_aid, q.user.stage, q.user.program_id,
          q.user.profile, q.user.notes) = row
+        
+        if not hasattr(q.user, 'records'):
+            q.user.ge_records = q.app.ge_records
+
+
 
 
     # End of student information

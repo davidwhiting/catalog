@@ -7,6 +7,28 @@ import pandas as pd
 
 from utils import add_card, single_query, query_row
 
+def dialog_description(row: int) -> ui.Dialog:
+    """
+    Dialog for viewing course description.
+    """
+
+    #if row == 0:
+    #    image_path = 'https://images.unsplash.com/photo-1587049016823-69ef9d68bd44'
+    #elif row == 2:
+    #    image_path = 'https://images.unsplash.com/photo-1552975084-6e027cd345c2'
+    #else:
+    #    image_path = 'https://images.unsplash.com/photo-1574276254982-d209f79d673a'
+
+    dialog = ui.dialog(
+        name='dialog_description',
+        title='Course Description',
+        items=[ui.image(title='Image', path=image_path, width='100%')],
+        closable=True,
+        events=['dismissed']
+    )
+
+    return dialog
+
 async def render_project_table(data, location='middle_vertical', title='Project Status Table', height='520px'):
 
     project_table_columns = [
@@ -103,128 +125,6 @@ async def render_project_table(data, location='middle_vertical', title='Project 
     )
     return card
 
-rao_table_columns = [
-    ui.table_column(
-        name='id',
-        label='Id',
-        min_width='20px'
-    ),
-    ui.table_column(
-        name='user',
-        label='User',
-        sortable=True,
-        filterable=True,
-        searchable=True,
-        min_width='100px'
-    ),
-    ui.table_column(
-        name='product',
-        label='Product',
-        sortable=True,
-        filterable=True,
-        searchable=True,
-        min_width='100px'
-    ),
-    ui.table_column(
-        name='description',
-        label='Description',
-        cell_type=ui.markdown_table_cell_type(),
-        searchable=True
-    ),
-    ui.table_column(
-        name='icon',
-        label='Icon',
-        cell_type=ui.icon_table_cell_type(),
-        min_width='30px'
-    ),
-    ui.table_column(
-        name='picture',
-        label='Picture',
-        cell_type=ui.markdown_table_cell_type(),
-        min_width='50px'
-    ),
-    ui.table_column(
-        name='audio',
-        label='Audio',
-        cell_type=ui.markdown_table_cell_type(),
-        min_width='300px'
-    ),
-    ui.table_column(
-        name='quantity',
-        label='Quantity',
-        data_type='number',
-        sortable=True,
-        min_width='95px'
-    ),
-    ui.table_column(
-        name='discount',
-        label='Discount',
-        cell_type=ui.progress_table_cell_type(),
-        sortable=True,
-        min_width='80px'
-    ),
-    ui.table_column(
-        name='tags',
-        label='Tags',
-        cell_type=ui.tag_table_cell_type(
-            name='',
-            tags=[
-                ui.tag(label='Beverage', color='$brown'),
-                ui.tag(label='Home', color='$blue'),
-                ui.tag(label='Retail', color='$purple'),
-                ui.tag(label='Sale', color='$red')
-            ]
-        ),
-        searchable=True
-    ),
-    ui.table_column(
-        name='menu',
-        label='Menu',
-        cell_type=ui.menu_table_cell_type(
-            commands=[
-                ui.command(name='view_transaction', label='View Transaction', icon='Shop'),
-                ui.command(name='view_image', label='View Image', icon='ImageSearch')
-            ]
-        ),
-        min_width='40px'
-    )
-]
-
-rao_table_rows = [
-    ui.table_row(
-        name='0',
-        cells=['0', 'Adam', 'Coffee',
-               '<b>Product</b>: <i>Coffee</i>\n<b>Category</b>: <i>Beverages</i>', 'CoffeeScript',
-               '<center><img src="https://images.unsplash.com/photo-1587049016823-69ef9d68bd44" width="70%">',
-               '<center><audio controls><source src="https://media.merriam-webster.com/audio/prons/en/us/mp3/c/coffee01.mp3" type="audio/wav">',
-               '1', '0.09', 'Beverage,Sale']
-    ),
-    ui.table_row(
-        name='1',
-        cells=['1', 'Sarah', 'Balloons',
-               '<b>Product</b>: <i>Balloons</i>\n<b>Category</b>: <i>Home</i>', 'Balloons',
-               '<center><img src="https://images.unsplash.com/photo-1574276254982-d209f79d673a" width="70%">',
-               '<center><audio controls><source src="https://media.merriam-webster.com/audio/prons/en/us/mp3/b/balloo01.mp3" type="audio/wav">',
-               '10', '0.66', 'Home,Sale']
-    ),
-    ui.table_row(
-        name='2',
-        cells=['2', 'Adam', 'Television',
-               '<b>Product</b>: <i>Television</i>\n<b>Category</b>: <i>Retail</i>', 'TVMonitor',
-               '<center><img src="https://images.unsplash.com/photo-1552975084-6e027cd345c2" width="70%">',
-               '<center><audio controls><source src="https://media.merriam-webster.com/audio/prons/en/us/mp3/t/televi03.mp3" type="audio/wav">',
-               '1', '0', 'Retail']
-    ),
-    ui.table_row(
-        name='3',
-        cells=['3', 'Jen', 'Balloons',
-               f'<b>Product</b>: <i>Balloons</i>\n<b>Category</b>: <i>Home</i>', 'Balloons',
-               '<center><img src="https://images.unsplash.com/photo-1574276254982-d209f79d673a" width="70%">',
-               '<center><audio controls><source src="https://media.merriam-webster.com/audio/prons/en/us/mp3/b/balloo01.mp3" type="audio/wav">',
-               '3', '0.15', 'Home,Sale']
-    )
-]
-
 project_table_columns = [
     ui.table_column(
         name='id',
@@ -280,45 +180,6 @@ project_table_columns = [
     )
 ]
 
-
-def rao_table(location='middle_horizontal'):
-    """
-    Card for table.
-    """
-
-    #pagination = ui.table_pagination(total_rows=4, rows_per_page=2) if pagination else None
-
-    card = ui.form_card(
-        box=location,
-        items=[
-            ui.table(
-                name='transactions',
-                columns=rao_table_columns,
-                rows=rao_table_rows,
-                #pagination=False,
-                groupable=True,
-                resettable=True,
-                downloadable=True,
-                events=['page_change'],
-                height='520px'
-            ),
-            ui.buttons(
-                items=[
-                    #ui.button(
-                    #    name='unpaginate' if pagination else 'paginate',
-                    #    label='Unpaginate' if pagination else 'Paginate',
-                    #    primary=True
-                    #),
-                    ui.button(name='multiselect', label='Multiselect', primary=True)
-                ],
-                justify='center'
-            )
-        ]
-    )
-
-    return card
-
-
 async def render_home_cards(q, width='25%'):
     add_card(q, 'student_guest', ui.wide_info_card(
         box=ui.box('top_horizontal', width=width),
@@ -351,7 +212,6 @@ async def render_home_cards(q, width='25%'):
             caption='User adds new info or confirms imported info.',
             icon='UserFollowed')
     )
-
 
 interview_questions = [
     'Have you ever attended a college or university before?',
@@ -454,7 +314,7 @@ def render_major_table_group(group_name, record_type, records, collapsed):
         ) for record in records if record['type'].upper() == record_type
     ], collapsed=collapsed)
 
-async def render_major_table(q, records, location='bottom_vertical', width='100%'):
+async def render_major_table(q, records, location='bottom_vertical', width='100%', ge=False, elective=False):
     return add_card(q, 'my_test_table', ui.form_card(
         #        box=ui.box(location, width=table_width, height=table_height),
         box=ui.box(location, height='350px', width=width),
@@ -527,17 +387,32 @@ async def render_major_table(q, records, location='bottom_vertical', width='100%
         ])]
     ))
 
-
-async def render_major_dashboard(q, title, row, location, width='100%'):
+async def render_major_dashboard(q, program_id, location, width='100%'):
     '''
     Renders the dashboard with explored majors
     :param q: instance of Q for wave query
-    :param title: title to be displayed
-    :param row: result of query to program_requirements table
+    :param program_id: id of program to be displayed
     :param location: page location to display
-    :return:
     '''
-    ge_total = q.app.ge_total
+
+    # get program name
+    query = '''
+        SELECT b.name || ' in ' || a.name as degree_program
+        FROM programs a, degrees b 
+        WHERE a.id = ? AND a.degree_id = b.id 
+    '''
+    row = query_row(query, (program_id,), q.app.c)
+    title = row[0]
+
+    # get program summary
+    query = '''
+        SELECT major, related_ge, related_elective, remaining_ge, remaining_elective, total
+        FROM program_requirements
+        WHERE program_id = ?
+    '''
+    row = query_row(query, (program_id,), q.app.c)
+    major, related_ge, related_elective, remaining_ge, remaining_elective, total = row
+
     return add_card(q, 'major_dashboard', ui.form_card(
         box=ui.box(location, width=width),
         items=[
@@ -547,27 +422,27 @@ async def render_major_dashboard(q, title, row, location, width='100%'):
                 items=[
                     ui.stat(
                         label='Major',
-                        value=str(row['major']),
+                        value=str(major),
                         caption='Required Core',
                         icon='Trackers'),
                     ui.stat(
                         label='Required',
-                        value=str(row['related_ge']+row['related_elective']),
+                        value=str(related_ge + related_elective),
                         caption='Required Related',
                         icon='News'),
                     ui.stat(
                         label='General Education',
-                        value=str(ge_total-row['related_ge']),
+                        value=str(remaining_ge),
                         caption='Remaining GE',
                         icon='TestBeaker'),
                     ui.stat(
                         label='Elective',
-                        value=str(row['remaining']-(ge_total-row['related_ge'])-row['related_elective']),
+                        value=str(remaining_elective),
                         caption='Remaining Elective',
                         icon='Media'),
                     ui.stat(
                         label='TOTAL',
-                        value=str(row['total']),
+                        value=str(total),
                         caption='Total Credits',
                         icon='Education'),
             ])
@@ -586,7 +461,6 @@ def create_table_group(group_name, record_type, records, collapsed):
             ]
         ) for record in records if record['type'].upper() == record_type
     ], collapsed=collapsed)
-
 
 def render_course_table2(q, records,
                          which=['MAJOR','REQUIRED'],
@@ -709,49 +583,93 @@ def render_course_table(q, records, which=['MAJOR'], title='Major Required Cours
 async def render_majors_discovery(q, program_id, compare=False):
     '''
     Create the bottom half of the majors page given a program_id
+    Compare: need to fix
+        For making side-by-side comparisons
     '''
-    query = '''
-        SELECT b.name || ' in ' || a.name as degree_program
-        FROM programs a, degrees b 
-        WHERE a.id = ? AND a.degree_id = b.id 
-    '''
-    row = query_row(query, (program_id,), q.app.c)
-    title = row[0]
+
+    # make this query into a view: major_records_view
 
     query = '''
         SELECT 
             id,
             course, 
-            course_type AS type,
-            course_type_id,
+            course_type as type,
             title,
             credits,
-            description,
             pre,
             pre_credits,
-            substitutions
-        FROM program_requirements_view 
-        WHERE program_requirements_id = (
-            SELECT id FROM program_requirements WHERE program_id = ?
-        )
+            substitutions,
+            description
+        FROM program_requirements_view
+        WHERE program_id = ?
     '''
     df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
     major_records = df.to_dict('records')
 
-    query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
-    rows = df.to_dict('records')
-    row = rows[0]
+    #query = 'SELECT * FROM program_requirements WHERE program_id = ?'
+    #df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
+    #rows = df.to_dict('records')
+    #row = rows[0]
 
     if compare:
         #width='50%'
-        location = 'horizontal'
+        card_location = 'horizontal'
     else:
         #width='100%'
-        location = 'vertical'
+        card_location = 'vertical'
 
-    await render_major_dashboard(q, title, row, 'middle_' + location)
-    await render_major_table(q, major_records, 'bottom_' + location)
+    await render_major_dashboard(q, program_id, location='middle_' + card_location)
+    await render_major_table(q, major_records, 'bottom_' + card_location)
+
+#async def render_majors_discovery_old(q, program_id, compare=False):
+#    '''
+#    Create the bottom half of the majors page given a program_id
+#    Compare: need to fix
+#        For making side-by-side comparisons
+#    '''
+#    query = '''
+#        SELECT b.name || ' in ' || a.name as degree_program
+#        FROM programs a, degrees b
+#        WHERE a.id = ? AND a.degree_id = b.id
+#    '''
+#    row = query_row(query, (program_id,), q.app.c)
+#    title = row[0]
+#
+#    # make this query into a view: major_records_view
+#
+#    query = '''
+#        SELECT
+#            id,
+#            course,
+#            type,
+#            course_type_id,
+#            title,
+#            credits,
+#            description,
+#            pre,
+#            pre_credits,
+#            substitutions
+#        FROM major_dashboard_view
+#        JOIN program_requirements_old b ON a.program_requirements_id = b.id
+#        WHERE program_id = ?
+#    '''
+#    df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
+#    major_records = df.to_dict('records')
+#
+#    query = 'SELECT * FROM program_requirements WHERE program_id = ?'
+#    df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
+#    rows = df.to_dict('records')
+#    row = rows[0]
+#
+#    if compare:
+#        #width='50%'
+#        location = 'horizontal'
+#    else:
+#        #width='100%'
+#        location = 'vertical'
+#
+#    #await render_major_dashboard(q, title, row, 'middle_' + location)
+#    #await render_major_table(q, major_records, 'bottom_' + location)
 
 def render_ge_table(q, records, which=['GENERAL'], title='Select General Education Courses', location='middle_horizontal', table_height='500px', table_width='700px'):
     # Renders a table for the courses tab
@@ -788,8 +706,8 @@ def render_ge_table(q, records, which=['GENERAL'], title='Select General Educati
                     ),
                     ui.table_column(name='actions', label='Menu',
                         cell_type=ui.menu_table_cell_type(name='commands', commands=[
-                            ui.command(name='description', label='Course Description'),
-                            ui.command(name='prerequisites', label='Show Prerequisites'),
+                            ui.command(name='view_description', label='Course Description'),
+                            ui.command(name='view_prerequisites', label='Show Prerequisites'),
                             #ui.command(name='delete', label='Delete'),
                         ])
                     )
@@ -844,8 +762,8 @@ def render_elective_table(q, records, which=['ELECTIVE'], title='Select Elective
                     ),
                     ui.table_column(name='actions', label='Menu',
                         cell_type=ui.menu_table_cell_type(name='commands', commands=[
-                            ui.command(name='description', label='Course Description'),
-                            ui.command(name='prerequisites', label='Show Prerequisites'),
+                            ui.command(name='view_description', label='Course Description'),
+                            ui.command(name='view_prerequisites', label='Show Prerequisites'),
                             #ui.command(name='delete', label='Delete'),
                         ])
                     )
@@ -943,6 +861,13 @@ def dropdown_menus(q, location='horizontal'):
             )
         ]
     )
+
+query = '''
+SELECT DISTINCT menu_area_id 
+FROM menu_programs_by_areas
+WHERE menu_degree_id = ?
+ORDER BY menu_area_id
+'''
 
 def dropdown_menus_vertical(q, location='horizontal', demo=True):
     menu_width = '250px'
@@ -1233,4 +1158,3 @@ def stats(D):
 #            ui.stat(label='CREDITS LEFT', value=str(total_credits_remaining)), 
 #        ]
 #    )
-
