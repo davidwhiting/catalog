@@ -16,87 +16,11 @@ import cards
 # utils contains all other python functions
 import utils
 
-from utils import add_card, single_query, query_row
+from utils import add_card, query_row
 
 async def on_startup():
     # Set up logging
     logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
-
-#def on_shutdown():
-
-# Moved to q.app
-# connect sqlite3
-
-conn = sqlite3.connect('UMGC.db')
-c = conn.cursor()
-
-#c.execute("SELECT * FROM progress WHERE student_id=?", (student_id_value,))
-
-# Pick this up from login activity
-student_info_id = 0 # Guest profile, default
-student_info_id = 3 # student with transfer credit
-student_info_id = 1 # new student
-
-#student_name = q.user.name
-
-student_progress_query = 'SELECT * FROM student_progress WHERE student_info_id={}'.format(student_info_id)
-
-df2 = pd.read_sql_query(templates.complete_student_records_query, conn, params=(student_info_id,))
-df_raw = pd.read_sql_query(templates.complete_student_records_query_old, conn, params=(student_info_id,))
-
-#df = pd.read_sql_query("SELECT * FROM student_progress WHERE student_id=?", conn, params=(student_id_value,))
-
-course_summary = df_raw.groupby(['type','completed']).agg(
-    n=('credits', 'count'),
-    total=('credits', 'sum')
-).reset_index()
-
-# pick up start_term from the form
-start_term = 'SPRING 2024'
-
-# may need to rewrite this for later
-# df and headers contain information for the d3 diagram
-#need to make this await
-df_d3, headers = utils.prepare_d3_data(df_raw, start_term.upper())
-
-# df_raw contains information for the class table in courses tab
-# I am currently converting to a dictionary, perhaps not needed
-df_raw = df_raw.merge(headers[['period', 'name']].rename(columns={'name': 'term'}), on='period', how='left')
-#df_raw = df_raw.merge(df2[['description','pre_classes', 'pre_credits']], on='class_id', how='left')
-
-# this is a quick hack for the demo
-# need to fix the logic
-
-student_progress_records = df_raw.to_dict('records')
-student_records_no_schedule = df2.to_dict('records')
-
-terms_remaining = max(headers.period)
-completion_date = headers.loc[headers['period'] == terms_remaining, 'name'].values[0].capitalize()
-total_credits_remaining = df_d3['credits'].sum()
-credits_next_term = headers.loc[headers['period'] == 1, 'credits'].values[0]
-
-# Convert to json for passing along to our d3 function
-#json_data = df_d3.to_json(orient='records')
-
-tuition = {
-    'in_state': 324,
-    'out_of_state': 499,
-    'military': 250
-}
-
-cost_per_credit = tuition['military']
-total_cost_remaining = "${:,}".format(total_credits_remaining * cost_per_credit)
-next_term_cost = "${:,}".format(credits_next_term * cost_per_credit)
-
-# Convert to json for passing along to our d3 function
-df_json = df_d3.to_json(orient='records')
-headers_json = headers.to_json(orient='records')
-
-html_template = templates.html_code_minimal.format(
-    javascript=templates.javascript_draw_only,
-    headers=headers_json, 
-    data=df_json)
-#    html_template = templates.html_code.format(javascript=d3_js_script_path, data=json_data)
 
 # Remove all the cards related to navigation.
 def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
@@ -106,17 +30,6 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
         if name not in ignore:
             del q.page[name]
             q.client.cards.remove(name)
-
-#home_tabs = [
-#    ui.tab(name='email', label='Mail', icon='Mail'),
-#    ui.tab(name='events', label='Events', icon='Calendar'),
-#    ui.tab(name='spam', label='Spam'),
-#]
-
-#def get_tab_content(category: str):
-#    # Return a checklist of dummy items.
-#    items = [f'{category.title()} {i}' for i in range(1, 11)]
-#    return ui.checklist(name='items', choices=[ui.choice(name=item, label=item) for item in items])
 
 ###############################################################################
 @on('#home')
@@ -128,7 +41,7 @@ async def home(q: Q):
     add_card(q, 'project_table_location', card)
 
     ## Debug Information
-    add_card(q, 'params', cards.render_debug_card(q, location='d3'))
+    #add_card(q, 'params', cards.render_debug_card(q, location='d3'))
 
 ###############################################################################
 
@@ -590,6 +503,65 @@ async def electives(q: Q):
 async def schedule(q: Q):
     clear_cards(q)  
 
+    # Pick this up from login activity
+    student_info_id = 0 # Guest profile, default
+    student_info_id = 3 # student with transfer credit
+    student_info_id = 1 # new student
+
+    #student_name = q.user.name
+    student_progress_query = 'SELECT * FROM student_progress WHERE student_info_id={}'.format(student_info_id)
+    df2 = pd.read_sql_query(templates.complete_student_records_query, q.app.conn, params=(student_info_id,))
+    df_raw = pd.read_sql_query(templates.complete_student_records_query_old, q.app.conn, params=(student_info_id,))
+    #df = pd.read_sql_query("SELECT * FROM student_progress WHERE student_id=?", conn, params=(student_id_value,))
+    course_summary = df_raw.groupby(['type','completed']).agg(
+        n=('credits', 'count'),
+        total=('credits', 'sum')
+    ).reset_index()
+    # pick up start_term from the form
+    start_term = 'SPRING 2024'
+    # may need to rewrite this for later
+    # df and headers contain information for the d3 diagram
+    #need to make this await
+    df_d3, headers = utils.prepare_d3_data(df_raw, start_term.upper())
+    # df_raw contains information for the class table in courses tab
+    # I am currently converting to a dictionary, perhaps not needed
+    df_raw = df_raw.merge(headers[['period', 'name']].rename(columns={'name': 'term'}), on='period', how='left')
+    #df_raw = df_raw.merge(df2[['description','pre_classes', 'pre_credits']], on='class_id', how='left')
+
+    # this is a quick hack for the demo
+    # need to fix the logic
+    student_progress_records = df_raw.to_dict('records')
+    student_records_no_schedule = df2.to_dict('records')
+
+    terms_remaining = max(headers.period)
+    completion_date = headers.loc[headers['period'] == terms_remaining, 'name'].values[0].capitalize()
+    total_credits_remaining = df_d3['credits'].sum()
+    credits_next_term = headers.loc[headers['period'] == 1, 'credits'].values[0]
+
+    # Convert to json for passing along to our d3 function
+    #json_data = df_d3.to_json(orient='records')
+
+    tuition = {
+        'in_state': 324,
+        'out_of_state': 499,
+        'military': 250
+    }
+
+    cost_per_credit = tuition['military']
+    total_cost_remaining = "${:,}".format(total_credits_remaining * cost_per_credit)
+    next_term_cost = "${:,}".format(credits_next_term * cost_per_credit)
+
+    # Convert to json for passing along to our d3 function
+    df_json = df_d3.to_json(orient='records')
+    headers_json = headers.to_json(orient='records')
+
+    html_template = templates.html_code_minimal.format(
+        javascript=templates.javascript_draw_only,
+        headers=headers_json, 
+        data=df_json)
+    add_card(q, 'd3plot', cards.d3plot(html_template, 'd3'))
+
+
 #    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
     # Generate the following automatically
     add_card(q, 'selected_major',
@@ -610,7 +582,6 @@ async def schedule(q: Q):
     #        ]
     #))
 
-    add_card(q, 'd3plot', cards.d3plot(html_template, 'd3'))
 
     demo = True
     Sessions = ['Session 1', 'Session 2', 'Session 3']
@@ -807,24 +778,24 @@ async def initialize_app(q: Q):
     """
     Initialize the app.
     """
+    q.app.initialized = True
     logging.info('Initializing app')
 
     q.app.umgc_logo, = await q.site.upload(['images/umgc-logo-white.png'])
     q.app.conn = sqlite3.connect('UMGC.db')
+    #q.app.conn.row_factory = sqlite3.Row  # return dictionaries rather than tuples
     q.app.c = q.app.conn.cursor()
     q.app.ge_total = 41 # total ge credits
-
     q.app.start_term = 'Spring 2024'
 
     # Load default General Education information
-    df = pd.read_sql_query('SELECT * FROM ge_view', q.app.conn)
-    q.app.ge_records = df.to_dict('records')
+    #df = pd.read_sql_query('SELECT * FROM ge_view', q.app.conn)
+    #q.app.ge_records = df.to_dict('records')
 
-    q.app.initialized = True
 
 async def initialize_user(q: Q) -> None:
     """
-    Initialize the app.
+    Initialize the user.
     """
     logging.info('Initializing user')
 
@@ -882,9 +853,6 @@ async def initialize_user(q: Q) -> None:
         if not hasattr(q.user, 'records'):
             q.user.ge_records = q.app.ge_records
 
-
-
-
     # End of student information
 
     q.user.initialized = True
@@ -915,10 +883,6 @@ async def initialize_client(q: Q) -> None:
 #    await q.page.save()
 
 ## need to fix so broadcast and multicast work correctly
-
-    #@app('/demo')
-    #async def serve(q: Q):
-        #await q.page.save()
 
 @app('/', mode='unicast', on_startup=on_startup)
 async def serve(q: Q):
