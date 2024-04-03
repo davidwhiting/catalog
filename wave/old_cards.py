@@ -164,3 +164,48 @@ def rao_table(location='middle_horizontal'):
 
     return card
 
+###################################
+
+# Example usage
+periods = generate_periods(start_term='SPRING 2024', max_courses=3, max_credits=10, sessions=[1, 3], summer=True, length=30)
+for period in periods:
+    print(period)
+
+periods = [
+    { "id":  1, "term": "WINTER", "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id":  2, "term": "WINTER", "session": 2, "year": 2024, "max_courses": 0, "max_credits": 10, "previous": 2 },
+    { "id":  3, "term": "WINTER", "session": 3, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id":  4, "term": "SPRING", "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id":  5, "term": "SPRING", "session": 2, "year": 2024, "max_courses": 0, "max_credits": 10, "previous": 2 },
+    { "id":  6, "term": "SPRING", "session": 3, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id":  7, "term": "SUMMER", "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id":  8, "term": "SUMMER", "session": 2, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id":  9, "term": "FALL",   "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id": 10, "term": "FALL",   "session": 2, "year": 2024, "max_courses": 0, "max_credits": 10, "previous": 2 },
+    { "id": 11, "term": "FALL",   "session": 3, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id": 12, "term": "WINTER", "session": 1, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id": 13, "term": "WINTER", "session": 2, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id": 14, "term": "WINTER", "session": 3, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id": 15, "term": "SPRING", "session": 1, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id": 16, "term": "SPRING", "session": 2, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id": 17, "term": "SPRING", "session": 3, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id": 18, "term": "SUMMER", "session": 1, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id": 19, "term": "SUMMER", "session": 2, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id": 20, "term": "FALL",   "session": 1, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 1 },
+    { "id": 21, "term": "FALL",   "session": 2, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 2 },
+    { "id": 22, "term": "FALL",   "session": 3, "year": 2025, "max_courses": 3, "max_credits": 10, "previous": 2 }
+]
+
+# WINTER SESSION 1
+# WINTER SESSION 2
+# WINTER SESSION 3
+# SPRING SESSION 1
+# SPRING SESSION 2
+# SPRING SESSION 3
+# SUMMER SESSION 1
+# SUMMER SESSION 2
+# FALL   SESSION 1
+# FALL   SESSION 2
+# FALL   SESSION 3
+
+

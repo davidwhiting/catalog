@@ -1,7 +1,7 @@
 from h2o_wave import ui
 from typing import Optional, List
 from utils import get_query, get_query_one
-
+import pandas as pd
 import sys
 
 async def get_choices(q, query, params=()):
@@ -105,16 +105,10 @@ program_query = '''
 def render_debug_card(q, location='bottom_horizontal', width='33%'):
     content = f'''
 ### q.args.degree value:
-{q.args.degree}
-
-### q.args.area_of_study value:
-{q.args.area_of_study}
-
-### q.args.program value:
-{q.args.program}
-
-### q.args value:
-{q.args}
+- q.args.degree value: {q.args.degree}
+- q.args.area_of_study value: {q.args.area_of_study}
+- q.args.program value: {q.args.program}
+- q.args value: {q.args}
 
     '''
     return ui.markdown_card(
@@ -125,14 +119,11 @@ def render_debug_card(q, location='bottom_horizontal', width='33%'):
 
 def render_debug_client_card(q, location='bottom_horizontal', width='33%'):
     content = f'''
-### q.client.degree value:
-{q.client.degree}
 
-### q.client.area_of_study value:
-{q.client.area_of_study}
-
-### q.client.program value:
-{q.client.program}
+### dropdown menu
+- q.client.degree value: {q.client.degree}
+- q.client.area_of_study value: {q.client.area_of_study}
+- q.client.program value: {q.client.program}
 
 ### q.client value:
 {q.client}
@@ -343,7 +334,127 @@ This app is in pre-alpha stage. Feedback welcomed.
     '''
 )
 
+def render_major_table_group(group_name, record_type, records, collapsed):
+    return ui.table_group(group_name, [
+        ui.table_row(
+            name=str(record['id']),
+            cells=[
+                record['course'],
+                record['title'],
+                str(record['credits']),
+                #record['description'],
+                record['type'].upper(),
+            ]
+        ) for record in records if record['type'].upper() == record_type
+    ], collapsed=collapsed)
 
+async def render_major_table(q, records, location='bottom_vertical', cardname='my_test_table', width='100%', ge=False, elective=False):
+    
+    def _render_major_table_group(group_name, record_type, records, collapsed):
+        return ui.table_group(group_name, [
+            ui.table_row(
+                name=str(record['id']),
+                cells=[
+                    record['course'],
+                    record['title'],
+                    str(record['credits']),
+                    #record['description'],
+                    record['type'].upper(),
+                ]
+            ) for record in records if record['type'].upper() == record_type
+        ], collapsed=collapsed)
+
+    return add_card(q, cardname, ui.form_card(
+        box=ui.box(location, height='350px', width=width),
+        items=[
+            #ui.text(title, size=ui.TextSize.L),
+            ui.table(
+                name='table',
+                downloadable=False,
+                resettable=False,
+                groupable=False,
+                height='350px',
+                columns=[
+                    # ui.table_column(name='seq', label='Seq', data_type='number'),
+                    ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
+                    ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300',
+                                    cell_overflow='wrap'),
+                    ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
+                                    align='center'),
+                    ui.table_column(
+                        name='tag',
+                        label='Type',
+                        min_width='190',
+                        filterable=True,
+                        cell_type=ui.tag_table_cell_type(
+                            name='tags',
+                            tags=[
+                                ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
+                                ui.tag(label='REQUIRED', color='$red'),
+                                ui.tag(label='GENERAL', color='#046A38'),
+                                ui.tag(label='MAJOR', color='#1565C0'),
+                            ]
+                        )
+                    ),
+                    ui.table_column(name='menu', label='Menu', max_width='150',
+                        cell_type=ui.menu_table_cell_type(name='commands', commands=[
+                            ui.command(name='description', label='Course Description'),
+                            ui.command(name='prerequisites', label='Show Prerequisites'),
+                    ]))
+                ],
+                groups=[
+                    _render_major_table_group(
+                        'Required Major Core Courses',
+                        'MAJOR',
+                        records,
+                        True),
+                    _render_major_table_group(
+                        'Required Related Courses/General Education',
+                        'REQUIRED,GENERAL',
+                        records,
+                        True),
+                    _render_major_table_group(
+                        'Required Related Courses/Electives',
+                        'REQUIRED,ELECTIVE',
+                        records,
+                        True),
+                    #_render_major_table_group(
+                    #    'General Education',
+                    #    'GENERAL',
+                    #    major_records,
+                    #    True),
+                    #_render_major_table_group(
+                    #    'Electives',
+                    #    'ELECTIVE',
+                    #    major_records,
+                    #    True)
+            # ui.text(title, size=ui.TextSize.L),
+        ])]
+    ))
+
+async def render_majors_coursework(q, location='bottom_vertical'):
+    '''
+    Create major coursework requirement table
+    '''
+    query = '''
+        SELECT 
+            id,
+            course, 
+            course_type as type,
+            title,
+            credits,
+            pre,
+            pre_credits,
+            substitutions,
+            description
+        FROM program_requirements_view
+        WHERE program_id = ?
+    '''
+    df = pd.read_sql_query(query, q.user.conn, params=(q.user.program_id,))
+    major_records = df.to_dict('records')
+    q.user.major_coursework_df = df
+    
+    await render_major_table(q, major_records, location)
 
 def d3plot(html, location='horizontal', height='500px', width='100%'):
     card = ui.frame_card(

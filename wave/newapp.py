@@ -52,9 +52,10 @@ async def course(q: Q):
                                                   caption='Lorem ipsum dolor sit amet'))
 ###########################################################
 
-#@on('#schedule')
-#async def schedule(q: Q):
-#    clear_cards(q)  
+@on('#schedule')
+async def schedule(q: Q):
+    clear_cards(q)  
+    await home(q)
 #    pass
 #    #add_card(q, 'major_recommendations', 
 #    #    cards.render_major_recommendation_card(q, location='top_horizontal'))
@@ -164,6 +165,7 @@ async def program(q: Q):
 
     # display major dashboard
     await cards.render_major_dashboard(q, location='middle_vertical')
+    await cards.render_majors_coursework(q, location='middle_vertical')
     # get program name
 
     q.page['debug_info'] = cards.render_debug_card(q) # update debug card

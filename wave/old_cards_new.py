@@ -242,9 +242,8 @@ def render_major_table_group(group_name, record_type, records, collapsed):
         ) for record in records if record['type'].upper() == record_type
     ], collapsed=collapsed)
 
-async def render_major_table(q, records, location='bottom_vertical', width='100%', ge=False, elective=False):
-    return add_card(q, 'my_test_table', ui.form_card(
-        #        box=ui.box(location, width=table_width, height=table_height),
+async def render_major_table(q, records, cardname='my_test_table', location='bottom_vertical', width='100%', ge=False, elective=False):
+    return add_card(q, cardname, ui.form_card(
         box=ui.box(location, height='350px', width=width),
         items=[
             #ui.text(title, size=ui.TextSize.L),
@@ -280,9 +279,7 @@ async def render_major_table(q, records, location='bottom_vertical', width='100%
                         cell_type=ui.menu_table_cell_type(name='commands', commands=[
                             ui.command(name='description', label='Course Description'),
                             ui.command(name='prerequisites', label='Show Prerequisites'),
-                    #                    # ui.command(name='delete', label='Delete'),
-                        ])
-                                )
+                    ]))
                 ],
                 groups=[
                     render_major_table_group(
@@ -314,8 +311,6 @@ async def render_major_table(q, records, location='bottom_vertical', width='100%
 
         ])]
     ))
-
-
 
 def create_table_group(group_name, record_type, records, collapsed):
     return ui.table_group(group_name, [
@@ -449,7 +444,23 @@ def render_course_table(q, records, which=['MAJOR'], title='Major Required Cours
 
     return result
 
-async def render_majors_discovery(q, program_id, compare=False):
+query = '''
+    SELECT 
+        id, 
+        course, 
+        course_id, 
+        course_type as type, 
+        title, 
+        credits, 
+        description, 
+        pre, 
+        pre_credits, 
+        substitutions 
+    FROM program_requirements_view 
+    WHERE program_id = ?
+'''
+
+async def render_majors_discovery_old(q, program_id, compare=False):
     '''
     Create the bottom half of the majors page given a program_id
     Compare: need to fix
@@ -472,6 +483,8 @@ async def render_majors_discovery(q, program_id, compare=False):
         FROM program_requirements_view
         WHERE program_id = ?
     '''
+
+
     df = pd.read_sql_query(query, q.app.conn, params=(program_id,))
     major_records = df.to_dict('records')
 
@@ -488,7 +501,10 @@ async def render_majors_discovery(q, program_id, compare=False):
         card_location = 'vertical'
 
     await render_major_dashboard(q, program_id, location='middle_' + card_location)
+
     await render_major_table(q, major_records, 'bottom_' + card_location)
+
+
 
 def render_ge_table(q, records, which=['GENERAL'], title='Select General Education Courses', location='middle_horizontal', table_height='500px', table_width='700px'):
     # Renders a table for the courses tab

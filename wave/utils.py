@@ -86,6 +86,74 @@ class TimedSQLiteConnection:
             self.connection.close()
             self.connection = None
 
+## Periods are the framework into which courses will be scheduled.
+
+def generate_periods(start_term='SPRING 2024', max_courses=3, max_credits=10, sessions=[1, 3], summer=True, length=30):
+    # Define terms and initialize year
+    terms = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
+    year_start = int(start_term.split()[1])
+    current_term_index = terms.index(start_term.split()[0])
+    
+    # Initialize periods list
+    periods = []
+    
+    # Iterate through the specified length of terms
+    for i in range(length):
+        # Calculate term and session
+        term_index = (current_term_index + i) % len(terms)
+        term = terms[term_index]
+        year = year_start + (current_term_index + i) // len(terms)
+        session = (i % 3) + 1
+        
+        # Check if term is summer and session is in the specified sessions
+        if term == 'SUMMER' and session not in sessions:
+            max_courses = 0
+        else:
+            max_courses = max_courses
+            
+        # Calculate previous value
+        previous = 1 if session == 1 else 2
+        
+        # Append period to the periods list
+        periods.append({
+            "id": i + 1,
+            "term": term,
+            "session": session,
+            "year": year,
+            "max_courses": max_courses,
+            "max_credits": max_credits,
+            "previous": previous
+        })
+    
+    return periods
+
+def update_periods(periods, condition, update_values):
+    # Convert periods to a DataFrame
+    periods_df = pd.DataFrame(periods)
+    
+    # Apply conditions
+    mask = periods_df.eval(condition)
+    
+    # Update values
+    periods_df.loc[mask, update_values.keys()] = update_values.values()
+    
+    # Convert DataFrame back to a list of dictionaries
+    updated_periods = periods_df.to_dict(orient='records')
+    
+    return updated_periods
+
+## Example usage
+#periods = [
+#    {"id": 1, "term": "WINTER", "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1},
+#    {"id": 2, "term": "WINTER", "session": 2, "year": 2024, "max_courses": 0, "max_credits": 10, "previous": 2},
+#    {"id": 3, "term": "SPRING", "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1},
+#    {"id": 4, "term": "SPRING", "session": 2, "year": 2024, "max_courses": 0, "max_credits": 10, "previous": 2}
+#]
+#
+## Update max_courses for SPRING 2024 to 0
+#updated_periods = update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
+
+
 def prepare_d3_data(df, start_term='SPRING 2024'):
 
     def set_colors(row):
