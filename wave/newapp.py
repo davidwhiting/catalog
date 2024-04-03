@@ -123,15 +123,18 @@ async def initialize_client(q: Q):
 @on()
 async def degree(q: Q):
     logging.info('The value of degree is ' + str(q.args.degree))
-    q.client.degree = q.args.degree
+    q.user.degree = q.args.degree
+    if q.user.degree != '2':
+        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
+        del q.user.major_coursework_df
     # reset area_of_study if degree changes
-    q.client.area_of_study = None 
-    q.page['dropdown'].area_of_study.value = q.client.area_of_study
+    q.user.area_of_study = None 
+    q.page['dropdown'].area_of_study.value = q.user.area_of_study
     # reset program if degree changes
-    q.client.program = None 
-    q.page['dropdown'].program.value = q.client.program
+    q.user.program = None 
+    q.page['dropdown'].program.value = q.user.program
 
-    q.page['dropdown'].area_of_study.choices = await get_choices(q, cards.area_query, (q.client.degree,))
+    q.page['dropdown'].area_of_study.choices = await get_choices(q, cards.area_query, (q.user.degree,))
 
     q.page['debug_info'] = cards.render_debug_card(q) # update debug card
     q.page['debug_client_info'] = cards.render_debug_client_card(q)
@@ -141,11 +144,15 @@ async def degree(q: Q):
 @on()
 async def area_of_study(q: Q):
     logging.info('The value of area_of_study is ' + str(q.args.degree))
-    q.client.area_of_study = q.args.area_of_study
-    # reset program if degree changes
-    q.client.program = None 
-    q.page['dropdown'].program.value = q.client.program
-    q.page['dropdown'].program.choices = await get_choices(q, cards.program_query, (q.client.degree, q.client.area_of_study))
+    q.user.area_of_study = q.args.area_of_study
+    if q.user.degree != '2':
+        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
+        del q.user.major_coursework_df
+
+    # reset program if area_of_study changes
+    q.user.program = None 
+    q.page['dropdown'].program.value = q.user.program
+    q.page['dropdown'].program.choices = await get_choices(q, cards.program_query, (q.user.degree, q.user.area_of_study))
 
     q.page['debug_info'] = cards.render_debug_card(q) # update debug card
     q.page['debug_client_info'] = cards.render_debug_client_card(q)
@@ -155,17 +162,18 @@ async def area_of_study(q: Q):
 @on()
 async def program(q: Q):
     logging.info('The value of program is ' + str(q.args.degree))
-    q.client.program = q.args.program
-    # save to user and get program name
-    q.user.degree = q.client.degree
-    q.user.area_of_study = q.client.area_of_study
-    q.user.program = q.client.program
+    q.user.program = q.args.program
     q.user.program_id = q.user.program # program_id an alias used throughout
     q.user.degree_program = await utils.get_program_title(q, q.user.program_id)
 
     # display major dashboard
-    await cards.render_major_dashboard(q, location='middle_vertical')
-    await cards.render_majors_coursework(q, location='middle_vertical')
+    if q.user.degree == '2':
+        await cards.render_major_dashboard(q, location='middle_vertical')
+        await cards.render_majors_coursework(q, location='middle_vertical')
+    else:
+        clear_cards(q,['major_recommendations', 'dropdown'])
+        del q.user.major_coursework_df
+
     # get program name
 
     q.page['debug_info'] = cards.render_debug_card(q) # update debug card
