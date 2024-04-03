@@ -210,8 +210,6 @@ fallback = ui.form_card(
     items=[ui.text('Uh-oh, something went wrong!')]
 )
 
-
-
 def render_tag_column(width='120'):
     result = ui.table_column(
         name='tag', 
@@ -229,22 +227,6 @@ def render_tag_column(width='120'):
         )
     )
     return result
-
-tag_column = ui.table_column(
-    name='tag', 
-    label='Type', 
-    min_width='100',
-    filterable=True,
-    cell_type=ui.tag_table_cell_type(
-        name='tags',
-        tags=[
-            ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
-            ui.tag(label='REQUIRED', color='$red'),
-            ui.tag(label='GENERAL', color='#046A38'),
-            ui.tag(label='MAJOR', color='#1565C0'),
-        ]
-    )
-)
 
 def render_major_table_group(group_name, record_type, records, collapsed):
     return ui.table_group(group_name, [
@@ -333,66 +315,7 @@ async def render_major_table(q, records, location='bottom_vertical', width='100%
         ])]
     ))
 
-async def render_major_dashboard(q, program_id, location, width='100%'):
-    '''
-    Renders the dashboard with explored majors
-    :param q: instance of Q for wave query
-    :param program_id: id of program to be displayed
-    :param location: page location to display
-    '''
 
-    # get program name
-    query = '''
-        SELECT b.name || ' in ' || a.name as degree_program
-        FROM programs a, degrees b 
-        WHERE a.id = ? AND a.degree_id = b.id 
-    '''
-    row = query_row(query, (program_id,), q.app.c)
-    title = row[0]
-
-    # get program summary
-    query = '''
-        SELECT major, related_ge, related_elective, remaining_ge, remaining_elective, total
-        FROM program_requirements
-        WHERE program_id = ?
-    '''
-    row = query_row(query, (program_id,), q.app.c)
-    major, related_ge, related_elective, remaining_ge, remaining_elective, total = row
-
-    return add_card(q, 'major_dashboard', ui.form_card(
-        box=ui.box(location, width=width),
-        items=[
-            ui.text(title + ': Credits', size=ui.TextSize.L),
-            ui.stats(
-                # justify='between',
-                items=[
-                    ui.stat(
-                        label='Major',
-                        value=str(major),
-                        caption='Required Core',
-                        icon='Trackers'),
-                    ui.stat(
-                        label='Required',
-                        value=str(related_ge + related_elective),
-                        caption='Required Related',
-                        icon='News'),
-                    ui.stat(
-                        label='General Education',
-                        value=str(remaining_ge),
-                        caption='Remaining GE',
-                        icon='TestBeaker'),
-                    ui.stat(
-                        label='Elective',
-                        value=str(remaining_elective),
-                        caption='Remaining Elective',
-                        icon='Media'),
-                    ui.stat(
-                        label='TOTAL',
-                        value=str(total),
-                        caption='Total Credits',
-                        icon='Education'),
-            ])
-    ]))
 
 def create_table_group(group_name, record_type, records, collapsed):
     return ui.table_group(group_name, [
@@ -700,183 +623,8 @@ def select_semester(q, location='horizontal'):
         ]
     )
 
-def dropdown_menus(q, location='horizontal'):
-    menu_width = '250px'
-    return ui.form_card(
-        box=location,
-        items=[
-            ui.inline(
-                items=[
-                    ui.dropdown(
-                        name='degree', 
-                        label='Degree', 
-                        value=q.args.degree,
-                        trigger=True,
-                        width=menu_width,
-                        choices=[
-                            ui.choice(name='AS', label="Associate"),
-                            ui.choice(name='BS', label="Bachelor's"),
-                            ui.choice(name='MS', label="Master's"),
-                            ui.choice(name='DC', label="Doctorate"),
-                            ui.choice(name='UC', label="Undergraduate Certificate"),
-                            ui.choice(name='GC', label="Graduate Certificate")
-                    ]),
-                    ui.dropdown(
-                        name='area_of_study', 
-                        label='Area of Study', 
-                        value=q.args.area_of_study,
-                        trigger=False,
-                        disabled=False,
-                        width=menu_width,
-                        choices=[
-                            ui.choice(name='BM', label='Business & Management'),
-                            ui.choice(name='CS', label='Cybersecurity'),
-                            ui.choice(name='DA', label='Data Analytics'),
-                            ui.choice(name='ET', label='Education & Teaching'),
-                            ui.choice(name='HS', label='Healthcare & Science'),
-                            ui.choice(name='LA', label='Liberal Arts & Communications'),
-                            ui.choice(name='PS', label='Public Safety'),
-                            ui.choice(name='IT', label='IT & Computer Science')
-                    ]),
-                    ui.dropdown(
-                        name='major', 
-                        label='Major', 
-                        value=q.args.major,
-                        trigger=False,
-                        disabled=False,
-                        width=menu_width,
-                        choices=[
-                            ui.choice(name='AC', label='Accounting'),
-                            ui.choice(name='BA', label='Business Administration'),
-                            ui.choice(name='FI', label='Finance'),
-                            ui.choice(name='HR', label='Human Resource Management'),
-                            ui.choice(name='MS', label='Management Studies'),
-                            ui.choice(name='MK', label='Marketing'),
-                    ]),
-                ]
-            )
-        ]
-    )
-
-query = '''
-SELECT DISTINCT menu_area_id 
-FROM menu_programs_by_areas
-WHERE menu_degree_id = ?
-ORDER BY menu_area_id
-'''
-
-def dropdown_menus_vertical(q, location='horizontal', demo=True):
-    menu_width = '250px'
-    return ui.form_card(
-        box=location,
-        items=[
-            ui.dropdown(
-                name='degree',
-                label='Degree',
-                value='BS' if demo else q.args.degree,
-                trigger=True,
-                width=menu_width,
-                choices=[
-                    ui.choice(name='AS', label="Associate"),
-                    ui.choice(name='BS', label="Bachelor's"),
-                    ui.choice(name='MS', label="Master's"),
-                    ui.choice(name='DC', label="Doctorate"),
-                    ui.choice(name='UC', label="Undergraduate Certificate"),
-                    ui.choice(name='GC', label="Graduate Certificate")
-            ]),
-            ui.dropdown(
-                name='area_of_study',
-                label='Area of Study',
-                value='BM' if demo else q.args.area_of_study,
-                trigger=True,
-                disabled=False,
-                width=menu_width,
-                choices=[
-                    ui.choice(name='BM', label='Business & Management'),
-                    ui.choice(name='CS', label='Cybersecurity'),
-                    ui.choice(name='DA', label='Data Analytics'),
-                    ui.choice(name='ET', label='Education & Teaching'),
-                    ui.choice(name='HS', label='Healthcare & Science'),
-                    ui.choice(name='LA', label='Liberal Arts & Communications'),
-                    ui.choice(name='PS', label='Public Safety'),
-                    ui.choice(name='IT', label='IT & Computer Science')
-            ]),
-            ui.dropdown(
-                name='major',
-                label='Major',
-                value='BA' if demo else q.args.major,
-                trigger=True,
-                disabled=False,
-                width=menu_width,
-                choices=[
-                    ui.choice(name='AC', label='Accounting'),
-                    ui.choice(name='BA', label='Business Administration'),
-                    ui.choice(name='FI', label='Finance'),
-                    ui.choice(name='HR', label='Human Resource Management'),
-                    ui.choice(name='MS', label='Management Studies'),
-                    ui.choice(name='MK', label='Marketing'),
-            ]),
-        ]
-    )
-
-def dropdown_menus_vertical_compare(q, location='horizontal', demo=True):
-    menu_width = '250px'
-    return ui.form_card(
-        box=location,
-        items=[
-            ui.dropdown(
-                name='degree',
-                label='Degree',
-                #value=q.args.degree,
-                value='BS' if demo else q.args.degree,
-                trigger=True,
-                width=menu_width,
-                choices=[
-                    ui.choice(name='AS', label="Associate"),
-                    ui.choice(name='BS', label="Bachelor's"),
-                    ui.choice(name='MS', label="Master's"),
-                    ui.choice(name='DC', label="Doctorate"),
-                    ui.choice(name='UC', label="Undergraduate Certificate"),
-                    ui.choice(name='GC', label="Graduate Certificate")
-            ]),
-            ui.dropdown(
-                name='area_of_study',
-                label='Area of Study',
-                value='BM' if demo else q.args.area_of_study,
-                #value='BM',
-                trigger=True,
-                disabled=False,
-                width=menu_width,
-                choices=[
-                    ui.choice(name='BM', label='Business & Management'),
-                    ui.choice(name='CS', label='Cybersecurity'),
-                    ui.choice(name='DA', label='Data Analytics'),
-                    ui.choice(name='ET', label='Education & Teaching'),
-                    ui.choice(name='HS', label='Healthcare & Science'),
-                    ui.choice(name='LA', label='Liberal Arts & Communications'),
-                    ui.choice(name='PS', label='Public Safety'),
-                    ui.choice(name='IT', label='IT & Computer Science')
-            ]),
-            ui.dropdown(
-                name='major',
-                label='Major',
-                value='AC' if demo else q.args.major,
-                trigger=True,
-                disabled=False,
-                width=menu_width,
-                choices=[
-                    ui.choice(name='AC', label='Accounting'),
-                    ui.choice(name='BA', label='Business Administration'),
-                    ui.choice(name='FI', label='Finance'),
-                    ui.choice(name='HR', label='Human Resource Management'),
-                    ui.choice(name='MS', label='Management Studies'),
-                    ui.choice(name='MK', label='Marketing'),
-            ]),
-        ]
-    )
-
 # A meta card to hold the app's title, layouts, dialogs, theme and other meta information
-meta = ui.meta_card(
+old_meta = ui.meta_card(
         box='', 
         title='UMGC Wave App',
         theme='ember',
@@ -924,52 +672,102 @@ transfer_toggle = ui.form_card(box='grid', items=[
     ui.toggle(name='toggle', label='Transfer Credits', value=False, disabled=False),
 ])
 
-footer = ui.footer_card(
-    box='footer',
-    caption='''
-Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
-This app is in pre-alpha stage. Feedback welcomed.
-    '''
-)
+
 
 markdown = ui.form_card(
     box='leftnote',
     items=[ui.text(templates.sample_markdown)]
 )
 
-def get_header(image_path, q):
-    persona_image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'
-    commands = [
-        ui.command(name='profile', label='Profile', icon='Contact'),
-        ui.command(name='preferences', label='Preferences', icon='Settings'),
-        ui.command(name='logout', label='Logout', icon='SignOut'),
+############################################################
+#
+# Try converting a dataframe directly into a wave table
+#
+############################################################
+
+@app('/demo')
+async def serve(q: ui.Request):
+    if q.client.initial:
+        q.page['meta'] = ui.meta_card(box='')
+        q.page['controls'] = ui.form_card(box='1 1 2 2', items=[
+            ui.textbox(name='row', label='Row'),
+            ui.textbox(name='column', label='Column'),
+            ui.textbox(name='value', label='Value'),
+            ui.button(name='update', label='Update', primary=True),
+        ])
+        q.page['table'] = ui.table_card(
+            box='1 3 5 5', 
+            title='Data', 
+            rows=to_rows(df), 
+            columns=to_columns(df)
+        )
+        await q.page.save()
+    elif q.args.update:
+        row = int(q.args.row)
+        column = q.args.column
+        value = q.args.value
+        df.at[row, column] = value # update dataframe
+        q.page['table'].rows = to_rows(df)
+        await q.page.save()
+
+def to_rows(df):
+    return [ui.table_row(name=str(i), cells=[str(x) for x in row]) for i, row in df.iterrows()]
+
+def to_columns(df):
+    return [ui.table_column(name=col, label=col, sortable=True, editable=False) for col in df.columns]
+
+############### Example using pandas dataframes
+
+import pandas as pd
+from h2o_wave import Q, main, app, ui
+
+# Sample DataFrame
+data = {
+    'id': [1, 2, 3],
+    'name': ['John', 'Alice', 'Bob'],
+    'title': ['Engineer', 'Manager', 'Designer'],
+    'description': ['John is a skilled engineer.', 'Alice oversees project management.', 'Bob specializes in UI/UX design.']
+}
+df = pd.DataFrame(data)
+
+@app('/table_with_description')
+async def serve(q: Q):
+    # Define column definitions
+    columns = [
+        ui.table_column(name='id', label='ID', link=True),
+        ui.table_column(name='name', label='Name'),
+        ui.table_column(name='title', label='Title')
     ]
 
-    result = ui.header_card(
-        box='header',
-        title='UMGC',
-        #title='',
-        #subtitle='',
-        subtitle="Registration Assistant",
-        image=image_path,
-        secondary_items=[
-            ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
-                ui.tab(name='#home', label='Home'),
-                ui.tab(name='#student', label='Student Info'),
-                ui.tab(name='#major', label='Select Major'),
-                ui.tab(name='#courses', label='Select Courses'),
-                ui.tab(name='#schedule', label='Set Schedule'),
-            ]),
-        ],
-        items=[ui.textbox(name='textbox_default', label='Student Name', value='John Doe', disabled=True)],
-#        items=[ui.persona(title='John Doe', subtitle='Student', size='xs', image=persona_image)]
-    )
-    return result
+    # Create rows from the DataFrame
+    rows = [ui.table_row(**{col.name: row[col.name] for col in columns}) for _, row in df.iterrows()]
 
-def d3plot(html, location='horizontal', height='500px', width='100%'):
-    result = ui.frame_card(
-        box=ui.box(location, height=height, width=width),
-        title='Tentative Course Schedule',
-        content=html
+    # Create the table
+    table = ui.table(
+        name='example_table',
+        columns=columns,
+        rows=rows,
+        downloadable=True
     )
-    return result
+
+    # Respond to clicks on the ID column
+    if q.client.initialized:
+        selected_id = q.client.selected_id
+        if selected_id is not None:
+            # Find the corresponding description
+            description = df.loc[df['id'] == selected_id, 'description'].iloc[0]
+            q.page['description'] = ui.text(description)
+
+    # Create the UI
+    q.page['example'] = ui.form_card(
+        box='1 1 4 6',
+        items=[table]
+    )
+
+    await q.page.save()
+
+@main('/table_with_description')
+async def main(q: Q):
+    if q.args.row_clicked:
+        q.client.selected_id = q.args.row_clicked['id']
+    await serve(q)

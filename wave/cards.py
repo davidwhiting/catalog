@@ -1,7 +1,13 @@
 from h2o_wave import ui
 from typing import Optional, List
+from utils import get_query, get_query_one
 
 import sys
+
+async def get_choices(q, query, params=()):
+    rows = await get_query(q, query, params)
+    choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
+    return choices
 
 # Use for page cards that should be removed when navigating away.
 # For pages that should be always present on screen use q.page[key] = ...
@@ -19,39 +25,60 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
             q.client.cards.remove(name)
 
 def meta_card():
-    card = ui.meta_card(box='', layouts=[ui.layout(breakpoint='xs', min_height='100vh', zones=[
-        ui.zone('header'),
-        ui.zone('content', zones=[
-            # Specify various zones and use the one that is currently needed. Empty zones are ignored.
-            ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
-            ui.zone('top_vertical'),
-            ui.zone('middle_horizontal', direction=ui.ZoneDirection.ROW),
-            ui.zone('middle_vertical'),
-            ui.zone('horizontal', direction=ui.ZoneDirection.ROW), # delete eventually
-            ui.zone('vertical'),                                   # delete eventually
-            ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center'), # delete eventually
-            ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
-            ui.zone('bottom_vertical'),
-        ]),
-        ui.zone('footer'),
+    card = ui.meta_card(
+        box='', 
+        themes=[ui.theme( # UMGC red: '#a30606', UMGC yellow: '#fdbf38'
+            name='UMGC',
+            primary='#a30606', 
+            text='#000000',
+            card='#ffffff',
+            page='#e2e2e2', 
+        )],
+        theme='UMGC',
+        title='UMGC Wave App',
+        layouts=[ui.layout(
+            breakpoint='xs', 
+            min_height='100vh', 
+            zones=[
+                ui.zone('header'),
+                ui.zone('content', zones=[
+                    # Specify various zones and use the one that is currently needed. Empty zones are ignored.
+                    ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
+                    ui.zone('top_vertical'),
+                    ui.zone('middle_horizontal', direction=ui.ZoneDirection.ROW),
+                    ui.zone('middle_vertical'),
+                    ui.zone('horizontal', direction=ui.ZoneDirection.ROW), # delete eventually
+                    ui.zone('vertical'),                                   # delete eventually
+                    ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center'), # delete eventually
+                    ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
+                    ui.zone('bottom_vertical'),
+                ]),
+                ui.zone('footer'),
     ])])
     return card 
 
 def header_card(q):
     card = ui.header_card(
-        box='header', title='My app', subtitle="Let's conquer the world",
-        image='https://wave.h2o.ai/img/h2o-logo.svg',
+        box='header', 
+        title='UMGC', 
+        subtitle='Registration Assistant',
+        image=q.app.umgc_logo,
         secondary_items=[
             ui.tabs(name='tabs', value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, items=[
                 ui.tab(name='#home', label='Home'),
-                ui.tab(name='#major', label='Major'),
-                ui.tab(name='#page3', label='Grid'),
+                #ui.tab(name='#student', label='Student Info'),
+                ui.tab(name='#major', label='Major'), # 'Select Major'
+                ui.tab(name='#course', label='Course'), # 'Select Courses'
+                ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
             ]),
         ],
         items=[
-            ui.persona(title='John Doe', subtitle='Developer', size='xs',
-                       image='https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&h=750&w=1260'),
-        ]
+            ui.textbox(
+                name='textbox_default', 
+                label='Student Name', 
+                value='John Doe', 
+                disabled=True
+        )],
     )
     return card
 
@@ -116,6 +143,7 @@ def render_debug_client_card(q, location='bottom_horizontal', width='33%'):
         title='Client Debugging Information', 
         content=content 
     )
+
 def render_debug_user_card(q, location='bottom_horizontal', width='33%'):
     content = f'''
 ### q.app values:
@@ -136,24 +164,7 @@ def render_debug(q, location='bottom_horizontal', width='25%'):
     add_card(q, 'debug_client_info', render_debug_client_card(q,  location=location, width=width)) 
     add_card(q, 'debug_user_info', render_debug_user_card(q,  location=location, width=width)) 
 
-async def get_query_one(q, query, params=()):
-    c = q.user.c 
-    c.execute(query, params)
-    row = c.fetchone()
-    return row
-
-async def get_query(q, query, params=()):
-    c = q.user.c 
-    c.execute(query, params)
-    rows = c.fetchall()
-    return rows
-
-async def get_choices(q, query, params=()):
-    rows = await get_query(q, query, params)
-    choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
-    return choices
-
-async def render_home_cards(q, location='top_horizontal', width='25%'):
+def render_home_cards(q, location='top_horizontal', width='25%'):
     add_card(q, 'student_guest', ui.wide_info_card(
         box=ui.box(location, width=width),
         name='',
@@ -209,9 +220,6 @@ def render_major_recommendation_card(q, location='top_horizontal', width='350px'
     )
     return card
 
-# doesn't work yet
-# ValueError: card must be dict or implement .dump() -> dict
-
 async def render_dropdown_menus(q, location='top_horizontal', menu_width='280px'):
     degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
     area_query = '''
@@ -260,11 +268,88 @@ async def render_dropdown_menus(q, location='top_horizontal', menu_width='280px'
     )
     return card
 
-async def get_program_title(q, program_id):
-    query = '''
-        SELECT b.name || ' in ' || a.name as title
-        FROM programs a, degrees b 
-        WHERE a.id = ? AND a.degree_id = b.id 
+async def render_major_dashboard(q, location='middle_vertical', width='100%'):
     '''
-    row = get_query_one(q, query, params=(program_id,))
-    return row['title']
+    Renders the dashboard with explored majors
+    :param q: instance of Q for wave query
+    :param location: page location to display
+    '''
+
+    title = q.user.degree_program # program name
+ 
+    if q.user.degree == '2':
+        # get program summary for bachelor's degrees
+        query = 'SELECT * FROM program_requirements WHERE program_id = ?'
+        row = await get_query_one(q, query, params=(q.user.program_id,))
+
+        if row:
+            return add_card(q, 'major_dashboard', ui.form_card(
+                box=ui.box(location, width=width),
+                items=[
+                    ui.text(title + ': Credits', size=ui.TextSize.L),
+                    ui.stats(
+                        # justify='between',
+                        items=[
+                            ui.stat(
+                                label='Major',
+                                value=str(row['major']),
+                                caption='Required Core',
+                                icon='Trackers'),
+                            ui.stat(
+                                label='Required',
+                                value=str(row['related_ge'] + row['related_elective']),
+                                caption='Required Related',
+                                icon='News'),
+                            ui.stat(
+                                label='General Education',
+                                value=str(row['remaining_ge']),
+                                caption='Remaining GE',
+                                icon='TestBeaker'),
+                            ui.stat(
+                                label='Elective',
+                                value=str(row['remaining_elective']),
+                                caption='Remaining Elective',
+                                icon='Media'),
+                            ui.stat(
+                                label='TOTAL',
+                                value=str(row['total']),
+                                caption='Total Credits',
+                                icon='Education'),
+                    ])
+            ]))
+        #else:
+        #    pass
+        #    # send a warning
+
+warning_example_card = ui.form_card(
+    box='1 1 4 7',
+    items=[
+        ui.message_bar(type='blocked', text='This action is blocked.'),
+        ui.message_bar(type='error', text='This is an error message'),
+        ui.message_bar(type='warning', text='This is a warning message.'),
+        ui.message_bar(type='info', text='This is an information message.'),
+        ui.message_bar(type='success', text='This is an success message.'),
+        ui.message_bar(type='danger', text='This is a danger message.'),
+        ui.message_bar(type='success', text='This is a **MARKDOWN** _message_.'),
+        ui.message_bar(type='success', text='This is an <b>HTML</b> <i>message</i>.'),
+    ]
+)
+
+footer = ui.footer_card(
+    box='footer',
+    caption='''
+Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
+This app is in pre-alpha stage. Feedback welcomed.
+    '''
+)
+
+
+
+def d3plot(html, location='horizontal', height='500px', width='100%'):
+    card = ui.frame_card(
+        box=ui.box(location, height=height, width=width),
+        title='Tentative Course Schedule',
+        content=html
+    )
+    return card
+

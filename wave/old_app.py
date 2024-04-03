@@ -857,15 +857,6 @@ async def initialize_user(q: Q) -> None:
 
     q.user.initialized = True
 
-async def initialize_client(q: Q) -> None:
-    q.page['meta'] = cards.meta
-    q.page['header'] = cards.get_header(q.app.umgc_logo, q)
-    q.page['footer'] = cards.footer
-
-    # If no active hash present, render home.
-    if q.args['#'] is None:
-        await home(q)
-
 #async def show_error(q: Q, error: str):
 #    """
 #    Displays errors.
