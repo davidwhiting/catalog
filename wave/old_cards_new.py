@@ -10,15 +10,8 @@ from utils import add_card, single_query, query_row
 def dialog_description(row: int) -> ui.Dialog:
     """
     Dialog for viewing course description.
+    The input is the row
     """
-
-    #if row == 0:
-    #    image_path = 'https://images.unsplash.com/photo-1587049016823-69ef9d68bd44'
-    #elif row == 2:
-    #    image_path = 'https://images.unsplash.com/photo-1552975084-6e027cd345c2'
-    #else:
-    #    image_path = 'https://images.unsplash.com/photo-1574276254982-d209f79d673a'
-
     dialog = ui.dialog(
         name='dialog_description',
         title='Course Description',
@@ -504,8 +497,6 @@ async def render_majors_discovery_old(q, program_id, compare=False):
 
     await render_major_table(q, major_records, 'bottom_' + card_location)
 
-
-
 def render_ge_table(q, records, which=['GENERAL'], title='Select General Education Courses', location='middle_horizontal', table_height='500px', table_width='700px'):
     # Renders a table for the courses tab
 
@@ -725,6 +716,7 @@ async def serve(q: ui.Request):
         df.at[row, column] = value # update dataframe
         q.page['table'].rows = to_rows(df)
         await q.page.save()
+
 
 def to_rows(df):
     return [ui.table_row(name=str(i), cells=[str(x) for x in row]) for i, row in df.iterrows()]

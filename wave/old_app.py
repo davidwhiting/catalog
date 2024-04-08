@@ -215,21 +215,6 @@ async def student_step5(q: Q):
 
 ###############################################################################
 
-@on('#major')
-async def major(q: Q):
-    clear_cards(q)
-    #add_card(q, 'title3',
-    #    ui.form_card(
-    #        box=ui.box('top_vertical'),
-    #        items=[ui.text('Browse Majors', size=ui.TextSize.XL),
-    #]))
-    add_card(q, 'major_recommendations', cards.major_recommendation_card)
-    add_card(q, 'dropdown_menus_vertical', cards.dropdown_menus_vertical(q, location='top_horizontal'))
-
-    # the program id should be returned from the menu
-    program_id = 5
-
-    await cards.render_majors_discovery(q, program_id)
 
 ###############################################################################
 
@@ -271,15 +256,6 @@ async def major2(q: Q):
 async def courses(q: Q):
     clear_cards(q)
 
-    # temp, move to appropriate spot
-    q.user.degree_program = 'BS in Business Administration'
-    #q.user.program_id
-
-    add_card(q, 'selected_major', 
-        ui.form_card(
-            box='top_vertical',
-            items=[ui.text(q.user.degree_program, size=ui.TextSize.XL)]
-    ))
 
 # get results from querying database
     add_card(q, 'major_dashboard', ui.form_card(box='top_vertical', items=[

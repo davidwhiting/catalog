@@ -349,7 +349,6 @@ def render_major_table_group(group_name, record_type, records, collapsed):
     ], collapsed=collapsed)
 
 async def render_major_table(q, records, location='bottom_vertical', cardname='my_test_table', width='100%', ge=False, elective=False):
-    
     def _render_major_table_group(group_name, record_type, records, collapsed):
         return ui.table_group(group_name, [
             ui.table_row(

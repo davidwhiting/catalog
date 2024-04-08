@@ -25,7 +25,95 @@ async def on_startup():
 @on('#home')
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    render_home_cards(q, location='middle_horizontal')
+    render_home_cards(q, location='top_horizontal')
+
+    #q.page['example'] = ui.form_card(box='1 1 2 2', items=[
+    #    ui.choice_group(
+    #        name='choice_group',
+    #        label='Choice group',
+    #        value='A',
+    #        choices=[
+    #            ui.choice('A', 'Selected A'),
+    #            ui.choice('B', 'Option B'),
+    #            ui.choice('C', 'Option C'),
+    #        ]
+    #    )
+    #])
+
+    user_roles = ['Guest', 'Student', 'Counselor', 'Admin']
+    add_card(q, 'home1', ui.form_card(
+        box=ui.box('middle_horizontal', width='250px'),
+        items=[
+            ui.choice_group(
+                name='user_role_choice_group',
+                label='User Role',
+                inline=False,
+                choices=[ui.choice(name=x, label=x) for x in user_roles],
+                value='Guest',
+            )
+        ]
+    ))
+    student_type = ["Associate", "Bachelor's", "Master's", "Doctorate"]
+    add_card(q, 'student_type_card', ui.form_card(
+        box=ui.box('middle_horizontal', width='250px'),
+        items=[
+            ui.choice_group(
+                name='student_type',
+                label='Student Type',
+                inline=False,
+                choices=[ui.choice(name=x, label=x) for x in student_type],
+                value=q.client.student_type if (q.client.student_type is not None) else q.args.student_type,
+            )
+        ]
+    ))
+    tuition_type = ['In-State', 'Out-of-State', 'Military']
+    add_card(q, 'tuition_type_card', ui.form_card(
+        box=ui.box('middle_horizontal', width='250px'),
+        items=[
+            ui.choice_group(
+                name='tuition_type',
+                label='Tuition Type',
+                inline=False,
+                choices=[ui.choice(name=x, label=x) for x in tuition_type],
+                value=q.client.tuition_type if (q.client.tuition_type is not None) else q.args.tuition_type,
+            )
+        ]
+    ))
+    attendance_type = ['Full-Time', 'Part-Time', 'Evening']
+    add_card(q, 'attendance_type_card', ui.form_card(
+        box=ui.box('middle_horizontal', width='250px'),
+        items=[
+            ui.choice_group(
+                name='attendance_type',
+                label='Attendance Type',
+                inline=False,
+                choices=[ui.choice(name=x, label=x) for x in attendance_type],
+                value=q.client.attendance_type if (q.client.attendance_type is not None) else \
+                    q.args.attendance_type,
+            )
+        ]
+    ))
+    student_profile_type = ['First time attending', 'Previous experience', 'Transfer credits']
+    add_card(q, 'student_profile_type_card', ui.form_card(
+        box=ui.box('middle_horizontal', width='250px'),
+        items=[
+            ui.choice_group(
+                name='student_profile_type',
+                label='Student Profile',
+                inline=False,
+                choices=[ui.choice(name=x, label=x) for x in student_profile_type],
+                value=q.client.student_profile_type if (q.client.student_profile_type is not None) else \
+                    q.args.student_profile_type,
+            )
+        ]
+    ))
+    #add_card(q, 'home5', ui.form_card(
+    #    box=ui.box('middle_horizontal', width='250px'),
+    #    items=[
+    #        ui.text('Basic student info', size=ui.TextSize.XL),
+    #        ui.text('Checkbox with **first time**, **previous experience**, **transfer credits**'),
+    #    ]
+    #))
 
     cards.render_debug(q, location='bottom_horizontal', width='33%')
 
@@ -34,10 +122,20 @@ async def home(q: Q):
 @on('#major')
 async def major(q: Q):
     clear_cards(q)  
-    add_card(q, 'major_recommendations', 
+    add_card(q, 'dropdown',
+        await cards.render_dropdown_menus(q, location='top_horizontal', menu_width='300px'))
+
+    add_card(q, 'major_recommendations',
         cards.render_major_recommendation_card(q, location='top_horizontal'))
-    add_card(q, 'dropdown', 
-        await cards.render_dropdown_menus(q, location='top_horizontal', menu_width='280px'))
+
+    add_card(q, 'major1', ui.form_card(
+        box=ui.box('top_horizontal', width='250px'),
+        items=[
+            ui.text('Compare Majors', size=ui.TextSize.XL),
+            ui.text('Add **Compare Majors** functionality'),
+        ]
+    ))
+
 
     cards.render_debug(q, location='bottom_horizontal', width='33%')
 
@@ -46,8 +144,21 @@ async def major(q: Q):
 @on('#course')
 async def course(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    if q.user.degree_program:
+        add_card(q, 'selected_program',
+           ui.form_card(
+               box='top_vertical',
+               items=[ui.text(q.user.degree_program, size=ui.TextSize.XL)]
+        ))
+    else:
+        add_card(q, 'selected_program',
+           ui.form_card(
+               box='top_vertical',
+               items=[ui.text('Degree program not yet selected.', size=ui.TextSize.L)]
+        ))
 
-    for i in range(12):
+
+    for i in range(4):
         add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
                                                   caption='Lorem ipsum dolor sit amet'))
 ###########################################################
