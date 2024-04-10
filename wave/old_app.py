@@ -559,45 +559,6 @@ async def schedule(q: Q):
     #))
 
 
-    demo = True
-    Sessions = ['Session 1', 'Session 2', 'Session 3']
-    add_card(q, 'sessions_spin', 
-        ui.form_card(
-            box=ui.box('d3', width='300px'), # min width 200px
-            items=[
-                ui.dropdown(
-                    name='first_term', 
-                    label='First Term', 
-                    value='spring2024' if demo else q.args.first_term,
-                    trigger=True,
-                    width='150px',
-                    choices=[
-                        ui.choice(name='spring2024', label="Spring 2024"),
-                        ui.choice(name='summer2024', label="Summer 2024"),
-                        ui.choice(name='fall2024', label="Fall 2024"),
-                        ui.choice(name='winter2025', label="Winter 2025"),
-                ]),
-#                ui.separator(),
-                ui.checklist(
-                    name='checklist', 
-                    label='Sessions Attending',
-                    choices=[ui.choice(name=x, label=x) for x in Sessions],
-                    values=['Session 1', 'Session 2', 'Session 3'], # set default
-                ),
-                ui.spinbox(
-                    name='spinbox', 
-                    label='Courses per Session', 
-                    width='150px',
-                    min=1, max=5, step=1, value=1),
-#                ui.separator(label=''),
-                ui.slider(name='slider', label='Max Credits per Term', min=1, max=16, step=1, value=9),
-                ui.inline(items=[
-                    ui.button(name='show_inputs', label='Submit', primary=True),
-                    ui.button(name='reset_sidebar', label='Reset', primary=False),
-                ])
-            ]
-        )
-    )
 
     # automatically group by term?
     # see https://wave.h2o.ai/docs/examples/table-groups
@@ -769,69 +730,6 @@ async def initialize_app(q: Q):
     #q.app.ge_records = df.to_dict('records')
 
 
-async def initialize_user(q: Q) -> None:
-    """
-    Initialize the user.
-    """
-    logging.info('Initializing user')
-
-    keycloak_implemented = False
-    ##### KEYCLOAK CODE ##############
-    # temporary until keycloak login fully implemented
-#    if keycloak_implemented:
-        # Decode the access token without verifying the signature
-        # Connects SSO to our user and student_info tables
-#        user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
-
-#        q.user.username = user_details['preferred_username']
-#        q.user.name = user_details['name']
-#        q.user.firstname = user_details['given_name']
-#        q.user.lastname = user_details['family_name']
-
-        # check whether user is in the sqlite3 db
-        # if so, get role and id
-        # if not, add user to db as a new student
-#        q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
-#    else:
-#        # fake it for now
-
-    ## That works for the entire website, not for an individual login
-    ## See https://docs.h2o.ai/mlops/py-client/py-client-examples/keycloak-authentication-methods
-    ##### KEYCLOAK CODE ##############
-
-    q.user.logged_in = True
-    if q.user.logged_in:
-        q.user.user_id = 1 # for the time being
-    else:
-        q.user.user_id = 0 # guest login, by default
-
-    # Get user information
-    query = '''
-        SELECT role_id, username, firstname, lastname, 
-            firstname || ' ' || lastname AS name
-        FROM users
-        WHERE id = ?
-    '''
-    row = query_row(query, (q.user.user_id,), q.app.c)
-    (q.user.role_id, q.user.username, q.user.firstname, q.user.lastname, q.user.name) = row
-
-    # If a student, get information from the student_info table
-    query = ''' 
-        SELECT resident_status_id, transfer_credits, financial_aid, stage, program_id, profile, notes
-        FROM student_info WHERE user_id = ?
-    '''
-    if q.user.role_id == 1:
-        q.user.student = True
-        row = query_row(query, (q.user.user_id,), q.app.c)
-        (q.user.resident_status_id, q.user.transfer_credits, q.user.financial_aid, q.user.stage, q.user.program_id,
-         q.user.profile, q.user.notes) = row
-        
-        if not hasattr(q.user, 'records'):
-            q.user.ge_records = q.app.ge_records
-
-    # End of student information
-
-    q.user.initialized = True
 
 #async def show_error(q: Q, error: str):
 #    """
