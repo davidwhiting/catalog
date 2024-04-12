@@ -18,18 +18,6 @@ import utils
 
 from utils import add_card, query_row
 
-async def on_startup():
-    # Set up logging
-    logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
-
-# Remove all the cards related to navigation.
-def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
-    if not q.client.cards:
-        return
-    for name in q.client.cards.copy():
-        if name not in ignore:
-            del q.page[name]
-            q.client.cards.remove(name)
 
 ###############################################################################
 @on('#home')
@@ -39,9 +27,6 @@ async def home(q: Q):
 
     card = await cards.render_project_table(templates.project_data)
     add_card(q, 'project_table_location', card)
-
-    ## Debug Information
-    #add_card(q, 'params', cards.render_debug_card(q, location='d3'))
 
 ###############################################################################
 
@@ -97,22 +82,6 @@ async def student(q: Q):
         ])
     )
     #career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
-    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
-
-    add_card(q, 'assessments', ui.wide_info_card(
-        box=ui.box('bottom_horizontal', width='400px'),
-        name='Assessments',
-        icon='AccountActivity',
-        title='Career Assessments',
-        caption=f'Access career assessment tools like **UMGC CareerQuest** or add a page like <a href="{yale_url}" target="_blank">Yale\'s</a> with _Interest_, _Personality_, and _Skills_ assessments.',
-    ))
-    add_card(q, 'enable_ai', ui.wide_info_card(
-        box=ui.box('bottom_horizontal', width='300px'),
-        name='ai',
-        icon='LightningBolt',
-        title='AI Enablement',
-        caption='*Interest* or *Skills* assessments critical for AI recommendations.'
-    ))
 
     #add_card(q, 'student_api', ui.wide_info_card(
     #    box=ui.box('grid', width='300px'),
@@ -230,65 +199,11 @@ async def major2(q: Q):
     add_card(q, 'dropdown_menus_vertical', cards.dropdown_menus_vertical(q, location='top_horizontal'))
     add_card(q, 'dropdown_menus_vertical2', cards.dropdown_menus_vertical_compare(q, location='top_horizontal'))
 
-    #career_url = 'https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx'
-    #add_card(q, 'major_section', ui.form_card(
-    #    box=ui.box('top_horizontal', width='400px'),
-    #    items=[
-    #        ui.text(
-    #            f'**Don\'t know what you want to do?** Take an Interest Assessment sponsored by the U.S. Department of Labor at <a href="{career_url}" target="_blank">CareerOneStop</a>.',
-    #            #size=ui.TextSize.L
-    #        ),
-    #        ui.separator(),
-    #        ui.text('*Can be replaced with UMGC Interest Assessment if one exists*')
-    #      ]
-    #))
-
-    # the program id should be returned from the menu
-    program_id = 5
-
-    await cards.render_major_dashboard(q, program_id, location='middle_vertical')
-    #await cards.render_majors_discovery(q, program_id)
-    #await cards.render_majors_discovery(q, 10, compare=True)
-
 ###############################################################################
 
 @on('#courses')
 async def courses(q: Q):
     clear_cards(q)
-
-
-# get results from querying database
-    add_card(q, 'major_dashboard', ui.form_card(box='top_vertical', items=[
-        ui.stats(
-#            justify='between', 
-            items=[
-                ui.stat(
-                    label='Total Credits', 
-                    value=str(total_credits_remaining), 
-                    caption='Total Credits Remaining', 
-                    icon='Education'),   
-                ui.stat(
-                    label='Major Credits', 
-                    value=str(33), 
-                    caption='Major Credits Remaining', 
-                    icon='Trackers'),   
-                ui.stat(
-                    label='Required Credits', 
-                    value=str(12), 
-                    caption='Required Credits Remaining', 
-                    icon='News'),   
-                ui.stat(
-                    label='GE Credits', 
-                    value=str(41), 
-                    caption='General Education Credits Remaining', 
-                    icon='TestBeaker'),   
-                ui.stat(
-                    label='Elective Credits', 
-                    value=str(46), 
-                    caption='Elective Credits Remaining', 
-                    icon='Media'),   
-            ]
-    )]))
 
     # automatically group by term?
     # see https://wave.h2o.ai/docs/examples/table-groups
@@ -322,156 +237,11 @@ async def courses(q: Q):
 #        table_width='48%'
 #    )
 
-    add_card(q, 'ge_tile', 
-        ui.wide_info_card(
-            box=ui.box('grid', width='300px'),
-            name='', 
-            title='Explore General Education',
-            caption='Explore and select GE courses'
-    ))
-    add_card(q, 'electives_tile', 
-        ui.wide_info_card(
-            box=ui.box('grid', width='300px'),
-            name='', 
-            title='Explore Electives',
-            caption='Explore and perhaps recommend electives',
-    ))
-    add_card(q, 'minors_tile', 
-        ui.wide_info_card(
-            box=ui.box('grid', width='300px'),
-            name='', 
-            title='Explore Minors',
-            caption='Explore and perhaps recommend minors',
-    ))
-
-###############################################################################
-
-# first query: WRTG 111 or another course
-
-#templates.ge_query_j(params=1)
-
-@on('#ge')
-async def ge(q: Q):
-
-    clear_cards(q)
-    add_card(q, 'ge_tile',
-        ui.wide_info_card(
-            box=ui.box('grid', width='50%'),
-            name='',
-            title='Explore General Education',
-            caption='Explore and select GE courses'
-    ))
-
-    #def render_major_table_group(group_name, record_type, records, collapsed):
-    #return ui.table_group(group_name, [
-    #    ui.table_row(
-    #        name=str(record['id']),
-    #        cells=[
-    #            record['course'],
-    #            record['title'],
-    #            str(record['credits']),
-    #            #record['description'],
-    #            record['type'].upper(),
-    #        ]
-    #    ) for record in records if record['type'].upper() == record_type
-    #], collapsed=collapsed)
-    add_card(q, 'ge_table',
-        ui.form_card(
-            box=ui.box('middle_vertical'),
-            items=[
-                ui.text('Requirement 1: Communications'),
-                # + 'WRTG 111 or another writing course'),
-                ui.table(
-                    name='ge_requirements',
-                    columns=[
-                        ui.table_column(name='course', label='Course'),
-                        ui.table_column(name='title', label='Title'),
-                    ],
-    #                ui.table_group('WRTG 111 or another writing course', [
-                    rows=[
-                        ui.table_row(
-                            name='first',
-                            cells=['WRTG 111', 'Intro to Writing ???']
-                        ),
-                        ui.table_row(
-                            name='first',
-                            cells=['WRTG 112', 'Intro to Writing 2 ???']
-                        ),
-                    ]
-                )
-            ]
-        )
-    )
-
-    #                    ui.table_row(
-    #                        name='second',
-    #                        cells=[
-    #                            'WRTG 112', 
-    #                            'Intro to Writing 2 ???'
-    #                        ]
-    #                    ),
-    #                ])
-    #
-    #                    name=, 
-    #                    rows=[
-    #                        ui.table_row(name='row1', cells=['WRTG 111', 'Intro to Writing ???']),
-    #                        ui.table_row(name='row2', cells=['WRTG 113', 'Intro to Writing 2 ???']),
-    #                    ]
-    #                ),
-    #                rows=[
-    #                    ui.table_row(name='row1', cells=['John', 'Doe']),
-    #                    ui.table_row(name='row2', cells=['Alice', 'Smith']),
-    #                ]
-    #            ),
-    #            ui.text('General Education Requirements'),
-    #            ui.table(
-    #                name='ge_requirements',
-    #                columns=[
-    #                    ui.table_column(name='name', label='Name'),
-    #                    ui.table_column(name='surname', label='Surname'),
-    #                ],
-    #                rows=[
-    #                    ui.table_row(name='row1', cells=['John', 'Doe']),
-    #                    ui.table_row(name='row2', cells=['Alice', 'Smith']),
-    #                    ui.table_row(name='row3', cells=['Bob', 'Adams']),
-    #                ]
-    #            ),
-    #            ui.text('General Education Requirements'),
-    #            ui.table(
-    #                name='ge_requirements',
-    #                columns=[
-    #                    ui.table_column(name='name', label='Name'),
-    #                    ui.table_column(name='surname', label='Surname'),
-    #                ],
-    #                rows=[
-    #                    ui.table_row(name='row1', cells=['John', 'Doe']),
-    #                    ui.table_row(name='row2', cells=['Alice', 'Smith']),
-    #                    ui.table_row(name='row3', cells=['Bob', 'Adams']),
-    #                ]
-    #            ),
-    #        ]
-    #    )
-    #)
-    #cards.render_ge_table(q, student_records_no_schedule,
-    #    #which=['GENERAL'],
-    #    #title='Select General Education Courses',
-    #    location='middle_horizontal',
-    #    table_width='95%'
-    #)
 
 
 ###############################################################################
 
-@on('#electives')
-async def electives(q: Q):
-    clear_cards(q)
-    add_card(q, 'careers', 
-        ui.frame_card(
-            box=ui.box('grid', width='100%', height='600px'),
-            title='Interest Assessment',
-            path='https://www.careeronestop.org/Toolkit/Careers/interest-assessment.aspx',
-        )
-    )
+###############################################################################
 
 ###############################################################################
 
@@ -538,16 +308,7 @@ async def schedule(q: Q):
     add_card(q, 'd3plot', cards.d3plot(html_template, 'd3'))
 
 
-#    add_card(q, 'dropdown_menus', cards.dropdown_menus(q))
-    # Generate the following automatically
-    add_card(q, 'selected_major',
-        ui.form_card(
-            box='top_horizontal',
-            items=[
-                ui.text(#q.user.degree_program,
-                    'BS in Business Administration',
-                    size=ui.TextSize.XL
-    )]))
+
     #add_card(q, 'more_student_info',
     #    ui.form_card(
     #        box='top_horizontal',

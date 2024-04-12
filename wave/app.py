@@ -9,7 +9,9 @@ import templates
 # cards contains static cards and python functions that render cards
 import cards
 from cards import add_card, clear_cards, meta_card, header_card, render_debug_card, render_debug_client_card, \
-    get_choices, area_query, render_home_cards
+    get_choices
+#, area_query 
+#, render_home_cards
 
 # 'utils' contains all other python functions
 import utils
@@ -39,12 +41,7 @@ async def home(q: Q):
     Attendance Type: {q.client.attendance_type}
 
     '''
-    #add_card(q, 'welcome2', ui.markdown_card(
-    #    box=ui.box('top_horizontal', width='30%'), 
-    #    title='Profile', 
-    #    content=content 
-    #))     
-    
+
     add_card(q, 'welcome2', ui.wide_info_card(
         box=ui.box('top_horizontal', width='30%'),
         name='welcome2',
@@ -52,21 +49,6 @@ async def home(q: Q):
         title='Profile',
         caption='Blank.'
     ))
-
-    #render_home_cards(q, location='top_horizontal')
-
-    #q.page['example'] = ui.form_card(box='1 1 2 2', items=[
-    #    ui.choice_group(
-    #        name='choice_group',
-    #        label='Choice group',
-    #        value='A',
-    #        choices=[
-    #            ui.choice('A', 'Selected A'),
-    #            ui.choice('B', 'Option B'),
-    #            ui.choice('C', 'Option C'),
-    #        ]
-    #    )
-    #])
 
     user_roles = ['Guest', 'Student', 'Counselor', 'Admin']
     add_card(q, 'user_role_card', ui.form_card(
@@ -84,20 +66,6 @@ async def home(q: Q):
             ),
         ]
     ))
-
-    #student_type = ["Associate", "Bachelor's", "Master's", "Doctorate"]
-    #add_card(q, 'student_type_card', ui.form_card(
-    #    box=ui.box('middle_horizontal', width='250px'),
-    #    items=[
-    #        ui.choice_group(
-    #            name='student_type',
-    #            label='Student Type',
-    #            inline=False,
-    #            choices=[ui.choice(name=x, label=x) for x in student_type],
-    #            value=q.client.student_type if (q.client.student_type is not None) else q.args.student_type,
-    #        )
-    #    ]
-    #))
 
     ## If a student, get information from the student_info table
     #query = '''
@@ -135,6 +103,7 @@ async def home(q: Q):
             )
         ]
     ))
+
     student_profile_type = ['First time attending', 'Previous experience', 'Transfer credits']
     add_card(q, 'student_profile_type_card', ui.form_card(
         box=ui.box('middle_horizontal', width='250px'),
@@ -149,30 +118,10 @@ async def home(q: Q):
             )
         ]
     ))
-    #add_card(q, 'home5', ui.form_card(
-    #    box=ui.box('middle_horizontal', width='250px'),
-    #    items=[
-    #        ui.text('Basic student info', size=ui.TextSize.XL),
-    #        ui.text('Checkbox with **first time**, **previous experience**, **transfer credits**'),
-    #    ]
-    #))
-    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
 
-    add_card(q, 'assessments', ui.wide_info_card(
-        box=ui.box('bottom_horizontal', width='400px'),
-        name='Assessments',
-        icon='AccountActivity',
-        title='Career Assessments',
-        caption=f'Access career assessment tools like **UMGC CareerQuest** or add a page like <a href="{yale_url}" target="_blank">Yale\'s</a> with _Interest_, _Personality_, and _Skills_ assessments.'
-    ))
-    add_card(q, 'enable_ai', ui.wide_info_card(
-        box=ui.box('bottom_horizontal', width='400px'),
-        name='ai',
-        icon='LightningBolt',
-        title='AI Enablement',
-        caption='*Interest* or *Skills* assessments critical for AI recommendations.'
-    ))
-
+    add_card(q, 'assessments', cards.career_assessment_card)
+    add_card(q, 'enable_ai', cards.ai_enablement_card)
+ 
     cards.render_debug(q, location='debug', width='33%')
 
 ###########################################################
@@ -190,13 +139,20 @@ async def major(q: Q):
             ui.text('Add **Compare Majors** functionality'),
         ]
     ))
+    add_card(q, 'major2', ui.form_card(
+        box=ui.box('top_horizontal', width='250px'),
+        items=[
+            ui.text('SPACER', size=ui.TextSize.XL),
+            ui.text('Replace with updated design'),
+        ]
+    ))
 
     add_card(q, 'major_recommendations',
         cards.render_major_recommendation_card(q, location='top_horizontal'))
 
     if hasattr(q.user, 'program'):
         if q.user.degree=='2': 
-            await cards.render_majors(q, location='middle_vertical')
+            await cards.render_program(q, location='middle_vertical')
 
     cards.render_debug(q, location='debug', width='33%')
 
@@ -215,14 +171,31 @@ async def course(q: Q):
             ]
     ))
 
-    for i in range(4):
-        add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
-                                                  caption='Lorem ipsum dolor sit amet'))
+    add_card(q, 'electives_tile', 
+        ui.wide_info_card(
+            box=ui.box('middle_horizontal', width='500px'),
+            name='', 
+            title='Explore Electives',
+            caption='Explore and perhaps recommend electives',
+    ))
+    add_card(q, 'minors_tile', 
+        ui.wide_info_card(
+            box=ui.box('middle_horizontal', width='500px'),
+            name='', 
+            title='Explore Minors',
+            caption='Explore and perhaps recommend minors',
+    ))
+    #for i in range(4):
+    #    add_card(q, f'item{i}', ui.wide_info_card(box=ui.box('grid', width='400px'), name='', title='Tile',
+    #                                              caption='Lorem ipsum dolor sit amet'))
 
     cards.render_debug(q)
+
 ###########################################################
 
+# GE should only show up if degree is Bachelor's. That navigation should show up in the Course tab.
 @on('#ge')
+@on('goto_ge')
 async def ge(q: Q):
     clear_cards(q)
 
@@ -236,14 +209,23 @@ async def ge(q: Q):
 
     menu_width = '350px'
 
+    add_card(q, 'ge_req6', await cards.render_ge_research_card(q, menu_width, location='grid'))
     add_card(q, 'ge_req1', await cards.render_ge_comm_card(q, menu_width, location='grid'))
+    add_card(q, 'ge_req4', await cards.render_ge_science_card(q, menu_width, location='grid'))
     add_card(q, 'ge_req2', await cards.render_ge_math_card(q, menu_width, location='grid'))
     add_card(q, 'ge_req3', await cards.render_ge_arts_card(q, menu_width, location='grid'))
-    add_card(q, 'ge_req4', await cards.render_ge_science_card(q, menu_width, location='grid'))
     add_card(q, 'ge_req5', await cards.render_ge_beh_card(q, menu_width, location='grid'))
-    add_card(q, 'ge_req6', await cards.render_ge_research_card(q, menu_width, location='grid'))
-
+    
     cards.render_debug(q)
+
+###########################################################
+
+@on('#electives')
+async def electives(q: Q):
+    clear_cards(q)
+    await ge(q)
+
+###########################################################
 
 @on('#schedule')
 async def schedule(q: Q):
@@ -400,7 +382,7 @@ async def user_role(q: Q):
     q.user.user_role = q.args.user_role
     #if q.user.degree != '2':
     #    clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
-    #    del q.user.major_coursework_df
+    #    del q.client.program_df
     ## reset area_of_study if degree changes
     #q.user.area_of_study = None
     #q.page['dropdown'].area_of_study.value = q.user.area_of_study
@@ -415,14 +397,13 @@ async def user_role(q: Q):
     q.page['debug_user_info'] = cards.render_debug_user_card(q)
     await q.page.save()
 
-
 @on()
 async def degree(q: Q):
     logging.info('The value of degree is ' + str(q.args.degree))
     q.user.degree = q.args.degree
     if q.user.degree != '2':
         clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
-        del q.user.major_coursework_df
+        del q.client.program_df
     # reset area_of_study if degree changes
     q.user.area_of_study = None 
     q.page['dropdown'].area_of_study.value = q.user.area_of_study
@@ -443,7 +424,7 @@ async def area_of_study(q: Q):
     q.user.area_of_study = q.args.area_of_study
     if q.user.degree != '2':
         clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
-        del q.user.major_coursework_df
+        del q.client.program_df
 
     # reset program if area_of_study changes
     q.user.program = None 
@@ -464,10 +445,12 @@ async def program(q: Q):
 
     # display major dashboard
     if q.user.degree == '2':
-        await cards.render_majors(q, location='middle_vertical')
+        #clear_cards(q, ['dropdown'])
+        #await cards.render_program_dashboard(q, location='top_horizontal', width='300px')
+        await cards.render_program(q, location='middle_vertical', dashboard=True)
     else:
         clear_cards(q,['major_recommendations', 'dropdown'])
-        del q.user.major_coursework_df
+        del q.client.program_df
 
     # get program name
 
@@ -475,6 +458,22 @@ async def program(q: Q):
     q.page['debug_client_info'] = cards.render_debug_client_card(q)
     q.page['debug_user_info'] = cards.render_debug_user_card(q)
     await q.page.save()
+
+@on()
+async def program_table(q: Q):
+    # note: q.args.table_name is set to [row_name]
+    # the name of the table is 'program_table'
+    # the name of the row is name=row['course'], the course name
+    coursename = q.args.program_table[0]
+    cards.render_dialog_description(q, coursename)
+    logging.info('The value of coursename in program_table is ' + coursename)
+
+@on()
+async def view_description(q: Q):
+    # Note: same function as program_table(q) called by view_description menu option
+    coursename = q.args.view_description
+    cards.render_dialog_description(q, coursename)
+    logging.info('The value of coursename in view_description is ' + str(coursename))
 
 @app('/', on_startup=on_startup)
 async def serve(q: Q):
