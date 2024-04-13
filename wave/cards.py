@@ -124,7 +124,7 @@ def render_dialog_description(q, course):
         #events = ['dismissed']
     )
 
-####################  SQL QUERIES (END)   ############################
+####################  SQL QUERIES & UTILITIES  (END)   ###############
 ######################################################################
 
 
@@ -626,38 +626,40 @@ async def render_ge_comm_card(q, menu_width, location='grid'):
     card = ui.form_card(
         box=ui.box(location),
         items=[
-            ui.text('Communications', size=ui.TextSize.XL),
+            ui.inline([
+                ui.text('Communications', size=ui.TextSize.XL),
+                ui.checkbox(name='ge_comm_check', label='')
+            ], justify='between', align='start'),
             ui.dropdown(
-                name='ge_comm_p1',
+                name='ge_comm_1',
                 label='1. WRTG 111 or another writing course (3 credits)',
                 value=q.user.ge_comm_p1 if (q.user.ge_comm_p1 is not None) else 'WRTG 111',
                 trigger=True,
-                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (1,))
             ),
             ui.dropdown(
-                name='ge_comm_p2',
+                name='ge_comm_2',
                 label='2. WRTG 112 (3 credits)',
                 value=q.user.ge_comm_p2 if (q.user.ge_comm_p2 is not None) else 'WRTG 112',
                 disabled=False,
                 trigger=True,
-                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (2,))
             ),
             ui.dropdown(
-                name='ge_comm_p3',
-                label='3. A course in communication, writing, or speech (3 credits)',
+                name='ge_comm_3',
+                label='3. Communication, writing, or speech course (3 credits)',
                 placeholder='(Select One)',
                 value=q.user.ge_comm_p3 if (q.user.ge_comm_p3 is not None) else q.args.ge_comm_p3,
                 trigger=True,
+                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (3,))
             ),
             ui.dropdown(
-                name='ge_comm_p4',
-                label='4. An upper-level advanced writing course (3 credits)',
+                name='ge_comm_4',
+                label='4. Advanced writing course (3 credits)',
                 placeholder='(Select One)',
                 value=q.user.ge_comm_p4 if (q.user.ge_comm_p4 is not None) else q.args.ge_comm_p4,
                 trigger=True,
@@ -672,13 +674,17 @@ async def render_ge_math_card(q, menu_width, location='grid'):
     card = ui.form_card(
         box=ui.box(location),
         items=[
-            ui.text('Mathematics', size=ui.TextSize.XL),
+            ui.inline([
+                ui.text('Mathematics', size=ui.TextSize.XL),
+                ui.checkbox(name='ge_math_check', label='')
+            ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_math',
                 label='Mathematics (3 credits)',
                 value=q.user.ge_math if (q.user.ge_math is not None) else q.args.ge_math,
                 placeholder='(Select One)',
                 trigger=True,
+                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (5,))
             ),
@@ -690,14 +696,17 @@ async def render_ge_arts_card(q, menu_width, location='grid'):
     card = ui.form_card(
         box=ui.box(location),
         items=[
-            #ui.separator(label=''),
-            ui.text('Arts and Humanities', size=ui.TextSize.XL),
+            ui.inline([
+                ui.text('Arts and Humanities', size=ui.TextSize.XL),
+                ui.checkbox(name='ge_arts_check', label='')
+            ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_arts_1',
                 label='1. Arts and Humanities (3 credits)',
                 value=q.user.ge_arts_1 if (q.user.ge_arts_1 is not None) else q.args.ge_arts_1,
                 trigger=True,
                 placeholder='(Select One)',
+                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (6,))
             ),
@@ -707,6 +716,7 @@ async def render_ge_arts_card(q, menu_width, location='grid'):
                 value=q.user.ge_arts_2 if (q.user.ge_arts_2 is not None) else q.args.ge_arts_2,
                 trigger=True,
                 placeholder='(Select One)',
+                required=True,
                 width=menu_width,
                 # figure out how to omit choice selected in Course 1
                 choices=await get_choices(q, ge_query, (6,))
@@ -720,15 +730,19 @@ async def render_ge_science_card(q, menu_width, location='grid'):
     card = ui.form_card(
         box=ui.box(location),
         items=[
-            ui.text('Biological and Physical Sciences', size=ui.TextSize.XL),
+            ui.inline([
+                ui.text('Biological and Physical Sciences', size=ui.TextSize.XL),
+                ui.checkbox(name='ge_science_check', label='')
+            ], justify='between', align='start'),
             #ui.text('Select one of the following:', size=ui.TextSize.L),
             #ui.separator(label='1. Select one of the following three choices:'),
             ui.dropdown(
                 name='ge_bio_1a',
-                label='1. Lecture with Laboratory (4 credits): [Select one]',
+                label='1. Lecture with Lab (4 credits): Select one',
                 value=q.user.ge_bio_1a if (q.user.ge_bio_1a is not None) else q.args.ge_bio_1a,
                 trigger=True,
-                placeholder='Combined Lecture and Laboratory',
+                placeholder='(Combined Lecture and Laboratory)',
+                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (7,))
             ),
@@ -737,7 +751,7 @@ async def render_ge_science_card(q, menu_width, location='grid'):
                 #label='Separate Lecture and Laboratory',
                 value=q.user.ge_bio_1c if (q.user.ge_bio_1c is not None) else q.args.ge_bio_1c,
                 trigger=True,
-                placeholder='Separate Lecture (3) and Laboratory (1)',
+                placeholder='or (Separate Lecture and Laboratory)',
                 width=menu_width,
                 choices=await get_choices(q, ge_pairs_query, ())
             ),
@@ -746,7 +760,7 @@ async def render_ge_science_card(q, menu_width, location='grid'):
                 #label='For Science Majors and Minors only:',
                 value=q.user.ge_bio_1b if (q.user.ge_bio_1b is not None) else q.args.ge_bio_1b,
                 trigger=True,
-                placeholder='For Science Majors and Minors only',
+                placeholder='or (Science Majors and Minors only)',
                 #placeholder='or (Select One)',
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (8,))
@@ -760,6 +774,7 @@ async def render_ge_science_card(q, menu_width, location='grid'):
                 trigger=True,
                 popup='always',
                 placeholder='(Select One)',
+                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query_nopre if nopre else ge_query, (10,))
                 #choices=await get_choices(q, ge_query_nopre, (10,))
@@ -774,7 +789,10 @@ async def render_ge_beh_card(q, menu_width, location='grid'):
         box=ui.box(location),
         items=[
             #ui.separator(label=''),
-            ui.text('Behavioral and Social Sciences', size=ui.TextSize.XL),
+            ui.inline([
+                ui.text('Behavioral and Social Sciences', size=ui.TextSize.XL),
+                ui.checkbox(name='ge_beh_check', label='')
+            ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_beh_1',
                 label='1. Behavioral and Social Sciences (3 credits)',
@@ -782,6 +800,7 @@ async def render_ge_beh_card(q, menu_width, location='grid'):
                 trigger=True,
                 popup='always',
                 placeholder='(Select One)',
+                required=True,
                 width=menu_width,
                 #choices=await get_choices(q, ge_query, (11,))
                 choices=await get_choices(q, ge_query_nopre if nopre else ge_query, (11,))
@@ -793,6 +812,7 @@ async def render_ge_beh_card(q, menu_width, location='grid'):
                 trigger=True,
                 popup='always',
                 placeholder='(Select One)',
+                required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query_nopre if nopre else ge_query, (11,))
                 #choices=await get_choices(q, ge_query, (11,))
@@ -809,14 +829,16 @@ async def render_ge_research_card(q, menu_width, location='grid'):
     card = ui.form_card(
         box=ui.box(location),
         items=[
-            ui.text('Research and Computing Literacy', size=ui.TextSize.XL),
+            ui.inline([
+                ui.text('Research and Computing Literacy', size=ui.TextSize.XL),
+                ui.checkbox(name='ge_res_check', label='')
+            ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_res_1',
                 label='1. Professional Exploration Course (3 credits)',
                 value=q.user.ge_res_1 if (q.user.ge_res_1 is not None) else q.args.ge_res_1,
                 # default value will depend on the major chosen
                 trigger=True,
-                required=True,
                 placeholder='(Select One)',
                 popup='always',
                 width=menu_width,
@@ -827,7 +849,6 @@ async def render_ge_research_card(q, menu_width, location='grid'):
                 label='2. Research Skills and Professional Development (1 credit)',
                 value=q.user.ge_res_2 if (q.user.ge_res_2 is not None) else 'LIBS 150',
                 trigger=True,
-                required=True,
                 placeholder='(Select One)',
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (13,))
@@ -837,6 +858,7 @@ async def render_ge_research_card(q, menu_width, location='grid'):
                 label='3. Computing or Information Technology (3 credits) One 3-credit course:',
                 value=q.user.ge_res_3 if (q.user.ge_res_3 is not None) else q.args.ge_res_3,
                 trigger=True,
+                required=True,
                 placeholder='(Select One)',
                 width=menu_width,
                 choices=await get_choices(q, ge_credits_query, (14,3))
@@ -844,6 +866,7 @@ async def render_ge_research_card(q, menu_width, location='grid'):
            ui.dropdown(
                 name='ge_res_3a',
                 label='or three 1-credit courses:\n',
+                required=True,
                 value=q.user.ge_res_3a if (q.user.ge_res_3a is not None) else q.args.ge_res_3a,
                 trigger=True,
                 placeholder='(Select One)',
