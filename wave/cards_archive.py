@@ -524,3 +524,17 @@ async def render_student_dropdown(q, menu_width, location):
     #    ('q.events', q.events),
     #    ('q.args', q.args)
     #]
+
+def dialog_description(course, description):
+    '''
+    Display the description of a row clicked on a table
+    '''
+    dialog = ui.dialog(
+        name = 'view_description',
+        title = course + ' Course Description',
+        width = '480px',
+        items = [ui.text(description)],
+        closable = True,
+        #events = ['dismissed']
+    )
+    return dialog

@@ -22,42 +22,57 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
             del q.page[name]
             q.client.cards.remove(name)
 
-def meta_card():
-    card = ui.meta_card(
-        box='', 
-        themes=[ui.theme( # UMGC red: '#a30606', UMGC yellow: '#fdbf38'
-            name='UMGC',
-            primary='#a30606', 
-            text='#000000',
-            card='#ffffff',
-            page='#e2e2e2', 
-        )],
-        theme='UMGC',
-        title='UMGC Wave App',
-        layouts=[ui.layout(
-            breakpoint='xs', 
-            min_height='100vh', 
-            zones=[
-                ui.zone('header'),
-                ui.zone('content', zones=[
-                    # Specify various zones and use the one that is currently needed. Empty zones are ignored.
-                    ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
-                    ui.zone('top_vertical'),
-                    ui.zone('middle_horizontal', direction=ui.ZoneDirection.ROW),
-                    ui.zone('middle_vertical'),
-                    #ui.zone('vertical'),                                   # delete eventually
-                    ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center'), # delete eventually
-                    ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
-                    ui.zone('bottom_vertical'),
-                    ui.zone('debug', direction=ui.ZoneDirection.ROW), 
-                ]),
-                ui.zone('footer'),
-    ])])
+def render_meta_card(flex=False):
+    title='UMGC Wave App'
+    theme_name='UMGC'
+    UMGC_layouts=[ui.layout(
+        breakpoint='xs', 
+        #min_height='100vh', 
+        zones=[
+            # size='0' keeps zone from expanding
+            ui.zone('header', size='80px'), 
+            ui.zone('content', zones=[
+                # Specify various zones and use the one that is currently needed. Empty zones are ignored.
+                ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
+                ui.zone('top_vertical'),
+                ui.zone('middle_horizontal', direction=ui.ZoneDirection.ROW),
+                ui.zone('middle_vertical'),
+                ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center'), # delete eventually
+                ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
+                ui.zone('bottom_vertical'),
+                ui.zone('debug', direction=ui.ZoneDirection.ROW), 
+            ], size='100%-80px'),
+            ui.zone('footer', size='0'),
+        ]
+    )]
+    UMGC_themes=[ui.theme( # UMGC red: '#a30606', UMGC yellow: '#fdbf38'
+        name='UMGC',
+        primary='#a30606', 
+        text='#000000',
+        card='#ffffff',
+        page='#e2e2e2', 
+    )]
+    if flex:
+        # card with layouts
+        card = ui.meta_card(
+            box='', themes=UMGC_themes, theme=theme_name, title=title,
+            layouts=UMGC_layouts,
+        )
+    else:
+        card = ui.meta_card(
+            box='', themes=UMGC_themes, theme=theme_name, title=title,
+        )
     return card 
 
-def header_card(q):
+def render_header(q, box='1 1 7 1', flex=False):
+    '''
+    flex: Use the old flex layout system rather than the grid system
+          (flex was not working correctly, can debug later)
+    '''
+    if flex:
+        box='header'
     card = ui.header_card(
-        box='header', 
+        box=box, 
         title='UMGC', 
         subtitle='Registration Assistant',
         image=q.app.umgc_logo,
@@ -82,13 +97,21 @@ def header_card(q):
     )
     return card
 
-footer = ui.footer_card(
-    box='footer',
-    caption='''
+def render_footer(box='1 10 7 1', flex=False):
+    '''
+    flex: Use the old flex layout system rather than the grid system
+    '''
+    if flex:
+        box='footer'
+    card = ui.footer_card(
+        box=box,
+        caption='''
 Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
 This app is in pre-alpha stage. Feedback welcomed.
-    '''
-)
+        '''
+    )
+    return card
+
 ####################  STANDARD WAVE CARDS (END)   ####################
 ######################################################################
 
@@ -127,11 +150,10 @@ def render_dialog_description(q, course):
 ####################  SQL QUERIES & UTILITIES  (END)   ###############
 ######################################################################
 
-
 ##############################################################
 ####################  DEBUG CARDS (START) ####################
 
-def render_debug_card(q, location='debug', width='33%', height='200px'):
+def render_debug_card_old(q, location='debug', width='33%', height='200px'):
     content = f'''
 ### q.args values:
 {q.args}
@@ -145,6 +167,29 @@ def render_debug_card(q, location='debug', width='33%', height='200px'):
         title='Debugging Information', 
         content=content 
     )
+
+def render_debug_card(q, location='debug', width='33%', height='200px'):
+    content = f'''
+### q.args values:
+{q.args}
+
+### q.events values:
+{q.events}
+
+    '''
+    card = ui.markdown_card(
+        box=ui.box(location, width=width, height=height), 
+        title='Debugging Information', 
+        content=content 
+    )
+    new_card = ui.form_card(
+        box=ui.box(location, width=width, height=height),items=[ui.expander(
+            name='debug_expander', 
+            label='Debug q.args and q.events',
+            items=[ui.textbox('Something should appear here')]
+        )]
+    )
+    return card
 
 def render_debug_client_card(q, location='debug', width='33%', height='200px'):
     content = f'''
@@ -213,7 +258,7 @@ async def get_choices(q, query, params=()):
     choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
     return choices
 
-async def render_dropdown_menus(q, location='top_horizontal', menu_width='280px'):
+async def render_dropdown_menus(q, box='1 2 3 3', location='top_horizontal', flex=False, menu_width='280px'):
     #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
     #area_query = '''
     #    SELECT DISTINCT menu_area_id AS name, area_name AS label
@@ -225,8 +270,13 @@ async def render_dropdown_menus(q, location='top_horizontal', menu_width='280px'
     #    FROM menu_all_view 
     #    WHERE menu_degree_id = ? AND menu_area_id = ?
     #'''
+    if flex:
+        box = location
+    else:
+        box = box
+
     card = ui.form_card(
-        box=location,
+        box=box,
         items=[
             ui.dropdown(
                 name='degree',
@@ -261,6 +311,85 @@ async def render_dropdown_menus(q, location='top_horizontal', menu_width='280px'
     )
     return card
 
+async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horizontal', flex=False, menu_width='280px'):
+    #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
+    #area_query = '''
+    #    SELECT DISTINCT menu_area_id AS name, area_name AS label
+    #    FROM menu_all_view 
+    #    WHERE menu_degree_id = ?
+    #'''
+    #program_query = '''
+    #    SELECT program_id AS name, program_name AS label
+    #    FROM menu_all_view 
+    #    WHERE menu_degree_id = ? AND menu_area_id = ?
+    #'''
+
+    dropdowns = ui.inline([
+        ui.dropdown(
+            name='degree',
+            label='Degree',
+            value=q.user.degree if (q.user.degree is not None) else q.args.degree,
+            trigger=True,
+            width='230px',
+            choices=await get_choices(q, degree_query)
+        ),
+        ui.dropdown(
+            name='area_of_study',
+            label='Area of Study',
+            value=q.user.area_of_study if (q.user.area_of_study is not None) else \
+                q.args.area_of_study,
+            trigger=True,
+            disabled=False,
+            width='250px',
+            choices=None if (q.user.degree is None) else \
+                await get_choices(q, area_query, (q.user.degree,))
+        ),
+        ui.dropdown(
+            name='program',
+            label='Program',
+            value=q.user.program if (q.user.program is not None) else q.args.program,
+            trigger=True,
+            disabled=False,
+            width='300px',
+            choices=None if (q.user.area_of_study is None) else \
+                await get_choices(q, program_query, (q.user.degree, q.user.area_of_study))
+        )
+    ], justify='start', align='start')
+
+    command_button = ui.button(
+        name='command_button', 
+        label='Select', 
+        disabled=True,
+        commands=[
+            ui.command(name='select_program', label='Save Program'),
+            ui.command(name='classes_menu', label='Classes', 
+                items=[
+                    ui.command(name='add_ge', label='Add GE'),
+                    ui.command(name='add_elective', label='Add Electives'),  
+            ])
+    ])
+
+    if flex:
+        box = location
+    else:
+        box = box
+
+    card = ui.form_card(box=box,
+        items=[
+            ui.inline([
+                dropdowns, 
+                command_button
+            ],
+            justify='between', 
+            align='end')
+        ]
+    )
+        
+    return card
+
+
+    ########################
+
 def render_major_recommendation_card(q, location='top_horizontal', width='350px'):
     card = ui.form_card(
         box=ui.box(location, width=width),
@@ -272,7 +401,7 @@ def render_major_recommendation_card(q, location='top_horizontal', width='350px'
                     ui.choice('A', label='My interests'),
                     ui.choice('B', label='My skills'),
                     ui.choice('C', label='Students like me'),
-                    ui.choice('D', label='The shortest time to graduate'),
+                    ui.choice('D', label='Shortest time to graduate'),
                 ]),
             ui.inline(
                 items=[
@@ -285,171 +414,103 @@ def render_major_recommendation_card(q, location='top_horizontal', width='350px'
     return card
 
 UMGC_tags = [
-    ui.tag(label='ELECTIVE', color='#FFEE58', label_color='$black'),
-    ui.tag(label='REQUIRED', color='$red'),
-    ui.tag(label='GENERAL', color='#046A38'),
-    ui.tag(label='MAJOR', color='#1565C0'),
+    ui.tag(label='ELECTIVE', color='#fdbf38', label_color='$black'),
+    ui.tag(label='REQUIRED', color='#a30606'),
+    ui.tag(label='MAJOR', color='#135f96'),
+    ui.tag(label='GENERAL', color='#3c3c43'), # dark gray
+#    ui.tag(label='GENERAL', color='#787800'), # khaki    
 ]
 
-async def render_program_dashboard(q, location, width):
+async def render_program_dashboard(q, box):
     '''
     Renders the dashboard with explored majors
     :param q: instance of Q for wave query
     :param location: page location to display
+    flex=True: location is required
+    flex=False: box is required
     '''
     title = q.user.degree_program # program name
- 
+
     if q.user.degree == '2':
         # get program summary for bachelor's degrees
         query = 'SELECT * FROM program_requirements WHERE program_id = ?'
         row = await get_query_one(q, query, params=(q.user.program_id,))
-
         if row:
-            return add_card(q, 'major_dashboard', ui.form_card(
-                box=ui.box(location, width=width),
+            card = add_card(q, 'major_dashboard', ui.form_card(
+                box=box,
                 items=[
-                    ui.text(title + ': Credits', size=ui.TextSize.L),
+                    #ui.text(title + ': Credits', size=ui.TextSize.L),
+                    ui.text('Credits', size=ui.TextSize.L),
                     ui.stats(
-                        # justify='between',
                         items=[
                             ui.stat(
                                 label='Major',
                                 value=str(row['major']),
-                                caption='Required Core',
-                                icon='Trackers'),
-                            ui.stat(
-                                label='Required',
-                                value=str(row['related_ge'] + row['related_elective']),
-                                caption='Required Related',
-                                icon='News'),
-                            ui.stat(
-                                label='General Education',
-                                value=str(row['remaining_ge']),
-                                caption='Remaining GE',
-                                icon='TestBeaker'),
-                            ui.stat(
-                                label='Elective',
-                                value=str(row['remaining_elective']),
-                                caption='Remaining Elective',
-                                icon='Media'),
-                            ui.stat(
-                                label='TOTAL',
-                                value=str(row['total']),
-                                caption='Total Credits',
-                                icon='Education'),
-                    ])
-            ]))
-            #else:
-            #    pass
-            #    # send a warning
-
-async def render_program_dashboard_inline_to_fix(q, location, width):
-    '''
-    ** CURRENTLY DOES NOT WORK
-
-    Renders the dashboard with explored majors
-    :param q: instance of Q for wave query
-    :param location: page location to display
-    '''
-    title = q.user.degree_program # program name
- 
-    if q.user.degree == '2':
-        # get program summary for bachelor's degrees
-        query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-        row = await get_query_one(q, query, params=(q.user.program_id,))
-
-        if row:
-            return add_card(q, 'major_dashboard', ui.form_card(
-                box=ui.box(location, width=width),
-                items=[
-                    ui.text(title + ': Credits', size=ui.TextSize.L),
+                                #caption='Credits',
+                                icon='Trackers',
+                                icon_color='#135f96'
+                        )]
+                    ),
                     ui.stats(
-                        # justify='between',
-                        items=[ui.inline(items=[
-                            ui.stat(
-                                label='Major',
-                                value=str(row['major']),
-                                caption='Required Core',
-                                icon='Trackers'),
+                        items=[
                             ui.stat(
                                 label='Required',
                                 value=str(row['related_ge'] + row['related_elective']),
-                                caption='Required Related',
-                                icon='News'),
+                                #caption='Credits',
+                                icon='News',
+                                icon_color='#a30606'
+                        )]
+                    ),
+                    ui.stats(
+                        items=[
                             ui.stat(
                                 label='General Education',
                                 value=str(row['remaining_ge']),
-                                caption='Remaining GE',
-                                icon='TestBeaker'),
+                                #caption='Remaining GE',
+                                icon='TestBeaker',
+                                #icon_color='#787800'
+                                icon_color='#3c3c43'
+                        )]
+                    ),
+                    ui.stats(
+                        items=[
                             ui.stat(
                                 label='Elective',
                                 value=str(row['remaining_elective']),
-                                caption='Remaining Elective',
-                                icon='Media'),
+                                #caption='Remaining Elective',
+                                icon='Media',
+                                icon_color='#fdbf38'
+                        )]
+                    ),
+                    ui.separator(),
+                    ui.stats(
+                        items=[
                             ui.stat(
                                 label='TOTAL',
                                 value=str(row['total']),
-                                caption='Total Credits',
-                                icon='Education'),
-                        ])]
-                )]
-            ))
-            #else:
-            #    pass
-            #    # send a warning
+                                #caption='Remaining Elective',
+                                icon='Education',
+                                icon_color='#da1a32 '
+                        )]
+                    ),
+                ])
+            )
+            return card
+        #else: '#3c3c43' 
+        #    pass
+        #    # send a warning
 
-async def render_program(q, location='middle_vertical', width='100%', dashboard=True):
-    async def _render_program_dashboard(q, location=location, width=width):
-        '''
-        Renders the dashboard with explored majors
-        :param q: instance of Q for wave query
-        :param location: page location to display
-        '''
-        title = q.user.degree_program # program name
- 
-        if q.user.degree == '2':
-            # get program summary for bachelor's degrees
-            query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-            row = await get_query_one(q, query, params=(q.user.program_id,))
-
-            if row:
-                return add_card(q, 'major_dashboard', ui.form_card(
-                    box=ui.box(location, width=width),
-                    items=[
-                        ui.text(title + ': Credits', size=ui.TextSize.L),
-                        ui.stats(
-                            # justify='between',
-                            items=[
-                                ui.stat(
-                                    label='Major',
-                                    value=str(row['major']),
-                                    caption='Required Core',
-                                    icon='Trackers'),
-                                ui.stat(
-                                    label='Required',
-                                    value=str(row['related_ge'] + row['related_elective']),
-                                    caption='Required Related',
-                                    icon='News'),
-                                ui.stat(
-                                    label='General Education',
-                                    value=str(row['remaining_ge']),
-                                    caption='Remaining GE',
-                                    icon='TestBeaker'),
-                                ui.stat(
-                                    label='Elective',
-                                    value=str(row['remaining_elective']),
-                                    caption='Remaining Elective',
-                                    icon='Media'),
-                                ui.stat(
-                                    label='TOTAL',
-                                    value=str(row['total']),
-                                    caption='Total Credits',
-                                    icon='Education'),
-                        ])
-                ]))
-            #else:
-            #    pass
-            #    # send a warning
+async def render_program_table(q, df, box=None, location=None, width=None, height=None, flex=False, check=True, ge=False, elective=False):
+    '''
+    q:
+    df:
+    location:
+    cardname:
+    width:
+    height:
+    ge: Include GE classes
+    elective: Include Elective classes
+    '''
     async def _render_program_group(group_name, record_type, df, collapsed, check=True):
         '''
         group_name: 
@@ -462,130 +523,154 @@ async def render_program(q, location='middle_vertical', width='100%', dashboard=
         # card will be returned if 
         # (1) check == False
         # (2) check == True and sum(rows) > 0
-        any_rows = (df['type'].str.upper() == record_type).sum() > 0
+        no_rows = (df['type'].str.upper() == record_type).sum() == 0
 
-        #if any_rows: #(check and not_blank) or (not check):
-        card = ui.table_group(group_name, [
-            ui.table_row(
-                #name=str(row['id']),
-                name=row['course'],
-                cells=[
-                    row['course'],
-                    row['title'],
-                    str(row['credits']),
-                    row['type'].upper(),
+        if check and no_rows: #(check and not_blank) or (not check):
+            return ''
+        else:
+            return ui.table_group(group_name, [
+                ui.table_row(
+                    #name=str(row['id']),
+                    name=row['course'],
+                    cells=[
+                        row['course'],
+                        row['title'],
+                        str(row['credits']),
+                        row['type'].upper(),
+                    ]
+                ) for _, row in df.iterrows() if row['type'].upper() == record_type
+            ], collapsed=collapsed)
+
+    # Create groups with logic
+    groups = []
+    result = await _render_program_group(
+        'Required Major Core Courses',
+        'MAJOR',
+        df, collapsed=True, check=False
+    )
+    if result != '':
+        groups.append(result)
+        
+    result = await _render_program_group(
+        'Required Related Courses/General Education',
+        'REQUIRED,GENERAL',
+        df, collapsed=True, check=check
+    )
+    if result != '':
+        groups.append(result)
+    
+    result = await _render_program_group(
+        'Required Related Courses/Electives',
+        'REQUIRED,ELECTIVE',
+        df, collapsed=True, check=check
+    )
+    if result != '':
+        groups.append(result)
+
+    if ge:
+        result = await _render_program_group(
+            'General Education',
+            'GENERAL',
+            df, collapsed=True, check=False
+        )
+        if result != '':
+            groups.append(result)
+        
+    if elective:
+        result = await _render_program_group(
+            'Electives',
+            'ELECTIVE',
+            df, collapsed=True, check=False
+        )
+        if result != '':
+            groups.append(result)
+
+    columns = [
+        # ui.table_column(name='seq', label='Seq', data_type='number'),
+        ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
+        ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300',
+                        cell_overflow='wrap'),
+        ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
+                        align='center'),
+        ui.table_column(
+            name='tag',
+            label='Type',
+            min_width='190',
+            filterable=True,
+            cell_type=ui.tag_table_cell_type(
+                name='tags',
+                tags=UMGC_tags
+            )
+        ),
+        ui.table_column(name='menu', label='Menu', max_width='150',
+            cell_type=ui.menu_table_cell_type(name='commands', 
+                commands=[
+                    ui.command(name='view_description', label='Course Description'),
+                    ui.command(name='prerequisites', label='Show Prerequisites'),
                 ]
-            ) for _, row in df.iterrows() if row['type'].upper() == record_type
-        ], collapsed=collapsed)
-        return card
-
-        #else:
-        #    return ''
-    async def _render_program_table(q, df, location='bottom_vertical', cardname='my_test_table', width='100%', 
-        height='350px', ge=False, elective=False):
-        '''
-        q:
-        df:
-        location:
-        cardname:
-        width:
-        height:
-        ge: Include GE classes
-        elective: Include Elective classes
-        '''
-        return add_card(q, cardname, ui.form_card(
-            box=ui.box(location, height=height, width=width),
-            items=[
-                ui.text('Required Courses', size=ui.TextSize.L),
-                ui.table(
-                    name='program_table',
-                    downloadable=False,
-                    resettable=False,
-                    groupable=False,
-                    height=height,
-                    columns=[
-                        # ui.table_column(name='seq', label='Seq', data_type='number'),
-                        ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
-                        ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300',
-                                        cell_overflow='wrap'),
-                        ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
-                                        align='center'),
-                        ui.table_column(
-                            name='tag',
-                            label='Type',
-                            min_width='190',
-                            filterable=True,
-                            cell_type=ui.tag_table_cell_type(
-                                name='tags',
-                                tags=UMGC_tags
-                            )
-                        ),
-                        ui.table_column(name='menu', label='Menu', max_width='150',
-                            cell_type=ui.menu_table_cell_type(name='commands', commands=[
-                                ui.command(name='view_description', label='Course Description'),
-                                ui.command(name='prerequisites', label='Show Prerequisites'),
-                        ]))
-                    ],
-                    groups=[
-                        await _render_program_group(
-                            'Required Major Core Courses',
-                            'MAJOR',
-                            df,
-                            False,
-                            check=True),
-                        await _render_program_group(
-                            'Required Related Courses/General Education',
-                            'REQUIRED,GENERAL',
-                            df,
-                            True),
-                        await _render_program_group(
-                            'Required Related Courses/Electives',
-                            'REQUIRED,ELECTIVE',
-                            df,
-                            True),
-                        #await _render_program_group(
-                        #    'General Education',
-                        #    'GENERAL',
-                        #    major_records,
-                        #    True),
-                        #await _render_program_group(
-                        #    'Electives',
-                        #    'ELECTIVE',
-                        #    major_records,
-                        #    True)
-                # ui.text(title, size=ui.TextSize.L),
-            ])]
         ))
-    async def _render_program_coursework(q, location=location, table_height='350px'):
-        '''
-        Create program coursework requirement table
-        '''
-        #############
-        query = '''
-            SELECT 
-                id,
-                course, 
-                course_type as type,
-                title,
-                credits,
-                pre,
-                pre_credits,
-                substitutions,
-                description
-            FROM program_requirements_view
-            WHERE program_id = ?
-        '''
-        df = pd.read_sql_query(query, q.user.conn, params=(q.user.program_id,))
-        q.client.program_df = df
+    ]
 
-        await _render_program_table(q, df, location, height=table_height)
+    if flex:
+        box = ui.box(location, height=height, width=width)
 
+    title = q.user.degree_program + ': Explore Required Courses'
+    card = add_card(q, 'program_table', ui.form_card(
+        box=box,
+        items=[
+            ui.inline(justify='between', align='center', items=[
+                ui.text(title, size=ui.TextSize.L),
+                ui.button(name='describe_program', label='About', 
+                    #caption='Description', 
+                    primary=True, disabled=True)
+            ]),
+            ui.table(
+                name='program_table',
+                downloadable=False,
+                resettable=False,
+                groupable=False,
+                height=height,
+                columns=columns,
+                groups=groups
+            )
+        ]
+    ))
+    return card
+
+async def render_program_coursework_table(q, box='1 3 5 7', location='middle_vertical', width='100%', height='500px', flex=False):
+    '''
+    Create program coursework requirement table
+    '''
+    #############
+    query = '''
+        SELECT 
+            id,
+            course, 
+            course_type as type,
+            title,
+            credits,
+            pre,
+            pre_credits,
+            substitutions,
+            description
+        FROM program_requirements_view
+        WHERE program_id = ?
+    '''
+    df = pd.read_sql_query(query, q.user.conn, params=(q.user.program_id,))
+    q.client.program_df = df
+
+    await render_program_table(q, df, box=box, location=location, width=width, height=height, flex=flex)
+
+
+async def render_program_old(q, box=None, flex=False, location='middle_vertical', width='100%', height='500px', dashboard=True):
+
+    await render_program_coursework_table(q, box='1 3 6 7', flex=False)
     if dashboard:
-        await _render_program_dashboard(q, location=location)
-        table_height='350px'
-    else:
-        table_height='480px'
-    await _render_program_coursework(q, location=location, table_height=table_height)
+        await render_program_dashboard(q, box='7 3 1 7', flex=False)
+
+async def render_program(q):
+    await render_program_dashboard(q, box='7 3 1 7')
+    await render_program_coursework_table(q, box='1 3 6 7')
 
 ####################  MAJORS PAGE (END)   ####################
 ##############################################################
