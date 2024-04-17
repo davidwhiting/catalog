@@ -3,27 +3,34 @@ import sqlite3
 from utils import conn, c, drop_table, drop_view, column_exists
 
 ################################################################
-# Roles Table
-# These are the roles for someone logging into the app
-#   student:   can select a major and create a schedule
-#   counselor: can select a student and do everything for them
-#   admin: for now, the same as counselor with potentially additional admin tasks
+# "App stage" table (for students)
+# Keep track of where users are in the app stage
+# (allow them to review and go back if needed)
+# 
+# 1: new
+# 2: personalized (whether they are at the student profile stage, 
+#        not whether they have answered everything.)
+# 3: program chosen (whether they have selected a major)
+#        building a program from scratch, adding GE, electives, minors, etc. 
+#        will be tracked elsewhere
+# 4: schedule created 
 
-roles = [
-    { "id": 1, "type": "student"  },
-    { "id": 2, "type": "counselor" },
-    { "id": 3, "type": "admin" }
+app_stage = [
+    { 'id': 1, 'stage': 'new' },
+    { 'id': 2, 'stage': 'personalized' },
+    { 'id': 3, 'stage': 'program chosen' },
+    { 'id': 4, 'stage': 'schedule created' }
 ]
 
-drop_table('roles',c)
+drop_table('app_stage', c)
 c.execute('''
-    CREATE TABLE roles (
+    CREATE TABLE app_stage (
         id INTEGER PRIMARY KEY,
-        type TEXT
+        stage TEXT
     )
 ''')
 
-c.executemany('INSERT INTO roles VALUES (:id, :type)', roles)
+c.executemany('INSERT INTO resident_status VALUES (:id, :type, :label)', resident_status)
 conn.commit()
 
 ################################################################

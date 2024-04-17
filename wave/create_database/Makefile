@@ -22,6 +22,7 @@ step3:
 	$(PYTHON) create_catalog_tables.py
 	$(PYTHON) create_programs_table.py
 	$(PYTHON) create_program_requirements_tables.py
+	$(PYTHON) create_program_courses.py
 	$(PYTHON) create_program_descriptions.py
 	$(PYTHON) create_ge_tables.py
 	$(PYTHON) create_catalog_program_suggested_sequence.py
