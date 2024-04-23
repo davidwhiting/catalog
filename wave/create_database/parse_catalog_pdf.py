@@ -9,7 +9,7 @@ from pdfminer.cmapdb import CMapDB
 from pdfminer.layout import LTTextContainer, LAParams
 from pdfminer.image import ImageWriter
 
-def pdf_to_txt(outfile='tmp_pdf2txt.txt', infile='2023-2024-catalog-courses.pdf', 
+def pdf_to_txt(outfile='tmp_pdf2txt.txt', infile='tmp_2023-2024-catalog-courses.pdf', 
                pages='', maxpages=0, password=b'', debug=0 ):
 
     # input option

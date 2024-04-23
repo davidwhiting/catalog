@@ -30,7 +30,7 @@ c.execute('''
     )
 ''')
 
-c.executemany('INSERT INTO resident_status VALUES (:id, :type, :label)', resident_status)
+c.executemany('INSERT INTO app_stage VALUES (:id, :stage)', app_stage)
 conn.commit()
 
 ################################################################

@@ -40,6 +40,7 @@ users = [
         "username": "admin", 
         "firstname": "The", 
         "lastname": "Administrator",
+        "notes": "default admin user"
     }
 ]
 
@@ -56,7 +57,10 @@ c.execute('''
     )
 ''')
 
-c.executemany('INSERT INTO users VALUES (:id, :role_id, :username, :firstname, :lastname)', users)
+c.executemany('''
+    INSERT INTO users (id, role_id, username, firstname, lastname, notes) 
+        VALUES (:id, :role_id, :username, :firstname, :lastname, :notes)
+    ''', users)
 conn.commit()
 
 
@@ -93,7 +97,7 @@ conn.commit()
 resident_status = [
     { "id": 1, "type": "in-state",     "label": "In-State" },
     { "id": 2, "type": "out-of-state", "label": "Out-of-State" },
-    { "id": 3, "type": "military" },   "label": "Military" }
+    { "id": 3, "type": "military",     "label": "Military" }
 ]
 
 drop_table('resident_status', c)
@@ -182,6 +186,7 @@ drop_table('student_info',c)
 c.execute('''
     CREATE TABLE student_info (
         id INTEGER PRIMARY KEY,
+        student_id INTEGER DEFAULT NULL,
         user_id INTEGER,
         resident_status_id INTEGER DEFAULT NULL,
         transfer_credits INTEGER DEFAULT NULL,
@@ -197,6 +202,9 @@ c.execute('''
         FOREIGN KEY(student_profile_id) REFERENCES student_profile(id)
     )
 ''')
+
+# Note: student_id is for internal student id (e.g., SS# replacement) to tie to university tables
+# It is not being used currently.
 
 # Close the connection
 conn.close()

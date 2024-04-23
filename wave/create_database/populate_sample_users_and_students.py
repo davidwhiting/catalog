@@ -15,6 +15,7 @@ users = [
         "username": "counselor", 
         "firstname": "Dr.", 
         "lastname": "Counselor",
+        "notes": "example coach"
     },
     { 
         "id": 3, 
@@ -43,25 +44,27 @@ users = [
     { 
         "id": 6, 
         "role_id": 3, 
-        "username": "major", 
-        "firstname": "Sergeant", 
-        "lastname": "Major",
+        "username": "sgtdoe", 
+        "firstname": "Sgt", 
+        "lastname": "Doe",
         "notes": "Example military student, evening classes only"
     },
 ]
 
-c.executemany('INSERT INTO users VALUES (:id, :role_id, :username, :firstname, :lastname)', users)
+c.executemany('''
+    INSERT INTO users VALUES (:id, :role_id, :username, :firstname, :lastname, :notes)
+''', users)
 conn.commit()
 
 ################################################################
-## Sample "Student Info" Table
+## Populate sample "Student Info" Table
 
 student_info = [
     { 
         "user_id": 3,
         "resident_status_id": 1,
         "transfer_credits": 0,
-        "financial_aid": 0,
+        "financial_aid": 1,
         "app_stage_id": 4, 
         "program_id": 5, 
         "student_profile_id": 1,
@@ -78,44 +81,158 @@ student_info = [
         "notes": "Jane Doe, student with transfer credits"
     },
     { 
-        "id": 2, 
-        "user_id": 3, 
-        "resident_status_id": 1 , 
-        "transfer_credits": 0,
-        "financial_aid": 0,
+        "user_id": 5, 
+        "resident_status_id": None,
+        "transfer_credits": None,
+        "financial_aid": None,
         "app_stage_id": 1,
-        "program_id": 0,
-        "student_profile_id": "unknown",
+        "program_id": None,
+        "student_profile_id": None,
         "notes": "Jim Doe new student no program selected"
     },
     { 
-        "id": 3, 
-        "user_id": 2, 
-        "resident_status_id": 2, 
-        "transfer_credits": 0,
-        "financial_aid": 0,
-        "stage": "program_chosen",
-        "program_id": 10, 
-        "profile": "part-time",
-        "notes": "Jane Doe with transfer credits" 
-    },
-    { 
-        "id": 4, 
-        "user_id": 4, 
+        "user_id": 6, 
         "resident_status_id": 3 , 
         "transfer_credits": 0,
-        "financial_aid": 0,
-        "stage": "new",
-        "program_id": 0, 
-        "profile": "evening",
-        "notes": "Sergeant Major - evening school" 
+        "financial_aid": 1,
+        "app_stage_id": 2,
+        "program_id": None, 
+        "student_profile_id": 3,
+        "notes": "Sgt Doe - evening school" 
     } 
 ]
 
 c.executemany('''
-    INSERT INTO student_info 
-        VALUES (:id, :user_id, :resident_status_id, :transfer_credits, :financial_aid, :stage, :program_id, :profile, :notes)
+    INSERT INTO student_info (user_id, resident_status_id, transfer_credits, financial_aid, 
+        app_stage_id, program_id, student_profile_id, notes)
+    VALUES (:user_id, :resident_status_id, :transfer_credits, :financial_aid, :app_stage_id, 
+        :program_id, :student_profile_id, :notes)
     ''', student_info)
+conn.commit()
+
+#################################################################
+# "Student History" Table                                       #
+#                                                               #
+# courses completed, including transfer credits                 #
+#################################################################
+
+student_history = [
+    { 'student_info_id': 2, 'name': 'STAT 200', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'HUMN 100', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ARTH 334', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'student_info_id': 2, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+]
+
+c.executemany('''
+    INSERT INTO student_history (student_info_id, name, credits, transfer)
+        VALUES (:student_info_id, :name, :credits, :transfer)
+    ''', student_history)
+
+conn.commit()
+
+#################################################################
+# "Student Progress" Table                                      #
+#                                                               #
+# student_history mapped into selected program.                 #
+#################################################################
+
+student_progress = [
+    { 'student_info_id': 1, 'seq':  1, 'name': 'PACE 111B', 'credits': 3, 'type': 'general',  'completed': 0, 'term':  1, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  2, 'name': 'LIBS 150',  'credits': 1, 'type': 'general',  'completed': 0, 'term':  1, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  3, 'name': 'WRTG 111',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  1, 'session': 3, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  4, 'name': 'WRTG 112',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  2, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  5, 'name': 'NUTR 100',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  1, 'session': 3, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  6, 'name': 'BMGT 110',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  2, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  7, 'name': 'SPCH 100',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  3, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  8, 'name': 'STAT 200',  'credits': 3, 'type': 'required', 'completed': 0, 'term':  3, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq':  9, 'name': 'IFSM 300',  'credits': 3, 'type': 'required', 'completed': 0, 'term':  4, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq': 10, 'name': 'ACCT 220',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  4, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 11, 'name': 'HUMN 100',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  4, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 12, 'name': 'BIOL 103',  'credits': 4, 'type': 'general',  'completed': 0, 'term':  5, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 13, 'name': 'ECON 201',  'credits': 3, 'type': 'required', 'completed': 0, 'term':  5, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 14, 'name': 'ARTH 334',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  5, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq': 15, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  6, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 16, 'name': 'ECON 203',  'credits': 3, 'type': 'required', 'completed': 0, 'term':  6, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 17, 'name': 'ACCT 221',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  7, 'session': 1, 'prerequisites': 'ACCT 220'                        }, 
+    { 'student_info_id': 1, 'seq': 18, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  7, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 19, 'name': 'BMGT 364',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  7, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 20, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  8, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 21, 'name': 'BMGT 365',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  8, 'session': 1, 'prerequisites': 'BMGT 364'                        }, 
+    { 'student_info_id': 1, 'seq': 22, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  9, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 23, 'name': 'MRKT 310',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  8, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 24, 'name': 'WRTG 394',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  9, 'session': 2, 'prerequisites': 'WRTG 112'                        }, 
+    { 'student_info_id': 1, 'seq': 25, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  9, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 26, 'name': 'BMGT 380',  'credits': 3, 'type': 'major',    'completed': 0, 'term': 10, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 27, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 10, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 28, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 11, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 29, 'name': 'HRMN 300',  'credits': 3, 'type': 'major',    'completed': 0, 'term': 11, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 1, 'seq': 30, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 11, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 31, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 12, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 32, 'name': 'FINC 330',  'credits': 3, 'type': 'major',    'completed': 0, 'term': 12, 'session': 1, 'prerequisites': 'ACCT 221 & STAT 200'             }, 
+    { 'student_info_id': 1, 'seq': 33, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 12, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 34, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 13, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 35, 'name': 'BMGT 496',  'credits': 3, 'type': 'major',    'completed': 0, 'term': 13, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 36, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 13, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 37, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 14, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 38, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 14, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 39, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 15, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 1, 'seq': 40, 'name': 'BMGT 495',  'credits': 3, 'type': 'major',    'completed': 0, 'term': 15, 'session': 2, 'prerequisites': 'BMGT 365 & MRKT 310 & FINC 330'  }, 
+    { 'student_info_id': 1, 'seq': 41, 'name': 'CAPSTONE',  'credits': 1, 'type': 'elective', 'completed': 0, 'term': 15, 'session': 3, 'prerequisites': 'FINC 330'                        }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'STAT 200',  'credits': 3, 'type': 'required', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  0, 'name': 'HUMN 100',  'credits': 3, 'type': 'general',  'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ARTH 334',  'credits': 3, 'type': 'general',  'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  0, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 1, 'term':  0, 'session': 0, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq':  1, 'name': 'PACE 111B', 'credits': 3, 'type': 'general',  'completed': 0, 'term':  1, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  2, 'name': 'LIBS 150',  'credits': 1, 'type': 'general',  'completed': 0, 'term':  1, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  3, 'name': 'WRTG 111',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  1, 'session': 3, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  4, 'name': 'WRTG 112',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  2, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  5, 'name': 'NUTR 100',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  2, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  6, 'name': 'BMGT 110',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  3, 'session': 3, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  7, 'name': 'SPCH 100',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  3, 'session': 1, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  8, 'name': 'IFSM 300',  'credits': 3, 'type': 'required', 'completed': 0, 'term':  3, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq':  9, 'name': 'ACCT 220',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  4, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 10, 'name': 'BIOL 103',  'credits': 4, 'type': 'general',  'completed': 0, 'term':  4, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 11, 'name': 'ECON 201',  'credits': 3, 'type': 'required', 'completed': 0, 'term':  4, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 12, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  5, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 13, 'name': 'ECON 203',  'credits': 3, 'type': 'required', 'completed': 0, 'term':  5, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 14, 'name': 'ACCT 221',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  5, 'session': 3, 'prerequisites': 'ACCT 220'                        }, 
+    { 'student_info_id': 2, 'seq': 15, 'name': 'BMGT 364',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  6, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 16, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  6, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 17, 'name': 'BMGT 365',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  7, 'session': 1, 'prerequisites': 'BMGT 364'                        }, 
+    { 'student_info_id': 2, 'seq': 18, 'name': 'MRKT 310',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  7, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 19, 'name': 'WRTG 394',  'credits': 3, 'type': 'general',  'completed': 0, 'term':  7, 'session': 2, 'prerequisites': 'WRTG 112'                        }, 
+    { 'student_info_id': 2, 'seq': 20, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  8, 'session': 3, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 21, 'name': 'BMGT 380',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  8, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 22, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  8, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 23, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term':  9, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 24, 'name': 'HRMN 300',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  9, 'session': 2, 'prerequisites': ''                                },
+    { 'student_info_id': 2, 'seq': 25, 'name': 'FINC 330',  'credits': 3, 'type': 'major',    'completed': 0, 'term':  9, 'session': 3, 'prerequisites': 'ACCT 221 & STAT 200'             }, 
+    { 'student_info_id': 2, 'seq': 26, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 10, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 27, 'name': 'ELECTIVE',  'credits': 3, 'type': 'elective', 'completed': 0, 'term': 11, 'session': 1, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 28, 'name': 'BMGT 496',  'credits': 3, 'type': 'major',    'completed': 0, 'term': 10, 'session': 2, 'prerequisites': ''                                }, 
+    { 'student_info_id': 2, 'seq': 29, 'name': 'BMGT 495',  'credits': 3, 'type': 'major',    'completed': 0, 'term': 11, 'session': 2, 'prerequisites': 'BMGT 365 & MRKT 310 & FINC 330'  }, 
+    { 'student_info_id': 2, 'seq': 30, 'name': 'CAPSTONE',  'credits': 1, 'type': 'elective', 'completed': 0, 'term': 11, 'session': 3, 'prerequisites': 'FINC 330'                        },    
+]
+
+c.executemany('''
+    INSERT INTO student_progress (student_info_id, seq, name, credits, type, completed, term, session, prerequisites)
+        VALUES (:student_info_id, :seq, :name, :credits, :type, :completed, :term, :session, :prerequisites)
+    ''', student_progress)
+
 conn.commit()
 
 # Close the connection
