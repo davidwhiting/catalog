@@ -1379,14 +1379,17 @@ c.execute('''
         id INTEGER PRIMARY KEY,
         program_id INTEGER,
         seq INTEGER,
-        course TEXT
+        course_type_id INTEGER,
+        course TEXT,
+        FOREIGN KEY(program_id) REFERENCES programs(id),
+        FOREIGN KEY(course_type_id) REFERENCES course_type(id)
     )
 ''')
 
 for catalog in catalogs:
     c.executemany('''
-        INSERT INTO catalog_program_sequence (program_id, seq, course) 
-        VALUES (:program_id, :seq, :course)
+        INSERT INTO catalog_program_sequence (program_id, seq, course_type_id, course) 
+        VALUES (:program_id, :seq, :course_type_id, :course)
     ''', catalog )
 conn.commit()
 

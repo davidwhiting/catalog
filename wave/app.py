@@ -1,7 +1,10 @@
-import logging
 from h2o_wave import main, app, Q, ui, on, run_on, data, handle_on
+
+import logging
+import pandas as pd
 from typing import Optional, List
 import random
+import sqlite3
 
 # 'templates' contains static html, markdown, and javascript D3 code
 import templates
@@ -17,7 +20,6 @@ from cards import add_card, clear_cards, get_choices
 # 'utils' contains all other python functions
 import utils
 from utils import get_query, get_query_one
-import sqlite3
 
 async def on_startup():
     # Set up logging
@@ -37,22 +39,6 @@ async def home(q: Q):
         title='Welcome to the UMGC Registration Assistant',
         caption='We will guide you through this experience.'
     ))
-
-#    #resident_status_check=q.client.resident_status if 
-#    content=f''' 
-#    Resident Status: {q.client.resident_status}
-#
-#    Attendance Type: {q.client.attendance_type}
-#
-#    '''
-
-#    add_card(q, 'welcome2', ui.wide_info_card(
-#        box=ui.box('top_horizontal', width='30%'),
-#        name='welcome2',
-#        icon='Contact',
-#        title='Profile',
-#        caption='Blank.'
-#    ))
 
 #    user_roles = ['Guest', 'Student', 'Counselor', 'Admin']
 #    add_card(q, 'user_role_card', ui.form_card(
@@ -138,8 +124,16 @@ async def major(q: Q):
     clear_cards(q)  
 
     add_card(q, 'dropdown',
-        await cards.render_dropdown_menus_horizontal(q, box='1 2 7 1', menu_width='280px')
+        await cards.render_dropdown_menus_horizontal(q, 
+            box='1 2 7 1', 
+            menu_width='280px'
+        )
     )
+
+    # if first time, add a blank card where table is 
+    # and a blank card for credits
+    #await render_program_dashboard(q, box='7 3 1 7')
+    #await render_program_coursework_table(q, box='1 3 6 7')
 
 #    #add_card(q, 'major1', ui.form_card(
 #    #    box=ui.box('top_horizontal', width='250px'),
@@ -151,8 +145,8 @@ async def major(q: Q):
 #    #    ]
 #    #))
 
-    if hasattr(q.user, 'program'):
-        if q.user.degree=='2': 
+    if hasattr(q.user, 'X_program'):
+        if q.user.X_degree=='2': 
             await cards.render_program(q)
 
 
@@ -161,10 +155,97 @@ async def major(q: Q):
 
 ###########################################################
 
+async def get_catalog_program_sequence(q):
+    query = '''
+        SELECT 
+            a.seq, 
+            a.course,
+            b.title,
+            b.credits,
+            0 AS completed,
+            0 AS term,
+            0 AS session,
+            0 AS locked,
+            b.substitutions,
+            b.pre,
+            b.pre_credits, 
+            b.description
+        FROM 
+            catalog_program_sequence a,
+            classes b
+        WHERE 
+            a.course = b.name
+            AND a.program_id = ?
+    '''
+    try:
+        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None  # or return a specific value or message
+
+    # Check if df is empty
+    if df.empty:
+        print("The query returned zero rows.")
+        return None  # or return a specific value or message
+
+    return df
+
+#async def get_catalog_program_sequence(q):
+#    query = '''
+#        SELECT seq, course FROM catalog_program_sequence WHERE program_id = ?
+#    '''
+#    df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))
+#    # check that df exists
+#    return df
+
+#async def get_student_progress(q):
+#    query = '''
+#        SELECT * FROM student_progress WHERE student_info_id = ?
+#    '''
+#    df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_student_info_id,))
+#    # check that df exists
+#    return df
+    
+async def get_student_progress(q):
+    query = '''
+        SELECT * FROM student_progress WHERE student_info_id = ?
+    '''
+    try:
+        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_student_info_id,))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None  # or return a specific value or message
+
+    # Check if df is empty
+    if df.empty:
+        print("The query returned zero rows.")
+        return None  # or return a specific value or message
+
+    return df
+
 @on('#course')
 async def course(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
+    # figure out conditions for program_selected to be true
+    # before selecting courses, a program should be chosen
+    if q.user.X_program is not None:
+        await cards.render_program_description(q, box='1 2 7 2')
+    else:
+        print("select a program.") # put this in a card or redirect
+
+    # starting to populate coursework... need to build this capability
+
+    program_courses_built = True
+    if program_courses_built:
+        q.user.X_schedule_df = await get_student_progress(q)
+
+    # check first that we are at the stage where this is available
+    # instead of us having to build it. That stage is program_selected and catalog_selected. If
+    # a schedule was ever created, we can retrieve it. 
+    # if the_right_conditions_exist:
+    
+    
 #    add_card(q, 'selected_program',
 #        ui.form_card(
 #        box='top_vertical',
@@ -193,7 +274,7 @@ async def course(q: Q):
 
 ###########################################################
 
-# GE should only show up if degree is Bachelor's. That navigation should show up in the Course tab.
+# GE should only show up if user.degree is Bachelor's. That navigation should show up in the Course tab.
 @on('#ge')
 @on('goto_ge')
 async def ge(q: Q):
@@ -281,84 +362,117 @@ async def schedule(q: Q):
 ##    #    await cards.render_dropdown_menus(q, location='top_horizontal', menu_width='280px'))
 ##    #cards.render_debug(q, location='bottom_horizontal', width='33%')
         
-###########################################################
+################################################################################
 
 async def initialize_app(q: Q):
     """
-    Initialize the app.
+    Initialize the app. Code here is run once at the app level.
     """
     q.app.initialized = True
     logging.info('Initializing app')
 
-    # upload once
+    # upload logo
     q.app.umgc_logo, = await q.site.upload(['images/umgc-logo-white.png'])
 
 
 async def initialize_user(q: Q):
     """
     Initialize the user.
+
+    - Keep database connections at the user level, rather than app (once per program run) 
+      or client (once per browser tab).
+    - In the future, will have multiple users connecting simultaneously
+
+    To do: 
+    - Replace sqlite3.connect with utils.TimesSQLiteConnection class. This will manage 
+      open connections assuming a multiuser system. (A lightweight connection pool.)
+
     """
     logging.info('Initializing user')
+
+    ## Initializing by deleting all variables in q.user. 
+    ## Double check that this isn't breaking anything.
+    #for key in list(q.user.keys()):
+    #    delattr(q.user, key)
+
     q.user.initialized = True
-#    #keycloak_implemented = False
 
-#    ##### KEYCLOAK CODE ##############
-#    # temporary until keycloak login fully implemented
-#    #    if keycloak_implemented:
-#    #        #Decode the access token without verifying the signature
-#    #        #Connects SSO to our user and student_info tables
-#    #        user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
-#    #
-#    #        q.user.username = user_details['preferred_username']
-#    #        q.user.name = user_details['name']
-#    #        q.user.firstname = user_details['given_name']
-#    #        q.user.lastname = user_details['family_name']
-#    #
-#    # check whether user is in the sqlite3 db
-#    # if so, get role and id
-#    # if not, add user to db as a new student
-#    #        q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
-#    #    else:
-#    #        # fake it for now
-
-    q.user.logged_in = False # need to test for this
-
-    if q.user.logged_in:
-        q.user.guest = False
-        q.user.user_id = 1 # for the time being
-    else:
-        q.user.guest = True
-        # create a random user_id for guest
-        q.user.user_id = random.randint(100000, 999999)
-
-    # keep database connections at the user level
-    # future state: multiple users connecting simultaneously
-    # tbd: replace connection with utils.TimesSQLiteConnection class
     q.user.conn = sqlite3.connect('UMGC.db')
-    q.user.conn.row_factory = sqlite3.Row  # return dictionaries rather than tuples
+    # row_factory returns dictionaries rather than tuples
+    # (more verbose, thus easier to understand code intent)
+    q.user.conn.row_factory = sqlite3.Row  
     q.user.c = q.user.conn.cursor()
 
-#    ## get user information
-#    #query = '''
-#    #    SELECT role_id, username, firstname, lastname, firstname || ' ' || lastname AS name
-#    #    FROM users
-#    #    WHERE id = ?
-#    #'''
-#
-#    #row = query_row(query, (q.user.user_id,), q.app.c)
-#    #(q.user.role_id, q.user.username, q.user.firstname, q.user.lastname, q.user.name) = row
-#    #
-#    ## If a student, get information from the student_info table
-#    #query = '''
-#    #    SELECT resident_status_id, transfer_credits, financial_aid, stage, program_id, profile, notes
-#    #    FROM student_info WHERE user_id = ?
-#    #'''
-#    #if q.user.role_id == 1:
-#    #    q.user.student = True
-#    #    row = query_row(query, (q.user.user_id,), q.app.c)
-#    #    (q.user.resident_status_id, q.user.transfer_credits, q.user.financial_aid, q.user.stage, q.user.program_id,
-#    #     q.user.profile, q.user.notes) = row
-#    #
+    #############################################################################
+    ## keycloak implementation code found in utils.py goes here after updating ##
+    #############################################################################
+
+    #############
+    ## Testing ##
+    #############
+    q.user.user_id = 0 # guest
+    #q.user.user_id = 1 # admin
+    #q.user.user_id = 2 # counselor
+    #q.user.user_id = 3 # John Doe, student
+    #q.user.user_id = 4 # Jane Doe, transfer student
+    #q.user.user_id = 5 # Jim Doe, new student no major selected
+    #q.user.user_id = 6 # Sgt Doe, military and evening student
+
+    if q.user.user_id > 0:
+        q.user.guest = False
+
+        await cards.get_role(q)
+        # add q.user.X_* updates if role is student
+        if int(q.user.role_id) == 3:
+            q.user.role = 'student'
+            q.user.X_user_id = q.user.user_id
+            q.user.X_name = q.user.name
+    else:
+        q.user.guest = True
+
+    # Guest path:
+    #   TBD (like student path, without saving) 
+    #
+    # Admin path:
+    #   Can add users
+    #   Can do other administrative tasks
+    #
+    # Counselor path:
+    #   Can add students
+    #   Using pulldown menu, can profile, select program, select courses, schedule courses for students
+    #
+    # Student path:
+    #   Can profile, select program, select courses, schedule courses for themselves
+    #
+
+    # All user variables related to students will be denoted
+    #   q.user.X_[name]
+    # This will allow us to keep track of student information whether the path is admin/counselor or student
+    # Otherwise, q.user.role_id=2 is counselor, but if the counselor is working on student with user_id=3, we
+    # need to be able to denote that q.user.X_user_id=3, etc.
+    
+    # manual switch to test guest mode vs. other modes
+    # will need an indicator from the app
+    
+    #q.user.logged_in = False 
+
+    # retrieve information for logged-in user
+
+    # note: student_info.id has a 1:1 mapping with user_id. May be better practice
+    # to use user_id throughout (some tables contain student_info_id, some user_id).
+
+    #if q.user.logged_in:
+        #q.user.guest = False
+        # q.user.user_id already created
+                           # later add an "add student" functionality
+        # if user is a student, do this:
+    if q.user.role == 'student':
+        await cards.get_student_info(q, q.user.X_user_id)
+    #else:
+    #    q.user.guest = True
+    #    # create a random user_id for guest
+    #    q.user.guest_id = random.randint(100000, 999999)
+
 #    #    if not hasattr(q.user, 'records'):
 #    #        q.user.ge_records = q.app.ge_records
 
@@ -404,20 +518,20 @@ async def user_role(q: Q):
 @on()
 async def degree(q: Q):
     logging.info('The value of degree is ' + str(q.args.degree))
-    q.user.degree = q.args.degree
+    q.user.X_degree = q.args.degree
 #    if q.user.degree != '2':
 #        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
 
 #        del q.client.program_df
 
     # reset area_of_study if degree changes
-    q.user.area_of_study = None 
-    q.page['dropdown'].area_of_study.value = q.user.area_of_study
+    q.user.X_area_of_study = None 
+    q.page['dropdown'].area_of_study.value = q.user.X_area_of_study
     # reset program if degree changes
-    q.user.program = None 
-    q.page['dropdown'].program.value = q.user.program
+    q.user.X_program = None 
+    q.page['dropdown'].program.value = q.user.X_program
 
-    q.page['dropdown'].area_of_study.choices = await get_choices(q, cards.area_query, (q.user.degree,))
+    q.page['dropdown'].area_of_study.choices = await get_choices(q, cards.area_query, (q.user.X_degree,))
 
 #    if q.client.major_debug:
 #        q.page['debug_info'] = cards.render_debug_card(q) # update debug card
@@ -427,16 +541,16 @@ async def degree(q: Q):
 
 @on()
 async def area_of_study(q: Q):
-    logging.info('The value of area_of_study is ' + str(q.args.degree))
-    q.user.area_of_study = q.args.area_of_study
+    logging.info('The value of area_of_study is ' + str(q.args.area_of_study))
+    q.user.X_area_of_study = q.args.area_of_study
 #    if q.user.degree != '2':
 #        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
 #        del q.client.program_df
 
     # reset program if area_of_study changes
-    q.user.program = None 
-    q.page['dropdown'].program.value = q.user.program
-    q.page['dropdown'].program.choices = await get_choices(q, cards.program_query, (q.user.degree, q.user.area_of_study))
+    q.user.X_program = None 
+    q.page['dropdown'].program.value = q.user.X_program
+    q.page['dropdown'].program.choices = await get_choices(q, cards.program_query, (q.user.X_degree, q.user.X_area_of_study))
 
 #    if q.client.major_debug:
 #        q.page['debug_info'] = cards.render_debug_card(q) # update debug card
@@ -446,13 +560,13 @@ async def area_of_study(q: Q):
 
 @on()
 async def program(q: Q):
-    logging.info('The value of program is ' + str(q.args.degree))
-    q.user.program = q.args.program
-    q.user.program_id = q.user.program # program_id an alias used throughout
-    q.user.degree_program = await utils.get_program_title(q, q.user.program_id)
+    logging.info('The value of program is ' + str(q.args.program))
+    q.user.X_program = q.args.program
+    q.user.X_program_id = q.user.X_program # program_id an alias used throughout
+    q.user.X_degree_program = await utils.get_program_title(q, q.user.X_program_id)
 
     # display major dashboard and table
-    if q.user.degree == '2':
+    if q.user.X_degree == '2':
         #clear_cards(q, ['dropdown'])
         await cards.render_program(q)
 

@@ -39,11 +39,11 @@ drop_table('student_history', c)
 c.execute('''
     CREATE TABLE student_history (
         id INTEGER PRIMARY KEY,
-        student_info_id INTEGER,
+        user_id INTEGER,
         name TEXT,
         credits INTEGER,
         transfer INTEGER,
-        FOREIGN KEY(student_info_id) REFERENCES student_info(id)
+        FOREIGN KEY(user_id) REFERENCES users(id)
     )
 ''')
 
@@ -68,7 +68,7 @@ drop_table('student_progress', c)
 c.execute('''
     CREATE TABLE student_progress (
         id INTEGER PRIMARY KEY,
-        student_info_id INTEGER,
+        user_id INTEGER,
         seq INTEGER,
         name TEXT,
         credits INTEGER,
@@ -80,7 +80,31 @@ c.execute('''
         prerequisites TEXT,
         pre TEXT DEFAULT NULL,
         pre_credits TEXT DEFAULT NULL,
-        FOREIGN KEY(student_info_id) REFERENCES student_info(id)
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+''')
+
+conn.commit()
+
+## This is the old table that currently works with D3. Need to adapt tne new table a bit.
+
+drop_table('student_progress_d3', c)
+c.execute('''
+    CREATE TABLE student_progress_d3 (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER,
+        seq INTEGER,
+        name TEXT,
+        credits INTEGER,
+        type TEXT,
+        completed INTEGER DEFAULT 0,
+        term INTEGER DEFAULT 0,
+        session INTEGER DEFAULT 0,
+        locked INTEGER DEFAULT 0,
+        prerequisites TEXT,
+        pre TEXT DEFAULT NULL,
+        pre_credits TEXT DEFAULT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id)
     )
 ''')
 

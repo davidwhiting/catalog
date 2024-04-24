@@ -123,7 +123,6 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
-
 drop_view('major_table_view')
 create_view_query = '''
     CREATE VIEW major_table_view AS

@@ -463,3 +463,27 @@ def move_courses_forward(period_index, periods, scheduled_courses):
         print("No movable courses found.")
 
     return
+
+    #############################################################################
+    ## keycloak implementation code found in utils.py goes here after updating ##
+    #############################################################################
+    
+    ##keycloak_implemented = False
+    ###### KEYCLOAK CODE ##############
+    ## temporary until keycloak login fully implemented
+    ##    if keycloak_implemented:
+    ##        #Decode the access token without verifying the signature
+    ##        #Connects SSO to our user and student_info tables
+    ##        user_details = jwt.decode(q.auth.access_token, options={"verify_signature": False})
+    ##
+    ##        q.user.username = user_details['preferred_username']
+    ##        q.user.name = user_details['name']
+    ##        q.user.firstname = user_details['given_name']
+    ##        q.user.lastname = user_details['family_name']
+    ##
+    ## check whether user is in the sqlite3 db
+    ## if so, get role and id
+    ## if not, add user to db as a new student
+    ##        q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
+    ##    else:
+    ##        # fake it for now
