@@ -159,23 +159,35 @@ async def get_catalog_program_sequence(q):
     query = '''
         SELECT 
             a.seq, 
-            a.course,
-            b.title,
+            a.course AS name,
+            c.name as course_type,
+            CASE
+                WHEN INSTR(c.name, '_') > 0 
+                THEN SUBSTR(c.name, 1, INSTR(c.name, '_') - 1)
+                ELSE c.name
+            END as type,
             b.credits,
+            b.title,
             0 AS completed,
             0 AS term,
             0 AS session,
             0 AS locked,
-            b.substitutions,
             b.pre,
             b.pre_credits, 
+            b.substitutions,
             b.description
         FROM 
-            catalog_program_sequence a,
+            catalog_program_sequence a
+        LEFT JOIN
+            course_type c
+        ON
+            c.id = a.course_type_id
+        LEFT JOIN
             classes b
-        WHERE 
+        ON
             a.course = b.name
-            AND a.program_id = ?
+        WHERE 
+            a.program_id = ?
     '''
     try:
         df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))

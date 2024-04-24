@@ -63,6 +63,8 @@ conn.commit()
 ##  - need to update prerequisites with pre and pre_credits
 ##  - note: term and session are initially NULL until updated prior 
 ##    to viewing with D3
+##  I may have included more than I need here. We will see and perhaps 
+##  make this a view instead of a table.
 
 drop_table('student_progress', c)
 c.execute('''
@@ -71,15 +73,18 @@ c.execute('''
         user_id INTEGER,
         seq INTEGER,
         name TEXT,
-        credits INTEGER,
+        course_type TEXT,
         type TEXT,
+        credits INTEGER,
+        title TEXT,
         completed INTEGER DEFAULT 0,
         term INTEGER DEFAULT 0,
         session INTEGER DEFAULT 0,
         locked INTEGER DEFAULT 0,
-        prerequisites TEXT,
-        pre TEXT DEFAULT NULL,
-        pre_credits TEXT DEFAULT NULL,
+        pre TEXT DEFAULT '',
+        pre_credits TEXT DEFAULT '',
+        substitutions TEXT DEFAULT '',
+        description TEXT DEFAULT '',
         FOREIGN KEY(user_id) REFERENCES users(id)
     )
 ''')
