@@ -66,9 +66,42 @@ conn.commit()
 ##  I may have included more than I need here. We will see and perhaps 
 ##  make this a view instead of a table.
 
+## bare minimum:
+##   user_id
+##   seq
+##   name
+##   course_type (note: type derived from it)
+##   completed
+##   term
+##   session
+##   locked
+
+## everything else in a view: student_progress_view
+
 drop_table('student_progress', c)
 c.execute('''
     CREATE TABLE student_progress (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER,
+        seq INTEGER,
+        name TEXT,
+        course_type TEXT,
+        credits INTEGER,
+        completed INTEGER DEFAULT 0,
+        term INTEGER DEFAULT 0,
+        session INTEGER DEFAULT 0,
+        locked INTEGER DEFAULT 0,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+''')
+conn.commit()
+
+## this should all be a view: student_progress_view
+## left join student_progress on courses
+
+drop_table('student_progress_old', c)
+c.execute('''
+    CREATE TABLE student_progress_old (
         id INTEGER PRIMARY KEY,
         user_id INTEGER,
         seq INTEGER,
@@ -84,6 +117,7 @@ c.execute('''
         pre TEXT DEFAULT '',
         pre_credits TEXT DEFAULT '',
         substitutions TEXT DEFAULT '',
+        prerequisites TEXT DEFAULT '',
         description TEXT DEFAULT '',
         FOREIGN KEY(user_id) REFERENCES users(id)
     )
@@ -96,6 +130,24 @@ conn.commit()
 drop_table('student_progress_d3', c)
 c.execute('''
     CREATE TABLE student_progress_d3 (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER,
+        seq INTEGER,
+        name TEXT,
+        credits INTEGER,
+        type TEXT,
+        completed INTEGER DEFAULT 0,
+        term INTEGER DEFAULT 0,
+        session INTEGER DEFAULT 0,
+        locked INTEGER DEFAULT 0,
+        prerequisites TEXT,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+''')
+
+drop_table('student_progress_d3_old', c)
+c.execute('''
+    CREATE TABLE student_progress_d3_old (
         id INTEGER PRIMARY KEY,
         user_id INTEGER,
         seq INTEGER,

@@ -167,5 +167,44 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
+
+drop_view('catalog_program_sequence_view')
+create_view_query = '''
+	CREATE VIEW catalog_program_sequence_view AS
+    SELECT 
+        a.program_id,
+        a.seq, 
+        a.course AS name,
+        c.name as course_type,
+        CASE
+            WHEN INSTR(c.name, '_') > 0 
+            THEN SUBSTR(c.name, 1, INSTR(c.name, '_') - 1)
+            ELSE c.name
+        END as type,
+        b.credits,
+        b.title,
+        0 AS completed,
+        0 AS term,
+        0 AS session,
+        0 AS locked,
+        b.pre,
+        b.pre_credits, 
+        b.substitutions,
+        b.description
+    FROM 
+        catalog_program_sequence a
+    LEFT JOIN
+        course_type c
+    ON
+        c.id = a.course_type_id
+    LEFT JOIN
+        classes b
+    ON
+        a.course = b.name
+'''
+c.execute(create_view_query)
+conn.commit()
+
+
 # Close the connection
 conn.close()

@@ -44,6 +44,18 @@ async def get_program_title(q, program_id):
     else:
         return None
 
+async def get_program_title_new(q, program_id):
+    query = '''
+        SELECT b.id, b.name || ' in ' || a.name as title
+        FROM programs a, degrees b 
+        WHERE a.id = ? AND a.degree_id = b.id 
+    '''
+    row = await get_query_one(q, query, params=(program_id,))
+    if row:
+        return row
+    else:
+        return None
+
 class TimedSQLiteConnection:
     '''
     This class creates an SQLite connection that will disconnect after 

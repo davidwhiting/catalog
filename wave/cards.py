@@ -7,6 +7,7 @@ import sys
 
 ######################################################################
 ####################  STANDARD WAVE CARDS (START) ####################
+######################################################################
 
 # Use for page cards that should be removed when navigating away.
 # For pages that should be always present on screen use q.page[key] = ...
@@ -113,11 +114,13 @@ This app is in pre-alpha stage. Feedback welcomed.
     )
     return card
 
+######################################################################
 ####################  STANDARD WAVE CARDS (END)   ####################
 ######################################################################
 
 ######################################################################
 ####################  SQL QUERIES & UTILITIES (START) ################
+######################################################################
 
 # These are used in app.py and elsewhere
 degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
@@ -151,37 +154,92 @@ def render_dialog_description(q, course):
 async def get_role(q):
     # get role given a user id
     query = '''
-        SELECT role_id, username, firstname || ' ' || lastname as fullname
-        FROM users WHERE user_id = ? 
+        SELECT 
+		    a.role_id,
+		    b.type AS role,
+		    a.username, 
+		    a.firstname || ' ' || a.lastname AS fullname
+        FROM 
+			users a, roles b
+		WHERE 
+			a.role_id=b.id AND a.id = ?
     '''
     row = await get_query_one(q, query, params=(q.user.user_id,))
     q.user.role_id = row['role_id']
+    q.user.role = row['role']
     q.user.username = row['username']
     q.user.name = row['fullname']
 
 async def get_student_info(q, user_id):
     # get information from student_info table
+    # create a view for this
     query = '''
-        SELECT * FROM student_info WHERE user_id = ?
+        SELECT 
+            a.user_id, 
+            b.firstname || ' ' || b.lastname AS fullname,
+            c.label AS resident_status, 
+            a.app_stage_id,
+            d.stage as app_stage,
+            e.label AS student_profile,
+            a.transfer_credits, 
+            a.financial_aid,
+            a.program_id
+        FROM 
+            student_info a
+        LEFT JOIN
+            users b
+        ON
+            a.user_id = b.id
+        LEFT JOIN
+            resident_status c
+        ON
+            a.resident_status_id=c.id
+        LEFT JOIN
+            app_stage d
+        ON
+            a.app_stage_id=d.id
+        LEFT JOIN
+            student_profile e
+        ON
+            a.student_profile_id=e.id
+        WHERE 
+            user_id = ?
     '''   
     row = await get_query_one(q, query, params=(user_id,))
     if row:
-        q.user.X_student_info_id = row['id']
-        q.user.X_resident_status_id = row['resident_status_id']
-        q.user.X_transfer_credits = row['transfer_credits']
-        q.user.X_financial_aid = row['financial_aid']
+        q.user.X_resident_status = row['resident_status']
         q.user.X_app_stage_id = row['app_stage_id']
-        q.user.X_student_profile_id = row['student_profile_id']
+        q.user.X_app_stage = row['app_stage']
+        q.user.X_student_profile = row['student_profile']
+        q.user.X_financial_aid = row['financial_aid']
+        q.user.X_transfer_credits = row['transfer_credits']
         q.user.X_program_id = row['program_id']
         if q.user.X_program_id is not None:
-            q.user.X_degree_program = await utils.get_program_title(q, q.user.X_program_id)
+            row = await utils.get_program_title_new(q, q.user.X_program_id)
+            if row:
+                q.user.X_degree_program = row['title']
+                q.user.X_degree_id = row['id']
+    
+    # retrieve menu status for students
+    query = '''
+        SELECT menu_degree_id, menu_area_id 
+        FROM menu_all_view
+        WHERE program_id = ?
+        LIMIT 1
+    '''
+    # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
+    row = await get_query_one(q, query, params=(q.user.X_program_id,))
+    if row:
+        q.user.X_menu_degree = row['menu_degree_id']
+        q.user.X_menu_area = row['menu_area_id']
 
-
+######################################################################
 ####################  SQL QUERIES & UTILITIES  (END)   ###############
 ######################################################################
 
 ##############################################################
 ####################  DEBUG CARDS (START) ####################
+##############################################################
 
 def render_debug_card_old(q, location='debug', width='33%', height='200px'):
     content = f'''
@@ -234,18 +292,32 @@ def render_debug_client_card(q, location='debug', width='33%', height='200px'):
         content=content 
     )
 
-def render_debug_user_card(q, location='debug', width='33%', height='200px'):
+def render_debug_user_card(q, flex=False, box='2 2 3 3', location='debug', width='33%', height='200px'):
+    if flex:
+        box = ui.box(location, width=width, height=height)
     content = f'''
-### q.app values:
-{q.app}
 
 ### q.user values:
 {q.user}
 
     '''
     return ui.markdown_card(
-        ui.box(location, width=width, height=height), 
+        box=box, 
         title='User Debugging Information', 
+        content=content 
+    )
+
+def render_debug_app_card(q, flex=False, box='2 2 3 3', location='debug', width='33%', height='200px'):
+    if flex:
+        box = ui.box(location, width=width, height=height)
+    content = f'''
+### q.app values:
+{q.app}
+
+    '''
+    return ui.markdown_card(
+        box=box, 
+        title='App Debugging Information', 
         content=content 
     )
 
@@ -254,34 +326,77 @@ def render_debug(q, location='debug', width='25%', height='230px'):
     add_card(q, 'debug_client_info', render_debug_client_card(q,  location=location, width=width, height=height)) 
     add_card(q, 'debug_info', render_debug_card(q, location=location, width=width, height=height)) 
 
+##############################################################
 ####################  DEBUG CARDS (END)   ####################
 ##############################################################
 
 ##############################################################
 ####################  HOME PAGE (START)  #####################
+##############################################################
 
-yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
-career_assessment_card = ui.wide_info_card(
-    box=ui.box('bottom_horizontal', width='400px'),
-    name='Assessments',
-    icon='AccountActivity',
-    title='Career Assessments',
+def render_welcome_card(q, box='1 2 7 1'):
+    add_card(q, 'welcome_home', ui.form_card(
+        box=box,
+        items=[
+            ui.text_l('Welcome to the UMGC Registration Assistant'),
+            ui.text('We will guide you through this experience.')
+        ]
+    ))
+
+def render_welcome_back_card(q, box='1 3 3 3', title=''):
+    content = f'''## Welcome back, {q.user.X_name}.
+
+### Here is your current selected information:
+
+- **Selected program**: {q.user.X_degree_program}
+
+- **Residency status**: {q.user.X_resident_status}
+
+- **Student type**: {q.user.X_student_profile}
+
+- **Transfer credits**: {q.user.X_transfer_credits==1}
+
+- **Financial aid**: {q.user.X_financial_aid==1}
+'''
+    add_card(q, 'user_info', ui.markdown_card(
+        box=box,
+        title=title,
+        content=content
+    ))
+
+def render_career_assessment_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):
+    if flex:
+        box=ui.box(location, width='400px')
+    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
     caption=f'Access career assessment tools like **UMGC CareerQuest** or add a page like <a href="{yale_url}" target="_blank">Yale\'s</a> with _Interest_, _Personality_, and _Skills_ assessments.'
-)
+    card = ui.wide_info_card(
+        box=box,
+        name='Assessments',
+        icon='AccountActivity',
+        title='Career Assessments',
+        caption=caption
+    )
+    return card
 
-ai_enablement_card = ui.wide_info_card(
-    box=ui.box('bottom_horizontal', width='400px'),
-    name='ai',
-    icon='LightningBolt',
-    title='AI Enablement',
-    caption='*Interest* or *Skills* assessments critical for AI recommendations.'
-)
+def render_ai_enablement_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):
+    if flex:
+        box=ui.box('bottom_horizontal', width='400px')
+    card = ui.wide_info_card(
+        box=box,
+        name='ai',
+        icon='LightningBolt',
+        title='AI Enablement',
+        caption='*Interest* or *Skills* assessments critical for AI recommendations.'
+    )
+    return card
 
+##############################################################
 ####################  HOME PAGE (END)    #####################
 ##############################################################
 
 ##############################################################
-####################  MAJORS PAGE (START) ####################
+####################  PROGRAMS PAGE (START) ##################
+##############################################################
 
 async def get_choices(q, query, params=()):
     rows = await get_query(q, query, params)
@@ -304,59 +419,6 @@ async def get_choices_with_disabled(q, query, params=()):
         disabled=(str(row['label']) in disabled_items)) for row in rows]
     return choices
 
-async def render_dropdown_menus(q, box='1 2 3 3', location='top_horizontal', flex=False, menu_width='280px'):
-    #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
-    #area_query = '''
-    #    SELECT DISTINCT menu_area_id AS name, area_name AS label
-    #    FROM menu_all_view 
-    #    WHERE menu_degree_id = ?
-    #'''
-    #program_query = '''
-    #    SELECT program_id AS name, program_name AS label
-    #    FROM menu_all_view 
-    #    WHERE menu_degree_id = ? AND menu_area_id = ?
-    #'''
-    if flex:
-        box = location
-    else:
-        box = box
-
-    card = ui.form_card(
-        box=box,
-        items=[
-            ui.dropdown(
-                name='degree',
-                label='Degree',
-                value=q.user.X_degree if (q.user.X_degree is not None) else q.args.degree,
-                trigger=True,
-                width=menu_width,
-                choices=await get_choices(q, degree_query)
-            ),
-            ui.dropdown(
-                name='area_of_study',
-                label='Area of Study',
-                value=q.user.X_area_of_study if (q.user.X_area_of_study is not None) else \
-                    q.args.area_of_study,
-                trigger=True,
-                disabled=False,
-                width=menu_width,
-                choices=None if (q.user.X_degree is None) else \
-                    await get_choices(q, area_query, (q.user.X_degree,))
-            ),
-            ui.dropdown(
-                name='program',
-                label='Program',
-                value=q.user.X_program if (q.user.X_program is not None) else q.args.program,
-                trigger=True,
-                disabled=False,
-                width=menu_width,
-                choices=None if (q.user.X_area_of_study is None) else \
-                    await get_choices(q, program_query, (q.user.X_degree, q.user.X_area_of_study))
-            )
-        ]
-    )
-    return card
-
 async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horizontal', flex=False, menu_width='280px'):
     #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
     #area_query = '''
@@ -372,35 +434,37 @@ async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horiz
 
     disabled = []
 
+    # enforcing string because I've got a but somewhere (passing an int instead of str)
+
     dropdowns = ui.inline([
         ui.dropdown(
-            name='degree',
+            name='menu_degree',
             label='Degree',
-            value=q.user.X_degree if (q.user.X_degree is not None) else q.args.degree,
+            value=str(q.user.X_menu_degree) if (q.user.X_menu_degree is not None) else q.args.menu_degree,
             trigger=True,
             width='230px',
             choices=await get_choices(q, degree_query)
         ),
         ui.dropdown(
-            name='area_of_study',
+            name='menu_area',
             label='Area of Study',
-            value=q.user.X_area_of_study if (q.user.X_area_of_study is not None) else \
-                q.args.area_of_study,
+            value=str(q.user.X_menu_area) if (str(q.user.X_menu_area) is not None) else \
+                str(q.args.menu_area),
             trigger=True,
             disabled=False,
             width='250px',
-            choices=None if (q.user.X_degree is None) else \
-                await get_choices(q, area_query, (q.user.X_degree,))
+            choices=None if (q.user.X_menu_degree is None) else \
+                await get_choices(q, area_query, (q.user.X_menu_degree,))
         ),
         ui.dropdown(
-            name='program',
+            name='menu_program',
             label='Program',
-            value=q.user.X_program if (q.user.X_program is not None) else q.args.program,
+            value=str(q.user.X_program_id) if (q.user.X_program_id is not None) else q.args.menu_program,
             trigger=True,
             disabled=False,
             width='300px',
-            choices=None if (q.user.X_area_of_study is None) else \
-                await get_choices_with_disabled(q, program_query, (q.user.X_degree, q.user.X_area_of_study))
+            choices=None if (q.user.X_menu_area is None) else \
+                await get_choices_with_disabled(q, program_query, (q.user.X_menu_degree, q.user.X_menu_area))
         )
     ], justify='start', align='start')
 
@@ -435,12 +499,13 @@ async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horiz
         
     return card
 
-
     ########################
 
-def render_major_recommendation_card(q, location='top_horizontal', width='350px'):
+def render_major_recommendation_card(q, box='1 5 3 3', flex=False, location='top_horizontal', width='350px'):
+    if flex:
+        box=ui.box(location, width=width)
     card = ui.form_card(
-        box=ui.box(location, width=width),
+        box=box,
         items=[
             ui.choice_group(
                 name='recommendation_group',
@@ -514,71 +579,72 @@ async def render_program_dashboard(q, box):
     '''
     title = q.user.X_degree_program # program name
 
-    if q.user.X_degree == '2':
-        # get program summary for bachelor's degrees
-        query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-        row = await get_query_one(q, query, params=(q.user.X_program_id,))
-        if row:
-            card = add_card(q, 'major_dashboard', ui.form_card(
-                box=box,
-                items=[
-                    #ui.text(title + ': Credits', size=ui.TextSize.L),
-                    ui.text('Credits', size=ui.TextSize.L),
-                    ui.stats(
-                        items=[
-                            ui.stat(
-                                label='Major',
-                                value=str(row['major']),
-                                #caption='Credits',
-                                icon='Trackers',
-                                icon_color='#135f96'
-                        )]
-                    ),
-                    ui.stats(
-                        items=[
-                            ui.stat(
-                                label='Required',
-                                value=str(row['related_ge'] + row['related_elective']),
-                                #caption='Credits',
-                                icon='News',
-                                icon_color='#a30606'
-                        )]
-                    ),
-                    ui.stats(
-                        items=[
-                            ui.stat(
-                                label='General Education',
-                                value=str(row['remaining_ge']),
-                                #caption='Remaining GE',
-                                icon='TestBeaker',
-                                #icon_color='#787800'
-                                icon_color='#3c3c43'
-                        )]
-                    ),
-                    ui.stats(
-                        items=[
-                            ui.stat(
-                                label='Elective',
-                                value=str(row['remaining_elective']),
-                                #caption='Remaining Elective',
-                                icon='Media',
-                                icon_color='#fdbf38'
-                        )]
-                    ),
-                    ui.separator(),
-                    ui.stats(
-                        items=[
-                            ui.stat(
-                                label='TOTAL',
-                                value=str(row['total']),
-                                #caption='Remaining Elective',
-                                icon='Education',
-                                icon_color='#da1a32 '
-                        )]
-                    ),
-                ])
-            )
-            return card
+    #if q.user.X_menu_degree == '2':
+
+    # get program summary for bachelor's degrees
+    query = 'SELECT * FROM program_requirements WHERE program_id = ?'
+    row = await get_query_one(q, query, params=(q.user.X_program_id,))
+    if row:
+        card = add_card(q, 'major_dashboard', ui.form_card(
+            box=box,
+            items=[
+                #ui.text(title + ': Credits', size=ui.TextSize.L),
+                ui.text('Credits', size=ui.TextSize.L),
+                ui.stats(
+                    items=[
+                        ui.stat(
+                            label='Major',
+                            value=str(row['major']),
+                            #caption='Credits',
+                            icon='Trackers',
+                            icon_color='#135f96'
+                    )]
+                ),
+                ui.stats(
+                    items=[
+                        ui.stat(
+                            label='Required',
+                            value=str(row['related_ge'] + row['related_elective']),
+                            #caption='Credits',
+                            icon='News',
+                            icon_color='#a30606'
+                    )]
+                ),
+                ui.stats(
+                    items=[
+                        ui.stat(
+                            label='General Education',
+                            value=str(row['remaining_ge']),
+                            #caption='Remaining GE',
+                            icon='TestBeaker',
+                            #icon_color='#787800'
+                            icon_color='#3c3c43'
+                    )]
+                ),
+                ui.stats(
+                    items=[
+                        ui.stat(
+                            label='Elective',
+                            value=str(row['remaining_elective']),
+                            #caption='Remaining Elective',
+                            icon='Media',
+                            icon_color='#fdbf38'
+                    )]
+                ),
+                ui.separator(),
+                ui.stats(
+                    items=[
+                        ui.stat(
+                            label='TOTAL',
+                            value=str(row['total']),
+                            #caption='Remaining Elective',
+                            icon='Education',
+                            icon_color='#da1a32 '
+                    )]
+                ),
+            ])
+        )
+        return card
         #else: '#3c3c43' 
         #    pass
         #    # send a warning
@@ -745,23 +811,187 @@ async def render_program_coursework_table(q, box='1 3 5 7', location='middle_ver
 
     await render_program_table(q, df, box=box, location=location, width=width, height=height, flex=flex)
 
-async def render_program_old(q, box=None, flex=False, location='middle_vertical', width='100%', height='500px', dashboard=True):
-
-    await render_program_coursework_table(q, box='1 3 6 7', flex=False)
-    if dashboard:
-        await render_program_dashboard(q, box='7 3 1 7', flex=False)
-
 async def render_program(q):
     await render_program_description(q, box='1 3 7 2')
     await render_program_dashboard(q, box='7 5 1 5')
     await render_program_coursework_table(q, box='1 5 6 5')
 
-####################  MAJORS PAGE (END)   ####################
+
+##############################################################
+####################  PROGRAM PAGE (END)   ###################
+##############################################################
+
+##############################################################
+####################  COURSES PAGE (START) ###################
+##############################################################
+
+def render_courses_header(q, box='1 2 7 1'):
+    content=f'**Program Selected**: {q.user.X_degree_program}'
+    add_card(q, 'courses_header', ui.form_card(
+        box=box,
+        items=[
+            ui.text_l(content),
+            #ui.text('We will guide you through this experience.')
+        ]
+    ))
+
+async def get_catalog_program_sequence(q):
+    query = 'SELECT * FROM catalog_program_sequence_view WHERE program_id = ?'
+    #query = '''
+    #    SELECT 
+    #        a.seq, 
+    #        a.course AS name,
+    #        c.name as course_type,
+    #        CASE
+    #            WHEN INSTR(c.name, '_') > 0 
+    #            THEN SUBSTR(c.name, 1, INSTR(c.name, '_') - 1)
+    #            ELSE c.name
+    #        END as type,
+    #        b.credits,
+    #        b.title,
+    #        0 AS completed,
+    #        0 AS term,
+    #        0 AS session,
+    #        0 AS locked,
+    #        b.pre,
+    #        b.pre_credits, 
+    #        b.substitutions,
+    #        b.description
+    #    FROM 
+    #        catalog_program_sequence a
+    #    LEFT JOIN
+    #        course_type c
+    #    ON
+    #        c.id = a.course_type_id
+    #    LEFT JOIN
+    #        classes b
+    #    ON
+    #        a.course = b.name
+    #    WHERE 
+    #        a.program_id = ?
+    #'''
+    try:
+        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None  # or return a specific value or message
+
+    # Check if df is empty
+    if df.empty:
+        print("The query returned zero rows.")
+        return None  # or return a specific value or message
+
+    return df
+
+async def get_student_progress_d3(q):
+    query = '''
+        SELECT * FROM student_progress_d3 WHERE user_id = ?
+    '''
+    try:
+        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_user_id,))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None  # or return a specific value or message
+
+    # Check if df is empty
+    if df.empty:
+        print("The query returned zero rows.")
+        return None  # or return a specific value or message
+
+    return df
+
+async def render_course_page_table(q, df, box=None, location=None, width=None, height=None, flex=False, check=True, ge=False, elective=False):
+    '''
+    Input comes from 
+    q:
+    df:
+    location:
+    cardname:
+    width:
+    height:
+    ge: Include GE classes
+    elective: Include Elective classes
+    '''
+
+    columns = [
+        ui.table_column(name='seq', label='Seq', data_type='number'),
+        ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
+        ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300',
+                        cell_overflow='wrap'),
+        ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
+                        align='center'),
+        ui.table_column(
+            name='tag',
+            label='Type',
+            min_width='190',
+            filterable=True,
+            cell_type=ui.tag_table_cell_type(
+                name='tags',
+                tags=UMGC_tags
+            )
+        ),
+        ui.table_column(name='menu', label='Menu', max_width='150',
+            cell_type=ui.menu_table_cell_type(name='commands', 
+                commands=[
+                    ui.command(name='view_description', label='Course Description'),
+                    ui.command(name='show_prereq', label='Show Prerequisites'),
+                    ui.command(name='select_course', label='Select Course'),
+                ]
+        ))
+    ]
+
+    rows = [
+        ui.table_row(
+            #name=str(row['id']),
+            name=row['course'],
+            cells=[
+                row['seq'],
+                row['name'], # course
+                row['title'],
+                str(row['credits']),
+                row['type'].upper(),
+            ]
+        ) for _, row in df.iterrows()
+    ]
+
+    if flex:
+        box = ui.box(location, height=height, width=width)
+
+    #title = q.user.X_degree_program + ': Explore Required Courses'
+    title = 'Remaining Courses'
+    card = add_card(q, 'course_table', ui.form_card(
+        box=box,
+        items=[
+            ui.inline(justify='between', align='center', items=[
+                ui.text(title, size=ui.TextSize.L),
+                ui.button(name='describe_program', label='About', 
+                    #caption='Description', 
+                    primary=True, disabled=True)
+            ]),
+            ui.table(
+                name='course_table',
+                downloadable=False,
+                resettable=True,
+                groupable=True,
+                height=height,
+                columns=columns,
+                rows=rows
+            )
+        ]
+    ))
+    return card
+
+
+
+##############################################################
+####################  COURSES PAGE (END)  ####################
 ##############################################################
 
 ##############################################################
 ####################  GE PAGE (START) ########################
+##############################################################
 
+# reset ge defaults if covered in  
 async def get_ge_choices(q, query, params=()):
     rows = await get_query(q, query, params)
     choices = [ui.choice(name=str(row['name']), label=row['name'] + ': ' + row['title']) for row in rows]
@@ -791,17 +1021,19 @@ ge_pairs_query = '''
     ORDER BY name
 '''
 
-async def render_ge_comm_card(q, menu_width, location='grid'):
+async def render_ge_comm_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    if flex:
+        box = location
     card = ui.form_card(
-        box=ui.box(location),
+        box=box,
         items=[
             ui.inline([
-                ui.text('Communications', size=ui.TextSize.XL),
+                ui.text('Communications', size=ui.TextSize.L),
                 ui.checkbox(name='ge_comm_check', label='')
             ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_comm_1',
-                label='1. WRTG 111 or another writing course (3 credits)',
+                label='1. WRTG 111 or equivalent (3 credits)',
                 value=q.user.X_ge_comm_p1 if (q.user.X_ge_comm_p1 is not None) else 'WRTG 111',
                 trigger=True,
                 width=menu_width,
@@ -818,7 +1050,7 @@ async def render_ge_comm_card(q, menu_width, location='grid'):
             ),
             ui.dropdown(
                 name='ge_comm_3',
-                label='3. Communication, writing, or speech course (3 credits)',
+                label='3. Another course (3 credits)',
                 placeholder='(Select One)',
                 value=q.user.X_ge_comm_p3 if (q.user.X_ge_comm_p3 is not None) else q.args.ge_comm_p3,
                 trigger=True,
@@ -839,17 +1071,20 @@ async def render_ge_comm_card(q, menu_width, location='grid'):
     )
     return card
 
-async def render_ge_math_card(q, menu_width, location='grid'):
+async def render_ge_math_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    if flex:
+        box = location
+    nopre = True # pick this value up from checkbox
     card = ui.form_card(
-        box=ui.box(location),
+        box=box,
         items=[
             ui.inline([
-                ui.text('Mathematics', size=ui.TextSize.XL),
+                ui.text('Mathematics', size=ui.TextSize.L),
                 ui.checkbox(name='ge_math_check', label='')
             ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_math',
-                label='Mathematics (3 credits)',
+                label='One Course (3 credits)',
                 value=q.user.X_ge_math if (q.user.X_ge_math is not None) else q.args.ge_math,
                 placeholder='(Select One)',
                 trigger=True,
@@ -861,17 +1096,20 @@ async def render_ge_math_card(q, menu_width, location='grid'):
     )
     return card
 
-async def render_ge_arts_card(q, menu_width, location='grid'):
+async def render_ge_arts_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    if flex:
+        box = location
+    nopre = True # pick this value up from checkbox
     card = ui.form_card(
-        box=ui.box(location),
+        box=box,
         items=[
             ui.inline([
-                ui.text('Arts and Humanities', size=ui.TextSize.XL),
+                ui.text('Arts and Humanities', size=ui.TextSize.L),
                 ui.checkbox(name='ge_arts_check', label='')
             ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_arts_1',
-                label='1. Arts and Humanities (3 credits)',
+                label='1. Course (3 credits)',
                 value=q.user.X_ge_arts_1 if (q.user.X_ge_arts_1 is not None) else q.args.ge_arts_1,
                 trigger=True,
                 placeholder='(Select One)',
@@ -881,7 +1119,7 @@ async def render_ge_arts_card(q, menu_width, location='grid'):
             ),
             ui.dropdown(
                 name='ge_arts_2',
-                label='2. Arts and Humanities (3 credits)',
+                label='2. Course (3 credits)',
                 value=q.user.X_ge_arts_2 if (q.user.X_ge_arts_2 is not None) else q.args.ge_arts_2,
                 trigger=True,
                 placeholder='(Select One)',
@@ -894,23 +1132,25 @@ async def render_ge_arts_card(q, menu_width, location='grid'):
     )
     return card
 
-async def render_ge_science_card(q, menu_width, location='grid'):
+async def render_ge_science_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    if flex:
+        box = location
     nopre = True # pick this value up from checkbox
     card = ui.form_card(
-        box=ui.box(location),
+        box=box,
         items=[
             ui.inline([
-                ui.text('Biological and Physical Sciences', size=ui.TextSize.XL),
+                ui.text('Biological and Physical Sciences', size=ui.TextSize.L),
                 ui.checkbox(name='ge_science_check', label='')
             ], justify='between', align='start'),
             #ui.text('Select one of the following:', size=ui.TextSize.L),
             #ui.separator(label='1. Select one of the following three choices:'),
             ui.dropdown(
                 name='ge_bio_1a',
-                label='1. Lecture with Lab (4 credits): Select one',
+                label='1. Lecture & Lab (4 credits): Select one',
                 value=q.user.X_ge_bio_1a if (q.user.X_ge_bio_1a is not None) else q.args.ge_bio_1a,
                 trigger=True,
-                placeholder='(Combined Lecture and Laboratory)',
+                placeholder='(Combined Lecture & Lab)',
                 required=True,
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (7,))
@@ -920,7 +1160,7 @@ async def render_ge_science_card(q, menu_width, location='grid'):
                 #label='Separate Lecture and Laboratory',
                 value=q.user.X_ge_bio_1c if (q.user.X_ge_bio_1c is not None) else q.args.ge_bio_1c,
                 trigger=True,
-                placeholder='or (Separate Lecture and Laboratory)',
+                placeholder='or (Separate Lecture & Lab)',
                 width=menu_width,
                 choices=await get_choices(q, ge_pairs_query, ())
             ),
@@ -929,7 +1169,7 @@ async def render_ge_science_card(q, menu_width, location='grid'):
                 #label='For Science Majors and Minors only:',
                 value=q.user.X_ge_bio_1b if (q.user.X_ge_bio_1b is not None) else q.args.ge_bio_1b,
                 trigger=True,
-                placeholder='or (Science Majors and Minors only)',
+                placeholder='or (Science Majors and Minors)',
                 #placeholder='or (Select One)',
                 width=menu_width,
                 choices=await get_choices(q, ge_query, (8,))
@@ -938,7 +1178,7 @@ async def render_ge_science_card(q, menu_width, location='grid'):
             #nopre=True # check for easy classes by selecting those w/o prerequisites
             ui.dropdown(
                 name='ge_bio_2',
-                label='2. An additional science course (3 credits)',
+                label='2. An additional course (3 credits)',
                 value=q.user.X_ge_bio_2 if (q.user.X_ge_bio_2 is not None) else q.args.ge_bio_2,
                 trigger=True,
                 popup='always',
@@ -952,19 +1192,21 @@ async def render_ge_science_card(q, menu_width, location='grid'):
     )
     return card
 
-async def render_ge_beh_card(q, menu_width, location='grid'):
+async def render_ge_beh_card(q, menu_width, box='1 3 3 4', flex=False, location='grid'):
+    if flex:
+        box = location
     nopre = True # pick this value up from checkbox
     card = ui.form_card(
-        box=ui.box(location),
+        box=box,
         items=[
             #ui.separator(label=''),
             ui.inline([
-                ui.text('Behavioral and Social Sciences', size=ui.TextSize.XL),
+                ui.text('Behavioral and Social Sciences', size=ui.TextSize.L),
                 ui.checkbox(name='ge_beh_check', label='')
             ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_beh_1',
-                label='1. Behavioral and Social Sciences (3 credits)',
+                label='1. Course (3 credits)',
                 value=q.user.X_ge_beh_1 if (q.user.X_ge_beh_1 is not None) else q.args.ge_beh_1,
                 trigger=True,
                 popup='always',
@@ -976,7 +1218,7 @@ async def render_ge_beh_card(q, menu_width, location='grid'):
             ),
             ui.dropdown(
                 name='ge_beh_2',
-                label='2. Behavioral and Social Sciences (3 credits)',
+                label='2. Course (3 credits)',
                 value=q.user.X_ge_beh_2 if (q.user.X_ge_beh_2 is not None) else q.args.ge_beh_2,
                 trigger=True,
                 popup='always',
@@ -990,21 +1232,22 @@ async def render_ge_beh_card(q, menu_width, location='grid'):
     )
     return card
 
-async def render_ge_research_card(q, menu_width, location='grid'):
+async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, location='grid'):
+    if flex:
+        box = location
     # make some defaults based on area of program chosen:
     if q.user.X_area_of_study == 1:
         q.user.X_ge_res_1 = 'PACE 111B'
-
     card = ui.form_card(
-        box=ui.box(location),
+        box=box,
         items=[
             ui.inline([
-                ui.text('Research and Computing Literacy', size=ui.TextSize.XL),
+                ui.text('Research and Computing Literacy', size=ui.TextSize.L),
                 ui.checkbox(name='ge_res_check', label='')
             ], justify='between', align='start'),
             ui.dropdown(
                 name='ge_res_1',
-                label='1. Professional Exploration Course (3 credits)',
+                label='1. Professional Exploration (3 credits)',
                 value=q.user.X_ge_res_1 if (q.user.X_ge_res_1 is not None) else q.args.ge_res_1,
                 # default value will depend on the major chosen
                 trigger=True,
@@ -1015,7 +1258,7 @@ async def render_ge_research_card(q, menu_width, location='grid'):
             ),
             ui.dropdown(
                 name='ge_res_2',
-                label='2. Research Skills and Professional Development (1 credit)',
+                label='2. Research Skills / Professional Development (1 credit)',
                 value=q.user.X_ge_res_2 if (q.user.X_ge_res_2 is not None) else 'LIBS 150',
                 trigger=True,
                 placeholder='(Select One)',
@@ -1024,21 +1267,21 @@ async def render_ge_research_card(q, menu_width, location='grid'):
             ),
             ui.dropdown(
                 name='ge_res_3',
-                label='3. Computing or Information Technology (3 credits) One 3-credit course:',
+                label='3. Computing or IT (3 credits)',
                 value=q.user.X_ge_res_3 if (q.user.X_ge_res_3 is not None) else q.args.ge_res_3,
                 trigger=True,
                 required=True,
-                placeholder='(Select One)',
+                placeholder='(Select 3-credit Course)',
                 width=menu_width,
                 choices=await get_choices(q, ge_credits_query, (14,3))
             ),
            ui.dropdown(
                 name='ge_res_3a',
-                label='or three 1-credit courses:\n',
+                label='[or three 1-credit courses]:',
                 required=True,
                 value=q.user.X_ge_res_3a if (q.user.X_ge_res_3a is not None) else q.args.ge_res_3a,
                 trigger=True,
-                placeholder='(Select One)',
+                placeholder='(Select 1-credit Course)',
                 width=menu_width,
                 choices=await get_choices(q, ge_credits_query, (14,1))
             ),
@@ -1047,7 +1290,7 @@ async def render_ge_research_card(q, menu_width, location='grid'):
                 #label='Computing or Information Technology (1 credit)',
                 value=q.user.X_ge_res_3b if (q.user.X_ge_res_3b is not None) else q.args.ge_res_3b,
                 trigger=True,
-                placeholder='and (Select One)',
+                placeholder='and (Select 1-credit Course)',
                 width=menu_width,
                 choices=await get_choices(q, ge_credits_query, (14,1))
             ),
@@ -1056,7 +1299,7 @@ async def render_ge_research_card(q, menu_width, location='grid'):
                 #label='Computing or Information Technology (1 credit each)',
                 value=q.user.X_ge_res_3c if (q.user.X_ge_res_3c is not None) else q.args.ge_res_3c,
                 trigger=True,
-                placeholder='and (Select One)',
+                placeholder='and (Select 1-credit Course)',
                 width=menu_width,
                 choices=await get_choices(q, ge_credits_query, (14,1))
             ),
@@ -1064,8 +1307,27 @@ async def render_ge_research_card(q, menu_width, location='grid'):
     )
     return card
 
+##############################################################
 ####################  GE PAGE (END)   ########################
 ##############################################################
+
+
+
+###############################################################
+####################  SCHEDULE PAGE (START) ###################
+###############################################################
+
+def d3plot(html, location='horizontal', height='500px', width='100%'):
+    card = ui.frame_card(
+        box=ui.box(location, height=height, width=width),
+        title='Tentative Course Schedule',
+        content=html
+    )
+    return card
+
+###############################################################
+####################  SCHEDULE PAGE (END)  ####################
+###############################################################
 
 warning_example_card = ui.form_card(
     box='1 1 4 7',
@@ -1083,11 +1345,4 @@ warning_example_card = ui.form_card(
 
 ###########
 
-def d3plot(html, location='horizontal', height='500px', width='100%'):
-    card = ui.frame_card(
-        box=ui.box(location, height=height, width=width),
-        title='Tentative Course Schedule',
-        content=html
-    )
-    return card
 

@@ -31,69 +31,26 @@ async def on_startup():
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
-    add_card(q, 'welcome', ui.wide_info_card(
-        #box=ui.box('top_horizontal', width='70%'),
-        box='1 2 4 1',
-        name='welcome',
-        icon='Contact',
-        title='Welcome to the UMGC Registration Assistant',
-        caption='We will guide you through this experience.'
+    # show this card only for guests and students with new status
+    # for folks not yet logged in
+    cards.render_welcome_card(q)
+
+    # show this card for returning users only
+    cards.render_welcome_back_card(q, box='1 3 3 3')
+
+    add_card(q, 'dashboard_placeholder', ui.markdown_card(
+        box='6 3 2 2',
+        title='Dashboard',
+        content='Add a summary dashboard here'
     ))
 
-#    user_roles = ['Guest', 'Student', 'Counselor', 'Admin']
-#    add_card(q, 'user_role_card', ui.form_card(
-#        box=ui.box('middle_horizontal', width='250px'),
-#        #style={'background': '#fdbf38'},
-#        items=[
-#            ui.dropdown(
-#                name='user_role',
-#                label='Select User Role',
-#                value=q.client.user_role if (q.client.user_role is not None) else \
-#                    'Guest', #q.args.user_role,
-#                trigger=True,
-#                width='200px',
-#                choices=[ui.choice(name=x, label=x) for x in user_roles],
-#            ),
-#        ]
-#    ))
-#
-#    ## If a student, get information from the student_info table
-#    #query = '''
-#    #    SELECT resident_status_id, transfer_credits, financial_aid, stage, program_id, profile, notes
-#    #    FROM student_info WHERE user_id = ?
-#    #'''
-#
-#    # select resident status from database
-#    # save to database
-#    resident_status = ['In-State', 'Out-of-State', 'Military']
-#    add_card(q, 'resident_status_card', ui.form_card(
-#        box=ui.box('middle_horizontal', width='250px'),
-#        items=[
-#            ui.choice_group(
-#                name='resident_status',
-#                label='Resident Status',
-#                inline=False,
-#                choices=[ui.choice(name=x, label=x) for x in resident_status],
-#                value=q.client.resident_status if (q.client.resident_status is not None) else q.args.resident_status,
-#            )
-#        ]
-#    ))
-#
-#    attendance_type = ['Full-Time', 'Part-Time', 'Evening']
-#    add_card(q, 'attendance_type_card', ui.form_card(
-#        box=ui.box('middle_horizontal', width='250px'),
-#        items=[
-#            ui.choice_group(
-#                name='attendance_type',
-#                label='Attendance Type',
-#                inline=False,
-#                choices=[ui.choice(name=x, label=x) for x in attendance_type],
-#                value=q.client.attendance_type if (q.client.attendance_type is not None) else \
-#                    q.args.attendance_type,
-#            )
-#        ]
-#    ))
-#
+    add_card(q, 'to_do_next', ui.markdown_card(
+        box='4 3 2 2',
+        title='Next steps',
+        content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
+    ))
+
+
 #    student_profile_type = ['First time attending', 'Previous experience', 'Transfer credits']
 #    add_card(q, 'student_profile_type_card', ui.form_card(
 #        box=ui.box('middle_horizontal', width='250px'),
@@ -109,16 +66,17 @@ async def home(q: Q):
 #        ]
 #    ))
 
-#    add_card(q, 'assessments', cards.career_assessment_card)
-#    add_card(q, 'major_recommendations',
-#        cards.render_major_recommendation_card(q, location='bottom_horizontal'))
-#
-#    add_card(q, 'enable_ai', cards.ai_enablement_card)
-# 
-#    cards.render_debug(q, location='debug', width='33%')
+    add_card(q, 'assessments', cards.render_career_assessment_card(box='3 6 3 2'))
+    add_card(q, 'major_recommendations',
+             cards.render_major_recommendation_card(q, box='1 6 2 3'))
+    add_card(q, 'enable_ai', cards.render_ai_enablement_card(box='3 8 3 2'))
 
-###########################################################
+    #add_card(q, 'debug_home', cards.render_debug_user_card(q, box='2 10 6 4'))
 
+
+##############################################################
+###########  PROGRAM PAGE (PREVIOUSLY MAJOR)   ###############
+##############################################################
 @on('#major')
 async def major(q: Q):
     clear_cards(q)  
@@ -126,7 +84,7 @@ async def major(q: Q):
     add_card(q, 'dropdown',
         await cards.render_dropdown_menus_horizontal(q, 
             box='1 2 7 1', 
-            menu_width='280px'
+            menu_width='300px'
         )
     )
 
@@ -145,118 +103,43 @@ async def major(q: Q):
 #    #    ]
 #    #))
 
-    if hasattr(q.user, 'X_program'):
-        if q.user.X_degree=='2': 
-            await cards.render_program(q)
+    if hasattr(q.user, 'X_program_id'):
+        await cards.render_program(q)
+    # need to make available for degree types other than bachelor's
 
-
-#    if q.client.major_debug:
-#        cards.render_debug(q, location='debug', width='33%')
-
-###########################################################
-
-async def get_catalog_program_sequence(q):
-    query = '''
-        SELECT 
-            a.seq, 
-            a.course AS name,
-            c.name as course_type,
-            CASE
-                WHEN INSTR(c.name, '_') > 0 
-                THEN SUBSTR(c.name, 1, INSTR(c.name, '_') - 1)
-                ELSE c.name
-            END as type,
-            b.credits,
-            b.title,
-            0 AS completed,
-            0 AS term,
-            0 AS session,
-            0 AS locked,
-            b.pre,
-            b.pre_credits, 
-            b.substitutions,
-            b.description
-        FROM 
-            catalog_program_sequence a
-        LEFT JOIN
-            course_type c
-        ON
-            c.id = a.course_type_id
-        LEFT JOIN
-            classes b
-        ON
-            a.course = b.name
-        WHERE 
-            a.program_id = ?
-    '''
-    try:
-        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None  # or return a specific value or message
-
-    # Check if df is empty
-    if df.empty:
-        print("The query returned zero rows.")
-        return None  # or return a specific value or message
-
-    return df
-
-#async def get_catalog_program_sequence(q):
-#    query = '''
-#        SELECT seq, course FROM catalog_program_sequence WHERE program_id = ?
-#    '''
-#    df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))
-#    # check that df exists
-#    return df
-
-#async def get_student_progress(q):
-#    query = '''
-#        SELECT * FROM student_progress WHERE student_info_id = ?
-#    '''
-#    df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_student_info_id,))
-#    # check that df exists
-#    return df
+    add_card(q, 'debug_program', cards.render_debug_user_card(q, box='1 10 7 2'))
     
-async def get_student_progress(q):
-    query = '''
-        SELECT * FROM student_progress WHERE student_info_id = ?
-    '''
-    try:
-        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_student_info_id,))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None  # or return a specific value or message
-
-    # Check if df is empty
-    if df.empty:
-        print("The query returned zero rows.")
-        return None  # or return a specific value or message
-
-    return df
-
+##############################################################
+####################  COURSES PAGE  ##########################
+##############################################################
 @on('#course')
 async def course(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
-    # figure out conditions for program_selected to be true
-    # before selecting courses, a program should be chosen
-    if q.user.X_program is not None:
-        await cards.render_program_description(q, box='1 2 7 2')
-    else:
-        print("select a program.") # put this in a card or redirect
+    if hasattr(q.user, 'X_program_id'):
+        cards.render_courses_header(q, box='1 2 7 1')
+        # check whether schedule was previously created
+        if hasattr(q.user, 'X_app_stage_id'):
+            stage_id=int(q.user.X_app_stage_id)
+            if stage_id==4:
+                # retrieve schedule from database
+                q.user.X_schedule_df = await cards.get_student_progress_d3(q)
+                # display table
+                ## this is the wrong table, for now is just a placeholder
+                await cards.render_program_coursework_table(q, box='1 5 7 5')
+            else: # stage_id==3:
+                # need to build a program from scratch
+                # ask whether to start by pulling from catalog suggested programs
+                pass
+
+        #await cards.render_program(q)
 
     # starting to populate coursework... need to build this capability
-
-    program_courses_built = True
-    if program_courses_built:
-        q.user.X_schedule_df = await get_student_progress(q)
 
     # check first that we are at the stage where this is available
     # instead of us having to build it. That stage is program_selected and catalog_selected. If
     # a schedule was ever created, we can retrieve it. 
     # if the_right_conditions_exist:
-    
     
 #    add_card(q, 'selected_program',
 #        ui.form_card(
@@ -284,30 +167,34 @@ async def course(q: Q):
 #   
 #    cards.render_debug(q)
 
-###########################################################
+    add_card(q, 'debug_course', cards.render_debug_user_card(q, box='1 10 7 2'))
 
-# GE should only show up if user.degree is Bachelor's. That navigation should show up in the Course tab.
+
+##############################################################
+####################  GE PAGE (START) ########################
+##############################################################
 @on('#ge')
 @on('goto_ge')
 async def ge(q: Q):
     clear_cards(q)
 
-#    add_card(q, 'welcome_ge', ui.wide_info_card(
-#        box=ui.box('top_horizontal', width='100%'),
-#        name='welcome',
-#        icon='Contact',
-#        title='Select your General Education courses here.',
-#        caption='We will guide you through this experience.'
-#    ))
-#
-#    menu_width = '350px'
-#
-#    add_card(q, 'ge_req6', await cards.render_ge_research_card(q, menu_width, location='grid'))
-#    add_card(q, 'ge_req1', await cards.render_ge_comm_card(q, menu_width, location='grid'))
-#    add_card(q, 'ge_req4', await cards.render_ge_science_card(q, menu_width, location='grid'))
-#    add_card(q, 'ge_req2', await cards.render_ge_math_card(q, menu_width, location='grid'))
-#    add_card(q, 'ge_req3', await cards.render_ge_arts_card(q, menu_width, location='grid'))
-#    add_card(q, 'ge_req5', await cards.render_ge_beh_card(q, menu_width, location='grid'))
+    add_card(q, 'welcome_ge', ui.form_card(
+        box='1 2 7 1',
+        items=[
+            ui.text_l('Select your General Education courses here.'),
+            #ui.text('We will guide you through this experience.')
+        ]
+    ))
+
+    menu_width = '300px'
+    add_card(q, 'ge_req1', await cards.render_ge_comm_card(q, menu_width, box='1 3 3 4'))
+    add_card(q, 'ge_req6', await cards.render_ge_research_card(q, menu_width, box='4 3 3 6'))
+    add_card(q, 'ge_req4', await cards.render_ge_science_card(q, menu_width, box='1 7 3 4'))
+    add_card(q, 'ge_req2', await cards.render_ge_math_card(q, menu_width, box='4 9 3 2'))
+    add_card(q, 'ge_req3', await cards.render_ge_arts_card(q, menu_width, box='1 11 3 3'))
+    add_card(q, 'ge_req5', await cards.render_ge_beh_card(q, menu_width, box='4 11 3 3'))
+
+ 
 #    
 #    cards.render_debug(q)
 
@@ -406,6 +293,7 @@ async def initialize_user(q: Q):
     ## Double check that this isn't breaking anything.
     #for key in list(q.user.keys()):
     #    delattr(q.user, key)
+    ### the above code is not working
 
     q.user.initialized = True
 
@@ -422,25 +310,30 @@ async def initialize_user(q: Q):
     #############
     ## Testing ##
     #############
-    q.user.user_id = 0 # guest
+    #q.user.user_id = 0 # guest
     #q.user.user_id = 1 # admin
     #q.user.user_id = 2 # counselor
-    #q.user.user_id = 3 # John Doe, student
+    q.user.user_id = 3 # John Doe, student
     #q.user.user_id = 4 # Jane Doe, transfer student
     #q.user.user_id = 5 # Jim Doe, new student no major selected
     #q.user.user_id = 6 # Sgt Doe, military and evening student
 
-    if q.user.user_id > 0:
+    # All user variables related to students will be denoted
+    #   q.user.X_[name]
+    # This will allow us to keep track of student information whether the path is admin/counselor or student
+    # Otherwise, q.user.role_id=2 is counselor, but if the counselor is working on student with user_id=3, we
+    # need to be able to denote that q.user.X_user_id=3, etc.
+
+    if q.user.user_id == 0:
+        q.user.guest = True
+    else:
         q.user.guest = False
 
-        await cards.get_role(q)
-        # add q.user.X_* updates if role is student
-        if int(q.user.role_id) == 3:
-            q.user.role = 'student'
+        await cards.get_role(q) # assigns q.user.role_id, q.user.username, q.user.name
+        if str(q.user.role) == 'student':
+            # add q.user.X_* updates if role is student
             q.user.X_user_id = q.user.user_id
             q.user.X_name = q.user.name
-    else:
-        q.user.guest = True
 
     # Guest path:
     #   TBD (like student path, without saving) 
@@ -457,12 +350,7 @@ async def initialize_user(q: Q):
     #   Can profile, select program, select courses, schedule courses for themselves
     #
 
-    # All user variables related to students will be denoted
-    #   q.user.X_[name]
-    # This will allow us to keep track of student information whether the path is admin/counselor or student
-    # Otherwise, q.user.role_id=2 is counselor, but if the counselor is working on student with user_id=3, we
-    # need to be able to denote that q.user.X_user_id=3, etc.
-    
+     
     # manual switch to test guest mode vs. other modes
     # will need an indicator from the app
     
@@ -480,6 +368,7 @@ async def initialize_user(q: Q):
         # if user is a student, do this:
     if q.user.role == 'student':
         await cards.get_student_info(q, q.user.X_user_id)
+    
     #else:
     #    q.user.guest = True
     #    # create a random user_id for guest
@@ -528,22 +417,22 @@ async def user_role(q: Q):
     await q.page.save()
 
 @on()
-async def degree(q: Q):
-    logging.info('The value of degree is ' + str(q.args.degree))
-    q.user.X_degree = q.args.degree
+async def menu_degree(q: Q):
+    logging.info('The value of menu_degree is ' + str(q.args.menu_degree))
+    q.user.X_menu_degree = q.args.menu_degree
 #    if q.user.degree != '2':
 #        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
 
 #        del q.client.program_df
 
-    # reset area_of_study if degree changes
-    q.user.X_area_of_study = None 
-    q.page['dropdown'].area_of_study.value = q.user.X_area_of_study
+    # reset area_of_study if menu_degree changes
+    q.user.X_menu_area = None 
+    q.page['dropdown'].area_of_study.value = q.user.X_menu_area
     # reset program if degree changes
-    q.user.X_program = None 
-    q.page['dropdown'].program.value = q.user.X_program
-
-    q.page['dropdown'].area_of_study.choices = await get_choices(q, cards.area_query, (q.user.X_degree,))
+    q.user.X_menu_program = None 
+    q.page['dropdown'].menu_program.value = q.user.X_menu_program
+    # update choices
+    q.page['dropdown'].area_of_study.choices = await get_choices(q, cards.area_query, (q.user.X_menu_degree,))
 
 #    if q.client.major_debug:
 #        q.page['debug_info'] = cards.render_debug_card(q) # update debug card
@@ -552,17 +441,17 @@ async def degree(q: Q):
     await q.page.save()
 
 @on()
-async def area_of_study(q: Q):
-    logging.info('The value of area_of_study is ' + str(q.args.area_of_study))
-    q.user.X_area_of_study = q.args.area_of_study
+async def menu_area(q: Q):
+    logging.info('The value of area_of_study is ' + str(q.args.menu_area))
+    q.user.X_menu_area = q.args.menu_area
 #    if q.user.degree != '2':
 #        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
 #        del q.client.program_df
 
     # reset program if area_of_study changes
-    q.user.X_program = None 
-    q.page['dropdown'].program.value = q.user.X_program
-    q.page['dropdown'].program.choices = await get_choices(q, cards.program_query, (q.user.X_degree, q.user.X_area_of_study))
+    q.user.X_menu_program = None 
+    q.page['dropdown'].menu_program.value = q.user.X_menu_program
+    q.page['dropdown'].menu_program.choices = await get_choices(q, cards.program_query, (q.user.X_menu_degree, q.user.X_menu_area))
 
 #    if q.client.major_debug:
 #        q.page['debug_info'] = cards.render_debug_card(q) # update debug card
@@ -571,16 +460,17 @@ async def area_of_study(q: Q):
     await q.page.save()
 
 @on()
-async def program(q: Q):
-    logging.info('The value of program is ' + str(q.args.program))
-    q.user.X_program = q.args.program
-    q.user.X_program_id = q.user.X_program # program_id an alias used throughout
+async def menu_program(q: Q):
+    logging.info('The value of program is ' + str(q.args.menu_program))
+    q.user.X_menu_program = q.args.menu_program
+    q.user.X_program_id = q.args.menu_program # program_id an alias used throughout
     q.user.X_degree_program = await utils.get_program_title(q, q.user.X_program_id)
-
-    # display major dashboard and table
-    if q.user.X_degree == '2':
-        #clear_cards(q, ['dropdown'])
-        await cards.render_program(q)
+    
+    # have the size of this depend on the degree
+    await cards.render_program(q)
+    #await cards.render_program_description(q, box='1 3 7 2')
+    #await cards.render_program_dashboard(q, box='7 5 1 5') # need to fix
+    #await cards.render_program_coursework_table(q, box='1 5 6 5')
 
 #    else:
 #        clear_cards(q,['major_recommendations', 'dropdown'])

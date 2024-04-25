@@ -232,7 +232,12 @@ c.executemany('''
     INSERT INTO student_progress_d3 (user_id, seq, name, credits, type, completed, term, session, prerequisites)
         VALUES (:user_id, :seq, :name, :credits, :type, :completed, :term, :session, :prerequisites)
     ''', student_progress_d3)
+conn.commit()
 
+c.executemany('''
+    INSERT INTO student_progress_d3_old (user_id, seq, name, credits, type, completed, term, session, prerequisites)
+        VALUES (:user_id, :seq, :name, :credits, :type, :completed, :term, :session, :prerequisites)
+    ''', student_progress_d3)
 conn.commit()
 
 # Close the connection
