@@ -732,7 +732,8 @@ javascript_insert = '''
 # it is the current implementation
 
 javascript_draw_only = '''
-    const screenWidth = 1200;
+    //const screenWidth = 1200;
+    const screenWidth = 800;
     const boxHeight = 40;
     const textOffsetX = 20;
     const textOffsetY = 25;
@@ -784,15 +785,15 @@ javascript_draw_only = '''
     // Zoom behavior
     var svg = body.append('svg')
         .attr('id', 'datavizArea')
-        .attr('height', 400)
-        .attr('width', 800);
+        .attr('height', 290)
+        .attr('width', 690);
     var zoomable = svg.append("g");
     var zoom = d3.zoom()
         .on("zoom", function() {
             zoomable.attr("transform", d3.event.transform);
         });
     svg.call(zoom)
-        .call(zoom.transform, d3.zoomIdentity.scale(0.80).translate(0, 0));
+        .call(zoom.transform, d3.zoomIdentity.scale(0.75).translate(0, 0));
 '''
 
 ## Escape curly brackets {} with {{}} so that substitution within Python works properly

@@ -265,6 +265,7 @@ async def schedule(q: Q):
     ).reset_index()
     # pick up start_term from the form
     start_term = 'SPRING 2024'
+    
     # may need to rewrite this for later
     # df and headers contain information for the d3 diagram
     #need to make this await

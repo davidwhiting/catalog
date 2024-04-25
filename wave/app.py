@@ -117,20 +117,26 @@ async def course(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
     if hasattr(q.user, 'X_program_id'):
-        cards.render_courses_header(q, box='1 2 7 1')
         # check whether schedule was previously created
         if hasattr(q.user, 'X_app_stage_id'):
             stage_id=int(q.user.X_app_stage_id)
             if stage_id==4:
-                # retrieve schedule from database
+                ## retrieve schedule from database
                 q.user.X_schedule_df = await cards.get_student_progress_d3(q)
-                # display table
-                ## this is the wrong table, for now is just a placeholder
-                await cards.render_program_coursework_table(q, box='1 5 7 5')
+
+                add_card(q, 'courses_instructions', ui.form_card(
+                    box='1 2 7 1',
+                    items=[
+                        ui.text('**Instructions**: You have selected courses. You may now add electives or view your schedule.')
+                    ]
+                ))
+                await cards.render_course_page_table(q, q.user.X_schedule_df, box='1 3 7 7')
+
             else: # stage_id==3:
+                cards.render_courses_header(q, box='1 2 7 1')
                 # need to build a program from scratch
                 # ask whether to start by pulling from catalog suggested programs
-                pass
+
 
         #await cards.render_program(q)
 
@@ -167,7 +173,7 @@ async def course(q: Q):
 #   
 #    cards.render_debug(q)
 
-    add_card(q, 'debug_course', cards.render_debug_user_card(q, box='1 10 7 2'))
+    #add_card(q, 'debug_course', cards.render_debug_user_card(q, box='1 9 7 2'))
 
 
 ##############################################################
@@ -193,7 +199,6 @@ async def ge(q: Q):
     add_card(q, 'ge_req2', await cards.render_ge_math_card(q, menu_width, box='4 9 3 2'))
     add_card(q, 'ge_req3', await cards.render_ge_arts_card(q, menu_width, box='1 11 3 3'))
     add_card(q, 'ge_req5', await cards.render_ge_beh_card(q, menu_width, box='4 11 3 3'))
-
  
 #    
 #    cards.render_debug(q)
@@ -211,45 +216,119 @@ async def electives(q: Q):
 async def schedule(q: Q):
     clear_cards(q)
 
-#    demo = True
-#    Sessions = ['Session 1', 'Session 2', 'Session 3']
-#    add_card(q, 'sessions_spin',
-#        ui.form_card(
-#            box=ui.box('middle_vertical', width='300px'),  # min width 200px
-#            items=[
-#                ui.dropdown(
-#                    name='first_term',
-#                    label='First Term',
-#                    value='spring2024' if demo else q.args.first_term,
-#                    trigger=True,
-#                    width='150px',
-#                    choices=[
-#                        ui.choice(name='spring2024', label="Spring 2024"),
-#                        ui.choice(name='summer2024', label="Summer 2024"),
-#                        ui.choice(name='fall2024', label="Fall 2024"),
-#                        ui.choice(name='winter2025', label="Winter 2025"),
-#                    ]),
-#                #                ui.separator(),
-#                ui.checklist(
-#                    name='checklist',
-#                    label='Sessions Attending',
-#                    choices=[ui.choice(name=x, label=x) for x in Sessions],
-#                    values=['Session 1', 'Session 2', 'Session 3'],  # set default
-#                ),
-#                ui.spinbox(
-#                    name='spinbox',
-#                    label='Courses per Session',
-#                    width='150px',
-#                    min=1, max=5, step=1, value=1),
-#                #                ui.separator(label=''),
-#                ui.slider(name='slider', label='Max Credits per Term', min=1, max=16, step=1, value=9),
-#                ui.inline(items=[
-#                    ui.button(name='show_inputs', label='Submit', primary=True),
-#                    ui.button(name='reset_sidebar', label='Reset', primary=False),
-#                ])
-#            ]
-#        )
-#    )
+    q.user.X_first_term = 'spring2024'
+    demo = True # temporary fix
+
+    ## Convert this to a function
+    Sessions = ['Session 1', 'Session 2', 'Session 3']
+                    
+    if q.user.X_student_profile == 'Full-time':
+        default_sessions = ['Session 1', 'Session 3']
+        default_max_credits = 12
+        default_courses_per_session = 2
+    else:
+        default_sessions = ['Session 1', 'Session 2', 'Session 3']
+        default_max_credits = 9
+        default_courses_per_session = 1
+
+    add_card(q, 'sessions_spin',
+        ui.form_card(
+            #box=ui.box('middle_vertical', width='300px'),  # min width 200px
+            box='6 2 2 5',
+            items=[
+                ui.dropdown(
+                    name='first_term',
+                    label='First Term',
+                    value='spring2024' if demo else q.args.first_term,
+                    trigger=True,
+                    width='150px',
+                    choices=[
+                        ui.choice(name='spring2024', label="Spring 2024"),
+                        ui.choice(name='summer2024', label="Summer 2024"),
+                        ui.choice(name='fall2024', label="Fall 2024"),
+                        ui.choice(name='winter2025', label="Winter 2025"),
+                    ]),
+                #                ui.separator(),
+                ui.checklist(
+                    name='checklist',
+                    label='Sessions Attending',
+                    choices=[ui.choice(name=x, label=x) for x in Sessions],
+                    values=default_sessions,  # set default
+                ),
+                ui.spinbox(
+                    name='spinbox',
+                    label='Courses per Session',
+                    width='150px',
+                    min=1, max=5, step=1, value=default_courses_per_session),
+                #                ui.separator(label=''),
+                ui.slider(name='slider', label='Max Credits per Term', min=1, max=16, step=1, 
+                          value=default_max_credits),
+                ui.inline(items=[
+                    ui.button(name='show_inputs', label='Submit', primary=True),
+                    ui.button(name='reset_sidebar', label='Reset', primary=False),
+                ])
+            ]
+        )
+    )
+
+    # this should be carried over from previous step, or any changes in course should be 
+    # written to DB, our source of truth
+    df = await cards.get_student_progress_d3(q)
+    q.user.X_schedule_df = df
+
+    if hasattr(q.user, 'X_schedule_df'):
+        add_card(q, 'schedule_instructions', ui.form_card(
+            box='1 2 5 1',
+            items=[
+                ui.text(f'**{q.user.X_degree_program}**')
+            ]
+        ))
+        await cards.render_schedule_page_table(q, box='1 7 7 6')
+
+        ## display df
+        start_term = 'Spring 2024' # pick this up from q.user variables
+        # rename because the function uses 'period' rather than 'term'
+
+        df_input = df.copy()
+        df_input.rename(columns={'term': 'period'}, inplace=True)
+
+        df_display, headers_display = utils.prepare_d3_data(df_input, start_term.upper())
+        df_json = df_display.to_json(orient='records')
+        headers_json = headers_display.to_json(orient='records')
+
+        html_template = templates.html_code_minimal.format(
+            javascript=templates.javascript_draw_only,
+            headers=headers_json, 
+            data=df_json)
+
+        add_card(q, 'd3plot', cards.d3plot(html_template, box='1 3 5 4'))
+
+        #######################################
+        ## Scheduling and updating schedules ##
+        #######################################
+
+        # rescheduling given rules
+        # pick these variables up from the form
+        periods = utils.generate_periods(
+            start_term='SPRING 2024', # pick up from q.user.X_ variable
+            max_courses=3, # pick up from courses_per_session
+            sessions=[1, 3], # pick up from 'Sessions Attending'
+            summer=True, # attending summer? Add this to form!!
+            length=30 # more than we need
+        )
+        q.user.X_periods = periods # save to variable
+
+        # updating syntax for fine-tuning max_courses, max_credits, etc. 
+        updated_periods = utils.update_periods(periods, 
+            "term == 'SUMMER' and year == 2024", 
+            {"max_courses": 0}
+        )
+        q.user.X_periods = updated_periods # save to variable
+#
+
+
+    #add_card(q, 'debug_schedule', cards.render_debug_user_card(q, box='1 9 7 2'))
+
 #
 #    cards.render_debug(q)
 #

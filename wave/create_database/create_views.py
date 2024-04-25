@@ -206,5 +206,37 @@ c.execute(create_view_query)
 conn.commit()
 
 
+drop_view('student_progress_d3_view')
+create_view_query = '''
+	CREATE VIEW student_progress_d3_view AS
+    SELECT 
+        a.id,
+        a.user_id,
+        a.seq, 
+        a.name,
+        COALESCE(b.title, '') AS title,
+        a.credits,
+        a.course_type,
+        a.type,
+        a.completed,
+        a.term,
+        a.session,
+        a.locked,
+        a.prerequisites,
+        COALESCE(b.pre, '') AS pre,
+        COALESCE(b.pre_credits, '') AS pre_credits,
+        COALESCE(b.substitutions, '') AS substitutions,
+        COALESCE(b.description, '') AS description
+    FROM 
+        student_progress_d3 a
+    LEFT JOIN
+        classes b
+    ON
+        a.name = b.name
+'''
+c.execute(create_view_query)
+conn.commit()
+
+
 # Close the connection
 conn.close()
