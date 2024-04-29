@@ -31,15 +31,21 @@ async def on_startup():
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
+    # get saved student information
+    if q.user.role == 'student':
+        await cards.get_student_info(q, q.user.X_user_id)
+
     # show this card only for guests and students with new status
     # for folks not yet logged in
-    cards.render_welcome_card(q)
-
-    # show this card for returning users only
-    cards.render_welcome_back_card(q, box='1 3 3 3')
+#    if q.user.role == 'student' and q.user.X_app_stage_id > 1:
+    if q.user.role == 'student':
+        cards.render_welcome_back_card(q, box='1 2 3 4')
+    else:
+        cards.render_welcome_card(q)
+        cards.render_please_login(q)
 
     add_card(q, 'dashboard_placeholder', ui.markdown_card(
-        box='6 3 2 2',
+        box='6 6 2 2',
         title='Dashboard',
         content='Add a summary dashboard here'
     ))
@@ -49,7 +55,6 @@ async def home(q: Q):
         title='Next steps',
         content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
     ))
-
 
 #    student_profile_type = ['First time attending', 'Previous experience', 'Transfer credits']
 #    add_card(q, 'student_profile_type_card', ui.form_card(
@@ -70,9 +75,11 @@ async def home(q: Q):
     add_card(q, 'major_recommendations',
              cards.render_major_recommendation_card(q, box='1 6 2 3'))
     add_card(q, 'enable_ai', cards.render_ai_enablement_card(box='3 8 3 2'))
+    add_card(q, 'debug_home', cards.render_debug_user_card(q, box='2 10 6 4'))
 
-    #add_card(q, 'debug_home', cards.render_debug_user_card(q, box='2 10 6 4'))
-
+##############################################################
+###########  STUDENT PAGE                      ###############
+##############################################################
 
 ##############################################################
 ###########  PROGRAM PAGE (PREVIOUSLY MAJOR)   ###############
@@ -107,7 +114,7 @@ async def major(q: Q):
         await cards.render_program(q)
     # need to make available for degree types other than bachelor's
 
-    add_card(q, 'debug_program', cards.render_debug_user_card(q, box='1 10 7 2'))
+    #add_card(q, 'debug_program', cards.render_debug_user_card(q, box='1 10 7 2'))
     
 ##############################################################
 ####################  COURSES PAGE  ##########################
@@ -116,26 +123,28 @@ async def major(q: Q):
 async def course(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
+    # this is not working in guest mode now
     if hasattr(q.user, 'X_program_id'):
         # check whether schedule was previously created
         if hasattr(q.user, 'X_app_stage_id'):
-            stage_id=int(q.user.X_app_stage_id)
-            if stage_id==4:
-                ## retrieve schedule from database
-                q.user.X_schedule_df = await cards.get_student_progress_d3(q)
+            if q.user.X_app_stage_id is not None:
+                stage_id=int(q.user.X_app_stage_id)
+                if stage_id==4:
+                    ## retrieve schedule from database
+                    q.user.X_schedule_df = await cards.get_student_progress_d3(q)
 
-                add_card(q, 'courses_instructions', ui.form_card(
-                    box='1 2 7 1',
-                    items=[
-                        ui.text('**Instructions**: You have selected courses. You may now add electives or view your schedule.')
-                    ]
-                ))
-                await cards.render_course_page_table(q, q.user.X_schedule_df, box='1 3 7 7')
+                    add_card(q, 'courses_instructions', ui.form_card(
+                        box='1 2 7 1',
+                        items=[
+                            ui.text('**Instructions**: You have selected courses. You may now add electives or view your schedule.')
+                        ]
+                    ))
+                    await cards.render_course_page_table(q, q.user.X_schedule_df, box='1 3 7 7')
 
-            else: # stage_id==3:
-                cards.render_courses_header(q, box='1 2 7 1')
-                # need to build a program from scratch
-                # ask whether to start by pulling from catalog suggested programs
+                else: # stage_id==3:
+                    cards.render_courses_header(q, box='1 2 7 1')
+                    # need to build a program from scratch
+                    # ask whether to start by pulling from catalog suggested programs
 
 
         #await cards.render_program(q)
@@ -276,6 +285,8 @@ async def schedule(q: Q):
     df = await cards.get_student_progress_d3(q)
     q.user.X_schedule_df = df
 
+
+    # Fix this to work with guest mode
     if hasattr(q.user, 'X_schedule_df'):
         add_card(q, 'schedule_instructions', ui.form_card(
             box='1 2 5 1',
@@ -327,7 +338,21 @@ async def schedule(q: Q):
 #
 
 
-    #add_card(q, 'debug_schedule', cards.render_debug_user_card(q, box='1 9 7 2'))
+#    #add_card(q, 'debug_schedule', cards.render_debug_user_card(q, box='1 9 7 2'))
+#    add_card(q, 'edit_sequence', ui.wide_info_card(
+#        box=ui.box('grid', width='400px'), 
+#        name='', 
+#        title='Edit Sequence',
+#        caption='Add per-term control of course selection and sequence.'
+#    ))
+#
+#    add_card(q, 'lock_courses', ui.wide_info_card(
+#        box=ui.box('grid', width='600px'), 
+#        name='', 
+#        title='Advice',
+#        caption='Add hints and advice from counselors, e.g., "Not scheduling a class for session 2 will delay your graduation by x terms"'
+#    ))
+
 
 #
 #    cards.render_debug(q)
@@ -339,7 +364,18 @@ async def schedule(q: Q):
 ##    #add_card(q, 'dropdown', 
 ##    #    await cards.render_dropdown_menus(q, location='top_horizontal', menu_width='280px'))
 ##    #cards.render_debug(q, location='bottom_horizontal', width='33%')
-        
+
+#############################################################
+####################  PROJECT PAGE (START) ##################
+#############################################################
+
+@on('#project')
+async def project(q: Q):
+    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+
+    card = await cards.render_project_table(templates.project_data, box='1 2 7 9', height='700px')
+    add_card(q, 'project_table_location', card)
+
 ################################################################################
 
 async def initialize_app(q: Q):
@@ -397,7 +433,7 @@ async def initialize_user(q: Q):
     #q.user.user_id = 5 # Jim Doe, new student no major selected
     #q.user.user_id = 6 # Sgt Doe, military and evening student
 
-    # All user variables related to students will be denoted
+    # Note: All user variables related to students will be denoted
     #   q.user.X_[name]
     # This will allow us to keep track of student information whether the path is admin/counselor or student
     # Otherwise, q.user.role_id=2 is counselor, but if the counselor is working on student with user_id=3, we
@@ -428,7 +464,6 @@ async def initialize_user(q: Q):
     # Student path:
     #   Can profile, select program, select courses, schedule courses for themselves
     #
-
      
     # manual switch to test guest mode vs. other modes
     # will need an indicator from the app
@@ -501,7 +536,6 @@ async def menu_degree(q: Q):
     q.user.X_menu_degree = q.args.menu_degree
 #    if q.user.degree != '2':
 #        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
-
 #        del q.client.program_df
 
     # reset area_of_study if menu_degree changes
@@ -578,6 +612,13 @@ async def view_description(q: Q):
     coursename = q.args.view_description
     cards.render_dialog_description(q, coursename)
     logging.info('The value of coursename in view_description is ' + str(coursename))
+
+@on()
+async def student_dropdown(q: Q):
+    logging.info('The value of user_dropdown is ' + str(q.args.user_dropdown))
+    #pass
+    q.user.user_dropdown = q.args.user_dropdown
+    #q.user.user_dropdown = q.args.user_dropdown # to check
 
 @app('/', on_startup=on_startup)
 async def serve(q: Q):

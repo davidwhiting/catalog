@@ -66,6 +66,17 @@ def render_meta_card(flex=False):
         )
     return card 
 
+   #############
+    ## Testing ##
+    #############
+    #q.user.user_id = 0 # guest
+    #q.user.user_id = 1 # admin
+    #q.user.user_id = 2 # counselor
+    q.user.user_id = 3 # John Doe, student
+    #q.user.user_id = 4 # Jane Doe, transfer student
+    #q.user.user_id = 5 # Jim Doe, new student no major selected
+    #q.user.user_id = 6 # Sgt Doe, military and evening student
+
 def render_header(q, box='1 1 7 1', flex=False):
     '''
     flex: Use the old flex layout system rather than the grid system
@@ -87,6 +98,7 @@ def render_header(q, box='1 1 7 1', flex=False):
                 #ui.tab(name='#ge', label='GE'), # 'Select Courses'
                 #ui.tab(name='#electives', label='Electives'), # 'Select Courses'
                 ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
+                ui.tab(name='#project', label='Project'), # 'Project Plan'
             ]),
         ],
         items=[
@@ -94,9 +106,28 @@ def render_header(q, box='1 1 7 1', flex=False):
                 name='textbox_default', 
                 label='Student Name', 
                 value='John Doe', 
-                disabled=True
-        )],
+                disabled=False
+            )
+            #ui.dropdown(
+            #    name='user_dropdown',
+            #    label='Name',
+            #    value=str(q.user.user_id) if (q.user.user_id is not None) else q.args.user_dropdown,
+            #    trigger=True,
+            #    width='200px',
+            #    #choices=await get_choices(q, user_query)
+            #    choices = [
+            #        ui.choice(name=str(0), label='Guest'),
+            #        ui.choice(name=str(1), label='Admin'),
+            #        ui.choice(name=str(2), label='Counselor'),
+            #        ui.choice(name=str(3), label='John Doe'),
+            #        ui.choice(name=str(4), label='Jane Doe'),
+            #        ui.choice(name=str(5), label='Jim Doe'),
+            #        ui.choice(name=str(6), label='Sgt Doe'),
+            #    ]
+            #)
+        ]
     )
+
     return card
 
 def render_footer(box='1 10 7 1', flex=False):
@@ -334,12 +365,30 @@ def render_debug(q, location='debug', width='25%', height='230px'):
 ####################  HOME PAGE (START)  #####################
 ##############################################################
 
-def render_welcome_card(q, box='1 2 7 1'):
+def render_welcome_card_old(q, box='1 2 7 1'):
     add_card(q, 'welcome_home', ui.form_card(
         box=box,
         items=[
             ui.text_l('Welcome to the UMGC Registration Assistant'),
             ui.text('We will guide you through this experience.')
+        ]
+    ))
+
+def render_welcome_card(q, box='1 2 4 1'):
+    add_card(q, 'welcome_home', ui.form_card(
+        box=box,
+        items=[
+            ui.text_l('Welcome to the UMGC Registration Assistant'),
+            #ui.text('We will guide you through this experience.')
+        ]
+    ))
+
+def render_please_login(q, box='5 2 3 1'):
+    add_card(q, 'please_login', ui.form_card(
+        box=box,
+        items=[
+            ui.text('You are a **Guest**. Login to save your information.'),
+            #ui.text('We will guide you through this experience.')
         ]
     ))
 
@@ -358,11 +407,30 @@ def render_welcome_back_card(q, box='1 3 3 3', title=''):
 
 - **Financial aid**: {q.user.X_financial_aid==1}
 '''
-    add_card(q, 'user_info', ui.markdown_card(
-        box=box,
-        title=title,
-        content=content
-    ))
+    add_card(q, 'user_info',
+        ui.markdown_card(
+            box=box,
+            title=title,
+            content=content
+        )
+    )
+    #add_card(q, 'user_info', 
+    #    ui.form_card(
+    #        box=box,
+    #        items=[
+    #            content,
+    #            ui.inline(
+    #                items=[
+    #                    ui.button(name='show_recommendations', label='Submit', primary=True),
+    #                    ui.button(name='clear_recommendations', label='Clear', primary=False),  # enable this
+    #                ]
+    #            )
+    #        ]
+    #    )
+    #)
+
+
+
 
 def render_career_assessment_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):
     if flex:
@@ -488,6 +556,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horiz
 
     card = ui.form_card(box=box,
         items=[
+            #ui.text_xl('Browse Programs'),
             ui.inline([
                 dropdowns, 
                 command_button
@@ -1330,8 +1399,6 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
 ####################  GE PAGE (END)   ########################
 ##############################################################
 
-
-
 ###############################################################
 ####################  SCHEDULE PAGE (START) ###################
 ###############################################################
@@ -1458,6 +1525,113 @@ async def render_schedule_page_table(q, box=None, location=None, width=None, hei
 ###############################################################
 ####################  SCHEDULE PAGE (END)  ####################
 ###############################################################
+
+#############################################################
+####################  PROJECT PAGE (START) ##################
+#############################################################
+
+async def render_project_table(data, box='1 1 5 5', flex=False, location='middle_vertical', title='Project Status Table', height='520px'):
+
+    if flex:
+        box=location
+
+    _project_table_columns = [
+        ui.table_column(
+            name='id',
+            label='Id',
+            sortable=True,
+            min_width='40px'
+        ),
+        ui.table_column(
+            name='rank',
+            label='Rank',
+            sortable=True,
+            min_width='60px'
+        ),
+        ui.table_column(
+            name='category',
+            label='Category',
+            sortable=True,
+            #filterable=True,
+            #searchable=True,
+            min_width='120px'
+        ),
+        ui.table_column(
+            name='description',
+            label='Description',
+            cell_type=ui.markdown_table_cell_type(),
+            min_width='300px',
+            searchable=True
+        ),
+        ui.table_column(
+            name='status',
+            label='Status',
+            cell_type=ui.progress_table_cell_type(),
+            sortable=True,
+            min_width='100px'
+        ),
+        ui.table_column(
+            name='tags',
+            label='Tags',
+            cell_type=ui.tag_table_cell_type(
+                name='',
+                tags=[
+                    ui.tag(label='Database', color='$green'),
+                    ui.tag(label='UI', color='$blue'),
+                    ui.tag(label='Wave', color='$orange'),
+                    ui.tag(label='Code', color='$purple'),
+                    ui.tag(label='Data', color='$red')
+                ]
+            ),
+            searchable=True
+        ),
+        ui.table_column(
+            name='menu',
+            label='Menu',
+            cell_type=ui.menu_table_cell_type(
+                commands=[
+                    ui.command(name='view_transaction', label='View Transaction', icon='Shop'),
+                    ui.command(name='view_image', label='View Image', icon='ImageSearch')
+                ]
+            ),
+            min_width='60px'
+        )
+    ]
+    _project_table_rows = [
+        ui.table_row(
+            name=row['id'],
+            cells=[
+                row['id'],
+                row['rank'],
+                row['category'],
+                row['description'],
+                row['status'],
+                row['tags']
+            ]
+        ) for row in data
+    ]
+    card = ui.form_card(
+        box=box,
+        items=[
+            ui.text(title, size=ui.TextSize.XL),
+            ui.table(
+                name='transactions',
+                columns=_project_table_columns,
+                rows=_project_table_rows,
+                # pagination=False,
+                groupable=True,
+                # resettable=True,
+                # downloadable=True,
+                events=['page_change'],
+                height=height
+            ),
+        ]
+    )
+    return card
+
+#############################################################
+####################  PROJECT PAGE (END)   ##################
+#############################################################
 
 warning_example_card = ui.form_card(
     box='1 1 4 7',

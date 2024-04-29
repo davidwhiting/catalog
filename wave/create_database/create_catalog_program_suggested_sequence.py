@@ -2,7 +2,12 @@ import sqlite3
 # db connection created w/in utils
 from utils import conn, c, drop_table, drop_view, column_exists
 
+# most catalog programs requires no options
+# options fields default to 0
 catalogs = []
+
+# to capture those with options (e.g., CHIN vs. JAPN courses)
+catalogs_with_options = []
 
 # Accounting
 program_id = 2
@@ -380,99 +385,6 @@ add_catalog = [
 ]
 catalogs.append(add_catalog)
 
-# East Asian Studies
-program_id = 12
-add_catalog = [
-    { 'program_id': program_id, 'seq':  1, 'course_type_id': 3, 'course': 'LIBS 150' },
-    { 'program_id': program_id, 'seq':  2, 'course_type_id': 3, 'course': 'PACE 111C' },
-    { 'program_id': program_id, 'seq':  3, 'course_type_id': 3, 'course': 'WRTG 111' },
-    { 'program_id': program_id, 'seq':  4, 'course_type_id': 3, 'course': 'IFSM 201' },
-    { 'program_id': program_id, 'seq':  5, 'course_type_id': 1, 'course': 'CHIN 111 | JAPN 111' },
-    { 'program_id': program_id, 'seq':  6, 'course_type_id': 3, 'course': 'NUTR 100' },
-    { 'program_id': program_id, 'seq':  7, 'course_type_id': 1, 'course': 'ASTD 284' },
-    { 'program_id': program_id, 'seq':  8, 'course_type_id': 1, 'course': 'CHIN 112 | JAPN 112' },
-    { 'program_id': program_id, 'seq':  9, 'course_type_id': 3, 'course': 'SPCH 100' },
-    { 'program_id': program_id, 'seq': 10, 'course_type_id': 3, 'course': 'MATH 105' },
-    { 'program_id': program_id, 'seq': 11, 'course_type_id': 1, 'course': 'CHIN 114 | JAPN 114' },
-    { 'program_id': program_id, 'seq': 12, 'course_type_id': 3, 'course': 'WRTG 112' },
-    { 'program_id': program_id, 'seq': 13, 'course_type_id': 1, 'course': 'ASTD 285' },
-    { 'program_id': program_id, 'seq': 14, 'course_type_id': 3, 'course': 'HUMN 100' },
-    { 'program_id': program_id, 'seq': 15, 'course_type_id': 3, 'course': 'BIOL 103' },
-    { 'program_id': program_id, 'seq': 16, 'course_type_id': 3, 'course': 'BEHS 103' },
-    { 'program_id': program_id, 'seq': 17, 'course_type_id': 3, 'course': 'ARTH 334' },
-    { 'program_id': program_id, 'seq': 18, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 19, 'course_type_id': 3, 'course': 'ECON 103' },
-    { 'program_id': program_id, 'seq': 20, 'course_type_id': 1, 'course': 'PHIL 348' },
-    { 'program_id': program_id, 'seq': 21, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 22, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 23, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 24, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 25, 'course_type_id': 3, 'course': 'WRTG 391' },
-    { 'program_id': program_id, 'seq': 26, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 27, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 28, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 29, 'course_type_id': 1, 'course': 'HIST 480 | HIST 482' },
-    { 'program_id': program_id, 'seq': 30, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 31, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 32, 'course_type_id': 1, 'course': 'ASTD 370 | JAPN 333' },
-    { 'program_id': program_id, 'seq': 33, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 34, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 35, 'course_type_id': 1, 'course': 'ANTH 417' },
-    { 'program_id': program_id, 'seq': 36, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 37, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 38, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 39, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 40, 'course_type_id': 1, 'course': 'ASTD 485' },
-    { 'program_id': program_id, 'seq': 41, 'course_type_id': 4, 'course': 'CAPL 398A' }
-]
-catalogs.append(add_catalog)
-
-# English
-program_id = 13
-add_catalog = [
-    { 'program_id': program_id, 'seq':  1, 'course_type_id': 3, 'course': 'LIBS 150' },
-    { 'program_id': program_id, 'seq':  2, 'course_type_id': 3, 'course': 'PACE 111C' },
-    { 'program_id': program_id, 'seq':  3, 'course_type_id': 3, 'course': 'WRTG 112' },
-    { 'program_id': program_id, 'seq':  4, 'course_type_id': 3, 'course': 'CMST 301' },
-    { 'program_id': program_id, 'seq':  5, 'course_type_id': 3, 'course': 'NUTR 100' },
-    { 'program_id': program_id, 'seq':  6, 'course_type_id': 3, 'course': 'ENGL 102' },
-    { 'program_id': program_id, 'seq':  7, 'course_type_id': 3, 'course': 'ENGL 281' },
-    { 'program_id': program_id, 'seq':  8, 'course_type_id': 3, 'course': 'MATH 105' },
-    { 'program_id': program_id, 'seq':  9, 'course_type_id': 1, 'course': 'ENGL 240' },
-    { 'program_id': program_id, 'seq': 10, 'course_type_id': 1, 'course': 'ENGL 250' },
-    { 'program_id': program_id, 'seq': 11, 'course_type_id': 3, 'course': 'HUMN 100' },
-    { 'program_id': program_id, 'seq': 12, 'course_type_id': 3, 'course': 'BIOL 103' },
-    { 'program_id': program_id, 'seq': 13, 'course_type_id': 3, 'course': 'BEHS 103' },
-    { 'program_id': program_id, 'seq': 14, 'course_type_id': 3, 'course': 'ARTH 334' },
-    { 'program_id': program_id, 'seq': 15, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 16, 'course_type_id': 3, 'course': 'ECON 103' },
-    { 'program_id': program_id, 'seq': 17, 'course_type_id': 1, 'course': 'ENGL 303' },
-    { 'program_id': program_id, 'seq': 18, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 19, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 20, 'course_type_id': 1, 'course': 'ENGL 310' },
-    { 'program_id': program_id, 'seq': 21, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 22, 'course_type_id': 1, 'course': 'ENGL 363 | ENGL 311' },
-    { 'program_id': program_id, 'seq': 23, 'course_type_id': 3, 'course': 'WRTG 391' },
-    { 'program_id': program_id, 'seq': 24, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 25, 'course_type_id': 1, 'course': 'ENGL 364 | ENGL 312' },
-    { 'program_id': program_id, 'seq': 26, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 27, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 28, 'course_type_id': 1, 'course': 'ENGL 430' },
-    { 'program_id': program_id, 'seq': 29, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 30, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 31, 'course_type_id': 1, 'course': 'ENGL 433 | ENGL 386' },
-    { 'program_id': program_id, 'seq': 32, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 33, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 34, 'course_type_id': 1, 'course': 'ENGL 441 | ENGL 406' },
-    { 'program_id': program_id, 'seq': 35, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 36, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 37, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 38, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 39, 'course_type_id': 1, 'course': 'ENGL 459' },
-    { 'program_id': program_id, 'seq': 40, 'course_type_id': 1, 'course': 'ENGL 495' },
-    { 'program_id': program_id, 'seq': 41, 'course_type_id': 4, 'course': 'CAPL 398A' }
-]
-catalogs.append(add_catalog)
 
 # Environmental Health and Safety
 program_id = 14
@@ -711,54 +623,6 @@ add_catalog = [
 ]
 catalogs.append(add_catalog)
 
-# History
-program_id = 20
-add_catalog = [
-    { 'program_id': program_id, 'seq':  1, 'course_type_id': 3, 'course': 'LIBS 150' },
-    { 'program_id': program_id, 'seq':  2, 'course_type_id': 3, 'course': 'PACE 111C' },
-    { 'program_id': program_id, 'seq':  3, 'course_type_id': 3, 'course': 'WRTG 111' },
-    { 'program_id': program_id, 'seq':  4, 'course_type_id': 3, 'course': 'CMST 301' },
-    { 'program_id': program_id, 'seq':  5, 'course_type_id': 3, 'course': 'NUTR 100' },
-    { 'program_id': program_id, 'seq':  6, 'course_type_id': 3, 'course': 'NUTR 101' },
-    { 'program_id': program_id, 'seq':  7, 'course_type_id': 1, 'course': 'HIST 115' },
-    { 'program_id': program_id, 'seq':  8, 'course_type_id': 3, 'course': 'SPCH 100' },
-    { 'program_id': program_id, 'seq':  9, 'course_type_id': 3, 'course': 'MATH 105' },
-    { 'program_id': program_id, 'seq': 10, 'course_type_id': 3, 'course': 'WRTG 112' },
-    { 'program_id': program_id, 'seq': 11, 'course_type_id': 1, 'course': 'HIST 116' },
-    { 'program_id': program_id, 'seq': 12, 'course_type_id': 3, 'course': 'HUMN 100' },
-    { 'program_id': program_id, 'seq': 13, 'course_type_id': 3, 'course': 'GEOL 100' },
-    { 'program_id': program_id, 'seq': 14, 'course_type_id': 3, 'course': 'BEHS 103' },
-    { 'program_id': program_id, 'seq': 15, 'course_type_id': 3, 'course': 'HIST 125' },
-    { 'program_id': program_id, 'seq': 16, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 17, 'course_type_id': 3, 'course': 'ECON 103' },
-    { 'program_id': program_id, 'seq': 18, 'course_type_id': 1, 'course': 'HIST 156' },
-    { 'program_id': program_id, 'seq': 19, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 20, 'course_type_id': 1, 'course': 'HIST 157' },
-    { 'program_id': program_id, 'seq': 21, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 22, 'course_type_id': 1, 'course': 'HIST 289' },
-    { 'program_id': program_id, 'seq': 23, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 24, 'course_type_id': 1, 'course': 'HIST 309' },
-    { 'program_id': program_id, 'seq': 25, 'course_type_id': 3, 'course': 'WRTG 391' },
-    { 'program_id': program_id, 'seq': 26, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 27, 'course_type_id': 1, 'course': 'HIST 316L | HIST 326' },
-    { 'program_id': program_id, 'seq': 28, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 29, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 30, 'course_type_id': 1, 'course': 'HIST 365 | HIST 337' },
-    { 'program_id': program_id, 'seq': 31, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 32, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 33, 'course_type_id': 1, 'course': 'HIST 377 | HIST 392' },
-    { 'program_id': program_id, 'seq': 34, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 35, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 36, 'course_type_id': 1, 'course': 'HIST 461 | HIST 480' },
-    { 'program_id': program_id, 'seq': 37, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 38, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 39, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 40, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 41, 'course_type_id': 1, 'course': 'HIST 495' },
-    { 'program_id': program_id, 'seq': 42, 'course_type_id': 4, 'course': 'CAPL 398A' }
-]
-catalogs.append(add_catalog)
-
 # Homeland Security
 program_id = 21
 add_catalog = [
@@ -806,52 +670,6 @@ add_catalog = [
 ]
 catalogs.append(add_catalog)
 
-# Human Resource Management
-program_id = 22
-add_catalog = [
-    { 'program_id': program_id, 'seq':  1, 'course_type_id': 3, 'course': 'LIBS 150' },
-    { 'program_id': program_id, 'seq':  2, 'course_type_id': 3, 'course': 'PACE 111B' },
-    { 'program_id': program_id, 'seq':  3, 'course_type_id': 3, 'course': 'WRTG 111' },
-    { 'program_id': program_id, 'seq':  4, 'course_type_id': 3, 'course': 'WRTG 112' },
-    { 'program_id': program_id, 'seq':  5, 'course_type_id': 3, 'course': 'NUTR 100' },
-    { 'program_id': program_id, 'seq':  6, 'course_type_id': 1, 'course': 'HRMN 300' },
-    { 'program_id': program_id, 'seq':  7, 'course_type_id': 3, 'course': 'SPCH 100' },
-    { 'program_id': program_id, 'seq':  8, 'course_type_id': 3, 'course': 'MATH 105' },
-    { 'program_id': program_id, 'seq':  9, 'course_type_id': 6, 'course': 'IFSM 300' },
-    { 'program_id': program_id, 'seq': 10, 'course_type_id': 1, 'course': 'HRMN 302' },
-    { 'program_id': program_id, 'seq': 11, 'course_type_id': 3, 'course': 'HUMN 100' },
-    { 'program_id': program_id, 'seq': 12, 'course_type_id': 3, 'course': 'BIOL 103' },
-    { 'program_id': program_id, 'seq': 13, 'course_type_id': 3, 'course': 'BEHS 103' },
-    { 'program_id': program_id, 'seq': 14, 'course_type_id': 3, 'course': 'ARTH 334' },
-    { 'program_id': program_id, 'seq': 15, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 16, 'course_type_id': 3, 'course': 'ECON 103' },
-    { 'program_id': program_id, 'seq': 17, 'course_type_id': 1, 'course': 'HRMN 362' },
-    { 'program_id': program_id, 'seq': 18, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 19, 'course_type_id': 1, 'course': 'HRMN 367' },
-    { 'program_id': program_id, 'seq': 20, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 21, 'course_type_id': 1, 'course': 'HRMN 395' },
-    { 'program_id': program_id, 'seq': 22, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 23, 'course_type_id': 1, 'course': 'HRMN 400' },
-    { 'program_id': program_id, 'seq': 24, 'course_type_id': 3, 'course': 'WRTG 394' },
-    { 'program_id': program_id, 'seq': 25, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 26, 'course_type_id': 1, 'course': 'HRMN 406 | HRMN 410' },
-    { 'program_id': program_id, 'seq': 27, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 28, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 29, 'course_type_id': 1, 'course': 'BMGT 364' },
-    { 'program_id': program_id, 'seq': 30, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 31, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 32, 'course_type_id': 1, 'course': 'FINC 331' },
-    { 'program_id': program_id, 'seq': 33, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 34, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 35, 'course_type_id': 1, 'course': 'HRMN 408' },
-    { 'program_id': program_id, 'seq': 36, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 37, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 38, 'course_type_id': 1, 'course': 'HRMN 467' },
-    { 'program_id': program_id, 'seq': 39, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 40, 'course_type_id': 1, 'course': 'HRMN 495' },
-    { 'program_id': program_id, 'seq': 41, 'course_type_id': 4, 'course': 'CAPL 398A' }
-]
-catalogs.append(add_catalog)
 
 # Humanities
 program_id = 23
@@ -1229,53 +1047,6 @@ add_catalog = [
 ]
 catalogs.append(add_catalog)
 
-# Social Science
-program_id = 33
-add_catalog = [
-    { 'program_id': program_id, 'seq':  1, 'course_type_id': 3, 'course': 'LIBS 150' },
-    { 'program_id': program_id, 'seq':  2, 'course_type_id': 3, 'course': 'PACE 111S' },
-    { 'program_id': program_id, 'seq':  3, 'course_type_id': 3, 'course': 'WRTG 111' },
-    { 'program_id': program_id, 'seq':  4, 'course_type_id': 3, 'course': 'CMST 301' },
-    { 'program_id': program_id, 'seq':  5, 'course_type_id': 3, 'course': 'NUTR 100' },
-    { 'program_id': program_id, 'seq':  6, 'course_type_id': 1, 'course': 'ANTH 102 | GERO 100 | PSYC 100 | SOCY 100' },
-    { 'program_id': program_id, 'seq':  7, 'course_type_id': 3, 'course': 'SPCH 100' },
-    { 'program_id': program_id, 'seq':  8, 'course_type_id': 6, 'course': 'STAT 200' },
-    { 'program_id': program_id, 'seq':  9, 'course_type_id': 3, 'course': 'WRTG 112' },
-    { 'program_id': program_id, 'seq': 10, 'course_type_id': 1, 'course': 'GERO 100 | PSYC 100 | SOCY 100 | ANTH 102' },
-    { 'program_id': program_id, 'seq': 11, 'course_type_id': 3, 'course': 'HUMN 100' },
-    { 'program_id': program_id, 'seq': 12, 'course_type_id': 3, 'course': 'BIOL 103' },
-    { 'program_id': program_id, 'seq': 13, 'course_type_id': 3, 'course': 'BEHS 103' },
-    { 'program_id': program_id, 'seq': 14, 'course_type_id': 3, 'course': 'ARTH 334' },
-    { 'program_id': program_id, 'seq': 15, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 16, 'course_type_id': 3, 'course': 'ECON 103' },
-    { 'program_id': program_id, 'seq': 17, 'course_type_id': 1, 'course': 'BEHS 210' },
-    { 'program_id': program_id, 'seq': 18, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 19, 'course_type_id': 1, 'course': 'BEHS 220 | BEHS 250' },
-    { 'program_id': program_id, 'seq': 20, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 21, 'course_type_id': 1, 'course': 'BEHS 300' },
-    { 'program_id': program_id, 'seq': 22, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 23, 'course_type_id': 1, 'course': 'ANTH 345 | GERO 302 | PSYC 338 | SOCY 313' },
-    { 'program_id': program_id, 'seq': 24, 'course_type_id': 3, 'course': 'WRTG 391' },
-    { 'program_id': program_id, 'seq': 25, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 26, 'course_type_id': 1, 'course': 'ANTH 346 | GERO 311 | PSYC 354 | SOCY 325' },
-    { 'program_id': program_id, 'seq': 27, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 28, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 29, 'course_type_id': 1, 'course': 'ANTH 350 | GERO 427 | PSYC 386 | SOCY 423' },
-    { 'program_id': program_id, 'seq': 30, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 31, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 32, 'course_type_id': 1, 'course': 'ANTH 351 | GERO 320 | PSYC 437 | SOCY 350' },
-    { 'program_id': program_id, 'seq': 33, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 34, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 35, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 36, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 37, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 38, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 39, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 40, 'course_type_id': 1, 'course': 'BEHS 495' },
-    { 'program_id': program_id, 'seq': 41, 'course_type_id': 4, 'course': 'CAPL 398A' }
-]
-catalogs.append(add_catalog)
-
 # Software Development and Security
 program_id = 34
 add_catalog = [
@@ -1323,50 +1094,331 @@ add_catalog = [
 ]
 catalogs.append(add_catalog)
 
+################################################################
+
+# East Asian Studies
+program_id = 12
+add_catalog = [
+    { 'program_id': program_id, 'seq':  1, 'option': 0, 'course_type_id': 3, 'course': 'LIBS 150' },
+    { 'program_id': program_id, 'seq':  2, 'option': 0, 'course_type_id': 3, 'course': 'PACE 111C' },
+    { 'program_id': program_id, 'seq':  3, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 111' },
+    { 'program_id': program_id, 'seq':  4, 'option': 0, 'course_type_id': 3, 'course': 'IFSM 201' },
+    { 'program_id': program_id, 'seq':  5, 'option': 1, 'course_type_id': 1, 'course': 'CHIN 111' },
+    { 'program_id': program_id, 'seq':  5, 'option': 2, 'course_type_id': 1, 'course': 'JAPN 111' },
+    { 'program_id': program_id, 'seq':  6, 'option': 0, 'course_type_id': 3, 'course': 'NUTR 100' },
+    { 'program_id': program_id, 'seq':  7, 'option': 0, 'course_type_id': 1, 'course': 'ASTD 284' },
+    { 'program_id': program_id, 'seq':  8, 'option': 1, 'course_type_id': 1, 'course': 'CHIN 112'},
+    { 'program_id': program_id, 'seq':  8, 'option': 2, 'course_type_id': 1, 'course': 'JAPN 112' },
+    { 'program_id': program_id, 'seq':  9, 'option': 0, 'course_type_id': 3, 'course': 'SPCH 100' },
+    { 'program_id': program_id, 'seq': 10, 'option': 0, 'course_type_id': 3, 'course': 'MATH 105' },
+    { 'program_id': program_id, 'seq': 11, 'option': 1, 'course_type_id': 1, 'course': 'CHIN 114' },
+    { 'program_id': program_id, 'seq': 11, 'option': 2, 'course_type_id': 1, 'course': 'JAPN 114' },
+    { 'program_id': program_id, 'seq': 12, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 112' },
+    { 'program_id': program_id, 'seq': 13, 'option': 0, 'course_type_id': 1, 'course': 'ASTD 285' },
+    { 'program_id': program_id, 'seq': 14, 'option': 0, 'course_type_id': 3, 'course': 'HUMN 100' },
+    { 'program_id': program_id, 'seq': 15, 'option': 0, 'course_type_id': 3, 'course': 'BIOL 103' },
+    { 'program_id': program_id, 'seq': 16, 'option': 0, 'course_type_id': 3, 'course': 'BEHS 103' },
+    { 'program_id': program_id, 'seq': 17, 'option': 0, 'course_type_id': 3, 'course': 'ARTH 334' },
+    { 'program_id': program_id, 'seq': 18, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 19, 'option': 0, 'course_type_id': 3, 'course': 'ECON 103' },
+    { 'program_id': program_id, 'seq': 20, 'option': 0, 'course_type_id': 1, 'course': 'PHIL 348' },
+    { 'program_id': program_id, 'seq': 21, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 22, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 23, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 24, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 25, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 391' },
+    { 'program_id': program_id, 'seq': 26, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 27, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 28, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 29, 'option': 1, 'course_type_id': 1, 'course': 'HIST 480' },
+    { 'program_id': program_id, 'seq': 29, 'option': 2, 'course_type_id': 1, 'course': 'HIST 482' },
+    { 'program_id': program_id, 'seq': 30, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 31, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 32, 'option': 1, 'course_type_id': 1, 'course': 'ASTD 370' },
+    { 'program_id': program_id, 'seq': 32, 'option': 2, 'course_type_id': 1, 'course': 'JAPN 333' },
+    { 'program_id': program_id, 'seq': 33, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 34, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 35, 'option': 0, 'course_type_id': 1, 'course': 'ANTH 417' },
+    { 'program_id': program_id, 'seq': 36, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 37, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 38, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 39, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 40, 'option': 0, 'course_type_id': 1, 'course': 'ASTD 485' },
+    { 'program_id': program_id, 'seq': 41, 'option': 0, 'course_type_id': 4, 'course': 'CAPL 398A' }
+]
+catalogs_with_options.append(add_catalog)
+
+# English
+program_id = 13
+add_catalog = [
+    { 'program_id': program_id, 'seq':  1, 'option': 0, 'course_type_id': 3, 'course': 'LIBS 150' },
+    { 'program_id': program_id, 'seq':  2, 'option': 0, 'course_type_id': 3, 'course': 'PACE 111C' },
+    { 'program_id': program_id, 'seq':  3, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 112' },
+    { 'program_id': program_id, 'seq':  4, 'option': 0, 'course_type_id': 3, 'course': 'CMST 301' },
+    { 'program_id': program_id, 'seq':  5, 'option': 0, 'course_type_id': 3, 'course': 'NUTR 100' },
+    { 'program_id': program_id, 'seq':  6, 'option': 0, 'course_type_id': 3, 'course': 'ENGL 102' },
+    { 'program_id': program_id, 'seq':  7, 'option': 0, 'course_type_id': 3, 'course': 'ENGL 281' },
+    { 'program_id': program_id, 'seq':  8, 'option': 0, 'course_type_id': 3, 'course': 'MATH 105' },
+    { 'program_id': program_id, 'seq':  9, 'option': 0, 'course_type_id': 1, 'course': 'ENGL 240' },
+    { 'program_id': program_id, 'seq': 10, 'option': 0, 'course_type_id': 1, 'course': 'ENGL 250' },
+    { 'program_id': program_id, 'seq': 11, 'option': 0, 'course_type_id': 3, 'course': 'HUMN 100' },
+    { 'program_id': program_id, 'seq': 12, 'option': 0, 'course_type_id': 3, 'course': 'BIOL 103' },
+    { 'program_id': program_id, 'seq': 13, 'option': 0, 'course_type_id': 3, 'course': 'BEHS 103' },
+    { 'program_id': program_id, 'seq': 14, 'option': 0, 'course_type_id': 3, 'course': 'ARTH 334' },
+    { 'program_id': program_id, 'seq': 15, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 16, 'option': 0, 'course_type_id': 3, 'course': 'ECON 103' },
+    { 'program_id': program_id, 'seq': 17, 'option': 0, 'course_type_id': 1, 'course': 'ENGL 303' },
+    { 'program_id': program_id, 'seq': 18, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 19, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 20, 'option': 0, 'course_type_id': 1, 'course': 'ENGL 310' },
+    { 'program_id': program_id, 'seq': 21, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 22, 'option': 1, 'course_type_id': 1, 'course': 'ENGL 363' },
+    { 'program_id': program_id, 'seq': 22, 'option': 2, 'course_type_id': 1, 'course': 'ENGL 311' },
+    { 'program_id': program_id, 'seq': 23, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 391' },
+    { 'program_id': program_id, 'seq': 24, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 25, 'option': 1, 'course_type_id': 1, 'course': 'ENGL 364' },
+    { 'program_id': program_id, 'seq': 25, 'option': 2, 'course_type_id': 1, 'course': 'ENGL 312' },
+    { 'program_id': program_id, 'seq': 26, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 27, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 28, 'option': 0, 'course_type_id': 1, 'course': 'ENGL 430' },
+    { 'program_id': program_id, 'seq': 29, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 30, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 31, 'option': 1, 'course_type_id': 1, 'course': 'ENGL 433' },
+    { 'program_id': program_id, 'seq': 31, 'option': 2, 'course_type_id': 1, 'course': 'ENGL 386' },
+    { 'program_id': program_id, 'seq': 32, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 33, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 34, 'option': 1, 'course_type_id': 1, 'course': 'ENGL 441' },
+    { 'program_id': program_id, 'seq': 34, 'option': 2, 'course_type_id': 1, 'course': 'ENGL 406' },
+    { 'program_id': program_id, 'seq': 35, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 36, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 37, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 38, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 39, 'option': 0, 'course_type_id': 1, 'course': 'ENGL 459' },
+    { 'program_id': program_id, 'seq': 40, 'option': 0, 'course_type_id': 1, 'course': 'ENGL 495' },
+    { 'program_id': program_id, 'seq': 41, 'option': 0, 'course_type_id': 4, 'course': 'CAPL 398A' }
+]
+catalogs_with_options.append(add_catalog)
+
+# History
+program_id = 20
+add_catalog = [
+    { 'program_id': program_id, 'seq':  1, 'option': 0, 'course_type_id': 3, 'course': 'LIBS 150' },
+    { 'program_id': program_id, 'seq':  2, 'option': 0, 'course_type_id': 3, 'course': 'PACE 111C' },
+    { 'program_id': program_id, 'seq':  3, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 111' },
+    { 'program_id': program_id, 'seq':  4, 'option': 0, 'course_type_id': 3, 'course': 'CMST 301' },
+    { 'program_id': program_id, 'seq':  5, 'option': 0, 'course_type_id': 3, 'course': 'NUTR 100' },
+    { 'program_id': program_id, 'seq':  6, 'option': 0, 'course_type_id': 3, 'course': 'NUTR 101' },
+    { 'program_id': program_id, 'seq':  7, 'option': 0, 'course_type_id': 1, 'course': 'HIST 115' },
+    { 'program_id': program_id, 'seq':  8, 'option': 0, 'course_type_id': 3, 'course': 'SPCH 100' },
+    { 'program_id': program_id, 'seq':  9, 'option': 0, 'course_type_id': 3, 'course': 'MATH 105' },
+    { 'program_id': program_id, 'seq': 10, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 112' },
+    { 'program_id': program_id, 'seq': 11, 'option': 0, 'course_type_id': 1, 'course': 'HIST 116' },
+    { 'program_id': program_id, 'seq': 12, 'option': 0, 'course_type_id': 3, 'course': 'HUMN 100' },
+    { 'program_id': program_id, 'seq': 13, 'option': 0, 'course_type_id': 3, 'course': 'GEOL 100' },
+    { 'program_id': program_id, 'seq': 14, 'option': 0, 'course_type_id': 3, 'course': 'BEHS 103' },
+    { 'program_id': program_id, 'seq': 15, 'option': 0, 'course_type_id': 3, 'course': 'HIST 125' },
+    { 'program_id': program_id, 'seq': 16, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 17, 'option': 0, 'course_type_id': 3, 'course': 'ECON 103' },
+    { 'program_id': program_id, 'seq': 18, 'option': 0, 'course_type_id': 1, 'course': 'HIST 156' },
+    { 'program_id': program_id, 'seq': 19, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 20, 'option': 0, 'course_type_id': 1, 'course': 'HIST 157' },
+    { 'program_id': program_id, 'seq': 21, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 22, 'option': 0, 'course_type_id': 1, 'course': 'HIST 289' },
+    { 'program_id': program_id, 'seq': 23, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 24, 'option': 0, 'course_type_id': 1, 'course': 'HIST 309' },
+    { 'program_id': program_id, 'seq': 25, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 391' },
+    { 'program_id': program_id, 'seq': 26, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 27, 'option': 1, 'course_type_id': 1, 'course': 'HIST 316L' },
+    { 'program_id': program_id, 'seq': 27, 'option': 2, 'course_type_id': 1, 'course': 'HIST 326' },
+    { 'program_id': program_id, 'seq': 28, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 29, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 30, 'option': 1, 'course_type_id': 1, 'course': 'HIST 365' },
+    { 'program_id': program_id, 'seq': 30, 'option': 2, 'course_type_id': 1, 'course': 'HIST 337' },
+    { 'program_id': program_id, 'seq': 31, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 32, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 33, 'option': 1, 'course_type_id': 1, 'course': 'HIST 377' },
+    { 'program_id': program_id, 'seq': 33, 'option': 2, 'course_type_id': 1, 'course': 'HIST 392' },
+    { 'program_id': program_id, 'seq': 34, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 35, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 36, 'option': 1, 'course_type_id': 1, 'course': 'HIST 461' },
+    { 'program_id': program_id, 'seq': 36, 'option': 2, 'course_type_id': 1, 'course': 'HIST 480' },
+    { 'program_id': program_id, 'seq': 37, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 38, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 39, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 40, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 41, 'option': 0, 'course_type_id': 1, 'course': 'HIST 495' },
+    { 'program_id': program_id, 'seq': 42, 'option': 0, 'course_type_id': 4, 'course': 'CAPL 398A' }
+]
+catalogs_with_options.append(add_catalog)
+
+# Human Resource Management
+program_id = 22
+add_catalog = [
+    { 'program_id': program_id, 'seq':  1, 'option': 0, 'course_type_id': 3, 'course': 'LIBS 150' },
+    { 'program_id': program_id, 'seq':  2, 'option': 0, 'course_type_id': 3, 'course': 'PACE 111B' },
+    { 'program_id': program_id, 'seq':  3, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 111' },
+    { 'program_id': program_id, 'seq':  4, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 112' },
+    { 'program_id': program_id, 'seq':  5, 'option': 0, 'course_type_id': 3, 'course': 'NUTR 100' },
+    { 'program_id': program_id, 'seq':  6, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 300' },
+    { 'program_id': program_id, 'seq':  7, 'option': 0, 'course_type_id': 3, 'course': 'SPCH 100' },
+    { 'program_id': program_id, 'seq':  8, 'option': 0, 'course_type_id': 3, 'course': 'MATH 105' },
+    { 'program_id': program_id, 'seq':  9, 'option': 0, 'course_type_id': 6, 'course': 'IFSM 300' },
+    { 'program_id': program_id, 'seq': 10, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 302' },
+    { 'program_id': program_id, 'seq': 11, 'option': 0, 'course_type_id': 3, 'course': 'HUMN 100' },
+    { 'program_id': program_id, 'seq': 12, 'option': 0, 'course_type_id': 3, 'course': 'BIOL 103' },
+    { 'program_id': program_id, 'seq': 13, 'option': 0, 'course_type_id': 3, 'course': 'BEHS 103' },
+    { 'program_id': program_id, 'seq': 14, 'option': 0, 'course_type_id': 3, 'course': 'ARTH 334' },
+    { 'program_id': program_id, 'seq': 15, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 16, 'option': 0, 'course_type_id': 3, 'course': 'ECON 103' },
+    { 'program_id': program_id, 'seq': 17, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 362' },
+    { 'program_id': program_id, 'seq': 18, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 19, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 367' },
+    { 'program_id': program_id, 'seq': 20, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 21, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 395' },
+    { 'program_id': program_id, 'seq': 22, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 23, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 400' },
+    { 'program_id': program_id, 'seq': 24, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 394' },
+    { 'program_id': program_id, 'seq': 25, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 26, 'option': 1, 'course_type_id': 1, 'course': 'HRMN 406' },
+    { 'program_id': program_id, 'seq': 26, 'option': 2, 'course_type_id': 1, 'course': 'HRMN 410' },
+    { 'program_id': program_id, 'seq': 27, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 28, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 29, 'option': 0, 'course_type_id': 1, 'course': 'BMGT 364' },
+    { 'program_id': program_id, 'seq': 30, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 31, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 32, 'option': 0, 'course_type_id': 1, 'course': 'FINC 331' },
+    { 'program_id': program_id, 'seq': 33, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 34, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 35, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 408' },
+    { 'program_id': program_id, 'seq': 36, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 37, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 38, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 467' },
+    { 'program_id': program_id, 'seq': 39, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 40, 'option': 0, 'course_type_id': 1, 'course': 'HRMN 495' },
+    { 'program_id': program_id, 'seq': 41, 'option': 0, 'course_type_id': 4, 'course': 'CAPL 398A' }
+]
+catalogs_with_options.append(add_catalog)
+
+# Social Science
+program_id = 33
+add_catalog = [
+    { 'program_id': program_id, 'seq':  1, 'option': 0, 'course_type_id': 3, 'course': 'LIBS 150' },
+    { 'program_id': program_id, 'seq':  2, 'option': 0, 'course_type_id': 3, 'course': 'PACE 111S' },
+    { 'program_id': program_id, 'seq':  3, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 111' },
+    { 'program_id': program_id, 'seq':  4, 'option': 0, 'course_type_id': 3, 'course': 'CMST 301' },
+    { 'program_id': program_id, 'seq':  5, 'option': 0, 'course_type_id': 3, 'course': 'NUTR 100' },
+    { 'program_id': program_id, 'seq':  6, 'option': 1, 'course_type_id': 1, 'course': 'ANTH 102' },
+    { 'program_id': program_id, 'seq':  6, 'option': 2, 'course_type_id': 1, 'course': 'GERO 100' },
+    { 'program_id': program_id, 'seq':  6, 'option': 3, 'course_type_id': 1, 'course': 'PSYC 100' },
+    { 'program_id': program_id, 'seq':  6, 'option': 4, 'course_type_id': 1, 'course': 'SOCY 100' },
+    { 'program_id': program_id, 'seq':  7, 'option': 0, 'course_type_id': 3, 'course': 'SPCH 100' },
+    { 'program_id': program_id, 'seq':  8, 'option': 0, 'course_type_id': 6, 'course': 'STAT 200' },
+    { 'program_id': program_id, 'seq':  9, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 112' },
+    { 'program_id': program_id, 'seq': 10, 'option': 1, 'course_type_id': 1, 'course': 'GERO 100' },
+    { 'program_id': program_id, 'seq': 10, 'option': 2, 'course_type_id': 1, 'course': 'PSYC 100' },
+    { 'program_id': program_id, 'seq': 10, 'option': 3, 'course_type_id': 1, 'course': 'SOCY 100' },
+    { 'program_id': program_id, 'seq': 10, 'option': 4, 'course_type_id': 1, 'course': 'ANTH 102' },
+    { 'program_id': program_id, 'seq': 11, 'option': 0, 'course_type_id': 3, 'course': 'HUMN 100' },
+    { 'program_id': program_id, 'seq': 12, 'option': 0, 'course_type_id': 3, 'course': 'BIOL 103' },
+    { 'program_id': program_id, 'seq': 13, 'option': 0, 'course_type_id': 3, 'course': 'BEHS 103' },
+    { 'program_id': program_id, 'seq': 14, 'option': 0, 'course_type_id': 3, 'course': 'ARTH 334' },
+    { 'program_id': program_id, 'seq': 15, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 16, 'option': 0, 'course_type_id': 3, 'course': 'ECON 103' },
+    { 'program_id': program_id, 'seq': 17, 'option': 0, 'course_type_id': 1, 'course': 'BEHS 210' },
+    { 'program_id': program_id, 'seq': 18, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 19, 'option': 1, 'course_type_id': 1, 'course': 'BEHS 220' },
+    { 'program_id': program_id, 'seq': 19, 'option': 2, 'course_type_id': 1, 'course': 'BEHS 250' },
+    { 'program_id': program_id, 'seq': 20, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 21, 'option': 0, 'course_type_id': 1, 'course': 'BEHS 300' },
+    { 'program_id': program_id, 'seq': 22, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 23, 'option': 1, 'course_type_id': 1, 'course': 'ANTH 345' },
+    { 'program_id': program_id, 'seq': 23, 'option': 2, 'course_type_id': 1, 'course': 'GERO 302' },
+    { 'program_id': program_id, 'seq': 23, 'option': 3, 'course_type_id': 1, 'course': 'PSYC 338' },
+    { 'program_id': program_id, 'seq': 23, 'option': 4, 'course_type_id': 1, 'course': 'SOCY 313' },
+    { 'program_id': program_id, 'seq': 24, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 391' },
+    { 'program_id': program_id, 'seq': 25, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 26, 'option': 1, 'course_type_id': 1, 'course': 'ANTH 346' },
+    { 'program_id': program_id, 'seq': 26, 'option': 2, 'course_type_id': 1, 'course': 'GERO 311' },
+    { 'program_id': program_id, 'seq': 26, 'option': 3, 'course_type_id': 1, 'course': 'PSYC 354' },
+    { 'program_id': program_id, 'seq': 26, 'option': 4, 'course_type_id': 1, 'course': 'SOCY 325' },
+    { 'program_id': program_id, 'seq': 27, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 28, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 29, 'option': 1, 'course_type_id': 1, 'course': 'ANTH 350' },
+    { 'program_id': program_id, 'seq': 29, 'option': 2, 'course_type_id': 1, 'course': 'GERO 427' },
+    { 'program_id': program_id, 'seq': 29, 'option': 3, 'course_type_id': 1, 'course': 'PSYC 386' },
+    { 'program_id': program_id, 'seq': 29, 'option': 4, 'course_type_id': 1, 'course': 'SOCY 423' },
+    { 'program_id': program_id, 'seq': 30, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 31, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 32, 'option': 1, 'course_type_id': 1, 'course': 'ANTH 351' },
+    { 'program_id': program_id, 'seq': 32, 'option': 2, 'course_type_id': 1, 'course': 'GERO 320' },
+    { 'program_id': program_id, 'seq': 32, 'option': 3, 'course_type_id': 1, 'course': 'PSYC 437' },
+    { 'program_id': program_id, 'seq': 32, 'option': 4, 'course_type_id': 1, 'course': 'SOCY 350' },
+    { 'program_id': program_id, 'seq': 33, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 34, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 35, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 36, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 37, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 38, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 39, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 40, 'option': 0, 'course_type_id': 1, 'course': 'BEHS 495' },
+    { 'program_id': program_id, 'seq': 41, 'option': 0, 'course_type_id': 4, 'course': 'CAPL 398A' }
+]
+catalogs_with_options.append(add_catalog)
+
 # Web and Digital Design
 program_id = 35
 add_catalog = [
-    { 'program_id': program_id, 'seq':  1, 'course_type_id': 3, 'course': 'LIBS 150' },
-    { 'program_id': program_id, 'seq':  2, 'course_type_id': 3, 'course': 'PACE 111T' },
-    { 'program_id': program_id, 'seq':  3, 'course_type_id': 3, 'course': 'WRTG 111' },
-    { 'program_id': program_id, 'seq':  4, 'course_type_id': 3, 'course': 'CMST 301' },
-    { 'program_id': program_id, 'seq':  5, 'course_type_id': 3, 'course': 'NUTR 100' },
-    { 'program_id': program_id, 'seq':  6, 'course_type_id': 1, 'course': 'CMST 290' },
-    { 'program_id': program_id, 'seq':  7, 'course_type_id': 3, 'course': 'SPCH 100' },
-    { 'program_id': program_id, 'seq':  8, 'course_type_id': 3, 'course': 'MATH 107' },
-    { 'program_id': program_id, 'seq':  9, 'course_type_id': 3, 'course': 'WRTG 112' },
-    { 'program_id': program_id, 'seq': 10, 'course_type_id': 1, 'course': 'CMST 295' },
-    { 'program_id': program_id, 'seq': 11, 'course_type_id': 3, 'course': 'HIST 125' },
-    { 'program_id': program_id, 'seq': 12, 'course_type_id': 3, 'course': 'BIOL 103' },
-    { 'program_id': program_id, 'seq': 13, 'course_type_id': 3, 'course': 'BEHS 103' },
-    { 'program_id': program_id, 'seq': 14, 'course_type_id': 3, 'course': 'ARTH 334' },
-    { 'program_id': program_id, 'seq': 15, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 16, 'course_type_id': 3, 'course': 'ECON 103' },
-    { 'program_id': program_id, 'seq': 17, 'course_type_id': 1, 'course': 'CMST 385 | CMST 310 | CMST 308' },
-    { 'program_id': program_id, 'seq': 18, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 19, 'course_type_id': 1, 'course': 'CMST 386 | CMST 311 | CMST 315' },
-    { 'program_id': program_id, 'seq': 20, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 21, 'course_type_id': 1, 'course': 'CMST 325' },
-    { 'program_id': program_id, 'seq': 22, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 23, 'course_type_id': 1, 'course': 'CMST 320' },
-    { 'program_id': program_id, 'seq': 24, 'course_type_id': 3, 'course': 'WRTG 393' },
-    { 'program_id': program_id, 'seq': 25, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 26, 'course_type_id': 1, 'course': 'CMST 388 | CMST 425 | CMST 330' },
-    { 'program_id': program_id, 'seq': 27, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 28, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 29, 'course_type_id': 1, 'course': 'CMST 355 | CMST 341 | CMST 331' },
-    { 'program_id': program_id, 'seq': 30, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 31, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 32, 'course_type_id': 1, 'course': 'CMST 488 | CMST 351 | CMST 390' },
-    { 'program_id': program_id, 'seq': 33, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 34, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 35, 'course_type_id': 1, 'course': 'CMST 495' },
-    { 'program_id': program_id, 'seq': 36, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 37, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 38, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 39, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 40, 'course_type_id': 4, 'course': 'ELECTIVE' },
-    { 'program_id': program_id, 'seq': 41, 'course_type_id': 4, 'course': 'CAPL 398A' }
+    { 'program_id': program_id, 'seq':  1, 'option': 0, 'course_type_id': 3, 'course': 'LIBS 150' },
+    { 'program_id': program_id, 'seq':  2, 'option': 0, 'course_type_id': 3, 'course': 'PACE 111T' },
+    { 'program_id': program_id, 'seq':  3, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 111' },
+    { 'program_id': program_id, 'seq':  4, 'option': 0, 'course_type_id': 3, 'course': 'CMST 301' },
+    { 'program_id': program_id, 'seq':  5, 'option': 0, 'course_type_id': 3, 'course': 'NUTR 100' },
+    { 'program_id': program_id, 'seq':  6, 'option': 0, 'course_type_id': 1, 'course': 'CMST 290' },
+    { 'program_id': program_id, 'seq':  7, 'option': 0, 'course_type_id': 3, 'course': 'SPCH 100' },
+    { 'program_id': program_id, 'seq':  8, 'option': 0, 'course_type_id': 3, 'course': 'MATH 107' },
+    { 'program_id': program_id, 'seq':  9, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 112' },
+    { 'program_id': program_id, 'seq': 10, 'option': 0, 'course_type_id': 1, 'course': 'CMST 295' },
+    { 'program_id': program_id, 'seq': 11, 'option': 0, 'course_type_id': 3, 'course': 'HIST 125' },
+    { 'program_id': program_id, 'seq': 12, 'option': 0, 'course_type_id': 3, 'course': 'BIOL 103' },
+    { 'program_id': program_id, 'seq': 13, 'option': 0, 'course_type_id': 3, 'course': 'BEHS 103' },
+    { 'program_id': program_id, 'seq': 14, 'option': 0, 'course_type_id': 3, 'course': 'ARTH 334' },
+    { 'program_id': program_id, 'seq': 15, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 16, 'option': 0, 'course_type_id': 3, 'course': 'ECON 103' },
+    { 'program_id': program_id, 'seq': 17, 'option': 1, 'course_type_id': 1, 'course': 'CMST 385' },
+    { 'program_id': program_id, 'seq': 17, 'option': 2, 'course_type_id': 1, 'course': 'CMST 310' },
+    { 'program_id': program_id, 'seq': 17, 'option': 3, 'course_type_id': 1, 'course': 'CMST 308' },
+    { 'program_id': program_id, 'seq': 18, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 19, 'option': 1, 'course_type_id': 1, 'course': 'CMST 386' },
+    { 'program_id': program_id, 'seq': 19, 'option': 2, 'course_type_id': 1, 'course': 'CMST 311' },
+    { 'program_id': program_id, 'seq': 19, 'option': 3, 'course_type_id': 1, 'course': 'CMST 315' },
+    { 'program_id': program_id, 'seq': 20, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 21, 'option': 0, 'course_type_id': 1, 'course': 'CMST 325' },
+    { 'program_id': program_id, 'seq': 22, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 23, 'option': 0, 'course_type_id': 1, 'course': 'CMST 320' },
+    { 'program_id': program_id, 'seq': 24, 'option': 0, 'course_type_id': 3, 'course': 'WRTG 393' },
+    { 'program_id': program_id, 'seq': 25, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 26, 'option': 1, 'course_type_id': 1, 'course': 'CMST 388' },
+    { 'program_id': program_id, 'seq': 26, 'option': 2, 'course_type_id': 1, 'course': 'CMST 425' },
+    { 'program_id': program_id, 'seq': 26, 'option': 3, 'course_type_id': 1, 'course': 'CMST 330' },
+    { 'program_id': program_id, 'seq': 27, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 28, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 29, 'option': 1, 'course_type_id': 1, 'course': 'CMST 355' },
+    { 'program_id': program_id, 'seq': 29, 'option': 2, 'course_type_id': 1, 'course': 'CMST 341' },
+    { 'program_id': program_id, 'seq': 29, 'option': 3, 'course_type_id': 1, 'course': 'CMST 331' },
+    { 'program_id': program_id, 'seq': 30, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 31, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 32, 'option': 1, 'course_type_id': 1, 'course': 'CMST 488' },
+    { 'program_id': program_id, 'seq': 32, 'option': 2, 'course_type_id': 1, 'course': 'CMST 351' },
+    { 'program_id': program_id, 'seq': 32, 'option': 3, 'course_type_id': 1, 'course': 'CMST 390' },
+    { 'program_id': program_id, 'seq': 33, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 34, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 35, 'option': 0, 'course_type_id': 1, 'course': 'CMST 495' },
+    { 'program_id': program_id, 'seq': 36, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 37, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 38, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 39, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 40, 'option': 0, 'course_type_id': 4, 'course': 'ELECTIVE' },
+    { 'program_id': program_id, 'seq': 41, 'option': 0, 'course_type_id': 4, 'course': 'CAPL 398A' }
 ]
 catalogs.append(add_catalog)
 
@@ -1379,6 +1431,7 @@ c.execute('''
         id INTEGER PRIMARY KEY,
         program_id INTEGER,
         seq INTEGER,
+        option INTEGER DEFAULT 0,
         course_type_id INTEGER,
         course TEXT,
         FOREIGN KEY(program_id) REFERENCES programs(id),
@@ -1390,6 +1443,13 @@ for catalog in catalogs:
     c.executemany('''
         INSERT INTO catalog_program_sequence (program_id, seq, course_type_id, course) 
         VALUES (:program_id, :seq, :course_type_id, :course)
+    ''', catalog )
+conn.commit()
+
+for catalog in catalogs_with_options:
+    c.executemany('''
+        INSERT INTO catalog_program_sequence (program_id, seq, option, course_type_id, course) 
+        VALUES (:program_id, :seq, :option, :course_type_id, :course)
     ''', catalog )
 conn.commit()
 
