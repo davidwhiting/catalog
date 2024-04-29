@@ -98,7 +98,7 @@ def render_header(q, box='1 1 7 1', flex=False):
                 #ui.tab(name='#ge', label='GE'), # 'Select Courses'
                 #ui.tab(name='#electives', label='Electives'), # 'Select Courses'
                 ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
-                ui.tab(name='#project', label='Project'), # 'Project Plan'
+                #ui.tab(name='#project', label='Status'), # 'Project Plan'
             ]),
         ],
         items=[
@@ -370,7 +370,7 @@ def render_welcome_card_old(q, box='1 2 7 1'):
         box=box,
         items=[
             ui.text_l('Welcome to the UMGC Registration Assistant'),
-            ui.text('We will guide you through this experience.')
+            ui.text('(The Home page will collect student information)')
         ]
     ))
 
@@ -430,6 +430,18 @@ def render_welcome_back_card(q, box='1 3 3 3', title=''):
     #)
 
 
+def render_student_information_stub_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):
+    if flex:
+        box=ui.box(location, width='400px')
+    caption=f'Gather incomplete student information. Walk students through transfer credits. Access allowable data from UMGC servers.'
+    card = ui.wide_info_card(
+        box=box,
+        name='StudentAssessments',
+        icon='AccountActivity',
+        title='Guided Student Updates',
+        caption=caption
+    )
+    return card
 
 
 def render_career_assessment_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):

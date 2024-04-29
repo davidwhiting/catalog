@@ -39,22 +39,12 @@ async def home(q: Q):
     # for folks not yet logged in
 #    if q.user.role == 'student' and q.user.X_app_stage_id > 1:
     if q.user.role == 'student':
-        cards.render_welcome_back_card(q, box='1 2 3 4')
+        cards.render_welcome_card_old(q)
+        cards.render_welcome_back_card(q, box='1 3 3 4')
     else:
         cards.render_welcome_card(q)
         cards.render_please_login(q)
 
-    add_card(q, 'dashboard_placeholder', ui.markdown_card(
-        box='6 6 2 2',
-        title='Dashboard',
-        content='Add a summary dashboard here'
-    ))
-
-    add_card(q, 'to_do_next', ui.markdown_card(
-        box='4 3 2 2',
-        title='Next steps',
-        content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
-    ))
 
 #    student_profile_type = ['First time attending', 'Previous experience', 'Transfer credits']
 #    add_card(q, 'student_profile_type_card', ui.form_card(
@@ -71,11 +61,28 @@ async def home(q: Q):
 #        ]
 #    ))
 
-    add_card(q, 'assessments', cards.render_career_assessment_card(box='3 6 3 2'))
-    add_card(q, 'major_recommendations',
-             cards.render_major_recommendation_card(q, box='1 6 2 3'))
-    add_card(q, 'enable_ai', cards.render_ai_enablement_card(box='3 8 3 2'))
-    add_card(q, 'debug_home', cards.render_debug_user_card(q, box='2 10 6 4'))
+    add_card(q, 'student_stub', cards.render_student_information_stub_card(box='4 3 3 2'))
+    add_card(q, 'assessments', cards.render_career_assessment_card(box='4 5 3 2'))
+    add_card(q, 'enable_ai', cards.render_ai_enablement_card(box='1 7 3 2'))
+
+
+    #add_card(q, 'dashboard_placeholder', ui.markdown_card(
+    #    box='6 6 2 2',
+    #    title='Dashboard',
+    #    content='Add a summary dashboard here'
+    #))
+
+    #add_card(q, 'to_do_next', ui.markdown_card(
+    #    box='4 3 2 2',
+    #    title='Next steps',
+    #    content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
+    #))
+
+
+    
+    add_card(q, 'major_recommendations', cards.render_major_recommendation_card(q, box='4 7 3 3'))
+    
+    #add_card(q, 'debug_home', cards.render_debug_user_card(q, box='2 10 6 4'))
 
 ##############################################################
 ###########  STUDENT PAGE                      ###############
@@ -339,12 +346,12 @@ async def schedule(q: Q):
 
 
 #    #add_card(q, 'debug_schedule', cards.render_debug_user_card(q, box='1 9 7 2'))
-#    add_card(q, 'edit_sequence', ui.wide_info_card(
-#        box=ui.box('grid', width='400px'), 
-#        name='', 
-#        title='Edit Sequence',
-#        caption='Add per-term control of course selection and sequence.'
-#    ))
+    add_card(q, 'edit_sequence', ui.wide_info_card(
+        box='', 
+        name='', 
+        title='Edit Sequence',
+        caption='Add per-term control of course selection and sequence.'
+    ))
 #
 #    add_card(q, 'lock_courses', ui.wide_info_card(
 #        box=ui.box('grid', width='600px'), 
