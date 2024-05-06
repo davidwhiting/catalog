@@ -12,6 +12,100 @@ import numpy as np
 #import pandas as pd
 #import numpy as np
 
+
+class TimedSQLiteConnection:
+    '''
+    This class creates an SQLite connection that will disconnect after 
+    'timeout' amount of inactivity. This is a lightweight way to manage 
+    multiple sqlite connections without using a connection pool. It prepares
+    for multiple users in Wave connecting to the same SQLite database.
+
+    Methods include 
+      - execute: executing commands (like create table), nothing returned
+      - fetchone and fetchall use corresponding sqlite methods
+      - (methods for pandas using ... df.to_sql and df.read_sql_query )
+    Note: The async/await syntax here is not really needed yet and defaults
+    to synchronous. It is harmless and anticipates future improvements.
+    '''
+    def __init__(self, db_path, row_factory=True, timeout=1800):  # Default is 1800 seconds
+        self.db_path = db_path
+        self.timeout = timeout
+        self.row_factory = row_factory # return dictionaries instead of tuples
+        self.last_activity_time = time.time()  # Initialize last activity time
+        self.connection = None
+
+    async def _check_and_close(self):
+        if self.connection is not None:
+            current_time = time.time()
+            if current_time - self.last_activity_time >= self.timeout:
+                self.connection.close()
+                self.connection = None
+
+    async def _update_activity_time(self):
+        self.last_activity_time = time.time()
+
+    async def execute(self, query, params=()):
+        await self._check_and_close()
+        if self.connection is None:
+            self.connection = sqlite3.connect(self.db_path)
+            if self.row_factory:
+                self.connection.row_factory = sqlite3.Row
+        cursor = self.connection.cursor()
+        cursor.execute(query, params)
+        await self._update_activity_time()
+        #return cursor.fetchall()
+
+    async def fetchone(self, query, params=()):
+        await self._check_and_close()
+        if self.connection is None:
+            self.connection = sqlite3.connect(self.db_path)
+            if self.row_factory:
+                self.connection.row_factory = sqlite3.Row
+        cursor = self.connection.cursor()
+        cursor.execute(query, params)
+        await self._update_activity_time()
+        return cursor.fetchone()
+
+    async def fetchall(self, query, params=()):
+        await self._check_and_close()
+        if self.connection is None:
+            self.connection = sqlite3.connect(self.db_path)
+            if self.row_factory:
+                self.connection.row_factory = sqlite3.Row
+        cursor = self.connection.cursor()
+        cursor.execute(query, params)
+        await self._update_activity_time()
+        return cursor.fetchall()
+
+    async def pd_read_sql(self, query, params=()):
+        await self._check_and_close()
+        if self.connection is None:
+            self.connection = sqlite3.connect(self.db_path)
+            if self.row_factory:
+                self.connection.row_factory = sqlite3.Row
+        df = pd.read_sql_query(query, self.connection, params)
+        await self._update_activity_time()
+        return df
+
+    async def close(self):
+        if self.connection is not None:
+            self.connection.close()
+            self.connection = None
+
+async def get_timed_query_one(timedConnection, query, params=()):
+    '''
+    This query uses the TimedSQLiteConnection class
+    timedConnection: an instantiation of TimeSQLiteConnection
+    query: SQL query
+    params: Optional parameters
+    '''
+    row = await timedConnection.fetchone(query, params)
+    if not row:
+        warnings.warn("Query returned no row", category=Warning)
+        return None
+    else:
+        return row
+    
 async def get_query_one(q, query, params=()):
     c = q.user.c 
     c.execute(query, params)
@@ -22,6 +116,20 @@ async def get_query_one(q, query, params=()):
     else:
         return row
 
+async def get_timed_query(timedConnection, query, params=()):
+    '''
+    This query uses the TimedSQLiteConnection class
+    timedConnection: an instantiation of TimeSQLiteConnection
+    query: SQL query
+    params: Optional parameters
+    '''
+    rows = await timedConnection.fetchall(query, params)
+    if not rows:
+        warnings.warn("Query returned no rows", category=Warning)
+        return None
+    else:
+        return rows
+    
 async def get_query(q, query, params=()):
     c = q.user.c 
     c.execute(query, params)
@@ -56,217 +164,132 @@ async def get_program_title_new(q, program_id):
     else:
         return None
 
-class TimedSQLiteConnection:
+def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=15, summer=False, sessions=[1,3], as_df=True):
     '''
-    This class creates an SQLite connection that will disconnect after 
-    'timeout' amount of inactivity. This is a quick-and-dirty way to manage 
-    multiple sqlite connections without using a connection pool.
+    A periods structure is a list of dictionaries (or a Pandas dataframe) containing information about terms and sessions,
+    into which we will place classes when scheduling.
 
-    Note: The async/await syntax here is not really needed yet and defaults
-    to synchronous. It is harmless and anticipates future improvements.
+    Parameters:
+
+    start_term: first term classes are to be scheduled into
+    years: number of years to create periods for (this can be larger than needed)
+    max_courses: maximum number of courses per session
+    max_credits: maximum number of credits per term
+    summer: whether attending summer (as default)
+    sessions: which sessions (1-3) to schedule classes in (excluding summer term, which has only sessions 1 & 2)
+    as_df: return results as Pandas dataframe, otherwise return as list of dictionaries
+
+    Output includes 'previous', a value used to determine placement of prerequisites. Because Sessions 1 & 2 and 
+    Sessions 2 & 3 overlap, a Session 2 class cannot have a Session 1 prerequisite, it's previous value is 2 (two
+    time-slots previous). Similarly, Session 3 cannot have a Session 2 prerequisite, it's previous value is also 2.
+    For all others, the 'previous' value is 1.
+    
+    Note: We create all terms a student could potentially attend and set max_courses=0 and max_credits=0 for periods they
+    are not attending.
     '''
-    def __init__(self, db_path, row_factory=True, timeout=1800):  # Default is 1800 seconds
-        self.db_path = db_path
-        self.timeout = timeout
-        self.row_factory = row_factory # return dictionaries instead of tuples
-        self.last_activity_time = time.time()  # Initialize last activity time
-        self.connection = None
-
-    async def _check_and_close(self):
-        if self.connection is not None:
-            current_time = time.time()
-            if current_time - self.last_activity_time >= self.timeout:
-                self.connection.close()
-                self.connection = None
-
-    async def _update_activity_time(self):
-        self.last_activity_time = time.time()
-
-    async def execute(self, query, params=()):
-        await self._check_and_close()
-        if self.connection is None:
-            self.connection = sqlite3.connect(self.db_path)
-            if self.row_factory:
-                self.connection.row_factory = sqlite3.Row
-        cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        await self._update_activity_time()
-        return cursor.fetchall()
-
-    async def close(self):
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
-
-## Periods are the framework into which courses will be scheduled.
-
-def generate_periods(start_term='SPRING 2024', max_courses=3, max_credits=10, sessions=[1, 3], summer=True, length=30):
-    # Define terms and initialize year
+    
+    # List terms
     terms = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
-    year_start = int(start_term.split()[1])
-    current_term_index = terms.index(start_term.split()[0])
-    
-    # Initialize periods list
-    periods = []
-    
-    # Iterate through the specified length of terms
-    for i in range(length):
-        # Calculate term and session
-        term_index = (current_term_index + i) % len(terms)
-        term = terms[term_index]
-        year = year_start + (current_term_index + i) // len(terms)
-        session = (i % 3) + 1
-        
-        # Check if term is summer and session is in the specified sessions
-        if term == 'SUMMER' and session not in sessions:
-            max_courses = 0
-        else:
-            max_courses = max_courses
-            
-        # Calculate previous value
-        previous = 1 if session == 1 else 2
-        
-        # Append period to the periods list
-        periods.append({
-            "id": i + 1,
-            "term": term,
-            "session": session,
-            "year": year,
-            "max_courses": max_courses,
-            "max_credits": max_credits,
-            "previous": previous
-        })
-    
-    return periods
+
+    # Define the number of sessions for each term
+    sessions_per_term = {
+        'WINTER': 3,
+        'SPRING': 3,
+        'SUMMER': 2,
+        'FALL': 3
+    }
+
+    # Split the start term into the term and the year
+    start_term, start_year = start_term.split()
+
+    # Convert the start year to an integer
+    start_year = int(start_year)
+
+    # Initialize the schedule and the id
+    schedule = []
+    id = 1
+
+    # Loop over the next 'years' years
+    for year in range(start_year, start_year + years):
+        # Loop over each term
+        for term in terms:
+            # If the year is the start year and the term is before the start term, skip it
+            if year == start_year and terms.index(term) < terms.index(start_term):
+                continue
+            # Loop over each session
+            for session in range(1, sessions_per_term[term] + 1):
+                # Set max_courses=0 and max_credits=0 if (term='SUMMER' and summer==False)
+                if term=='SUMMER': 
+                    if not summer:
+                        max_courses_value = 0
+                        max_credits_value = 0
+                    else:
+                        max_courses_value = max_courses
+                        # only 2 sessions in summer, adjust max_credits accordingly
+                        max_credits_value = 2*int(np.floor(max_credits/3))
+                
+                # Set max_courses=0 and max_credits=0 if session not in sessions
+                else:
+                    if session not in sessions:
+                        max_courses_value = 0
+                        max_credits_value = 0
+                    else: # spring, fall, winter
+                        max_courses_value = max_courses
+                        max_credits_value = max_credits
+                       
+                # Calculate previous value
+                # 
+                previous = 1 if session == 1 else 2
+ 
+                # Add the entry to the schedule
+                schedule.append({
+                    'id': id,
+                    'term': term,
+                    'session': session,
+                    'year': year,
+                    'max_courses': max_courses_value,
+                    'max_credits': max_credits_value,
+                    'previous': previous
+                })
+                # Increment the id
+                id += 1
+    # either return as a dataframe or as a list of dictionaries
+    if as_df:
+        return pd.DataFrame(schedule)
+    else:
+        return schedule
 
 def update_periods(periods, condition, update_values):
-    # Convert periods to a DataFrame
-    periods_df = pd.DataFrame(periods)
+    '''
+    Update the 'periods' structure. Will return a DataFrame if a DataFrame is input,
+    otherwise will return a list of dictionaries.
+
+    periods: a list of dictionaries or a DataFrame with periods information returned from 'generate_periods'
+
+    Example usage
+    # Update max_courses for SPRING 2024 to 0
+    update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
+    '''
+
+    # Check whether input periods is a DataFrame
+    if isinstance(periods, pd.DataFrame):
+        return_as_list = False
+    else:
+        periods = pd.DataFrame(periods)
+        return_as_list = True
     
     # Apply conditions
-    mask = periods_df.eval(condition)
+    mask = periods.eval(condition)
     
     # Update values
-    periods_df.loc[mask, update_values.keys()] = update_values.values()
-    
+    for key, value in update_values.items():
+        periods.loc[mask, key] = value
+
     # Convert DataFrame back to a list of dictionaries
-    updated_periods = periods_df.to_dict(orient='records')
-    
-    return updated_periods
-
-## Example usage
-#periods = [
-#    {"id": 1, "term": "WINTER", "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1},
-#    {"id": 2, "term": "WINTER", "session": 2, "year": 2024, "max_courses": 0, "max_credits": 10, "previous": 2},
-#    {"id": 3, "term": "SPRING", "session": 1, "year": 2024, "max_courses": 3, "max_credits": 10, "previous": 1},
-#    {"id": 4, "term": "SPRING", "session": 2, "year": 2024, "max_courses": 0, "max_credits": 10, "previous": 2}
-#]
-#
-## Update max_courses for SPRING 2024 to 0
-#updated_periods = update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
-
-
-def prepare_d3_data_old(df, start_term='SPRING 2024'):
-
-    def set_colors(row):
-        if row['type'] == 'general':
-            return pd.Series(['green', 'white'])
-        elif row['type'] == 'major':
-            return pd.Series(['blue', 'white'])
-        # hack: fix the following 3 elifs
-        elif row['type'] == 'required,elective':
-            row['type'] = 'required'
-            return pd.Series(['red', 'white'])
-        elif row['type'] == 'required,general':
-            row['type'] = 'required'
-            return pd.Series(['red', 'white'])
-        elif row['type'] == 'required':
-            return pd.Series(['red', 'white'])
-        elif row['type'] == 'elective':
-            return pd.Series(['yellow', 'black'])
-        else:
-            return pd.Series(['white', 'black'])  # default colors
-
-    def generate_header_data(start_semester, num_periods, data_df = df):
-        seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
-        semester_data = []
-        start_season, start_year = start_semester.split(' ')
-        start_year = int(start_year)
-        season_index = seasons.index(start_season)
-        year = start_year
-        period = 0
-
-        while period < num_periods:
-            for j in range(season_index, len(seasons)):
-                semester_data.append(f'{seasons[j]} {year}')
-                period += 1
-
-                # Break the loop when i equals num_periods
-                if period == num_periods:
-                    break
-
-            # Reset the season index to start from 'WINTER' for the next year
-            season_index = 0
-            year += 1
-
-        df = pd.DataFrame(semester_data, columns=['term'])
-        df['width'] = df['term'].apply(lambda x: 190 if 'SUMMER' in x else 260)
-        df['offset'] = df['term'].apply(lambda x: 2 if 'SUMMER' in x else 3)
-        df['fontsize'] = '14px'
-        df['description'] = ''
-        df['space'] = 40
-        df['xpos'] = df['width'] + df['space']
-
-        x0 = 10
-        # Calculate the cumulative sum of 'xpos'
-        df['x'] = df['xpos'].cumsum()
-        df['x'] = df['x'].shift(1)
-        df.loc[0, 'x'] = 0
-        df['x'] = df['x'] + x0
-        df['y'] = 10
-        df['color'] = 'lightgray'
-        df['textcolor'] = 'black'
-        df['period'] = np.arange(1, num_periods+1)
-
-        df.drop
-        # Sum credits per period and convert to a DataFrame
-        total_credits = data_df.groupby('period')['credits'].sum().sort_index()
-        total_credits_df = total_credits.reset_index()
-
-        df = pd.merge(df, total_credits_df, on='period', how='inner')
-        df['name'] = df['term']
-        df['printname'] = df['name'] + ' (' + df['credits'].astype(str) + ')'
-
-        return df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 
-                   'fontsize', 'period', 'name', 'credits', 'description']]
-
-    # Prepare data for the D3 figure
-
-    max_period = max(df['period'])
-    headers = generate_header_data(start_term, max_period)
-
-    df['description'] = df['prerequisite']
-    df['width'] = 120
-    # Calculate 'x' column
-    df = pd.merge(df, headers[['period','x']], on='period', how='left')
-    df['x'] += 70*(df['session']-1)
-
-    # Calculate 'y' column
-    df = df.sort_values(by=['period', 'session', 'seq' ])
-    df['y_row'] = df.groupby('period').cumcount() + 1
-    df['y'] = 70 + 45 * (df['y_row'] - 1)
-
-    # Create rectangle colors
-    df[['color', 'textcolor']] = df.apply(set_colors, axis=1)
-
-    # Set text offset multiplier to 1 and text fontsize
-    df['offset'] = 1
-    df['fontsize'] = '12px'
-    df['printname'] = df['name'] + ' (' + df['credits'].astype(str) + ')'
-    
-    df = df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 'fontsize', 'period', 'session', 'type', 'name', 'credits', 'description']]
-
-    return df, headers
+    if return_as_list:
+        return periods.to_dict(orient='records')
+    else:
+        return periods
 
 # note: renamed 'prerequisite' to 'prerequisites' to follow changes in the db table
 def prepare_d3_data(df, start_term='SPRING 2024'):
@@ -374,109 +397,6 @@ def prepare_d3_data(df, start_term='SPRING 2024'):
 
     return df, headers
 
-
-### For Later: Object Oriented Version of prepare_d3_data
-
-class D3DataPreparer:
-    def __init__(self, df):
-        self.df = df
-
-    def set_colors(self, row):
-        if row['type'] == 'general':
-            return pd.Series(['green', 'white'])
-        elif row['type'] == 'major':
-            return pd.Series(['blue', 'white'])
-        elif row['type'] in ['required,elective', 'required,general', 'required']:
-            return pd.Series(['red', 'white'])
-        elif row['type'] == 'elective':
-            return pd.Series(['yellow', 'black'])
-        else:
-            return pd.Series(['white', 'black'])  # default colors
-
-    def generate_header_data(self, start_term, num_periods):
-        seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
-        semester_data = []
-        start_season, start_year = start_term.split(' ')
-        start_year = int(start_year)
-        season_index = seasons.index(start_season)
-        year = start_year
-        period = 0
-
-        while period < num_periods:
-            for j in range(season_index, len(seasons)):
-                semester_data.append(f'{seasons[j]} {year}')
-                period += 1
-
-                # Break the loop when i equals num_periods
-                if period == num_periods:
-                    break
-
-            # Reset the season index to start from 'WINTER' for the next year
-            season_index = 0
-            year += 1
-
-        df = pd.DataFrame(semester_data, columns=['term'])
-        df['width'] = df['term'].apply(lambda x: 190 if 'SUMMER' in x else 260)
-        df['offset'] = df['term'].apply(lambda x: 2 if 'SUMMER' in x else 3)
-        df['fontsize'] = '14px'
-        df['description'] = ''
-        df['space'] = 40
-        df['xpos'] = df['width'] + df['space']
-
-        x0 = 10
-        # Calculate the cumulative sum of 'xpos'
-        df['x'] = df['xpos'].cumsum()
-        df['x'] = df['x'].shift(1)
-        df.loc[0, 'x'] = 0
-        df['x'] = df['x'] + x0
-        df['y'] = 10
-        df['color'] = 'lightgray'
-        df['textcolor'] = 'black'
-        df['period'] = np.arange(1, num_periods+1)
-
-        df.drop
-        # Sum credits per period and convert to a DataFrame
-        total_credits = self.df.groupby('period')['credits'].sum().sort_index()
-        total_credits_df = total_credits.reset_index()
-
-        df = pd.merge(df, total_credits_df, on='period', how='inner')
-        df['name'] = df['term']
-        df['printname'] = df['name'] + ' (' + df['credits'].astype(str) + ')'
-
-        return df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 
-                   'fontsize', 'period', 'name', 'credits', 'description']]
-
-    def prepare_d3_data(self, start_term='SPRING 2024'):
-        max_period = max(self.df['period'])
-        headers = self.generate_header_data(start_term, max_period)
-
-        self.df['description'] = self.df['prerequisite']
-        self.df['width'] = 120
-        # Calculate 'x' column
-        self.df = pd.merge(self.df, headers[['period','x']], on='period', how='left')
-        self.df['x'] += 70*(self.df['session']-1)
-
-        # Calculate 'y' column
-        self.df = self.df.sort_values(by=['period', 'session', 'seq' ])
-        self.df['y_row'] = self.df.groupby('period').cumcount() + 1
-        self.df['y'] = 70 + 45 * (self.df['y_row'] - 1)
-
-        # Create rectangle colors
-        self.df[['color', 'textcolor']] = self.df.apply(self.set_colors, axis=1)
-
-        # Set text offset multiplier to 1 and text fontsize
-        self.df['offset'] = 1
-        self.df['fontsize'] = '12px'
-        self.df['printname'] = self.df['name'] + ' (' + self.df['credits'].astype(str) + ')'
-        
-        self.df = self.df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 'fontsize', 'period', 'session', 'type', 'name', 'credits', 'description']]
-
-        return self.df, headers
-
-# Example usage:
-# d3_preparer = D3DataPreparer(df)
-# d3_data, headers = d3_preparer.prepare_d3_data(start_term='SPRING 2024')
-    
 ## Need to update this
 
 def schedule_courses(courses, periods, max_courses_default, max_credits_default):
