@@ -1,5 +1,0 @@
-#!/bin/bash
-docker run --rm --name umgc_catalog \
--p 10102:10101 \
--e PORT=10101 \
-umgc-catalog-wave:0.1.0

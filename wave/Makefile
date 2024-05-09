@@ -28,3 +28,9 @@ docker:
 	--build-arg WAVE_VERSION=1.1.1 \
 	--build-arg PYTHON_MODULE="app.py" \
 	-f Dockerfile .
+
+run_docker:
+	docker run --rm --name umgc_catalog \
+	-p 10101:10101 \
+	-e PORT=10101 \
+	umgc-catalog-wave:0.1.0
