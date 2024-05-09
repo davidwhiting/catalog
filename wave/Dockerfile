@@ -8,7 +8,7 @@ FROM python:${PYTHON_VERSION}-slim
 # Install OS dependencies
 RUN apt-get update && apt-get -y upgrade \
     && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends curl build-essential
+    && apt-get -y install --no-install-recommends curl build-essential libsqlite3-dev
 
 # Create a non-root user
 RUN useradd --create-home appuser
@@ -34,8 +34,7 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy app code
-COPY --chown=appuser:appuser app.py cards.py templates.py utils.py \
-    UMGC.db umgc-logo-white.png class_d3.js .
+COPY --chown=appuser:appuser  . .
 
 # Set permissions for the Entrypoint script
 RUN chmod +x docker-entrypoint.sh
