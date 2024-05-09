@@ -9,17 +9,17 @@ import sqlite3
 # 'templates' contains static html, markdown, and javascript D3 code
 import templates
 
-# cards contains static cards and python functions that render cards
+# cards contains static cards and python functions that render cards (render_... functions)
 import cards
-from cards import add_card, clear_cards, get_choices
-    #meta_card, render_debug_card
-    #, render_debug_client_card
-    #, area_query 
-    #, render_home_cards
 
 # 'utils' contains all other python functions
 import utils
-from utils import get_query, get_query_one
+from utils import add_card, clear_cards
+from utils import get_query, get_query_one, get_query_dict, get_query_df
+from utils import get_choices, get_choices_with_disabled, get_role, \
+    get_ge_choices, get_catalog_program_sequence, get_student_progress_d3
+from utils import generate_periods, update_periods, generate_schedule, handle_prerequisites, \
+    schedule_courses_old, update_courses, move_courses_forward
 
 async def on_startup():
     # Set up logging
@@ -31,9 +31,9 @@ async def on_startup():
 async def home(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
 
-    # get saved student information
+    # get saved student information from the db and save to q.user.X_... variables
     if q.user.role == 'student':
-        await cards.get_student_info(q, q.user.X_user_id)
+        await utils.populate_student_info(q, q.user.X_user_id)
 
     # show this card only for guests and students with new status
     # for folks not yet logged in
@@ -44,7 +44,6 @@ async def home(q: Q):
     else:
         cards.render_welcome_card(q)
         cards.render_please_login(q)
-
 
 #    student_profile_type = ['First time attending', 'Previous experience', 'Transfer credits']
 #    add_card(q, 'student_profile_type_card', ui.form_card(
@@ -61,10 +60,10 @@ async def home(q: Q):
 #        ]
 #    ))
 
-    add_card(q, 'student_stub', cards.render_student_information_stub_card(box='4 3 3 2'))
-    add_card(q, 'assessments', cards.render_career_assessment_card(box='4 5 3 2'))
-    add_card(q, 'enable_ai', cards.render_ai_enablement_card(box='1 7 3 2'))
-
+    add_card(q, 'student_stub', cards.render_student_information_stub_card(box='4 3 4 2'))
+    add_card(q, 'assessments', cards.render_career_assessment_card(box='4 5 4 2'))
+    add_card(q, 'enable_ai', cards.render_ai_enablement_card(box='1 7 4 2'))
+    add_card(q, 'major_recommendations', cards.render_major_recommendation_card(q, box='5 7 3 3'))
 
     #add_card(q, 'dashboard_placeholder', ui.markdown_card(
     #    box='6 6 2 2',
@@ -78,9 +77,6 @@ async def home(q: Q):
     #    content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
     #))
 
-
-    
-    add_card(q, 'major_recommendations', cards.render_major_recommendation_card(q, box='4 7 3 3'))
     
     #add_card(q, 'debug_home', cards.render_debug_user_card(q, box='2 10 6 4'))
 
@@ -119,6 +115,7 @@ async def major(q: Q):
 
     if hasattr(q.user, 'X_program_id'):
         await cards.render_program(q)
+
     # need to make available for degree types other than bachelor's
 
     #add_card(q, 'debug_program', cards.render_debug_user_card(q, box='1 10 7 2'))
@@ -329,10 +326,10 @@ async def schedule(q: Q):
         # pick these variables up from the form
         periods = utils.generate_periods(
             start_term='SPRING 2024', # pick up from q.user.X_ variable
+            years=8, # number of years, more than we need
             max_courses=3, # pick up from courses_per_session
             sessions=[1, 3], # pick up from 'Sessions Attending'
-            summer=True, # attending summer? Add this to form!!
-            length=30 # more than we need
+            summer=True # attending summer? Add this to form!!
         )
         q.user.X_periods = periods # save to variable
 
@@ -415,16 +412,14 @@ async def initialize_user(q: Q):
     ## Double check that this isn't breaking anything.
     #for key in list(q.user.keys()):
     #    delattr(q.user, key)
-    ### the above code is not working
+    ############ the above code is not working #############
 
     q.user.initialized = True
 
-    q.user.conn = sqlite3.connect('UMGC.db')
-    # row_factory returns dictionaries rather than tuples
-    # (more verbose, thus easier to understand code intent)
-    q.user.conn.row_factory = sqlite3.Row  
-    q.user.c = q.user.conn.cursor()
-
+    #q.user.conn = sqlite3.connect('UMGC.db')
+    #q.user.c = q.user.conn.cursor()
+    q.user.conn = utils.TimedSQLiteConnection('UMGC.db')
+ 
     #############################################################################
     ## keycloak implementation code found in utils.py goes here after updating ##
     #############################################################################
@@ -488,7 +483,7 @@ async def initialize_user(q: Q):
                            # later add an "add student" functionality
         # if user is a student, do this:
     if q.user.role == 'student':
-        await cards.get_student_info(q, q.user.X_user_id)
+        await utils.populate_student_info(q, q.user.X_user_id)
     
     #else:
     #    q.user.guest = True

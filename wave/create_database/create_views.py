@@ -2,6 +2,42 @@ import sqlite3
 # db connection created w/in utils
 from utils import conn, c, drop_table, drop_view, column_exists
 
+# student_info_view used by utils.populate_student_info
+drop_view('student_info_view')
+create_view_query = '''
+    CREATE VIEW student_info_view AS
+        SELECT 
+            a.user_id, 
+            b.firstname || ' ' || b.lastname AS fullname,
+            c.label AS resident_status, 
+            a.app_stage_id,
+            d.stage as app_stage,
+            e.label AS student_profile,
+            a.transfer_credits, 
+            a.financial_aid,
+            a.program_id
+        FROM 
+            student_info a
+        LEFT JOIN
+            users b
+        ON
+            a.user_id = b.id
+        LEFT JOIN
+            resident_status c
+        ON
+            a.resident_status_id=c.id
+        LEFT JOIN
+            app_stage d
+        ON
+            a.app_stage_id=d.id
+        LEFT JOIN
+            student_profile e
+        ON
+            a.student_profile_id=e.id
+'''
+c.execute(create_view_query)
+conn.commit()
+
 drop_view('student_records_view_old')
 create_view_query = '''
     CREATE VIEW student_records_view_old AS
@@ -21,7 +57,7 @@ create_view_query = '''
     FROM 
         student_progress a
     LEFT JOIN 
-        classes b
+        courses b
     ON 
         a.name = b.name
 '''
@@ -44,7 +80,7 @@ create_view_query = '''
     FROM 
         general_education a
     LEFT JOIN 
-        classes b
+        courses b
     ON 
         a.course_id = b.id
 '''
@@ -66,7 +102,7 @@ create_view_query = '''
     FROM 
         program_sequence a
     JOIN 
-        classes b
+        courses b
     ON 
         a.class_id = b.id
 '''
@@ -87,12 +123,12 @@ create_view_query = '''
         IFNULL(b.title, '') AS title,
         IFNULL(b.description, '') AS description,
         IFNULL(b.prerequisites, '') as prerequisites,
-        IFNULL(b.pre, '') as pre_classes,
+        IFNULL(b.pre, '') as pre_courses,
         IFNULL(b.pre_credits, '') as pre_credits
     FROM 
         student_progress a
     LEFT JOIN 
-        classes b
+        courses b
     ON 
         a.name = b.name
 '''
@@ -115,7 +151,7 @@ create_view_query = '''
     	b.pre_credits,
     	b.description
     FROM program_requirement_courses a
-    LEFT JOIN classes b
+    LEFT JOIN courses b
     	ON a.course = b.name
     LEFT JOIN course_type c
     	ON a.course_type_id = c.id
@@ -167,7 +203,7 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
-
+# catalog_program_sequence_view used by get_catalog_program_sequence
 drop_view('catalog_program_sequence_view')
 create_view_query = '''
 	CREATE VIEW catalog_program_sequence_view AS
@@ -198,7 +234,7 @@ create_view_query = '''
     ON
         c.id = a.course_type_id
     LEFT JOIN
-        classes b
+        courses b
     ON
         a.course = b.name
 '''
@@ -230,7 +266,7 @@ create_view_query = '''
     FROM 
         student_progress_d3 a
     LEFT JOIN
-        classes b
+        courses b
     ON
         a.name = b.name
 '''

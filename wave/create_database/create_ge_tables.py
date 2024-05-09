@@ -31,7 +31,7 @@ c.execute('''
         note TEXT DEFAULT '',
         FOREIGN KEY(general_education_requirements_id) 
             REFERENCES general_education_requirements(id),        
-        FOREIGN KEY(course_id) REFERENCES classes(id)
+        FOREIGN KEY(course_id) REFERENCES courses(id)
     )
 ''')
 
@@ -50,7 +50,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         1, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
@@ -75,7 +75,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         2, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
         name = 'WRTG 112'
 '''
@@ -94,7 +94,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         3, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
@@ -122,7 +122,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         4, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '3' 
 		AND 
@@ -143,7 +143,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         5, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		name IN ('MATH 105', 'MATH 107', 'MATH 115', 'MATH 140', 'STAT 200')
 '''
@@ -162,7 +162,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         6, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
@@ -233,7 +233,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         7, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		name in (
             'BIOL 103', 
@@ -247,7 +247,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         8, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		name in (
             'CHEM 103', 
@@ -261,7 +261,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
     SELECT 
         9, id, name, 'Pair: BIOL 101 (3) & BIOL 102 (1)' 
-	FROM classes
+	FROM courses
 	WHERE 
 		name in (
             'BIOL 101',
@@ -274,7 +274,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
     SELECT 
         9, id, name, 'Pair: BIOL 160 (3) & BIOL 161 (1)' 
-	FROM classes
+	FROM courses
 	WHERE 
 		name in (
             'BIOL 160',
@@ -287,7 +287,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
     SELECT 
         9, id, name, 'Pair: NSCI 100 (3) & NSCI 101 (1)' 
-	FROM classes
+	FROM courses
 	WHERE 
 		name in (
             'NSCI 100',
@@ -300,7 +300,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
     SELECT 
         9, id, name, 'Pair: NSCI 170 (3) & NSCI 171 (1)' 
-	FROM classes
+	FROM courses
 	WHERE 
 		name IN (
             'NSCI 170',
@@ -313,7 +313,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
     SELECT 
         9, id, name, 'Pair: NUTR 100 (3) & NUTR 101 (1)' 
-	FROM classes
+	FROM courses
 	WHERE 
 		name in (
             'NUTR 100',
@@ -326,7 +326,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
     SELECT 
         9, id, name, '' 
-	FROM classes
+	FROM courses
 	WHERE 
 		name in (
             'NSCI 120'
@@ -348,7 +348,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         10, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
@@ -378,7 +378,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         11, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
@@ -418,7 +418,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         12, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '3' 
 		AND name LIKE 'PACE 111_'
@@ -429,7 +429,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         13, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits = '1' 
 		AND name IN ('LIBS 150', 'CAPL 398A')
@@ -440,7 +440,7 @@ query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, name)
     SELECT 
         14, id, name 
-	FROM classes
+	FROM courses
 	WHERE 
 		credits IN ('1', '3') 
 		AND (

@@ -554,8 +554,23 @@ import sqlite3
 conn = sqlite3.connect('UMGC.db')
 c = conn.cursor()
 
+# Create catalog table referenced by courses table
+catalog = [
+    { 'id':  1, 'version': '2023-2024' }
+]
 c.execute('''
-    CREATE TABLE classes (
+    CREATE TABLE catalog (
+        id INTEGER PRIMARY KEY,
+        version TEXT
+    )
+''')
+c.executemany('INSERT INTO catalog VALUES (:id, :version)', catalog)
+
+###############################################################
+# Create courses table
+
+c.execute('''
+    CREATE TABLE courses (
         id INTEGER PRIMARY KEY,  
         name TEXT,
         title TEXT,
@@ -567,30 +582,31 @@ c.execute('''
         substitutions TEXT,
         pre TEXT,
         pre_credits TEXT,
-        pre_notes TEXT
+        pre_notes TEXT,
+        catalog_id INTEGER,
+        FOREIGN KEY(catalog_id) REFERENCES catalog(id)
     )
 ''')
 
-# Insert data into the table
-
-i = 0 # add primary key
+catalog_integer = 1
 for class_name, class_info in classes.items():
-    i += 1
     c.execute('''
-        INSERT INTO classes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        i,
-        class_info['name'],
-        class_info['title'],
-        class_info['credit'],
-        class_info['description'],
-        class_info['prerequisites'],
-        class_info['recommended'],
-        class_info['warnings'],
-        class_info['substitutions'],
-        class_info['pre'],
-        class_info['pre_credits'],
-        class_info['pre_notes']
+        INSERT INTO courses ('name','title','credits','description','prerequisites','recommended',
+              'warnings','substitutions','pre','pre_credits','pre_notes','catalog_id')
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', 
+        (
+            class_info['name'],
+            class_info['title'],
+            class_info['credit'],
+            class_info['description'],
+            class_info['prerequisites'],
+            class_info['recommended'],
+            class_info['warnings'],
+            class_info['substitutions'],
+            class_info['pre'],
+            class_info['pre_credits'],
+            class_info['pre_notes'],
+            catalog_integer
     ))
 
 conn.commit()
