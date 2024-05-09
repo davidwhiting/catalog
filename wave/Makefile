@@ -22,7 +22,9 @@ clone_venv:
 	.venv/bin/pip install -r requirements.txt
 
 docker:
-	docker build -t umgc-catalog-wave:0.1.0 \
+	docker buildx build --platform linux/amd64 \
+	-t umgc-catalog-wave:0.1.0 \
 	--build-arg PYTHON_VERSION=3.10.12 \
 	--build-arg WAVE_VERSION=1.1.1 \
-	--build-arg PYTHON_MODULE="app.py" .
+	--build-arg PYTHON_MODULE="app.py" \
+	-f Dockerfile .

@@ -43,4 +43,4 @@ ENV PATH="$VIRTUAL_ENV/bin:$WAVE_PATH:$PATH"
 
 # Set permissions for the Entrypoint script
 RUN chmod +x docker-entrypoint.sh
-#ENTRYPOINT [ "./docker-entrypoint.sh" ]
+ENTRYPOINT [ "./docker-entrypoint.sh" ]
