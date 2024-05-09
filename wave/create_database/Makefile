@@ -1,4 +1,4 @@
-PYTHON := ../venv/bin/python
+PYTHON := ../.venv/bin/python
 default: all
 
 # Makefile for creating UMGC database with a sequence of python files
