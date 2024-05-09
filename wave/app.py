@@ -389,8 +389,11 @@ async def initialize_app(q: Q):
     q.app.initialized = True
     logging.info('Initializing app')
 
-    # upload logo
-    q.app.umgc_logo, = await q.site.upload(['images/umgc-logo-white.png'])
+    ## upload logo
+    #q.app.umgc_logo, = await q.site.upload(['images/umgc-logo-white.png'])
+    ## removed images directory for convenience in docker testing
+    q.app.umgc_logo, = await q.site.upload(['umgc-logo-white.png'])
+    
 
 
 async def initialize_user(q: Q):
