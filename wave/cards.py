@@ -1,28 +1,18 @@
 from h2o_wave import ui
 from typing import Optional, List
 import utils
-from utils import get_query, get_query_one
+from utils import add_card, clear_cards
+from utils import get_query, get_query_one, get_query_dict, get_query_df
+from utils import get_choices, get_choices_with_disabled, get_role, \
+    get_ge_choices, get_catalog_program_sequence, get_student_progress_d3
+from utils import generate_periods, update_periods, generate_schedule, handle_prerequisites, \
+    schedule_courses_old, update_courses, move_courses_forward
 import pandas as pd
 import sys
 
 ######################################################################
-####################  STANDARD WAVE CARDS (START) ####################
+####################  STANDARD WAVE CARDS  ###########################
 ######################################################################
-
-# Use for page cards that should be removed when navigating away.
-# For pages that should be always present on screen use q.page[key] = ...
-def add_card(q, name, card) -> None:
-    q.client.cards.add(name)
-    q.page[name] = card
-
-# Remove all the cards related to navigation.
-def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
-    if not q.client.cards:
-        return
-    for name in q.client.cards.copy():
-        if name not in ignore:
-            del q.page[name]
-            q.client.cards.remove(name)
 
 def render_meta_card(flex=False):
     title='UMGC Wave App'
@@ -146,25 +136,8 @@ This app is in pre-alpha stage. Feedback welcomed.
     return card
 
 ######################################################################
-####################  STANDARD WAVE CARDS (END)   ####################
+####################  SQL QUERIES & UTILITIES  #######################
 ######################################################################
-
-######################################################################
-####################  SQL QUERIES & UTILITIES (START) ################
-######################################################################
-
-# These are used in app.py and elsewhere
-degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
-area_query = '''
-    SELECT DISTINCT menu_area_id AS name, area_name AS label
-    FROM menu_all_view 
-    WHERE menu_degree_id = ?
-'''
-program_query = '''
-    SELECT program_id AS name, program_name AS label
-    FROM menu_all_view 
-    WHERE menu_degree_id = ? AND menu_area_id = ?
-'''
 
 def render_dialog_description(q, course):
     '''
@@ -181,92 +154,6 @@ def render_dialog_description(q, course):
         closable = True,
         #events = ['dismissed']
     )
-
-async def get_role(q):
-    # get role given a user id
-    query = '''
-        SELECT 
-		    a.role_id,
-		    b.type AS role,
-		    a.username, 
-		    a.firstname || ' ' || a.lastname AS fullname
-        FROM 
-			users a, roles b
-		WHERE 
-			a.role_id=b.id AND a.id = ?
-    '''
-    row = await get_query_one(q, query, params=(q.user.user_id,))
-    q.user.role_id = row['role_id']
-    q.user.role = row['role']
-    q.user.username = row['username']
-    q.user.name = row['fullname']
-
-async def get_student_info(q, user_id):
-    # get information from student_info table
-    # create a view for this
-    query = '''
-        SELECT 
-            a.user_id, 
-            b.firstname || ' ' || b.lastname AS fullname,
-            c.label AS resident_status, 
-            a.app_stage_id,
-            d.stage as app_stage,
-            e.label AS student_profile,
-            a.transfer_credits, 
-            a.financial_aid,
-            a.program_id
-        FROM 
-            student_info a
-        LEFT JOIN
-            users b
-        ON
-            a.user_id = b.id
-        LEFT JOIN
-            resident_status c
-        ON
-            a.resident_status_id=c.id
-        LEFT JOIN
-            app_stage d
-        ON
-            a.app_stage_id=d.id
-        LEFT JOIN
-            student_profile e
-        ON
-            a.student_profile_id=e.id
-        WHERE 
-            user_id = ?
-    '''   
-    row = await get_query_one(q, query, params=(user_id,))
-    if row:
-        q.user.X_resident_status = row['resident_status']
-        q.user.X_app_stage_id = row['app_stage_id']
-        q.user.X_app_stage = row['app_stage']
-        q.user.X_student_profile = row['student_profile']
-        q.user.X_financial_aid = row['financial_aid']
-        q.user.X_transfer_credits = row['transfer_credits']
-        q.user.X_program_id = row['program_id']
-        if q.user.X_program_id is not None:
-            row = await utils.get_program_title_new(q, q.user.X_program_id)
-            if row:
-                q.user.X_degree_program = row['title']
-                q.user.X_degree_id = row['id']
-    
-    # retrieve menu status for students
-    query = '''
-        SELECT menu_degree_id, menu_area_id 
-        FROM menu_all_view
-        WHERE program_id = ?
-        LIMIT 1
-    '''
-    # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
-    row = await get_query_one(q, query, params=(q.user.X_program_id,))
-    if row:
-        q.user.X_menu_degree = row['menu_degree_id']
-        q.user.X_menu_area = row['menu_area_id']
-
-######################################################################
-####################  SQL QUERIES & UTILITIES  (END)   ###############
-######################################################################
 
 ##############################################################
 ####################  DEBUG CARDS (START) ####################
@@ -310,18 +197,24 @@ def render_debug_card(q, location='debug', width='33%', height='200px'):
     )
     return card
 
-def render_debug_client_card(q, location='debug', width='33%', height='200px'):
+def render_debug_client_card(q, box='3 3 1 1', flex=False, location='debug', width='33%', height='200px'):
+    '''
+    Show q.client information in a card for debugging
+    '''
+    if flex:
+        box = ui.box(location, width=width, height=height)
     content = f'''
 
 ### q.client value:
 {q.client}
 
     '''
-    return ui.markdown_card(
-        ui.box(location, width=width, height=height), 
+    card = ui.markdown_card(
+        box,
         title='Client Debugging Information', 
         content=content 
     )
+    return card
 
 def render_debug_user_card(q, flex=False, box='2 2 3 3', location='debug', width='33%', height='200px'):
     if flex:
@@ -362,7 +255,7 @@ def render_debug(q, location='debug', width='25%', height='230px'):
 ##############################################################
 
 ##############################################################
-####################  HOME PAGE (START)  #####################
+####################  HOME PAGE  #############################
 ##############################################################
 
 def render_welcome_card_old(q, box='1 2 7 1'):
@@ -429,7 +322,6 @@ def render_welcome_back_card(q, box='1 3 3 3', title=''):
     #    )
     #)
 
-
 def render_student_information_stub_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):
     if flex:
         box=ui.box(location, width='400px')
@@ -442,7 +334,6 @@ def render_student_information_stub_card(box='1 1 2 2', flex=False, location='bo
         caption=caption
     )
     return card
-
 
 def render_career_assessment_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):
     if flex:
@@ -475,47 +366,30 @@ def render_ai_enablement_card(box='1 1 2 2', flex=False, location='bottom_horizo
 ##############################################################
 
 ##############################################################
-####################  PROGRAMS PAGE (START) ##################
+####################  PROGRAMS PAGE ##########################
 ##############################################################
 
-async def get_choices(q, query, params=()):
-    rows = await get_query(q, query, params)
-    choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
-    return choices
-
-async def get_choices_with_disabled(q, query, params=()):
-    disabled_items = {
-        'Cybersecurity Technology',
-        'Social Science',
-        'Applied Technology',
-        'Web and Digital Design',        
-        'East Asian Studies',
-        'English',
-        'General Studies',
-        'History'
-    }
-    rows = await get_query(q, query, params)
-    choices = [ui.choice(name=str(row['name']), label=row['label'], \
-        disabled=(str(row['label']) in disabled_items)) for row in rows]
-    return choices
-
 async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horizontal', flex=False, menu_width='280px'):
-    #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
-    #area_query = '''
-    #    SELECT DISTINCT menu_area_id AS name, area_name AS label
-    #    FROM menu_all_view 
-    #    WHERE menu_degree_id = ?
-    #'''
-    #program_query = '''
-    #    SELECT program_id AS name, program_name AS label
-    #    FROM menu_all_view 
-    #    WHERE menu_degree_id = ? AND menu_area_id = ?
-    #'''
+    '''
+    Create menus for selecting degree, area of study, and program
+    '''
+    timedConnection = q.user.conn
+
+    degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
+    area_query = '''
+        SELECT DISTINCT menu_area_id AS name, area_name AS label
+        FROM menu_all_view 
+        WHERE menu_degree_id = ?
+    '''
+    program_query = '''
+        SELECT program_id AS name, program_name AS label
+        FROM menu_all_view 
+        WHERE menu_degree_id = ? AND menu_area_id = ?
+    '''
 
     disabled = []
 
-    # enforcing string because I've got a but somewhere (passing an int instead of str)
-
+    # enforcing string because I've got a bug somewhere (passing an int instead of str)
     dropdowns = ui.inline([
         ui.dropdown(
             name='menu_degree',
@@ -523,7 +397,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horiz
             value=str(q.user.X_menu_degree) if (q.user.X_menu_degree is not None) else q.args.menu_degree,
             trigger=True,
             width='230px',
-            choices=await get_choices(q, degree_query)
+            choices=await get_choices(timedConnection, degree_query)
         ),
         ui.dropdown(
             name='menu_area',
@@ -534,7 +408,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horiz
             disabled=False,
             width='250px',
             choices=None if (q.user.X_menu_degree is None) else \
-                await get_choices(q, area_query, (q.user.X_menu_degree,))
+                await get_choices(timedConnection, area_query, (q.user.X_menu_degree,))
         ),
         ui.dropdown(
             name='menu_program',
@@ -544,7 +418,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horiz
             disabled=False,
             width='300px',
             choices=None if (q.user.X_menu_area is None) else \
-                await get_choices_with_disabled(q, program_query, (q.user.X_menu_degree, q.user.X_menu_area))
+                await get_choices_with_disabled(timedConnection, program_query, (q.user.X_menu_degree, q.user.X_menu_area))
         )
     ], justify='start', align='start')
 
@@ -622,14 +496,14 @@ async def render_program_description(q, box):
     :param q: instance of Q for wave query
     :param location: page location to display
     '''
+    timedConnection = q.user.conn
     title = q.user.X_degree_program # program name
-
 
     query = '''
         SELECT description, info, learn, certification
         FROM program_descriptions WHERE program_id = ?
     '''
-    row = await get_query_one(q, query, params=(q.user.X_program_id,))
+    row = await get_query_one(timedConnection, query, params=(q.user.X_program_id,))
     if row:
         #major = '\n##' + title + '\n\n'
         frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
@@ -659,13 +533,14 @@ async def render_program_dashboard(q, box):
     flex=True: location is required
     flex=False: box is required
     '''
+    timedConnection = q.user.conn
     title = q.user.X_degree_program # program name
 
     #if q.user.X_menu_degree == '2':
 
     # get program summary for bachelor's degrees
     query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    row = await get_query_one(q, query, params=(q.user.X_program_id,))
+    row = await get_query_one(timedConnection, query, params=(q.user.X_program_id,))
     if row:
         card = add_card(q, 'major_dashboard', ui.form_card(
             box=box,
@@ -742,6 +617,7 @@ async def render_program_table(q, df, box=None, location=None, width=None, heigh
     ge: Include GE classes
     elective: Include Elective classes
     '''
+
     async def _render_program_group(group_name, record_type, df, collapsed, check=True):
         '''
         group_name: 
@@ -873,6 +749,7 @@ async def render_program_coursework_table(q, box='1 3 5 7', location='middle_ver
     '''
     Create program coursework requirement table
     '''
+    timedConnection = q.user.conn
     #############
     query = '''
         SELECT 
@@ -888,7 +765,7 @@ async def render_program_coursework_table(q, box='1 3 5 7', location='middle_ver
         FROM program_requirements_view
         WHERE program_id = ?
     '''
-    df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))
+    df = await get_query_df(timedConnection, query, params=(q.user.X_program_id,))
     q.client.program_df = df
 
     await render_program_table(q, df, box=box, location=location, width=width, height=height, flex=flex)
@@ -898,13 +775,12 @@ async def render_program(q):
     await render_program_dashboard(q, box='7 5 1 5')
     await render_program_coursework_table(q, box='1 5 6 5')
 
-
 ##############################################################
 ####################  PROGRAM PAGE (END)   ###################
 ##############################################################
 
 ##############################################################
-####################  COURSES PAGE (START) ###################
+####################  COURSES PAGE  ##########################
 ##############################################################
 
 def render_courses_header(q, box='1 2 7 1'):
@@ -916,71 +792,6 @@ def render_courses_header(q, box='1 2 7 1'):
             #ui.text('We will guide you through this experience.')
         ]
     ))
-
-async def get_catalog_program_sequence(q):
-    query = 'SELECT * FROM catalog_program_sequence_view WHERE program_id = ?'
-    #query = '''
-    #    SELECT 
-    #        a.seq, 
-    #        a.course AS name,
-    #        c.name as course_type,
-    #        CASE
-    #            WHEN INSTR(c.name, '_') > 0 
-    #            THEN SUBSTR(c.name, 1, INSTR(c.name, '_') - 1)
-    #            ELSE c.name
-    #        END as type,
-    #        b.credits,
-    #        b.title,
-    #        0 AS completed,
-    #        0 AS term,
-    #        0 AS session,
-    #        0 AS locked,
-    #        b.pre,
-    #        b.pre_credits, 
-    #        b.substitutions,
-    #        b.description
-    #    FROM 
-    #        catalog_program_sequence a
-    #    LEFT JOIN
-    #        course_type c
-    #    ON
-    #        c.id = a.course_type_id
-    #    LEFT JOIN
-    #        classes b
-    #    ON
-    #        a.course = b.name
-    #    WHERE 
-    #        a.program_id = ?
-    #'''
-    try:
-        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_program_id,))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None  # or return a specific value or message
-
-    # Check if df is empty
-    if df.empty:
-        print("The query returned zero rows.")
-        return None  # or return a specific value or message
-
-    return df
-
-async def get_student_progress_d3(q):
-    query = '''
-        SELECT * FROM student_progress_d3_view WHERE user_id = ?
-    '''
-    try:
-        df = pd.read_sql_query(query, q.user.conn, params=(q.user.X_user_id,))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None  # or return a specific value or message
-
-    # Check if df is empty
-    if df.empty:
-        print("The query returned zero rows.")
-        return None  # or return a specific value or message
-
-    return df
 
 async def render_course_page_table(q, df, box=None, location=None, width=None, height=None, flex=False, check=True, ge=False, elective=False):
     '''
@@ -1092,10 +903,6 @@ async def render_course_page_table(q, df, box=None, location=None, width=None, h
 ##############################################################
 
 # reset ge defaults if covered in  
-async def get_ge_choices(q, query, params=()):
-    rows = await get_query(q, query, params)
-    choices = [ui.choice(name=str(row['name']), label=row['name'] + ': ' + row['title']) for row in rows]
-    return choices
 
 ge_query = "SELECT name, name || ': ' || title AS label FROM ge_view WHERE ge_id=? ORDER BY name"
 ge_query_nopre = '''
@@ -1122,6 +929,10 @@ ge_pairs_query = '''
 '''
 
 async def render_ge_comm_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    '''
+    Create the General Education - Communications card
+    '''
+    timedConnection = q.user.conn
     if flex:
         box = location
     card = ui.form_card(
@@ -1137,7 +948,7 @@ async def render_ge_comm_card(q, menu_width, box='4 2 2 5', flex=False, location
                 value=q.user.X_ge_comm_p1 if (q.user.X_ge_comm_p1 is not None) else 'WRTG 111',
                 trigger=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (1,))
+                choices=await get_choices(timedConnection, ge_query, (1,))
             ),
             ui.dropdown(
                 name='ge_comm_2',
@@ -1146,7 +957,7 @@ async def render_ge_comm_card(q, menu_width, box='4 2 2 5', flex=False, location
                 disabled=False,
                 trigger=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (2,))
+                choices=await get_choices(timedConnection, ge_query, (2,))
             ),
             ui.dropdown(
                 name='ge_comm_3',
@@ -1156,7 +967,7 @@ async def render_ge_comm_card(q, menu_width, box='4 2 2 5', flex=False, location
                 trigger=True,
                 required=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (3,))
+                choices=await get_choices(timedConnection, ge_query, (3,))
             ),
             ui.dropdown(
                 name='ge_comm_4',
@@ -1165,13 +976,17 @@ async def render_ge_comm_card(q, menu_width, box='4 2 2 5', flex=False, location
                 value=q.user.X_ge_comm_p4 if (q.user.X_ge_comm_p4 is not None) else q.args.ge_comm_p4,
                 trigger=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (4,))
+                choices=await get_choices(timedConnection, ge_query, (4,))
             ),
         ]
     )
     return card
 
 async def render_ge_math_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    '''
+    Create the General Education - Mathematics card
+    '''
+    timedConnection = q.user.conn
     if flex:
         box = location
     nopre = True # pick this value up from checkbox
@@ -1190,13 +1005,17 @@ async def render_ge_math_card(q, menu_width, box='4 2 2 5', flex=False, location
                 trigger=True,
                 required=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (5,))
+                choices=await get_choices(timedConnection, ge_query, (5,))
             ),
         ]
     )
     return card
 
 async def render_ge_arts_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    '''
+    Create the General Education - Arts card
+    '''
+    timedConnection = q.user.conn
     if flex:
         box = location
     nopre = True # pick this value up from checkbox
@@ -1215,7 +1034,7 @@ async def render_ge_arts_card(q, menu_width, box='4 2 2 5', flex=False, location
                 placeholder='(Select One)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (6,))
+                choices=await get_choices(timedConnection, ge_query, (6,))
             ),
             ui.dropdown(
                 name='ge_arts_2',
@@ -1226,13 +1045,17 @@ async def render_ge_arts_card(q, menu_width, box='4 2 2 5', flex=False, location
                 required=True,
                 width=menu_width,
                 # figure out how to omit choice selected in Course 1
-                choices=await get_choices(q, ge_query, (6,))
+                choices=await get_choices(timedConnection, ge_query, (6,))
             ),
         ]
     )
     return card
 
 async def render_ge_science_card(q, menu_width, box='4 2 2 5', flex=False, location='grid'):
+    '''
+    Create the General Education - Science card
+    '''
+    timedConnection = q.user.conn
     if flex:
         box = location
     nopre = True # pick this value up from checkbox
@@ -1253,7 +1076,7 @@ async def render_ge_science_card(q, menu_width, box='4 2 2 5', flex=False, locat
                 placeholder='(Combined Lecture & Lab)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (7,))
+                choices=await get_choices(timedConnection, ge_query, (7,))
             ),
             ui.dropdown(
                 name='ge_bio_1c',
@@ -1262,7 +1085,7 @@ async def render_ge_science_card(q, menu_width, box='4 2 2 5', flex=False, locat
                 trigger=True,
                 placeholder='or (Separate Lecture & Lab)',
                 width=menu_width,
-                choices=await get_choices(q, ge_pairs_query, ())
+                choices=await get_choices(timedConnection, ge_pairs_query, ())
             ),
             ui.dropdown(
                 name='ge_bio_1b',
@@ -1272,7 +1095,7 @@ async def render_ge_science_card(q, menu_width, box='4 2 2 5', flex=False, locat
                 placeholder='or (Science Majors and Minors)',
                 #placeholder='or (Select One)',
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (8,))
+                choices=await get_choices(timedConnection, ge_query, (8,))
             ),
             #ui.separator(label='Select an additional science course:'),
             #nopre=True # check for easy classes by selecting those w/o prerequisites
@@ -1285,7 +1108,7 @@ async def render_ge_science_card(q, menu_width, box='4 2 2 5', flex=False, locat
                 placeholder='(Select One)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query_nopre if nopre else ge_query, (10,))
+                choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (10,))
                 #choices=await get_choices(q, ge_query_nopre, (10,))
             ),
         ]
@@ -1293,6 +1116,10 @@ async def render_ge_science_card(q, menu_width, box='4 2 2 5', flex=False, locat
     return card
 
 async def render_ge_beh_card(q, menu_width, box='1 3 3 4', flex=False, location='grid'):
+    '''
+    Create the General Education - Behavioral and Social Sciences card
+    '''
+    timedConnection = q.user.conn
     if flex:
         box = location
     nopre = True # pick this value up from checkbox
@@ -1314,7 +1141,7 @@ async def render_ge_beh_card(q, menu_width, box='1 3 3 4', flex=False, location=
                 required=True,
                 width=menu_width,
                 #choices=await get_choices(q, ge_query, (11,))
-                choices=await get_choices(q, ge_query_nopre if nopre else ge_query, (11,))
+                choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (11,))
             ),
             ui.dropdown(
                 name='ge_beh_2',
@@ -1325,7 +1152,7 @@ async def render_ge_beh_card(q, menu_width, box='1 3 3 4', flex=False, location=
                 placeholder='(Select One)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(q, ge_query_nopre if nopre else ge_query, (11,))
+                choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (11,))
                 #choices=await get_choices(q, ge_query, (11,))
             ),
         ]
@@ -1333,6 +1160,10 @@ async def render_ge_beh_card(q, menu_width, box='1 3 3 4', flex=False, location=
     return card
 
 async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, location='grid'):
+    '''
+    Create the General Education - Research and Computing Literacy card
+    '''
+    timedConnection = q.user.conn
     if flex:
         box = location
     # make some defaults based on area of program chosen:
@@ -1354,7 +1185,7 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
                 placeholder='(Select One)',
                 popup='always',
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (12,))
+                choices=await get_choices(timedConnection, ge_query, (12,))
             ),
             ui.dropdown(
                 name='ge_res_2',
@@ -1363,7 +1194,7 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
                 trigger=True,
                 placeholder='(Select One)',
                 width=menu_width,
-                choices=await get_choices(q, ge_query, (13,))
+                choices=await get_choices(timedConnection, ge_query, (13,))
             ),
             ui.dropdown(
                 name='ge_res_3',
@@ -1373,7 +1204,7 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
                 required=True,
                 placeholder='(Select 3-credit Course)',
                 width=menu_width,
-                choices=await get_choices(q, ge_credits_query, (14,3))
+                choices=await get_choices(timedConnection, ge_credits_query, (14,3))
             ),
            ui.dropdown(
                 name='ge_res_3a',
@@ -1383,7 +1214,7 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
                 trigger=True,
                 placeholder='(Select 1-credit Course)',
                 width=menu_width,
-                choices=await get_choices(q, ge_credits_query, (14,1))
+                choices=await get_choices(timedConnection, ge_credits_query, (14,1))
             ),
             ui.dropdown(
                 name='ge_res_3b',
@@ -1392,7 +1223,7 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
                 trigger=True,
                 placeholder='and (Select 1-credit Course)',
                 width=menu_width,
-                choices=await get_choices(q, ge_credits_query, (14,1))
+                choices=await get_choices(timedConnection, ge_credits_query, (14,1))
             ),
             ui.dropdown(
                 name='ge_res_3c',
@@ -1401,7 +1232,7 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
                 trigger=True,
                 placeholder='and (Select 1-credit Course)',
                 width=menu_width,
-                choices=await get_choices(q, ge_credits_query, (14,1))
+                choices=await get_choices(timedConnection, ge_credits_query, (14,1))
             ),
         ]
     )

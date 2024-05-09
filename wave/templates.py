@@ -109,7 +109,7 @@ complete_records_query = '''
     FROM 
         program_sequence a
     JOIN 
-        classes b
+        courses b
     ON 
         a.class_id = b.id
     WHERE 
@@ -129,7 +129,7 @@ ge_query_j_old_delete_me = '''
     FROM 
         general_education a
     LEFT JOIN 
-        classes b
+        courses b
     ON 
         a.course_id = b.id
     WHERE 
@@ -151,7 +151,7 @@ complete_records_query_old_delete_me = '''
     FROM 
         program_sequence a
     JOIN 
-        classes b
+        courses b
     ON 
         a.class_id = b.id
     WHERE 
@@ -177,7 +177,7 @@ complete_student_records_query_old_delete_me = '''
     FROM 
         student_progress a
     LEFT JOIN 
-        classes b
+        courses b
     ON 
         a.name = b.name
     WHERE 
@@ -198,12 +198,12 @@ complete_student_records_query_delete_me = '''
         IFNULL(b.title, '') AS title,
         IFNULL(b.description, '') AS description,
         IFNULL(b.prerequisites, '') as prerequisites,
-        IFNULL(b.pre, '') as pre_classes,
+        IFNULL(b.pre, '') as pre_courses,
         IFNULL(b.pre_credits, '') as pre_credits
     FROM 
         student_progress a
     LEFT JOIN 
-        classes b
+        courses b
     ON 
         a.name = b.name
     WHERE 
@@ -1316,7 +1316,7 @@ data_json = [
 
 ## will make it possible to move from one session to another
 ## check whether prerequisites in session 1 fulfill session 3 follow up
-## also, have warnings for classes that should be taken closely together if we are doing,
+## also, have warnings for courses that should be taken closely together if we are doing,
 ##  e.g., period 1 session 1 to period 2 session 3 is a pretty long time
 ## allow people to x out a session
 ## 

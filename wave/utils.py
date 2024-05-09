@@ -1,3 +1,6 @@
+from h2o_wave import ui
+from typing import Optional, List
+
 import warnings
 import sqlite3
 import asyncio
@@ -9,9 +12,29 @@ import numpy as np
 #import traceback
 #from h2o_wave import Q, ui, graphics as g
 #import templates
-#import pandas as pd
-#import numpy as np
 
+######################################################################
+####################  STANDARD WAVE CARDS  ###########################
+######################################################################
+
+# Use for page cards that should be removed when navigating away.
+# For pages that should be always present on screen use q.page[key] = ...
+def add_card(q, name, card) -> None:
+    q.client.cards.add(name)
+    q.page[name] = card
+
+# Remove all the cards related to navigation.
+def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
+    if not q.client.cards:
+        return
+    for name in q.client.cards.copy():
+        if name not in ignore:
+            del q.page[name]
+            q.client.cards.remove(name)
+
+######################################################################
+####################  SQL-RELATED FUNCTIONS  #########################
+######################################################################
 
 class TimedSQLiteConnection:
     '''
@@ -23,9 +46,12 @@ class TimedSQLiteConnection:
     Methods include 
       - execute: executing commands (like create table), nothing returned
       - fetchone and fetchall use corresponding sqlite methods
-      - (methods for pandas using ... df.to_sql and df.read_sql_query )
-    Note: The async/await syntax here is not really needed yet and defaults
-    to synchronous. It is harmless and anticipates future improvements.
+      - fetchdict returns query results as a dictionary
+      - fetchdf returns a Pandas DataFrame
+
+    Notes: 
+    (1) The async/await syntax here may not be needed yet, it defaults
+        to synchronous. It is harmless and anticipates future improvements.
     '''
     def __init__(self, db_path, row_factory=True, timeout=1800):  # Default is 1800 seconds
         self.db_path = db_path
@@ -44,47 +70,59 @@ class TimedSQLiteConnection:
     async def _update_activity_time(self):
         self.last_activity_time = time.time()
 
-    async def execute(self, query, params=()):
+    async def _get_cursor(self):
+        '''
+        Common code used in execute and fetch methods
+        '''
         await self._check_and_close()
         if self.connection is None:
             self.connection = sqlite3.connect(self.db_path)
             if self.row_factory:
                 self.connection.row_factory = sqlite3.Row
         cursor = self.connection.cursor()
+
+        return cursor
+
+    async def execute(self, query, params=()):
+        cursor = await self._get_cursor()
         cursor.execute(query, params)
         await self._update_activity_time()
-        #return cursor.fetchall()
 
     async def fetchone(self, query, params=()):
-        await self._check_and_close()
-        if self.connection is None:
-            self.connection = sqlite3.connect(self.db_path)
-            if self.row_factory:
-                self.connection.row_factory = sqlite3.Row
-        cursor = self.connection.cursor()
+        cursor = await self._get_cursor()
         cursor.execute(query, params)
         await self._update_activity_time()
+
         return cursor.fetchone()
 
     async def fetchall(self, query, params=()):
-        await self._check_and_close()
-        if self.connection is None:
-            self.connection = sqlite3.connect(self.db_path)
-            if self.row_factory:
-                self.connection.row_factory = sqlite3.Row
-        cursor = self.connection.cursor()
+        cursor = await self._get_cursor()
         cursor.execute(query, params)
         await self._update_activity_time()
-        return cursor.fetchall()
 
-    async def pd_read_sql(self, query, params=()):
-        await self._check_and_close()
-        if self.connection is None:
-            self.connection = sqlite3.connect(self.db_path)
-            if self.row_factory:
-                self.connection.row_factory = sqlite3.Row
-        df = pd.read_sql_query(query, self.connection, params)
+        return cursor.fetchall()
+    
+    async def fetchdict(self, query, params=()):
+        cursor = await self._get_cursor()
+        cursor.execute(query, params)
         await self._update_activity_time()
+    
+        # Fetch column names
+        column_names = [description[0] for description in cursor.description]    
+        # Fetch all rows and convert each to a dictionary
+        rows = cursor.fetchall()
+        result = []
+        for row in rows:
+            row_dict = dict(zip(column_names, row))
+            result.append(row_dict)
+
+        return result
+
+    async def fetchdf(self, query, params=()):
+        cursor = await self._get_cursor()
+        df = pd.read_sql_query(query, self.connection, params=params)
+        await self._update_activity_time()
+
         return df
 
     async def close(self):
@@ -92,33 +130,10 @@ class TimedSQLiteConnection:
             self.connection.close()
             self.connection = None
 
-async def get_timed_query_one(timedConnection, query, params=()):
+async def get_query(timedConnection, query, params=()):
     '''
-    This query uses the TimedSQLiteConnection class
-    timedConnection: an instantiation of TimeSQLiteConnection
-    query: SQL query
-    params: Optional parameters
-    '''
-    row = await timedConnection.fetchone(query, params)
-    if not row:
-        warnings.warn("Query returned no row", category=Warning)
-        return None
-    else:
-        return row
-    
-async def get_query_one(q, query, params=()):
-    c = q.user.c 
-    c.execute(query, params)
-    row = c.fetchone()
-    if not row:
-        warnings.warn("Query returned no row", category=Warning)
-        return None
-    else:
-        return row
+    This query uses the TimedSQLiteConnection class to return all rows
 
-async def get_timed_query(timedConnection, query, params=()):
-    '''
-    This query uses the TimedSQLiteConnection class
     timedConnection: an instantiation of TimeSQLiteConnection
     query: SQL query
     params: Optional parameters
@@ -129,40 +144,171 @@ async def get_timed_query(timedConnection, query, params=()):
         return None
     else:
         return rows
-    
-async def get_query(q, query, params=()):
-    c = q.user.c 
-    c.execute(query, params)
-    rows = c.fetchall()
-    if not rows:
-        warnings.warn("Query returned no rows", category=Warning)
-        return None
-    else:
-        return rows
 
-async def get_program_title(q, program_id):
-    query = '''
-        SELECT b.name || ' in ' || a.name as title
-        FROM programs a, degrees b 
-        WHERE a.id = ? AND a.degree_id = b.id 
+async def get_query_one(timedConnection, query, params=()):
     '''
-    row = await get_query_one(q, query, params=(program_id,))
-    if row:
-        return row['title']
-    else:
-        return None
+    This query uses the TimedSQLiteConnection class to return a row
 
-async def get_program_title_new(q, program_id):
+    timedConnection: an instantiation of TimeSQLiteConnection
+    query: SQL query
+    params: Optional parameters
+    '''
+    row = await timedConnection.fetchone(query, params)
+    if not row:
+        warnings.warn("Query returned no row", category=Warning)
+        return None
+    else:
+        return row
+
+async def get_query_dict(timedConnection, query, params=()):
+    '''
+    This query uses the TimedSQLiteConnection class to return a 
+    dictionary of all rows
+
+    timedConnection: an instantiation of TimeSQLiteConnection
+    query: SQL query
+    params: Optional parameters
+    '''
+    result = await timedConnection.fetchdict(query, params)
+    if not result:
+        warnings.warn("Query did not return a dictionary", category=Warning)
+        return None
+    else:
+        return result
+
+async def get_query_df(timedConnection, query, params=()):
+    '''
+    This query uses the TimedSQLiteConnection class to return a dataframe
+
+    timedConnection: an instantiation of TimeSQLiteConnection
+    query: SQL query
+    params: Optional parameters
+    '''
+    try:
+        df = await timedConnection.fetchdf(query, params)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None  # or return a specific value or message
+    if df.empty:
+        warnings.warn("Query returned zero rows", category=Warning)
+        return None
+    else:
+        return df
+
+######################################################################
+#####################  QUERIES & FUNCTIONS  ##########################
+######################################################################
+
+async def get_program_title(timedConnection, program_id):
     query = '''
         SELECT b.id, b.name || ' in ' || a.name as title
         FROM programs a, degrees b 
         WHERE a.id = ? AND a.degree_id = b.id 
     '''
-    row = await get_query_one(q, query, params=(program_id,))
+    row = await get_query_one(timedConnection, query, params=(program_id,))
     if row:
         return row
     else:
         return None
+
+async def get_role(q):
+    '''
+    Get role given a user id
+    '''
+    timedConnection = q.user.conn
+    query = '''
+        SELECT 
+		    a.role_id,
+		    b.type AS role,
+		    a.username, 
+		    a.firstname || ' ' || a.lastname AS fullname
+        FROM 
+			users a, roles b
+		WHERE 
+			a.role_id=b.id AND a.id = ?
+    '''
+    row = await get_query_one(timedConnection, query, params=(q.user.user_id,))
+    q.user.role_id = row['role_id']
+    q.user.role = row['role']
+    q.user.username = row['username']
+    q.user.name = row['fullname']
+
+async def populate_student_info(q, user_id):
+    '''
+    Get information from student_info table and populate the q.user.X_* parameters
+    '''
+    timedConnection = q.user.conn
+    query = 'SELECT * FROM student_info_view WHERE user_id = ?'
+    row = await get_query_one(timedConnection, query, params=(user_id,))
+    if row:
+        q.user.X_resident_status = row['resident_status']
+        q.user.X_app_stage_id = row['app_stage_id']
+        q.user.X_app_stage = row['app_stage']
+        q.user.X_student_profile = row['student_profile']
+        q.user.X_financial_aid = row['financial_aid']
+        q.user.X_transfer_credits = row['transfer_credits']
+        q.user.X_program_id = row['program_id']
+        if q.user.X_program_id is not None:
+            row = await get_program_title(timedConnection, q.user.X_program_id)
+            if row:
+                q.user.X_degree_program = row['title']
+                q.user.X_degree_id = row['id']
+    
+    # retrieve menu status for students
+    query = '''
+        SELECT menu_degree_id, menu_area_id 
+        FROM menu_all_view
+        WHERE program_id = ?
+        LIMIT 1
+    '''
+    # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
+    row = await get_query_one(q.user.conn, query, params=(q.user.X_program_id,))
+    if row:
+        q.user.X_menu_degree = row['menu_degree_id']
+        q.user.X_menu_area = row['menu_area_id']
+
+async def get_ge_choices(conn, query, params=()):
+    rows = await get_query(conn, query, params)
+    choices = [ui.choice(name=str(row['name']), label=row['name'] + ': ' + row['title']) for row in rows]
+    return choices
+
+async def get_catalog_program_sequence(q):
+    query = 'SELECT * FROM catalog_program_sequence_view WHERE program_id = ?'
+    df = await get_query_df(q.user.conn, query, params=(q.user.X_program_id,))
+    return df
+
+async def get_student_progress_d3(q):
+    query = 'SELECT * FROM student_progress_d3_view WHERE user_id = ?'
+    df = await get_query_df(q.user.conn, query, params=(q.user.X_user_id,))
+    return df
+
+async def get_choices(timedConnection, query, params=()):
+    rows = await get_query(timedConnection, query, params)
+    choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
+    return choices
+
+async def get_choices_with_disabled(timedConnection, query, params=()):
+    '''
+    Note: consolidate with get_choices to add a disabled={} option
+    '''
+    disabled_items = {
+        'Cybersecurity Technology',
+        'Social Science',
+        'Applied Technology',
+        'Web and Digital Design',        
+        'East Asian Studies',
+        'English',
+        'General Studies',
+        'History'
+    }
+    rows = await get_query(timedConnection, query, params)
+    choices = [ui.choice(name=str(row['name']), label=row['label'], \
+        disabled=(str(row['label']) in disabled_items)) for row in rows]
+    return choices
+
+######################################################################
+#################  COURSE SCHEDULING FUNCTIONS  ######################
+######################################################################
 
 def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=15, summer=False, sessions=[1,3], as_df=True):
     '''
@@ -292,6 +438,7 @@ def update_periods(periods, condition, update_values):
         return periods
 
 # note: renamed 'prerequisite' to 'prerequisites' to follow changes in the db table
+
 def prepare_d3_data(df, start_term='SPRING 2024'):
     green = '#3b8132'
     blue = '#135f96'
@@ -397,9 +544,123 @@ def prepare_d3_data(df, start_term='SPRING 2024'):
 
     return df, headers
 
+def generate_schedule(course_list, periods):
+    schedule = []
+    max_credits_by_term_year = {}
+    
+    # Iterate over locked courses to update periods and max_credits_by_term_year
+    for course in course_list:
+        if course.get('locked', False):
+            term_year = (course['term'], course['year'])
+            session = course['session']
+            
+            # Find the corresponding period
+            for period in periods:
+                if (period['term'], period['year'], period['session']) == (course['term'], course['year'], course['session']):
+                    if period['max_courses_remaining'] > 0:
+                        period['max_courses_remaining'] -= 1
+                        
+                        # Update max_credits_by_term_year
+                        if term_year not in max_credits_by_term_year:
+                            max_credits_by_term_year[term_year] = period['max_credits']
+                        else:
+                            max_credits_by_term_year[term_year] -= course['credits']
+                        
+                        # Add the locked course to the schedule
+                        schedule.append({
+                            'seq': len(schedule) + 1,
+                            'course': course['name'],
+                            'term': course['term'],
+                            'year': course['year'],
+                            'session': course['session'],
+                            'locked': True
+                        })
+                        
+                    else:
+                        print(f"Unable to assign locked course '{course['name']}' to period {period}.")
+                    break  # Exit the inner loop once the corresponding period is found
+    
+    # Iterate over unlocked courses to schedule them
+    for course in course_list:
+        if not course.get('locked', False):
+            assigned = False
+            
+            # Iterate over periods to find an appropriate slot
+            for period in periods:
+                term_year = (period['term'], period['year'])
+                
+                if period['max_courses_remaining'] > 0 and max_credits_by_term_year[term_year] >= course['credits']:
+                    # Add the course to the schedule
+                    schedule.append({
+                        'seq': len(schedule) + 1,
+                        'course': course['name'],
+                        'term': period['term'],
+                        'year': period['year'],
+                        'session': period['session'],
+                        'locked': False
+                    })
+                    
+                    # Update period information
+                    period['max_courses_remaining'] -= 1
+                    max_credits_by_term_year[term_year] -= course['credits']
+                    
+                    assigned = True
+                    break  # Exit the inner loop once a slot is found
+            
+            if not assigned:
+                print(f"Unable to assign unlocked course '{course['name']}' to any period.")
+    
+    return schedule
+
+def handle_prerequisites(course_list):
+    # Create a dictionary to store courses by their name for easy lookup
+    courses_dict = {course['name']: course for course in course_list}
+    
+    # Iterate over the course list to handle prerequisites
+    for course in course_list:
+        # Check if the course has prerequisites
+        if course.get('pre', ''):
+            # Split the prerequisites string into individual courses
+            prerequisites = course['pre'].split('&')
+            
+            # Iterate over the prerequisites
+            for prereq_group in prerequisites:
+                prereq_group = prereq_group.strip()
+                
+                # Split the prerequisites group into individual prerequisites
+                prereqs = prereq_group.split('|')
+                
+                # Initialize a list to store prerequisite information for each branch
+                branch_prereqs_info = []
+                
+                # Iterate over the prerequisites in the group
+                for prereq_name in prereqs:
+                    prereq_name = prereq_name.strip()
+                    
+                    # Check if the prerequisite is not already in the course list
+                    if prereq_name not in courses_dict:
+                        # Call update_prerequisites function to get information for the prerequisite
+                        prereq_info = update_prerequisites(prereq_name)
+                        
+                        # Add the prerequisite to the branch_prereqs_info list
+                        if prereq_info:
+                            branch_prereqs_info.append(prereq_info)
+                    else:
+                        # If the prerequisite is already in the course list, find its index
+                        prereq_index = course_list.index(courses_dict[prereq_name])
+                        
+                        # Add the prerequisite information to the branch_prereqs_info list
+                        branch_prereqs_info.append(course_list[prereq_index])
+                
+                # Insert the branch_prereqs_info into the course_list before the current course
+                if branch_prereqs_info:
+                    course_list.insert(course_list.index(course), branch_prereqs_info)
+    
+    return course_list
+
 ## Need to update this
 
-def schedule_courses(courses, periods, max_courses_default, max_credits_default):
+def schedule_courses_old(courses, periods, max_courses_default, max_credits_default):
     scheduled_courses = []
 
     for course in courses:

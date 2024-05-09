@@ -18,7 +18,7 @@ step2:
 	rm tmp_pdf2txt.txt
 
 # input is tmp_pdf2txt.txt
-# output is UMGC.db
+# output is UMGC.db with catalog and courses tables
 # remove tmp file at the end 
 
 ##################################################3

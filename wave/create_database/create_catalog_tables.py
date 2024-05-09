@@ -2,30 +2,6 @@ import sqlite3
 # db connection created w/in utils
 from utils import conn, c, drop_table, drop_view, column_exists
 
-###############################################################
-# Catalog Table
-
-catalog = [
-    { "id":  1, "version": "2023-2024" }
-]
-
-drop_table('catalog',c)
-c.execute('''
-    CREATE TABLE catalog (
-        id INTEGER PRIMARY KEY,
-        version TEXT
-    )
-''')
-c.executemany('INSERT INTO catalog VALUES (:id, :version)', catalog)
-
-# Update classes to contain catalog version
-# Use the function to check if 'catalog_id' exists in 'classes'
-if not column_exists('classes', 'catalog_id'):
-    c.execute('ALTER TABLE classes ADD COLUMN catalog_id INTEGER')
-    c.execute('UPDATE classes SET catalog_id = 1 WHERE catalog_id IS NULL')
-
-conn.commit()
-
 ################################################################
 # Degrees Table
 
