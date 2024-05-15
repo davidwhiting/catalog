@@ -1,6 +1,7 @@
-from h2o_wave import ui
+from h2o_wave import Q, ui
 from typing import Optional, List
 
+import logging
 import warnings
 import sqlite3
 import asyncio
@@ -12,6 +13,104 @@ import numpy as np
 #import traceback
 #from h2o_wave import Q, ui, graphics as g
 #import templates
+
+#############################################################
+####################  Initialize Functions ##################
+#############################################################
+
+## Note: moved initialize_app, initialize_user, initialize_client functions
+## to app.py to avoid circular import references between utils.py and cards.py
+
+######################################################################
+
+def initialize_ge():
+    '''
+    Initialize General Education tracking for undergraduate students.
+    '''
+    ge = {
+        'arts': {
+            '1': None,
+            '2': None
+        },
+        'beh': {
+            '1': None,
+            '2': None
+        },
+        'bio': {
+            '1a': None,
+            '1b': None,
+            '1c': None,
+            '2': None
+        },
+        'comm': {
+            '1': 'WRTG 111',
+            '2': 'WRTG 112',
+            '3': None,
+            '4': None
+        },
+        'math': None,
+        'res': {
+            '1': None,
+            '2': 'LIBS 150',
+            '3': None,
+            '3a': None,
+            '3b': None,
+            '3c': None
+        }
+    }
+    return ge
+
+def initialize_student_info():
+    '''
+    Initialize new student information
+    (This is not the same as populating from the database)
+    '''
+    student_info = {}
+    # Initialize some attributes
+    attributes = [        
+        'user_id',
+        'name', 
+        'financial_aid', 
+        'resident_status', 
+        'student_profile', 
+        'transfer_credits', 
+        'app_stage', 
+        'app_stage_id', 
+        'first_term', 
+        'program_id', 
+        'degree_program'
+    ]
+    student_info.update({name: None for name in attributes})
+
+    student_info['menu'] = {
+        'degree': None,
+        'area_of_study': None,
+        'program': None
+    }
+    # 'required' used to be 'q.client.program_df'
+    # 
+    student_info['df'] = {
+        'required': None,
+        'periods': None,
+        'schedule': None
+    }
+    
+    return student_info
+
+def reset_program(q):
+    '''
+    When program is changed, multiple variables need to be reset
+    '''
+    q.user.student_info['menu']['program'] = None
+    q.user.student_info['program_id'] = None
+    q.user.student_info['df']['required'] = None
+    q.user.student_info['df']['schedule'] = None
+    q.user.student_info['degree_program'] = None
+
+    q.page['dropdown'].menu_program.value = None
+    # reset program choices
+    q.page['dropdown'].menu_program.choices = None
+
 
 ######################################################################
 ####################  STANDARD WAVE CARDS  ###########################
@@ -235,37 +334,41 @@ async def get_role(q):
 
 async def populate_student_info(q, user_id):
     '''
-    Get information from student_info table and populate the q.user.X_* parameters
+    Get information from student_info table and populate the q.user.student_info parameters
     '''
     timedConnection = q.user.conn
+    attributes = ['resident_status', 'app_stage_id', 'app_stage', 'student_profile', 'financial_aid', 
+        'transfer_credits', 'program_id']
     query = 'SELECT * FROM student_info_view WHERE user_id = ?'
     row = await get_query_one(timedConnection, query, params=(user_id,))
     if row:
-        q.user.X_resident_status = row['resident_status']
-        q.user.X_app_stage_id = row['app_stage_id']
-        q.user.X_app_stage = row['app_stage']
-        q.user.X_student_profile = row['student_profile']
-        q.user.X_financial_aid = row['financial_aid']
-        q.user.X_transfer_credits = row['transfer_credits']
-        q.user.X_program_id = row['program_id']
-        if q.user.X_program_id is not None:
-            row = await get_program_title(timedConnection, q.user.X_program_id)
+        q.user.student_info.update({name: row[name] for name in attributes})
+        if q.user.student_info['program_id'] is not None:
+            row = await get_program_title(timedConnection, q.user.student_info['program_id'])
             if row:
-                q.user.X_degree_program = row['title']
-                q.user.X_degree_id = row['id']
+                q.user.student_info['degree_program'] = row['title']
+                q.user.student_info['degree_id'] = row['id']
     
-    # retrieve menu status for students
-    query = '''
-        SELECT menu_degree_id, menu_area_id 
-        FROM menu_all_view
-        WHERE program_id = ?
-        LIMIT 1
-    '''
-    # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
-    row = await get_query_one(q.user.conn, query, params=(q.user.X_program_id,))
-    if row:
-        q.user.X_menu_degree = row['menu_degree_id']
-        q.user.X_menu_area = row['menu_area_id']
+    # Recreate dropdown menus for students
+    # Need to do this only if dropdown menu status was not saved
+    # (We should save this status in the future)
+    if q.user.student_info['program_id'] is not None:
+        # recreate dropdown menu for program if empty
+        if q.user.student_info['menu']['program'] is None:
+            q.user.student_info['menu']['program'] = q.user.student_info['program_id']
+        # recreate dropdowns for degree and area_of_study if either is empty
+        if (q.user.student_info['menu']['degree'] is None) or (q.user.student_info['menu']['area_of_study'] is None):
+            query = '''
+                SELECT menu_degree_id, menu_area_id 
+                FROM menu_all_view
+                WHERE program_id = ?
+                LIMIT 1
+            '''
+            # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
+            row = await get_query_one(q.user.conn, query, params=(q.user.student_info['program_id'],))
+            if row:
+                q.user.student_info['menu']['degree'] = row['menu_degree_id']
+                q.user.student_info['menu']['area_of_study'] = row['menu_area_id']
 
 async def get_ge_choices(conn, query, params=()):
     rows = await get_query(conn, query, params)
@@ -274,12 +377,12 @@ async def get_ge_choices(conn, query, params=()):
 
 async def get_catalog_program_sequence(q):
     query = 'SELECT * FROM catalog_program_sequence_view WHERE program_id = ?'
-    df = await get_query_df(q.user.conn, query, params=(q.user.X_program_id,))
+    df = await get_query_df(q.user.conn, query, params=(q.user.student_info['program_id'],))
     return df
 
 async def get_student_progress_d3(q):
     query = 'SELECT * FROM student_progress_d3_view WHERE user_id = ?'
-    df = await get_query_df(q.user.conn, query, params=(q.user.X_user_id,))
+    df = await get_query_df(q.user.conn, query, params=(q.user.student_info['user_id'],))
     return df
 
 async def get_choices(timedConnection, query, params=()):
@@ -305,6 +408,31 @@ async def get_choices_with_disabled(timedConnection, query, params=()):
     choices = [ui.choice(name=str(row['name']), label=row['label'], \
         disabled=(str(row['label']) in disabled_items)) for row in rows]
     return choices
+
+######################################################################
+#################  EVENT AND HANDLER FUNCTIONS  ######################
+######################################################################
+
+async def recommend_a_major(q, choice):
+    '''
+    Placeholder for the render_major_recommendation_card event
+    '''
+    def _to_be_implemented(q, label, box='3 6 5 1', type='info'):
+        message = label + ' has not been implemented yet'
+        q.page['info'] = ui.form_card(box=box, items=[
+            ui.message_bar(type='warning', text=message)
+        ]) 
+    if choice == 'A':
+        label = 'Recommendation engine for "My interests"'
+    elif choice == 'B':
+        label = 'Recommendation engine for "My skills"'
+    elif choice == 'C':
+        label = 'Recommendation engine for "Students like me"'
+    else: 
+        label = '"Shortest time to graduate" function'
+    # 
+    # Need to add a dismiss function
+    _to_be_implemented(q, label)
 
 ######################################################################
 #################  COURSE SCHEDULING FUNCTIONS  ######################
@@ -784,6 +912,6 @@ def move_courses_forward(period_index, periods, scheduled_courses):
     ## check whether user is in the sqlite3 db
     ## if so, get role and id
     ## if not, add user to db as a new student
-    ##        q.user.user_id, q.user.role_id = utils.find_or_add_user(q)
+    ##        q.user.user_id, q.user.role_id = find_or_add_user(q)
     ##    else:
     ##        # fake it for now
