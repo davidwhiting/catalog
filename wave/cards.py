@@ -154,7 +154,8 @@ program_query = '''
     WHERE menu_degree_id = ? AND menu_area_id = ?
 '''
 
-# The 'dismissed' function does not work completely
+# To do: This is broken now. 
+# Also, the 'dismissed' function does not work completely
 # Card reappears when going to new page
 def render_dialog_description(q, course):
     '''

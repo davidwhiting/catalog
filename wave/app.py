@@ -238,8 +238,27 @@ async def schedule(q: Q):
 
     # this should be carried over from previous step, or any changes in course should be 
     # written to DB, our source of truth
+
+    # this function pulls data from the db, we need to create it.
+    # need to store for each student 
+    # seq, name, course_type, 
+
+    # get department recommended course list and schedule from catalog:
+    #     student_progress_d3
+    #
     
-    df = await get_student_progress_d3(q)
+    # initialize student progress by picking undergraduate program from catalog
+    query = '''
+        INSERT INTO student_progress ( user_id, seq, course, course_type_id )
+             SELECT ?, a.program_id, a.seq, a.course, a.course_type_id
+             FROM catalog_program_sequence a
+             WHERE program_id = ?
+    '''
+    # need to see if this works then wrap in error checking
+    # 1 - if the result returns no rows (nothing is written)
+    # 2 - if there is no corresponding user_id this will throw an error
+
+    df = await utils.get_student_progress_d3(q)
 
     q.user.student_info['df']['schedule'] = df
 
@@ -469,6 +488,11 @@ async def menu_program(q: Q):
 
 ################################################################################
 
+##################################################################################
+### Program page: Create Description popup for table by clicking on table row  ###
+### on course name link or double-clicking course row                          ###
+##################################################################################
+
 @on()
 async def program_table(q: Q):
     # note: q.args.table_name is set to [row_name]
@@ -478,6 +502,8 @@ async def program_table(q: Q):
     cards.render_dialog_description(q, coursename)
     logging.info('The value of coursename in program_table is ' + coursename)
 
+    await q.page.save()
+
 ################################################################################
 
 @on()
@@ -486,13 +512,8 @@ async def view_description(q: Q):
     coursename = q.args.view_description
     cards.render_dialog_description(q, coursename)
     logging.info('The value of coursename in view_description is ' + str(coursename))
-
-################################################################################
-
-@on()
-async def student_dropdown(q: Q):
-    logging.info('The value of user_dropdown is ' + str(q.args.user_dropdown))
-    q.user.user_dropdown = q.args.user_dropdown
+    
+    await q.page.save()
 
 ################################################################################
 
@@ -505,6 +526,17 @@ async def dismiss_dialog(q: Q):
     q.page['meta'].dialog = None
 
     await q.page.save()
+
+
+################################################################################
+
+@on()
+async def student_dropdown(q: Q):
+    logging.info('The value of user_dropdown is ' + str(q.args.user_dropdown))
+    q.user.user_dropdown = q.args.user_dropdown
+
+################################################################################
+
 
 ###############################################
 ### Schedule page: For schedule_menu events ###

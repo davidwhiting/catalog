@@ -101,29 +101,6 @@ c.execute('''
 ''')
 conn.commit()
 
-## This is the old table that currently works with D3. Need to adapt tne new table a bit.
-
-#drop_table('student_progress_d3', c)
-#c.execute('''
-#    CREATE TABLE student_progress_d3 (
-#        id INTEGER PRIMARY KEY,
-#        user_id INTEGER,
-#        seq INTEGER,
-#        name TEXT,
-#        credits INTEGER,
-#        course_type TEXT,
-#        type TEXT,
-#        completed INTEGER DEFAULT 0,
-#        term INTEGER DEFAULT 0,
-#        session INTEGER DEFAULT 0,
-#        locked INTEGER DEFAULT 0,
-#        prerequisites TEXT,
-#        FOREIGN KEY(user_id) REFERENCES users(id)
-#    )
-#''')
-#
-#conn.commit()
-
 #################################################################
 # "Student Schedule" View                                       #
 #                                                               #
