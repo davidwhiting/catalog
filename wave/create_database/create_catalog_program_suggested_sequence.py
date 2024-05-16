@@ -9,6 +9,11 @@ catalogs = []
 # to capture those with options (e.g., CHIN vs. JAPN courses)
 catalogs_with_options = []
 
+## Note: By default, 'ELECTIVE' assumes 3 credits. 
+## 'ELECTIVE-2' will denote 2 credit, etc.
+## Currently, only 1 suggested catalog program requires an elective with 
+## 2 credits: Computer Science
+
 # Accounting
 program_id = 2
 add_catalog = [
@@ -193,7 +198,7 @@ add_catalog = [
     { 'program_id': program_id, 'seq': 37, 'course_type_id': 1, 'course': 'CMSC 451' },
     { 'program_id': program_id, 'seq': 38, 'course_type_id': 4, 'course': 'ELECTIVE' },
     { 'program_id': program_id, 'seq': 39, 'course_type_id': 1, 'course': 'CMSC 495' },
-    { 'program_id': program_id, 'seq': 40, 'course_type_id': 4, 'course': 'ELECTIVE' }
+    { 'program_id': program_id, 'seq': 40, 'course_type_id': 4, 'course': 'ELECTIVE-2' }
 ]
 catalogs.append(add_catalog)
 

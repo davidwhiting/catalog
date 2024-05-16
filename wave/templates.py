@@ -138,77 +138,7 @@ ge_query_j_old_delete_me = '''
 
 ge_query_j = 'SELECT * FROM ge_view WHERE ge_id = ?'
 
-complete_records_query_old_delete_me = '''
-    SELECT 
-        a.seq,
-        a.name,
-        a.program_id,
-        a.class_id,
-        a.course_type_id,
-        b.title,
-        b.description,
-        b.prerequisites
-    FROM 
-        program_sequence a
-    JOIN 
-        courses b
-    ON 
-        a.class_id = b.id
-    WHERE 
-        a.program_id = ?
-'''
-
 complete_records_query = 'SELECT * FROM complete_records_view WHERE program_id = ?'
-
-
-complete_student_records_query_old_delete_me = '''
-    SELECT 
-        a.seq,
-        a.name,
-        a.credits,
-        a.type,
-        a.completed,
-        a.period,
-        a.session,
-        a.prerequisite,
-        IFNULL(b.title, '') AS title,
-        IFNULL(b.description, '') AS description,
-        IFNULL(b.prerequisites, '') as prereq_full
-    FROM 
-        student_progress a
-    LEFT JOIN 
-        courses b
-    ON 
-        a.name = b.name
-    WHERE 
-        a.student_info_id = ?
-'''
-
-complete_student_records_query_old = 'SELECT * FROM student_records_view_old WHERE student_info_id = ?'
-
-
-complete_student_records_query_delete_me = '''
-    SELECT 
-        a.seq,
-        a.name,
-        a.credits,
-        a.type,
-        a.completed,
-        a.prerequisite,
-        IFNULL(b.title, '') AS title,
-        IFNULL(b.description, '') AS description,
-        IFNULL(b.prerequisites, '') as prerequisites,
-        IFNULL(b.pre, '') as pre_courses,
-        IFNULL(b.pre_credits, '') as pre_credits
-    FROM 
-        student_progress a
-    LEFT JOIN 
-        courses b
-    ON 
-        a.name = b.name
-    WHERE 
-        a.student_info_id = ?
-'''
 
 complete_student_records_query = 'SELECT * FROM student_records_view WHERE student_info_id = ?'
 

@@ -38,33 +38,6 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
-# templates.py:complete_student_records_query_old
-drop_view('student_records_view_old')
-create_view_query = '''
-    CREATE VIEW student_records_view_old AS
-    SELECT 
-        a.seq as seq,
-        a.student_info_id as student_info_id,
-        a.name as name,
-        a.credits as credits,
-        a.type as type,
-        a.completed as completed,
-        a.period as period,
-        a.session as session,
-        a.prerequisite as prerequisite,
-        IFNULL(b.title, '') AS title,
-        IFNULL(b.description, '') AS description,
-        IFNULL(b.prerequisites, '') as prereq_full
-    FROM 
-        student_progress a
-    LEFT JOIN 
-        courses b
-    ON 
-        a.name = b.name
-'''
-c.execute(create_view_query)
-conn.commit()
-
 # used by cards.ge_query, templates.ge_query_j
 drop_view('ge_view')
 create_view_query = '''
@@ -197,15 +170,26 @@ create_view_query = '''
 	CREATE VIEW catalog_program_sequence_view AS
     SELECT 
         a.program_id,
-        a.seq, 
-        a.course AS name,
+        a.seq,
+        CASE
+            WHEN a.course = 'ELECTIVE' THEN 'ELECTIVE'
+            WHEN a.course = 'ELECTIVE-2' THEN 'ELECTIVE'
+            ELSE a.course
+        END AS name,
         c.name as course_type,
         CASE
             WHEN INSTR(c.name, '_') > 0 
             THEN SUBSTR(c.name, 1, INSTR(c.name, '_') - 1)
             ELSE c.name
         END as type,
-        b.credits,
+        CASE
+            WHEN a.course IN ('ELECTIVE', 'ELECTIVE-2') THEN
+                CASE
+                    WHEN a.course = 'ELECTIVE' THEN 3
+                    WHEN a.course = 'ELECTIVE-2' THEN 2
+                END
+            ELSE b.credits
+        END AS credits,
         b.title,
         0 AS completed,
         0 AS term,
@@ -217,14 +201,10 @@ create_view_query = '''
         b.description
     FROM 
         catalog_program_sequence a
-    LEFT JOIN
-        course_type c
-    ON
-        c.id = a.course_type_id
-    LEFT JOIN
-        courses b
-    ON
-        a.course = b.name
+    LEFT JOIN course_type c
+        ON c.id = a.course_type_id
+    LEFT JOIN courses b
+        ON a.course = b.name
 '''
 c.execute(create_view_query)
 conn.commit()
@@ -236,31 +216,33 @@ create_view_query = '''
     SELECT 
         a.id,
         a.user_id,
-        a.seq, 
-        a.name,
+        a.seq,
+        a.course as name,
         COALESCE(b.title, '') AS title,
-        a.credits,
-        a.course_type,
-        a.type,
+        a.credits, 
+        LOWER(c.label) AS course_type,
+        CASE
+            WHEN INSTR(c.label, ',') > 0 
+            THEN LOWER(SUBSTR(c.label, 1, INSTR(c.label, ',') - 1))
+            ELSE LOWER(c.label)
+        END as type,
         a.completed,
         a.term,
         a.session,
         a.locked,
-        a.prerequisites,
+        COALESCE(b.prerequisites, '') AS prerequisites,
         COALESCE(b.pre, '') AS pre,
         COALESCE(b.pre_credits, '') AS pre_credits,
         COALESCE(b.substitutions, '') AS substitutions,
         COALESCE(b.description, '') AS description
-    FROM 
-        student_progress_d3 a
-    LEFT JOIN
-        courses b
-    ON
-        a.name = b.name
+    FROM student_progress a
+    LEFT JOIN courses b
+        ON a.course = b.name
+    LEFT JOIN course_type c
+        ON c.id = a.course_type_id
 '''
 c.execute(create_view_query)
 conn.commit()
-
 
 # Close the connection
 conn.close()
