@@ -38,6 +38,7 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
+# templates.py:complete_student_records_query_old
 drop_view('student_records_view_old')
 create_view_query = '''
     CREATE VIEW student_records_view_old AS
@@ -64,6 +65,7 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
+# used by cards.ge_query, templates.ge_query_j
 drop_view('ge_view')
 create_view_query = '''
     CREATE VIEW ge_view AS
@@ -87,6 +89,7 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
+# complete_records_view used by templates.complete_records_query
 drop_view('complete_records_view')
 create_view_query = '''
     CREATE VIEW complete_records_view AS
@@ -109,32 +112,37 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
+# templates.complete_student_records_query
 drop_view('student_records_view')
 create_view_query = '''
     CREATE VIEW student_records_view AS
     SELECT 
+        a.user_id,
+        a.program_id,
         a.seq,
-        a.student_info_id,
-        a.name,
-        a.credits,
-        a.type,
+        a.course,
+        a.course_type_id,
         a.completed,
-        a.prerequisite,
+        a.term,
+        a.session,
+        a.locked,
+        b.credits,
         IFNULL(b.title, '') AS title,
         IFNULL(b.description, '') AS description,
         IFNULL(b.prerequisites, '') as prerequisites,
-        IFNULL(b.pre, '') as pre_courses,
+        IFNULL(b.pre, '') as pre,
         IFNULL(b.pre_credits, '') as pre_credits
     FROM 
         student_progress a
     LEFT JOIN 
         courses b
     ON 
-        a.name = b.name
+        a.course = b.name
 '''
 c.execute(create_view_query)
 conn.commit()
 
+# used by cards.render_program_coursework_table
 drop_view('program_requirements_view')
 create_view_query = '''
     CREATE VIEW program_requirements_view AS 
@@ -159,27 +167,7 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
-drop_view('major_table_view')
-create_view_query = '''
-    CREATE VIEW major_table_view AS
-    SELECT 
-        a.id,
-        b.program_id,
-        a.course, 
-        a.course_type AS type,
-        a.course_type_id,
-        a.title,
-        a.credits,
-        a.description,
-        a.pre,
-        a.pre_credits,
-        a.substitutions
-     FROM program_requirements_view a
-     JOIN program_requirements b ON a.program_requirements_id = b.id
-'''
-c.execute(create_view_query)
-conn.commit()
-
+# used by cards.area_query and cards.program_query
 drop_view('menu_all_view')
 create_view_query = '''
 	CREATE VIEW menu_all_view AS
@@ -241,7 +229,7 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
-
+# used by utils.get_student_progress_d3
 drop_view('student_progress_d3_view')
 create_view_query = '''
 	CREATE VIEW student_progress_d3_view AS

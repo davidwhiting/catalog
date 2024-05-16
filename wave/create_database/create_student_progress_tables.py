@@ -40,9 +40,10 @@ c.execute('''
     CREATE TABLE student_history (
         id INTEGER PRIMARY KEY,
         user_id INTEGER,
-        name TEXT,
+        course TEXT,
         credits INTEGER,
         transfer INTEGER,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
         FOREIGN KEY(user_id) REFERENCES users(id)
     )
 ''')
@@ -68,9 +69,10 @@ conn.commit()
 
 ## bare minimum:
 ##   user_id
+##   program_id
 ##   seq
-##   name
-##   course_type (note: type derived from it)
+##   course
+##   course_type_id
 ##   completed
 ##   term
 ##   session
@@ -83,46 +85,19 @@ c.execute('''
     CREATE TABLE student_progress (
         id INTEGER PRIMARY KEY,
         user_id INTEGER,
+        program_id INTEGER,
         seq INTEGER,
-        name TEXT,
-        course_type TEXT,
-        credits INTEGER,
+        course TEXT,
+        course_type_id INTEGER,
         completed INTEGER DEFAULT 0,
         term INTEGER DEFAULT 0,
         session INTEGER DEFAULT 0,
         locked INTEGER DEFAULT 0,
-        FOREIGN KEY(user_id) REFERENCES users(id)
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        FOREIGN KEY(program_id) REFERENCES users(id),          
+        FOREIGN KEY(user_id) REFERENCES programs(id)
     )
 ''')
-conn.commit()
-
-## this should all be a view: student_progress_view
-## left join student_progress on courses
-
-drop_table('student_progress_old', c)
-c.execute('''
-    CREATE TABLE student_progress_old (
-        id INTEGER PRIMARY KEY,
-        user_id INTEGER,
-        seq INTEGER,
-        name TEXT,
-        course_type TEXT,
-        type TEXT,
-        credits INTEGER,
-        title TEXT,
-        completed INTEGER DEFAULT 0,
-        term INTEGER DEFAULT 0,
-        session INTEGER DEFAULT 0,
-        locked INTEGER DEFAULT 0,
-        pre TEXT DEFAULT '',
-        pre_credits TEXT DEFAULT '',
-        substitutions TEXT DEFAULT '',
-        prerequisites TEXT DEFAULT '',
-        description TEXT DEFAULT '',
-        FOREIGN KEY(user_id) REFERENCES users(id)
-    )
-''')
-
 conn.commit()
 
 ## This is the old table that currently works with D3. Need to adapt tne new table a bit.
@@ -142,27 +117,6 @@ c.execute('''
         session INTEGER DEFAULT 0,
         locked INTEGER DEFAULT 0,
         prerequisites TEXT,
-        FOREIGN KEY(user_id) REFERENCES users(id)
-    )
-''')
-
-drop_table('student_progress_d3_old', c)
-c.execute('''
-    CREATE TABLE student_progress_d3_old (
-        id INTEGER PRIMARY KEY,
-        user_id INTEGER,
-        seq INTEGER,
-        name TEXT,
-        credits INTEGER,
-        course_type TEXT,
-        type TEXT,
-        completed INTEGER DEFAULT 0,
-        term INTEGER DEFAULT 0,
-        session INTEGER DEFAULT 0,
-        locked INTEGER DEFAULT 0,
-        prerequisites TEXT,
-        pre TEXT DEFAULT NULL,
-        pre_credits TEXT DEFAULT NULL,
         FOREIGN KEY(user_id) REFERENCES users(id)
     )
 ''')

@@ -8,8 +8,7 @@
 # ---
 from h2o_wave import main, app, Q, ui
 
-
-@app('/demo')
+@app('/breadcrumbs')
 async def serve(q: Q):
     blurb_items = [ui.button(name='#submenu', label='Go to submenu', link=True)]
     blurb_title = 'Welcome to Menu'

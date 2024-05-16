@@ -232,13 +232,15 @@ async def electives(q: Q):
 async def schedule(q: Q):
     clear_cards(q)
 
-    q.user.student_info['first_term'] = 'spring2024' # pull this from db instead
-    demo = True # temporary fix
-    await cards.render_schedule_menu(q, demo=demo)
+    if q.user.student_info['first_term'] is None:
+        q.user.student_info['first_term'] = 'spring2024' # need to set this default elsewhere
+    await cards.render_schedule_menu(q)
 
     # this should be carried over from previous step, or any changes in course should be 
     # written to DB, our source of truth
+    
     df = await get_student_progress_d3(q)
+
     q.user.student_info['df']['schedule'] = df
 
     # Fix this to work with guest mode
@@ -503,6 +505,37 @@ async def dismiss_dialog(q: Q):
     q.page['meta'].dialog = None
 
     await q.page.save()
+
+###############################################
+### Schedule page: For schedule_menu events ###
+###############################################
+@on()
+async def submit_schedule_menu(q: Q):
+    '''
+    Click 'Submit' on options on Schedule page for card 'schedule_menu'
+    '''
+    logging.info('Submit option on schedule page')
+    # to do: finish code here
+
+    await schedule(q) # dummy, just reload schedule page. remove when function is completed
+    await q.page.save()
+    
+@on()
+
+async def reset_schedule_menu(q: Q):
+    '''
+    Click 'Reset' on options on Schedule page for card 'schedule_menu'
+
+    Need to store original options in a dictionary that can be reapplied here 
+    if someone clicks Reset. Either that, or I should rerun the function from 
+    the beginning with its defaults.
+    '''
+    logging.info('Reset option on schedule page')
+    # to do: finish code here
+
+    await schedule(q) # dummy, just reload schedule page. remove when function is completed
+    await q.page.save()
+
 
 ################################################################################
 

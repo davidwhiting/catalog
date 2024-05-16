@@ -52,7 +52,8 @@ users = [
 ]
 
 c.executemany('''
-    INSERT INTO users VALUES (:id, :role_id, :username, :firstname, :lastname, :notes)
+    INSERT INTO users ( id, role_id, username, firstname, lastname, notes )
+        VALUES (:id, :role_id, :username, :firstname, :lastname, :notes)
 ''', users)
 conn.commit()
 
@@ -117,22 +118,22 @@ conn.commit()
 #################################################################
 
 student_history = [
-    { 'user_id': 4, 'name': 'STAT 200', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'HUMN 100', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ARTH 334', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
-    { 'user_id': 4, 'name': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'STAT 200', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'HUMN 100', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ARTH 334', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
+    { 'user_id': 4, 'course': 'ELECTIVE', 'credits': 3, 'transfer': 1 },
 ]
 
 c.executemany('''
-    INSERT INTO student_history (user_id, name, credits, transfer)
-        VALUES (:user_id, :name, :credits, :transfer)
+    INSERT INTO student_history (user_id, course, credits, transfer)
+        VALUES (:user_id, :course, :credits, :transfer)
     ''', student_history)
 
 conn.commit()
@@ -231,7 +232,7 @@ student_progress_d3 = [
 
 
 c.execute('DELETE FROM student_progress_d3')
-c.execute('DELETE FROM student_progress_d3_old')
+#c.execute('DELETE FROM student_progress_d3_old')
 
 c.executemany('''
     INSERT INTO student_progress_d3 (user_id, seq, name, credits, course_type, type, completed, term, session, prerequisites)
@@ -239,11 +240,11 @@ c.executemany('''
     ''', student_progress_d3)
 conn.commit()
 
-c.executemany('''
-    INSERT INTO student_progress_d3_old (user_id, seq, name, credits, course_type, type, completed, term, session, prerequisites)
-        VALUES (:user_id, :seq, :name, :credits, :course_type, :type, :completed, :term, :session, :prerequisites)
-    ''', student_progress_d3)
-conn.commit()
+#c.executemany('''
+#    INSERT INTO student_progress_d3_old (user_id, seq, name, credits, course_type, type, completed, term, session, prerequisites)
+#        VALUES (:user_id, :seq, :name, :credits, :course_type, :type, :completed, :term, :session, :prerequisites)
+#    ''', student_progress_d3)
+#conn.commit()
 
 # Close the connection
 conn.close()

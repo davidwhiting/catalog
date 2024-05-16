@@ -318,7 +318,7 @@ async def get_role(q):
     query = '''
         SELECT 
 		    a.role_id,
-		    b.type AS role,
+		    b.role,
 		    a.username, 
 		    a.firstname || ' ' || a.lastname AS fullname
         FROM 

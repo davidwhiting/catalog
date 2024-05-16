@@ -11,21 +11,21 @@ from utils import conn, c, drop_table, drop_view, column_exists
 #   admin: for now, the same as counselor with potentially additional admin tasks
 
 roles = [
-    { "id": 1, "type": "admin" },
-    { "id": 2, "type": "counselor" },
-    { "id": 3, "type": "student"  },
-    { "id": 4, "type": "guest"  }
+    { 'id': 1, 'role': 'admin' },
+    { 'id': 2, 'role': 'counselor' },
+    { 'id': 3, 'role': 'student' },
+    { 'id': 4, 'role': 'guest'  }
 ]
 
 drop_table('roles', c)
 c.execute('''
     CREATE TABLE roles (
         id INTEGER PRIMARY KEY,
-        type TEXT
+        role TEXT
     )
 ''')
 
-c.executemany('INSERT INTO roles VALUES (:id, :type)', roles)
+c.executemany('INSERT INTO roles VALUES (:id, :role)', roles)
 conn.commit()
 
 ################################################################
@@ -38,7 +38,7 @@ users = [
         "id": 1, 
         "role_id": 1, 
         "username": "admin", 
-        "firstname": "The", 
+        "firstname": "Default", 
         "lastname": "Administrator",
         "notes": "default admin user"
     }
@@ -53,6 +53,7 @@ c.execute('''
         firstname TEXT,
         lastname TEXT,
         notes TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
         FOREIGN KEY(role_id) REFERENCES roles(id)
     )
 ''')
@@ -166,7 +167,10 @@ c.execute('''
     )
 ''')
 
-c.executemany('INSERT INTO tuition(term, program, resident_status_id, cost) VALUES (:term, :program, :resident_status_id, :cost)', tuition )
+c.executemany('''
+    INSERT INTO tuition(term, program, resident_status_id, cost) 
+    VALUES (:term, :program, :resident_status_id, :cost)
+''', tuition )
 conn.commit()
 
 ################################################################
@@ -186,7 +190,7 @@ drop_table('student_info',c)
 c.execute('''
     CREATE TABLE student_info (
         id INTEGER PRIMARY KEY,
-        student_id INTEGER DEFAULT NULL,
+        student_id INTEGER UNIQUE DEFAULT NULL,
         user_id INTEGER,
         resident_status_id INTEGER DEFAULT NULL,
         transfer_credits INTEGER DEFAULT NULL,
@@ -195,6 +199,7 @@ c.execute('''
         program_id INTEGER DEFAULT NULL,
         student_profile_id INTEGER DEFAULT NULL,
         notes TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
         FOREIGN KEY(user_id) REFERENCES users(id),
         FOREIGN KEY(resident_status_id) REFERENCES resident_status(id),
         FOREIGN KEY(app_stage_id) REFERENCES app_stage(id),

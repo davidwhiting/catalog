@@ -1,7 +1,6 @@
 from h2o_wave import ui
 from typing import Optional, List
 
-
 import utils
 from utils import add_card, clear_cards
 from utils import get_query, get_query_one, get_query_dict, get_query_df
@@ -1318,20 +1317,27 @@ def d3plot(html, box='1 2 5 6', flex=False, location='horizontal', height='500px
     return card
 
 ##############
-async def render_schedule_menu(q, box='6 2 2 5', flex=False, location='middle_vertical', box_width='300px', demo=True):
+async def render_schedule_menu(q, box='6 2 2 5', flex=False, location='middle_vertical', box_width='300px'):
     '''
     Create menu for schedule page
-    (remove demo after fixing up)
     (retrieve defaults from DB)
     '''
-    ## Convert this to a function
     Sessions = ['Session 1', 'Session 2', 'Session 3']
-                    
-    if q.user.student_info['student_profile'] == 'Full-time':
+    
+    student_profile = q.user.student_info['student_profile']
+    if student_profile == 'Full-time':
+        # todo: get courses_per_session and max_credits from university rules
         default_sessions = ['Session 1', 'Session 3']
-        default_max_credits = 12
-        default_courses_per_session = 2
+        default_max_credits = 15
+        default_courses_per_session = 3
+    elif student_profile == 'Part-time':
+        # todo: get courses_per_session and max_credits from university rules
+        default_sessions = ['Session 1', 'Session 3']
+        default_max_credits = 9
+        default_courses_per_session = 1
     else:
+        # todo: enumerate the rest of the profile cases
+        # todo: get courses_per_session and max_credits from university rules
         default_sessions = ['Session 1', 'Session 2', 'Session 3']
         default_max_credits = 9
         default_courses_per_session = 1
@@ -1344,9 +1350,11 @@ async def render_schedule_menu(q, box='6 2 2 5', flex=False, location='middle_ve
             ui.dropdown(
                 name='first_term',
                 label='First Term',
-                value='spring2024' if demo else q.args.first_term,
+                value=q.user.student_info['first_term'] if (q.user.student_info['first_term'] is not None) \
+                    else q.args.first_term,
                 trigger=True,
                 width='150px',
+                # todo: create these choices via same function call as used in scheduling slots
                 choices=[
                     ui.choice(name='spring2024', label="Spring 2024"),
                     ui.choice(name='summer2024', label="Summer 2024"),
@@ -1361,20 +1369,20 @@ async def render_schedule_menu(q, box='6 2 2 5', flex=False, location='middle_ve
                 values=default_sessions,  # set default
             ),
             ui.spinbox(
-                name='spinbox',
+                name='courses_per_session',
                 label='Courses per Session',
                 width='150px',
                 min=1, max=5, step=1, value=default_courses_per_session),
             #                ui.separator(label=''),
-            ui.slider(name='slider', label='Max Credits per Term', min=1, max=16, step=1, 
+            ui.slider(name='slider', label='Max Credits per Term', min=1, max=18, step=1, 
                       value=default_max_credits),
             ui.inline(items=[
-                ui.button(name='show_inputs', label='Submit', primary=True),
-                ui.button(name='reset_sidebar', label='Reset', primary=False),
+                ui.button(name='submit_schedule_menu', label='Submit', primary=True),
+                ui.button(name='reset_schedule_menu', label='Reset', primary=False),
             ])
         ]
     )
-    add_card(q, 'sessions_spin', card)
+    add_card(q, 'schedule_menu', card)
 
 ##############
 

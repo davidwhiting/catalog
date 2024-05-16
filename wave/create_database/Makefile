@@ -13,7 +13,7 @@ step1:
 # output is tmp_pdf2txt.txt
 
 step2:
-	rm UMGC.db
+	rm -f UMGC.db
 	$(PYTHON) parse_text_create_dictionary.py
 	rm tmp_pdf2txt.txt
 
