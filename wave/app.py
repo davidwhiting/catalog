@@ -30,6 +30,7 @@ async def on_startup():
 @on('#home')
 async def home(q: Q):
     clear_cards(q)  # Drop all cards except main ones (header, sidebar, meta).
+    q.page['meta'].dialog = None # just in case, event closing not working currently
 
     ## get saved student information from the db and save to q.user.student_info variables
     ## (this is currently done at the initialize_user level)
@@ -96,6 +97,8 @@ async def home(q: Q):
 @on('#major')
 async def major(q: Q):
     clear_cards(q)  
+    q.page['meta'].dialog = None # just in case, event closing not working currently
+
 
     add_card(q, 'dropdown',
         await cards.render_dropdown_menus_horizontal(q, 
@@ -130,6 +133,7 @@ async def major(q: Q):
 @on('#course')
 async def course(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
+    q.page['meta'].dialog = None # just in case, event closing not working currently
 
     # this is not working in guest mode now
     if q.user.student_info['menu']['program'] is not None:
@@ -231,6 +235,7 @@ async def electives(q: Q):
 @on('#schedule')
 async def schedule(q: Q):
     clear_cards(q)
+    q.page['meta'].dialog = None # just in case, event closing not working currently
 
     if q.user.student_info['first_term'] is None:
         q.user.student_info['first_term'] = 'spring2024' # need to set this default elsewhere
@@ -498,8 +503,9 @@ async def program_table(q: Q):
     # note: q.args.table_name is set to [row_name]
     # the name of the table is 'program_table'
     # the name of the row is name=row['course'], the course name
-    coursename = q.args.program_table[0]
-    cards.render_dialog_description(q, coursename)
+    coursename = q.args.program_table[0] # am I getting coursename wrong here?
+    #cards.render_dialog_description(q, coursename)
+    cards.render_description_dialog(q, coursename)
     logging.info('The value of coursename in program_table is ' + coursename)
 
     await q.page.save()
@@ -510,15 +516,17 @@ async def program_table(q: Q):
 async def view_description(q: Q):
     # Note: same function as program_table(q) called by view_description menu option
     coursename = q.args.view_description
-    cards.render_dialog_description(q, coursename)
+#    cards.render_dialog_description(q, coursename)
+    cards.render_description_dialog(q, coursename)
+
     logging.info('The value of coursename in view_description is ' + str(coursename))
-    
+
     await q.page.save()
 
 ################################################################################
 
 @on('render_dialog_description.dismissed')
-async def dismiss_dialog(q: Q):
+async def render_dialog_description_dismissed(q: Q):
     """
     Dismiss dialog.
     """
@@ -527,6 +535,15 @@ async def dismiss_dialog(q: Q):
 
     await q.page.save()
 
+@on('render_description_dialog.dismissed')
+async def render_description_dialog_dismissed(q: Q):
+    """
+    Dismiss dialog.
+    """
+    logging.info('Dismissing dialog')
+    q.page['meta'].dialog = None
+
+    await q.page.save()
 
 ################################################################################
 

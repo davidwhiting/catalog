@@ -157,7 +157,7 @@ program_query = '''
 # To do: This is broken now. 
 # Also, the 'dismissed' function does not work completely
 # Card reappears when going to new page
-def render_dialog_description(q, course):
+def render_description_dialog_old(q, course):
     '''
     Display the description of a row clicked on a table
     '''
@@ -172,6 +172,43 @@ def render_dialog_description(q, course):
         closable = True,
         events = ['dismissed']
     )
+
+def render_description_dialog(q, course, events=False):
+    '''
+    Display the description of a row clicked on a table
+    df: dataframe from which the wave table was built
+    course: course for description
+    '''
+    df = q.user.student_info['df']['required']
+
+    #    # create the required course_dict once instead of every time this is called
+    #    if 'course_dict' in q.user.student_info and q.user.student_info.get('course_dict') is not None:
+    #        course_dict =  q.user.student_info['course_dict']
+    #    else:
+    #        # Assuming my_dict is your DataFrame converted to a dictionary of records
+    #        tmp_dict = df.to_dict(orient='records')
+    #        # Create a dictionary of dictionaries with 'course' as keys
+    #        course_dict = {record['course']: record for record in tmp_dict}
+    #        q.user.student_info['course_dict'] = course_dict
+    #
+    #    description = course_dict[course]['description']
+
+    #an error crept into the df code so working direcdtly with dictionaries instead
+    description = df.loc[df['course'] == course, 'description'].iloc[0]
+
+    q.client.dialog_state = {
+        'name': 'view_description',
+        'title': course + ' Course Description',
+        'width': '480px',
+        'items': [ui.text(description)],
+        'closable': True,
+        #'events': ['dismissed']  # Changed from 'dismiss_dialog' to 'dismissed'
+    }
+    if events:
+        q.client.dialog_state['events'] = ['dismissed']
+
+    q.page['meta'].dialog = ui.dialog(**q.client.dialog_state)
+
 
 ##############################################################
 ####################  DEBUG CARDS (START) ####################
@@ -198,12 +235,20 @@ def render_debug_card(q, box='3 3 1 1', flex=False, location='debug', width='33%
     '''
     if flex:
         box = ui.box(location, width=width, height=height)
+
+    ## debug dataframe
+    #q.client.required = q.user.student_info['df']['required'].to_dict(orient='records')
+
     content = f'''
 ### q.client values:
 {q.client}
 
-### q.user.student_info['menu'] values:
-{q.user.student_info['menu']}
+### q.client.required values:
+{q.client.required}
+
+### q.user.student_info['df']['required'] values:
+{q.user.student_info['df']['required']}
+
 
 ### q.args values:
 {q.args}
@@ -646,7 +691,7 @@ async def render_program_dashboard(q, box):
         #    pass
         #    # send a warning
 
-async def render_program_table(q, df, box=None, location=None, width=None, height=None, flex=False, check=True, ge=False, elective=False):
+async def _render_program_table(q, box=None, location=None, width=None, height=None, flex=False, check=True, ge=False, elective=False):
     '''
     q:
     df:
@@ -657,6 +702,7 @@ async def render_program_table(q, df, box=None, location=None, width=None, heigh
     ge: Include GE classes
     elective: Include Elective classes
     '''
+    df = q.user.student_info['df']['required']
 
     async def _render_program_group(group_name, record_type, df, collapsed, check=True):
         '''
@@ -753,7 +799,7 @@ async def render_program_table(q, df, box=None, location=None, width=None, heigh
             cell_type=ui.menu_table_cell_type(name='commands', 
                 commands=[
                     ui.command(name='view_description', label='Course Description'),
-                    ui.command(name='prerequisites', label='Show Prerequisites'),
+                    #ui.command(name='prerequisites', label='Show Prerequisites'),
                 ]
         ))
     ]
@@ -763,7 +809,7 @@ async def render_program_table(q, df, box=None, location=None, width=None, heigh
 
     #title = q.user.student_info['degree_program'] + ': Explore Required Courses'
     title = 'Explore Required Courses'
-    card = add_card(q, 'program_table', ui.form_card(
+    card = add_card(q, 'program_table_card', ui.form_card(
         box=box,
         items=[
             ui.inline(justify='between', align='center', items=[
@@ -808,7 +854,7 @@ async def render_program_coursework_table(q, box='1 3 5 7', location='middle_ver
     df = await get_query_df(timedConnection, query, params=(q.user.student_info['program_id'],))
     q.user.student_info['df']['required'] = df
 
-    await render_program_table(q, df, box=box, location=location, width=width, height=height, flex=flex)
+    await _render_program_table(q, box=box, location=location, width=width, height=height, flex=flex)
 
 async def render_program(q):
     await render_program_description(q, box='1 3 7 2')
