@@ -572,7 +572,7 @@ c.executemany('INSERT INTO catalog VALUES (:id, :version)', catalog)
 c.execute('''
     CREATE TABLE courses (
         id INTEGER PRIMARY KEY,  
-        name TEXT,
+        course TEXT,
         title TEXT,
         credits TEXT,
         description TEXT,
@@ -591,7 +591,7 @@ c.execute('''
 catalog_integer = 1
 for class_name, class_info in classes.items():
     c.execute('''
-        INSERT INTO courses ('name','title','credits','description','prerequisites','recommended',
+        INSERT INTO courses ('course','title','credits','description','prerequisites','recommended',
               'warnings','substitutions','pre','pre_credits','pre_notes','catalog_id')
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', 
         (

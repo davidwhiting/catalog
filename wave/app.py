@@ -55,7 +55,7 @@ async def on_shutdown():
 ####################  Initialize app, user, client Functions ##################
 ###############################################################################
 
-async def initialize_app(q: Q) -> None:
+async def initialize_app(q: Q):
     """
     Initialize the app. Code here is run once at the app level.
     """
@@ -71,7 +71,7 @@ async def initialize_app(q: Q) -> None:
     q.app.umgc_logo, = await q.site.upload(['umgc-logo-white.png'])
     await q.page.save()
 
-async def initialize_user(q: Q) -> None:
+async def initialize_user(q: Q):
     """
     Initialize the user.
 
@@ -84,7 +84,7 @@ async def initialize_user(q: Q) -> None:
     q.user.conn = utils.TimedSQLiteConnection('UMGC.db')
 
     # Note: All user variables related to students will be saved in a dictionary
-    # q.user.student_info.
+    # q.user.student_info
     #
     # This will allow us to keep track of student information whether the role is admin/counselor 
     # (where we can easily switch students by deleting q.user.student_info and starting over), or
@@ -107,10 +107,10 @@ async def initialize_user(q: Q) -> None:
     #############
     ## Testing ##
     #############
-    q.user.user_id = 0 # guest
+    #q.user.user_id = 0 # guest
     #q.user.user_id = 1 # admin
-    #q.user.user_id = 2 # counselor
-    #q.user.user_id = 3 # John Doe, student
+    #q.user.user_id = 2 # coach
+    q.user.user_id = 3 # John Doe, student
     #q.user.user_id = 4 # Jane Doe, transfer student
     #q.user.user_id = 5 # Jim Doe, new student no major selected
     #q.user.user_id = 6 # Sgt Doe, military and evening student
@@ -232,6 +232,9 @@ async def admin(q: Q):
         # coach, student, guest not allowed
         pass
 
+    if q.app.debug:
+        add_card(q, 'admin_debug', await cards.render_debug_card(q, width='100%'))
+
     await q.page.save()
 
 ######################################################
@@ -268,6 +271,9 @@ async def home(q: Q):
         # guest home page
         await guest_home(q)
 
+    if q.app.debug:
+        add_card(q, 'home_debug', await cards.render_debug_card(q, width='100%'))
+    
     await q.page.save()
 
 #########################################################
@@ -303,7 +309,9 @@ async def program(q: Q):
     else:
         # guest program page
         await guest_program(q)
-        
+    
+    if q.app.debug:
+        add_card(q, 'program_debug', await cards.render_debug_card(q, width='100%'))
     await q.page.save()
 
 ########################################################
@@ -340,6 +348,9 @@ async def course(q: Q):
         # guest course page
         await guest_course(q)
         
+    if q.app.debug:
+        add_card(q, 'course_debug', await cards.render_debug_card(q, width='100%'))
+
     await q.page.save()
 
 ##########################################################

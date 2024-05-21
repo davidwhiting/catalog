@@ -45,7 +45,7 @@ create_view_query = '''
     SELECT 
         a.id,
         a.general_education_requirements_id as ge_id,
-        b.name,
+        b.course,
         b.title,
         b.credits,
         b.description,
@@ -68,7 +68,7 @@ create_view_query = '''
     CREATE VIEW complete_records_view AS
     SELECT 
         a.seq,
-        a.name,
+        a.course,
         a.program_id,
         a.class_id,
         a.course_type_id,
@@ -76,7 +76,7 @@ create_view_query = '''
         b.description,
         b.prerequisites
     FROM 
-        program_sequence a
+        catalog_program_sequence_view a
     JOIN 
         courses b
     ON 
@@ -110,7 +110,7 @@ create_view_query = '''
     LEFT JOIN 
         courses b
     ON 
-        a.course = b.name
+        a.course = b.course
 '''
 c.execute(create_view_query)
 conn.commit()
@@ -133,7 +133,7 @@ create_view_query = '''
     	b.description
     FROM program_requirement_courses a
     LEFT JOIN courses b
-    	ON a.course = b.name
+    	ON a.course = b.course
     LEFT JOIN course_type c
     	ON a.course_type_id = c.id
 '''
@@ -175,7 +175,7 @@ create_view_query = '''
             WHEN a.course = 'ELECTIVE' THEN 'ELECTIVE'
             WHEN a.course = 'ELECTIVE-2' THEN 'ELECTIVE'
             ELSE a.course
-        END AS name,
+        END AS course,
         c.name as course_type,
         CASE
             WHEN INSTR(c.name, '_') > 0 
@@ -204,7 +204,7 @@ create_view_query = '''
     LEFT JOIN course_type c
         ON c.id = a.course_type_id
     LEFT JOIN courses b
-        ON a.course = b.name
+        ON a.course = b.course
 '''
 c.execute(create_view_query)
 conn.commit()
@@ -237,7 +237,7 @@ create_view_query = '''
         COALESCE(b.description, '') AS description
     FROM student_progress a
     LEFT JOIN courses b
-        ON a.course = b.name
+        ON a.course = b.course
     LEFT JOIN course_type c
         ON c.id = a.course_type_id
 '''

@@ -109,26 +109,6 @@ def render_debug_card_old(q, location='debug', width='33%', height='200px'):
         content=content 
     )
 
-
-def render_debug_client_card(q, box='3 3 1 1', flex=False, location='debug', width='33%', height='200px'):
-    '''
-    Show q.client information in a card for debugging
-    '''
-    if flex:
-        box = ui.box(location, width=width, height=height)
-    content = f'''
-
-### q.client value:
-{q.client}
-
-    '''
-    card = ui.markdown_card(
-        box,
-        title='Client Debugging Information', 
-        content=content 
-    )
-    return card
-
 def render_debug_user_card(q, flex=False, box='2 2 3 3', location='debug', width='33%', height='200px'):
     if flex:
         box = ui.box(location, width=width, height=height)
@@ -198,13 +178,13 @@ def render_please_login(q, box='5 2 3 1'):
         ]
     ))
 
-def render_welcome_back_card(q, box='1 3 3 3', title=''):
+def render_welcome_back_card(q, flex=True, location='vertical', box='1 3 3 3', title=''):
     student_info = q.user.student_info
+    if flex:
+        box = location
     content = f'''## Welcome back, {student_info['name']}.
 
-### Here is your current selected information:
-
-- **Selected program**: {student_info['degree_program']}
+### Here is your current selected student information:
 
 - **Residency status**: {student_info['resident_status']}
 
@@ -213,6 +193,9 @@ def render_welcome_back_card(q, box='1 3 3 3', title=''):
 - **Transfer credits**: {student_info['transfer_credits']==1}
 
 - **Financial aid**: {student_info['financial_aid']==1}
+
+- **Selected program**: {student_info['degree_program']}
+
 '''
     
     add_card(q, 'user_info',
@@ -250,7 +233,7 @@ def render_student_information_stub_card(box='1 1 2 2', flex=False, location='bo
     )
     return card
 
-def render_career_assessment_card(box='1 1 2 2', flex=False, location='bottom_horizontal'):
+def render_career_assessment_card(box='1 1 2 2', flex=True, location='horizontal'):
     if flex:
         box=ui.box(location, width='400px')
     yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'

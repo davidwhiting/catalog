@@ -216,7 +216,35 @@ This app is in pre-alpha stage. Feedback welcomed.
 ####################  DEBUG CARDS  ####################
 #######################################################
 
+async def render_debug_card(q, box='3 3 1 1', flex=True, location='debug', width='100%', height='300px'):
+    '''
+    Show q.client information in a card for debugging
+    '''
+    if flex:
+        box = ui.box(location, width=width, height=height)
+    content = f'''
+### q.args values:
+{q.args}
 
+### q.events values:
+{q.events}
+
+### q.client value:
+{q.client}
+
+### q.user values:
+{q.user}
+
+### q.app values:
+{q.app}
+
+    '''
+    card = ui.markdown_card(
+        box,
+        title='Debug Information', 
+        content=content 
+    )
+    return card
 
 
 ##############################################################

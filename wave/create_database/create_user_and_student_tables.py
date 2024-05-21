@@ -5,14 +5,14 @@ from utils import conn, c, drop_table, drop_view, column_exists
 ################################################################
 # Roles Table
 # These are the roles for someone logging into the app
-#   guest:     can do everything a student can do except save the schedule
-#   student:   can select a major and create a schedule
-#   counselor: can select a student and do everything for them
-#   admin: for now, the same as counselor with potentially additional admin tasks
+#   guest:   can do everything a student can do except save the schedule
+#   student: can select a major and create a schedule
+#   coach:   can select a student and do everything for them
+#   admin:   can add users, change roles, plus everything a coach can do
 
 roles = [
     { 'id': 1, 'role': 'admin' },
-    { 'id': 2, 'role': 'counselor' },
+    { 'id': 2, 'role': 'coach' },
     { 'id': 3, 'role': 'student' },
     { 'id': 4, 'role': 'guest'  }
 ]
@@ -40,6 +40,7 @@ users = [
         "username": "admin", 
         "firstname": "Default", 
         "lastname": "Administrator",
+        "sso_role": "staff",
         "notes": "default admin user"
     }
 ]
@@ -52,6 +53,8 @@ c.execute('''
         username TEXT,
         firstname TEXT,
         lastname TEXT,
+        sso_role TEXT,
+        sso_notes TEXT,
         notes TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
         FOREIGN KEY(role_id) REFERENCES roles(id)
@@ -59,8 +62,8 @@ c.execute('''
 ''')
 
 c.executemany('''
-    INSERT INTO users (id, role_id, username, firstname, lastname, notes) 
-        VALUES (:id, :role_id, :username, :firstname, :lastname, :notes)
+    INSERT INTO users (id, role_id, username, firstname, lastname, sso_role, notes) 
+        VALUES (:id, :role_id, :username, :firstname, :lastname, :sso_role, :notes)
     ''', users)
 conn.commit()
 
