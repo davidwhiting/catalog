@@ -78,12 +78,6 @@ async def home(q: Q):
 async def major(q: Q):
     clear_cards(q)  
 
-    add_card(q, 'dropdown',
-        await cards.render_dropdown_menus_horizontal(q, 
-            box='1 2 7 1', 
-            menu_width='300px'
-        )
-    )
     # future: do this only for undergraduate degrees
     await cards.render_program(q)
 
@@ -102,16 +96,12 @@ async def major(q: Q):
 #    #    ]
 #    #))
 
-    if q.client.debug:
-        add_card(q, 'debug_program', cards.render_debug_card(q, box='1 11 7 3')) 
-
 ##############################################################
 ####################  COURSES PAGE  ##########################
 ##############################################################
 @on('#course')
 async def course(q: Q):
     clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    q.page['meta'].dialog = None # just in case, event closing not working currently
 
     # this is not working in guest mode now
     if q.user.student_info['menu']['program'] is not None:
@@ -130,7 +120,7 @@ async def course(q: Q):
                             ui.text('**Instructions**: You have selected courses. You may now add electives or view your schedule.')
                         ]
                     ))
-                    await cards.render_course_page_table(q, q.user.student_info['df']['schedule'], box='1 3 7 7')
+                    await cards.render_course_page_table(q, q.user.student_data['schedule'], box='1 3 7 7')
 
                 else: # stage_id==3:
                     cards.render_courses_header(q, box='1 2 7 1')
@@ -213,11 +203,10 @@ async def electives(q: Q):
 @on('#schedule')
 async def schedule(q: Q):
     clear_cards(q)
-    q.page['meta'].dialog = None # just in case, event closing not working currently
 
     if q.user.student_info['first_term'] is None:
         q.user.student_info['first_term'] = 'spring2024' # need to set this default elsewhere
-    await cards.render_schedule_menu(q)
+
 
     # this should be carried over from previous step, or any changes in course should be 
     # written to DB, our source of truth
@@ -229,7 +218,9 @@ async def schedule(q: Q):
     # get department recommended course list and schedule from catalog:
     #     student_progress_d3
     #
-    
+
+    ###########################################################
+
     # initialize student progress by picking undergraduate program from catalog
     query = '''
         INSERT INTO student_progress ( user_id, seq, course, course_type_id )
@@ -241,10 +232,6 @@ async def schedule(q: Q):
     # 1 - if the result returns no rows (nothing is written)
     # 2 - if there is no corresponding user_id this will throw an error
 
-    df = await utils.get_student_progress_d3(q)
-
-    q.user.student_info['df']['schedule'] = df
-
     # Fix this to work with guest mode
     if q.user.student_info['df']['schedule'] is not None:
         degree_program = q.user.student_info['degree_program']
@@ -254,24 +241,22 @@ async def schedule(q: Q):
                 ui.text(f'**{degree_program}**')
             ]
         ))
-        await cards.render_schedule_page_table(q, df, box='1 7 7 6')
 
-        ## display df
-        start_term = 'Spring 2024' # pick this up from q.user variables
-        # rename because the function uses 'period' rather than 'term'
+#        # rename because the function uses 'period' rather than 'term'
+#        # to do: inefficient, need to rewrite
+#        df_input = df.copy()
+#        df_input.rename(columns={'term': 'period'}, inplace=True)
+#
+#        df_display, headers_display = utils.prepare_d3_data(df_input, start_term.upper())
+#        df_json = df_display.to_json(orient='records')
+#        headers_json = headers_display.to_json(orient='records')
+#
+#        html_template = templates.html_code_minimal.format(
+#            javascript=templates.javascript_draw_only,
+#            headers=headers_json, 
+#            data=df_json)
 
-        df_input = df.copy()
-        df_input.rename(columns={'term': 'period'}, inplace=True)
-
-        df_display, headers_display = utils.prepare_d3_data(df_input, start_term.upper())
-        df_json = df_display.to_json(orient='records')
-        headers_json = headers_display.to_json(orient='records')
-
-        html_template = templates.html_code_minimal.format(
-            javascript=templates.javascript_draw_only,
-            headers=headers_json, 
-            data=df_json)
-
+        html_template = utils.create_html_template(df, start_term)
         add_card(q, 'd3plot', cards.d3plot(html_template, box='1 3 5 4'))
 
         #######################################
@@ -482,6 +467,7 @@ async def program_table(q: Q):
     # the name of the table is 'program_table'
     # the name of the row is name=row['course'], the course name
     coursename = q.args.program_table[0] # am I getting coursename wrong here?
+
     #cards.render_dialog_description(q, coursename)
     cards.render_description_dialog(q, coursename)
     logging.info('The value of coursename in program_table is ' + coursename)
@@ -490,38 +476,7 @@ async def program_table(q: Q):
 
 ################################################################################
 
-@on()
-async def view_description(q: Q):
-    # Note: same function as program_table(q) called by view_description menu option
-    coursename = q.args.view_description
-#    cards.render_dialog_description(q, coursename)
-    cards.render_description_dialog(q, coursename)
-
-    logging.info('The value of coursename in view_description is ' + str(coursename))
-
-    await q.page.save()
-
 ################################################################################
-
-@on('render_dialog_description.dismissed')
-async def render_dialog_description_dismissed(q: Q):
-    """
-    Dismiss dialog.
-    """
-    logging.info('Dismissing dialog')
-    q.page['meta'].dialog = None
-
-    await q.page.save()
-
-@on('render_description_dialog.dismissed')
-async def render_description_dialog_dismissed(q: Q):
-    """
-    Dismiss dialog.
-    """
-    logging.info('Dismissing dialog')
-    q.page['meta'].dialog = None
-
-    await q.page.save()
 
 ################################################################################
 
@@ -531,7 +486,6 @@ async def student_dropdown(q: Q):
     q.user.user_dropdown = q.args.user_dropdown
 
 ################################################################################
-
 
 ###############################################
 ### Schedule page: For schedule_menu events ###
@@ -571,22 +525,6 @@ async def reset_schedule_menu(q: Q):
 ###############################################################################
     
 
-async def initialize_client(q: Q):
-    """
-    Initialize the client (once per connection)
-    """
-    logging.info('Initializing client')
-    q.client.initialized = True
-    q.client.cards = set()
-    q.page['meta'] = cards.render_meta_card()
-    q.page['header'] = cards.render_header(q)
-    q.page['footer'] = cards.render_footer()
-
-    # Debug status
-    q.client.debug = True
-
-    if q.args['#'] is None:
-        await home(q)
 
 
 ## Below needs some editing, from ChatGPT

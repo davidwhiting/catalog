@@ -12,55 +12,18 @@
 
 ######################################################################
 
-def initialize_ge():
-    '''
-    Initialize General Education tracking for undergraduate students.
-    '''
-    ge = {
-        'arts': {
-            '1': None,
-            '2': None
-        },
-        'beh': {
-            '1': None,
-            '2': None
-        },
-        'bio': {
-            '1a': None,
-            '1b': None,
-            '1c': None,
-            '2': None
-        },
-        'comm': {
-            '1': 'WRTG 111',
-            '2': 'WRTG 112',
-            '3': None,
-            '4': None
-        },
-        'math': None,
-        'res': {
-            '1': None,
-            '2': 'LIBS 150',
-            '3': None,
-            '3a': None,
-            '3b': None,
-            '3c': None
-        }
-    }
-    return ge
-
 def reset_program(q):
     '''
     When program is changed, multiple variables need to be reset
     '''
     q.user.student_info['menu']['program'] = None
     q.user.student_info['program_id'] = None
-    q.user.student_info['df']['required'] = None
-    q.user.student_info['df']['schedule'] = None
     q.user.student_info['degree_program'] = None
 
+    q.user.student_data['required'] = None
+    q.user.student_data['schedule'] = None
+
     q.page['dropdown'].menu_program.value = None
-    # reset program choices
     q.page['dropdown'].menu_program.choices = None
 
 ######################################################################
@@ -77,14 +40,25 @@ async def get_catalog_program_sequence(q):
     df = await get_query_df(q.user.conn, query, params=(q.user.student_info['program_id'],))
     return df
 
-async def get_student_progress_d3(q):
-    query = 'SELECT * FROM student_progress_d3_view WHERE user_id = ?'
-    df = await get_query_df(q.user.conn, query, params=(q.user.student_info['user_id'],))
-    return df
 
-async def get_choices(timedConnection, query, params=()):
+
+async def get_choices_with_disabled_old(timedConnection, query, params=()):
+    '''
+    Note: consolidate with get_choices to add a disabled={} option
+    '''
+    disabled_items = {
+        'Cybersecurity Technology',
+        'Social Science',
+        'Applied Technology',
+        'Web and Digital Design',        
+        'East Asian Studies',
+        'English',
+        'General Studies',
+        'History'
+    }
     rows = await get_query(timedConnection, query, params)
-    choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
+    choices = [ui.choice(name=str(row['name']), label=row['label'], \
+        disabled=(str(row['label']) in disabled_items)) for row in rows]
     return choices
 
 async def get_choices_with_disabled(timedConnection, query, params=()):
@@ -135,7 +109,8 @@ async def recommend_a_major(q, choice):
 #################  COURSE SCHEDULING FUNCTIONS  ######################
 ######################################################################
 
-def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=15, summer=False, sessions=[1,3], as_df=True):
+def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=15, 
+                     summer=False, sessions=[1,3], as_df=False):
     '''
     A periods structure is a list of dictionaries (or a Pandas dataframe) containing information about terms and sessions,
     into which we will place classes when scheduling.
@@ -263,111 +238,6 @@ def update_periods(periods, condition, update_values):
         return periods
 
 # note: renamed 'prerequisite' to 'prerequisites' to follow changes in the db table
-
-def prepare_d3_data(df, start_term='SPRING 2024'):
-    green = '#3b8132'
-    blue = '#135f96'
-    red = '#a30606'
-    yellow = '#fdbf38'
-    def set_colors(row):
-        if row['type'] == 'general':
-            return pd.Series([green, 'white'])
-        elif row['type'] == 'major':
-            return pd.Series([blue, 'white'])
-        # hack: fix the following 3 elifs
-        elif row['type'] == 'required,elective':
-            row['type'] = 'required'
-            return pd.Series([red, 'white'])
-        elif row['type'] == 'required,general':
-            row['type'] = 'required'
-            return pd.Series([red, 'white'])
-        elif row['type'] == 'required':
-            return pd.Series([red, 'white'])
-        elif row['type'] == 'elective':
-            return pd.Series([yellow, 'black'])
-        else:
-            return pd.Series(['white', 'black'])  # default colors
-
-    def generate_header_data(start_semester, num_periods, data_df = df):
-        seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
-        semester_data = []
-        start_season, start_year = start_semester.split(' ')
-        start_year = int(start_year)
-        season_index = seasons.index(start_season)
-        year = start_year
-        period = 0
-
-        while period < num_periods:
-            for j in range(season_index, len(seasons)):
-                semester_data.append(f'{seasons[j]} {year}')
-                period += 1
-
-                # Break the loop when i equals num_periods
-                if period == num_periods:
-                    break
-
-            # Reset the season index to start from 'WINTER' for the next year
-            season_index = 0
-            year += 1
-
-        df = pd.DataFrame(semester_data, columns=['term'])
-        df['width'] = df['term'].apply(lambda x: 190 if 'SUMMER' in x else 260)
-        df['offset'] = df['term'].apply(lambda x: 2 if 'SUMMER' in x else 3)
-        df['fontsize'] = '14px'
-        df['description'] = ''
-        df['space'] = 40
-        df['xpos'] = df['width'] + df['space']
-
-        x0 = 10
-        # Calculate the cumulative sum of 'xpos'
-        df['x'] = df['xpos'].cumsum()
-        df['x'] = df['x'].shift(1)
-        df.loc[0, 'x'] = 0
-        df['x'] = df['x'] + x0
-        df['y'] = 10
-        df['color'] = 'lightgray'
-        df['textcolor'] = 'black'
-        df['period'] = np.arange(1, num_periods+1)
-
-        df.drop
-        # Sum credits per period and convert to a DataFrame
-        total_credits = data_df.groupby('period')['credits'].sum().sort_index()
-        total_credits_df = total_credits.reset_index()
-
-        df = pd.merge(df, total_credits_df, on='period', how='inner')
-        df['name'] = df['term']
-        df['printname'] = df['name'] + ' (' + df['credits'].astype(str) + ')'
-
-        return df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 
-                   'fontsize', 'period', 'name', 'credits', 'description']]
-
-    # Prepare data for the D3 figure
-
-    max_period = max(df['period'])
-    headers = generate_header_data(start_term, max_period)
-
-    df['description'] = df['prerequisites']
-    df['width'] = 120
-    # Calculate 'x' column
-    df = pd.merge(df, headers[['period','x']], on='period', how='left')
-    df['x'] += 70*(df['session']-1)
-
-    # Calculate 'y' column
-    df = df.sort_values(by=['period', 'session', 'seq' ])
-    df['y_row'] = df.groupby('period').cumcount() + 1
-    df['y'] = 70 + 45 * (df['y_row'] - 1)
-
-    # Create rectangle colors
-    df[['color', 'textcolor']] = df.apply(set_colors, axis=1)
-
-    # Set text offset multiplier to 1 and text fontsize
-    df['offset'] = 1
-    df['fontsize'] = '12px'
-    df['printname'] = df['name'] + ' (' + df['credits'].astype(str) + ')'
-    
-    df = df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 'fontsize', 'period', 'session', 'type', 'name', 'credits', 'description']]
-
-    return df, headers
 
 def generate_schedule(course_list, periods):
     schedule = []

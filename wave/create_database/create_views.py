@@ -62,28 +62,30 @@ create_view_query = '''
 c.execute(create_view_query)
 conn.commit()
 
-# complete_records_view used by templates.complete_records_query
-drop_view('complete_records_view')
-create_view_query = '''
-    CREATE VIEW complete_records_view AS
-    SELECT 
-        a.seq,
-        a.course,
-        a.program_id,
-        a.class_id,
-        a.course_type_id,
-        b.title,
-        b.description,
-        b.prerequisites
-    FROM 
-        catalog_program_sequence_view a
-    JOIN 
-        courses b
-    ON 
-        a.class_id = b.id
-'''
-c.execute(create_view_query)
-conn.commit()
+### Don't think this is being used
+##
+## complete_records_view used by templates.complete_records_query
+#drop_view('complete_records_view')
+#create_view_query = '''
+#    CREATE VIEW complete_records_view AS
+#    SELECT 
+#        a.seq,
+#        a.course,
+#        a.program_id,
+#        a.class_id,
+#        a.course_type_id,
+#        b.title,
+#        b.description,
+#        b.prerequisites
+#    FROM 
+#        catalog_program_sequence_view a
+#    JOIN 
+#        courses b
+#    ON 
+#        a.class_id = b.id
+#'''
+#c.execute(create_view_query)
+#conn.commit()
 
 # templates.complete_student_records_query
 drop_view('student_records_view')
@@ -168,7 +170,7 @@ conn.commit()
 drop_view('catalog_program_sequence_view')
 create_view_query = '''
 	CREATE VIEW catalog_program_sequence_view AS
-    SELECT 
+	SELECT 
         a.program_id,
         a.seq,
         CASE
@@ -176,11 +178,11 @@ create_view_query = '''
             WHEN a.course = 'ELECTIVE-2' THEN 'ELECTIVE'
             ELSE a.course
         END AS course,
-        c.name as course_type,
+        c.type as course_type,
         CASE
-            WHEN INSTR(c.name, '_') > 0 
-            THEN SUBSTR(c.name, 1, INSTR(c.name, '_') - 1)
-            ELSE c.name
+            WHEN INSTR(c.type, '_') > 0 
+            THEN SUBSTR(c.type, 1, INSTR(c.type, '_') - 1)
+            ELSE c.type
         END as type,
         CASE
             WHEN a.course IN ('ELECTIVE', 'ELECTIVE-2') THEN

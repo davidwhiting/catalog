@@ -53,99 +53,14 @@ def render_description_dialog_old(q, course):
         events = ['dismissed']
     )
 
-def render_description_dialog(q, course, events=False):
-    '''
-    Display the description of a row clicked on a table
-    df: dataframe from which the wave table was built
-    course: course for description
-    '''
-    df = q.user.student_info['df']['required']
-
-    #    # create the required course_dict once instead of every time this is called
-    #    if 'course_dict' in q.user.student_info and q.user.student_info.get('course_dict') is not None:
-    #        course_dict =  q.user.student_info['course_dict']
-    #    else:
-    #        # Assuming my_dict is your DataFrame converted to a dictionary of records
-    #        tmp_dict = df.to_dict(orient='records')
-    #        # Create a dictionary of dictionaries with 'course' as keys
-    #        course_dict = {record['course']: record for record in tmp_dict}
-    #        q.user.student_info['course_dict'] = course_dict
-    #
-    #    description = course_dict[course]['description']
-
-    #an error crept into the df code so working direcdtly with dictionaries instead
-    description = df.loc[df['course'] == course, 'description'].iloc[0]
-
-    q.client.dialog_state = {
-        'name': 'view_description',
-        'title': course + ' Course Description',
-        'width': '480px',
-        'items': [ui.text(description)],
-        'closable': True,
-        #'events': ['dismissed']  # Changed from 'dismiss_dialog' to 'dismissed'
-    }
-    if events:
-        q.client.dialog_state['events'] = ['dismissed']
-
-    q.page['meta'].dialog = ui.dialog(**q.client.dialog_state)
-
-
 ##############################################################
 ####################  DEBUG CARDS (START) ####################
 ##############################################################
-
-def render_debug_card_old(q, location='debug', width='33%', height='200px'):
-    content = f'''
-### q.args values:
-{q.args}
-
-### q.events values:
-{q.events}
-
-    '''
-    return ui.markdown_card(
-        box=ui.box(location, width=width, height=height), 
-        title='Debugging Information', 
-        content=content 
-    )
-
-def render_debug_user_card(q, flex=False, box='2 2 3 3', location='debug', width='33%', height='200px'):
-    if flex:
-        box = ui.box(location, width=width, height=height)
-    content = f'''
-
-### q.user values:
-{q.user}
-
-    '''
-    return ui.markdown_card(
-        box=box, 
-        title='User Debugging Information', 
-        content=content 
-    )
-
-def render_debug_app_card(q, flex=False, box='2 2 3 3', location='debug', width='33%', height='200px'):
-    if flex:
-        box = ui.box(location, width=width, height=height)
-    content = f'''
-### q.app values:
-{q.app}
-
-    '''
-    return ui.markdown_card(
-        box=box, 
-        title='App Debugging Information', 
-        content=content 
-    )
 
 def render_debug(q, location='debug', width='25%', height='230px'):
     add_card(q, 'debug_user_info', render_debug_user_card(q,  location=location, width=width, height=height)) 
     add_card(q, 'debug_client_info', render_debug_client_card(q,  location=location, width=width, height=height)) 
     add_card(q, 'debug_info', render_debug_card(q, location=location, width=width, height=height)) 
-
-##############################################################
-####################  DEBUG CARDS (END)   ####################
-##############################################################
 
 ##############################################################
 ####################  HOME PAGE  #############################
@@ -260,101 +175,9 @@ def render_ai_enablement_card(box='1 1 2 2', flex=False, location='bottom_horizo
     return card
 
 ##############################################################
-####################  HOME PAGE (END)    #####################
-##############################################################
-
-##############################################################
 ####################  PROGRAMS PAGE ##########################
 ##############################################################
 
-async def render_dropdown_menus_horizontal(q, box='1 2 6 1', location='top_horizontal', flex=False, menu_width='280px'):
-    '''
-    Create menus for selecting degree, area of study, and program
-    '''
-    timedConnection = q.user.conn
-
-    degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
-    area_query = '''
-        SELECT DISTINCT menu_area_id AS name, area_name AS label
-        FROM menu_all_view 
-        WHERE menu_degree_id = ?
-    '''
-    program_query = '''
-        SELECT program_id AS name, program_name AS label
-        FROM menu_all_view 
-        WHERE menu_degree_id = ? AND menu_area_id = ?
-    '''
-
-    disabled = []
-
-    # enforcing string because I've got a bug somewhere (passing an int instead of str)
-    dropdowns = ui.inline([
-        ui.dropdown(
-            name='menu_degree',
-            label='Degree',
-            value=str(q.user.student_info['menu']['degree']) if \
-                (q.user.student_info['menu']['degree'] is not None) else q.args.menu_degree,
-            trigger=True,
-            width='230px',
-            choices=await get_choices(timedConnection, degree_query)
-        ),
-        ui.dropdown(
-            name='menu_area',
-            label='Area of Study',
-            value=str(q.user.student_info['menu']['area_of_study']) if \
-                (str(q.user.student_info['menu']['area_of_study']) is not None) else \
-                str(q.args.menu_area),
-            trigger=True,
-            disabled=False,
-            width='250px',
-            choices=None if (q.user.student_info['menu']['degree'] is None) else \
-                await get_choices(timedConnection, area_query, (q.user.student_info['menu']['degree'],))
-        ),
-        ui.dropdown(
-            name='menu_program',
-            label='Program',
-            value=str(q.user.student_info['menu']['program']) if \
-                (q.user.student_info['menu']['program'] is not None) else q.args.menu_program,
-            trigger=True,
-            disabled=False,
-            width='300px',
-            choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
-                await get_choices_with_disabled(timedConnection, program_query, 
-                (q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']))
-        )
-    ], justify='start', align='start')
-
-    command_button = ui.button(
-        name='command_button', 
-        label='Select', 
-        disabled=False,
-        commands=[
-            ui.command(name='program', label='Save Program'),
-            ui.command(name='classes_menu', label='Classes', 
-                items=[
-                    ui.command(name='add_ge', label='Add GE'),
-                    ui.command(name='add_elective', label='Add Electives'),  
-            ])
-    ])
-
-    if flex:
-        box = location
-
-    card = ui.form_card(box=box,
-        items=[
-            #ui.text_xl('Browse Programs'),
-            ui.inline([
-                dropdowns, 
-                command_button
-            ],
-            justify='between', 
-            align='end')
-        ]
-    )
-        
-    return card
-
-    ########################
 
 def render_major_recommendation_card(q, box='1 5 3 3', flex=False, location='top_horizontal', width='350px'):
     if flex:
@@ -696,11 +519,11 @@ def render_courses_header(q, box='1 2 7 1'):
         ]
     ))
 
-async def render_course_page_table(q, df, box=None, location=None, width=None, height=None, flex=False, check=True, ge=False, elective=False):
+async def render_course_page_table(q, data, box=None, location=None, width=None, height=None, flex=False, check=True, ge=False, elective=False):
     '''
     Input comes from 
     q:
-    df:
+    data: a list of dictionaries, each element corresponding to a row of the table 
     location:
     cardname:
     width:
@@ -742,7 +565,6 @@ async def render_course_page_table(q, df, box=None, location=None, width=None, h
             cell_type=ui.menu_table_cell_type(name='commands', 
                 commands=[
                     ui.command(name='view_description', label='Course Description'),
-                    ui.command(name='show_prereq', label='Show Prerequisites'),
                     ui.command(name='select_elective', label='Select Elective'),
                 ]
         ))
@@ -1167,194 +989,10 @@ async def render_ge_research_card(q, menu_width, box='1 3 3 4', flex=False, loca
 ####################  SCHEDULE PAGE (START) ###################
 ###############################################################
 
-def d3plot(html, box='1 2 5 6', flex=False, location='horizontal', height='500px', width='100%'):
-    if flex:
-        box=ui.box(location, height=height, width=width)
-    card = ui.frame_card(
-        box=box,
-        #title='Course Schedule',
-        title='',
-        content=html
-    )
-    return card
-
-##############
-async def render_schedule_menu(q, box='6 2 2 5', flex=False, location='middle_vertical', box_width='300px'):
-    '''
-    Create menu for schedule page
-    (retrieve defaults from DB)
-    '''
-    Sessions = ['Session 1', 'Session 2', 'Session 3']
-    
-    student_profile = q.user.student_info['student_profile']
-    if student_profile == 'Full-time':
-        # todo: get courses_per_session and max_credits from university rules
-        default_sessions = ['Session 1', 'Session 3']
-        default_max_credits = 15
-        default_courses_per_session = 3
-    elif student_profile == 'Part-time':
-        # todo: get courses_per_session and max_credits from university rules
-        default_sessions = ['Session 1', 'Session 3']
-        default_max_credits = 9
-        default_courses_per_session = 1
-    else:
-        # todo: enumerate the rest of the profile cases
-        # todo: get courses_per_session and max_credits from university rules
-        default_sessions = ['Session 1', 'Session 2', 'Session 3']
-        default_max_credits = 9
-        default_courses_per_session = 1
-
-    if flex:
-        box = ui.box(location, width=box_width)
-    card = ui.form_card(
-        box=box,
-        items=[
-            ui.dropdown(
-                name='first_term',
-                label='First Term',
-                value=q.user.student_info['first_term'] if (q.user.student_info['first_term'] is not None) \
-                    else q.args.first_term,
-                trigger=True,
-                width='150px',
-                # todo: create these choices via same function call as used in scheduling slots
-                choices=[
-                    ui.choice(name='spring2024', label="Spring 2024"),
-                    ui.choice(name='summer2024', label="Summer 2024"),
-                    ui.choice(name='fall2024', label="Fall 2024"),
-                    ui.choice(name='winter2025', label="Winter 2025"),
-                ]),
-            #                ui.separator(),
-            ui.checklist(
-                name='checklist',
-                label='Sessions Attending',
-                choices=[ui.choice(name=x, label=x) for x in Sessions],
-                values=default_sessions,  # set default
-            ),
-            ui.spinbox(
-                name='courses_per_session',
-                label='Courses per Session',
-                width='150px',
-                min=1, max=5, step=1, value=default_courses_per_session),
-            #                ui.separator(label=''),
-            ui.slider(name='slider', label='Max Credits per Term', min=1, max=18, step=1, 
-                      value=default_max_credits),
-            ui.inline(items=[
-                ui.button(name='submit_schedule_menu', label='Submit', primary=True),
-                ui.button(name='reset_schedule_menu', label='Reset', primary=False),
-            ])
-        ]
-    )
-    add_card(q, 'schedule_menu', card)
 
 ##############
 
-async def render_schedule_page_table(q, df, box=None, location=None, width=None, height=None, flex=False):
-    '''
-    Input comes from 
-    q:
-    df:
-    location:
-    cardname:
-    width:
-    height:
-    '''
-    #df = q.user.student_info['df']['schedule']
-
-    def _get_commands(course, type):
-        # for creating adaptive menus
-        # to complete later
-        if course == 'ELECTIVE':
-            commands = [ui.command(name='select_elective', label='Select Elective')]
-        elif course == 'GENERAL':
-            commands = [ui.command(name='select_general', label='Select GE Course')]
-        else:
-            commands = [
-                ui.command(name='view_description', label='Course Description'),
-            ]
-            if type in ['ELECTIVE', 'GENERAL']:
-                commands.append(ui.command(name='change_course', label='Change Course'))
-
-        return commands
-
-    columns = [
-        #ui.table_column(name='seq', label='Seq', data_type='number'),
-        ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
-        ui.table_column(name='title', label='Title', searchable=False, min_width='180', 
-                        max_width='300', cell_overflow='wrap'),
-        ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
-                        align='center'),
-        ui.table_column(
-            name='tag',
-            label='Type',
-            min_width='190',
-            filterable=True,
-            cell_type=ui.tag_table_cell_type(
-                name='tags',
-                tags=UMGC_tags
-            )
-        ),
-        ui.table_column(name='term', label='Term', max_width='50', data_type='number'),        
-        ui.table_column(name='session', label='Session', max_width='80', data_type='number'),        
-        ui.table_column(name='menu', label='Menu', max_width='150',
-            cell_type=ui.menu_table_cell_type(name='commands', 
-                commands=[
-                    ui.command(name='view_description', label='Course Description'),
-                    ui.command(name='change_time', label='Move Class'),
-                    ui.command(name='lock_class', label='Lock Class'),
-                ]
-        ))
-        #ui.table_column(name='menu', label='Menu', max_width='150',
-        #    cell_type=ui.menu_table_cell_type(name='commands', 
-        #        commands=[
-        #            ui.command(name='view_description', label='Course Description'),
-        #            ui.command(name='show_prereq', label='Show Prerequisites'),
-        #            ui.command(name='select_elective', label='Select Elective'),
-        #        ]
-        #))
-    ]
-    rows = [
-        ui.table_row(
-            #name=str(row['id']),
-            name=row['name'],
-            cells=[
-                #str(row['seq']),
-                row['name'],
-                row['title'],
-                str(row['credits']),
-                row['course_type'].upper(),
-                str(row['term']),
-                str(row['session']),
-            ]
-        ) for _, row in df.iterrows()
-    ]
-
-    if flex:
-        box = ui.box(location, height=height, width=width)
-
-    degree_program = q.user.student_info['degree_program']
-    title = f'**{degree_program}**: Courses'
-    #title = 'Courses'
-    card = add_card(q, 'course_table', ui.form_card(
-        box=box,
-        items=[
-            #ui.inline(justify='between', align='center', items=[
-            #    ui.text(title, size=ui.TextSize.L),
-            #    ui.button(name='schedule_coursework', label='Schedule', 
-            #        #caption='Description', 
-            #        primary=True, disabled=False)
-            #]),
-            ui.table(
-                name='course_table',
-                downloadable=False,
-                resettable=True,
-                groupable=False,
-                height=height,
-                columns=columns,
-                rows=rows
-            )
-        ]
-    ))
-    return card
+##############
 
 ###############################################################
 ####################  SCHEDULE PAGE (END)  ####################
