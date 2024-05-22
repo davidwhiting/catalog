@@ -11,6 +11,7 @@ Babel==2.14.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
 blessed==1.20.0
+cached-property==1.5.2
 certifi==2024.2.2
 cffi==1.16.0
 charset-normalizer==3.3.2
@@ -21,6 +22,7 @@ debugpy==1.8.1
 decorator==5.1.1
 defusedxml==0.7.1
 distro==1.9.0
+ecdsa==0.19.0
 editor==1.6.6
 exceptiongroup==1.2.0
 executing==2.0.1
@@ -54,9 +56,11 @@ jupyterlab==4.1.4
 jupyterlab_pygments==0.3.0
 jupyterlab_server==2.25.3
 jupyterlab_widgets==3.0.10
+keycloak==3.1.4
 MarkupSafe==2.1.5
 matplotlib-inline==0.1.6
 mistune==3.0.2
+msal==1.28.0
 nbclient==0.9.0
 nbconvert==7.16.2
 nbformat==5.9.2
@@ -64,6 +68,7 @@ nest-asyncio==1.6.0
 notebook==7.1.1
 notebook_shim==0.2.4
 numpy==1.26.4
+oauthlib==3.2.2
 overrides==7.7.0
 packaging==23.2
 pandas==2.2.0
@@ -78,6 +83,7 @@ psutil==5.9.8
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pyarrow==15.0.0
+pyasn1==0.6.0
 pycparser==2.21
 pycryptodome==3.20.0
 Pygments==2.17.2
@@ -85,6 +91,7 @@ PyJWT==2.8.0
 PyPDF2==3.0.1
 pysqlite3==0.5.2
 python-dateutil==2.8.2
+python-jose==3.3.0
 python-json-logger==2.0.7
 pytz==2024.1
 PyYAML==6.0.1
@@ -94,9 +101,11 @@ QtPy==2.4.1
 readchar==4.0.5
 referencing==0.33.0
 requests==2.31.0
+requests-oauthlib==2.0.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.18.0
+rsa==4.9
 runs==1.2.2
 Send2Trash==1.8.2
 six==1.16.0

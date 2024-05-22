@@ -27,7 +27,7 @@ c.execute('''
         id INTEGER PRIMARY KEY,
         general_education_requirements_id INTEGER,
         course_id INTEGER,
-        name TEXT,
+        course TEXT,
         note TEXT DEFAULT '',
         FOREIGN KEY(general_education_requirements_id) 
             REFERENCES general_education_requirements(id),        
@@ -47,17 +47,17 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        1, id, name 
+        1, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
-		    name LIKE 'WRTG 111'  
-			OR name IN ('COMM 390', 'COMM 492','ENGL 102','JOUR 201')
+		    course LIKE 'WRTG 111'  
+			OR course IN ('COMM 390', 'COMM 492','ENGL 102','JOUR 201')
 		)
-		AND name NOT IN ('WRTG 112', 'WRTG 288', 'WRTG 388','WRTG 486%')
+		AND course NOT IN ('WRTG 112', 'WRTG 288', 'WRTG 388','WRTG 486%')
 '''
 #        AND pre == ''
 c.execute(query)
@@ -72,12 +72,12 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        2, id, name 
+        2, id, course 
 	FROM courses
 	WHERE 
-        name = 'WRTG 112'
+        course = 'WRTG 112'
 '''
 c.execute(query)
 
@@ -91,22 +91,22 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        3, id, name 
+        3, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
-            name IN ('ENGL 102', 'ENGL 281', 'JOUR 201')
-			OR name LIKE 'COMM %'
-            OR name LIKE 'SPCH %'
-            OR name LIKE 'WRTG %'
+            course IN ('ENGL 102', 'ENGL 281', 'JOUR 201')
+			OR course LIKE 'COMM %'
+            OR course LIKE 'SPCH %'
+            OR course LIKE 'WRTG %'
 		)
-		AND name NOT LIKE '% 486A'
-		AND name NOT LIKE '% 486B'
-		AND name NOT LIKE 'WRTG 111'
-		AND name NOT LIKE 'WRTG 112'
+		AND course NOT LIKE '% 486A'
+		AND course NOT LIKE '% 486B'
+		AND course NOT LIKE 'WRTG 111'
+		AND course NOT LIKE 'WRTG 112'
 '''
 c.execute(query)
 
@@ -119,14 +119,14 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        4, id, name 
+        4, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND 
-            name IN ('WRTG 391', 'WRTG 393','WRTG 394')
+            course IN ('WRTG 391', 'WRTG 393','WRTG 394')
 ;
 '''
 c.execute(query)
@@ -140,12 +140,12 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        5, id, name 
+        5, id, course 
 	FROM courses
 	WHERE 
-		name IN ('MATH 105', 'MATH 107', 'MATH 115', 'MATH 140', 'STAT 200')
+		course IN ('MATH 105', 'MATH 107', 'MATH 115', 'MATH 140', 'STAT 200')
 '''
 c.execute(query)
 
@@ -159,24 +159,24 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        6, id, name 
+        6, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
- 		       name LIKE 'ARTH %'
- 			OR name LIKE 'ARTT %'
- 			OR name LIKE 'ASTD %' 
- 			OR name LIKE 'ENGL %' 
- 			OR name LIKE 'GRCO %' 
- 			OR name LIKE 'HIST %'
- 			OR name LIKE 'HUMN %' 
- 			OR name LIKE 'MUSC %' 
- 			OR name LIKE 'PHIL %' 
- 			OR name LIKE 'THET %' 
- 			OR name IN (
+ 		       course LIKE 'ARTH %'
+ 			OR course LIKE 'ARTT %'
+ 			OR course LIKE 'ASTD %' 
+ 			OR course LIKE 'ENGL %' 
+ 			OR course LIKE 'GRCO %' 
+ 			OR course LIKE 'HIST %'
+ 			OR course LIKE 'HUMN %' 
+ 			OR course LIKE 'MUSC %' 
+ 			OR course LIKE 'PHIL %' 
+ 			OR course LIKE 'THET %' 
+ 			OR course IN (
                     'ENGL 250', 
                     'ENGL 303', 
                     'ENGL 310',
@@ -192,13 +192,13 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
                     'ENGL 459',
                     'ENGL 495' 
                ) 
- 			OR name LIKE 'ARAB 11_'
- 			OR name LIKE 'CHIN 11_'
- 			OR name LIKE 'FREN 11_'
- 			OR name LIKE 'GERM %'
-               OR name LIKE 'JAPN 11_' 
-               OR name LIKE 'JAPN 22_'
- 			OR name IN (
+ 			OR course LIKE 'ARAB 11_'
+ 			OR course LIKE 'CHIN 11_'
+ 			OR course LIKE 'FREN 11_'
+ 			OR course LIKE 'GERM %'
+               OR course LIKE 'JAPN 11_' 
+               OR course LIKE 'JAPN 22_'
+ 			OR course IN (
                     'SPAN 111', 
                     'SPAN 112', 
                     'SPAN 211',
@@ -207,7 +207,7 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
                     'SPAN 314'               
                ) 
           )
-          AND name NOT IN ('ENGL 281', 'ENGL 384')
+          AND course NOT IN ('ENGL 281', 'ENGL 384')
 '''
 c.execute(query)
 
@@ -230,12 +230,12 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        7, id, name 
+        7, id, course 
 	FROM courses
 	WHERE 
-		name in (
+		course in (
             'BIOL 103', 
             'BIOL 230',
 			'NSCI 103'
@@ -244,12 +244,12 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        8, id, name 
+        8, id, course 
 	FROM courses
 	WHERE 
-		name in (
+		course in (
             'CHEM 103', 
             'PHYS 121',
 			'PHYS 122'
@@ -258,12 +258,12 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
+INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, name, 'Pair: BIOL 101 (3) & BIOL 102 (1)' 
+        9, id, course, 'Pair: BIOL 101 (3) & BIOL 102 (1)' 
 	FROM courses
 	WHERE 
-		name in (
+		course in (
             'BIOL 101',
             'BIOL 102'
         )
@@ -271,12 +271,12 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
+INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, name, 'Pair: BIOL 160 (3) & BIOL 161 (1)' 
+        9, id, course, 'Pair: BIOL 160 (3) & BIOL 161 (1)' 
 	FROM courses
 	WHERE 
-		name in (
+		course in (
             'BIOL 160',
             'BIOL 161'
         )
@@ -284,12 +284,12 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
+INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, name, 'Pair: NSCI 100 (3) & NSCI 101 (1)' 
+        9, id, course, 'Pair: NSCI 100 (3) & NSCI 101 (1)' 
 	FROM courses
 	WHERE 
-		name in (
+		course in (
             'NSCI 100',
             'NSCI 101'
         )
@@ -297,12 +297,12 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
+INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, name, 'Pair: NSCI 170 (3) & NSCI 171 (1)' 
+        9, id, course, 'Pair: NSCI 170 (3) & NSCI 171 (1)' 
 	FROM courses
 	WHERE 
-		name IN (
+		course IN (
             'NSCI 170',
             'NSCI 171'
         )
@@ -310,12 +310,12 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
+INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, name, 'Pair: NUTR 100 (3) & NUTR 101 (1)' 
+        9, id, course, 'Pair: NUTR 100 (3) & NUTR 101 (1)' 
 	FROM courses
 	WHERE 
-		name in (
+		course in (
             'NUTR 100',
             'NUTR 101'
         )
@@ -323,12 +323,12 @@ INSERT INTO general_education (general_education_requirements_id, course_id, nam
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name, note)
+INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, name, '' 
+        9, id, course, '' 
 	FROM courses
 	WHERE 
-		name in (
+		course in (
             'NSCI 120'
         )
 '''
@@ -345,20 +345,20 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        10, id, name 
+        10, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
- 		       name LIKE 'ASTR %'
- 			OR name LIKE 'BIOL %'
- 			OR name LIKE 'CHEM %'
- 			OR name LIKE 'GEOL %'
- 			OR name LIKE 'NSCI %'
- 			OR name LIKE 'NUTR %'
- 			OR name LIKE 'PHYS %'
+ 		       course LIKE 'ASTR %'
+ 			OR course LIKE 'BIOL %'
+ 			OR course LIKE 'CHEM %'
+ 			OR course LIKE 'GEOL %'
+ 			OR course LIKE 'NSCI %'
+ 			OR course LIKE 'NUTR %'
+ 			OR course LIKE 'PHYS %'
         )
 '''
 c.execute(query)
@@ -375,25 +375,25 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        11, id, name 
+        11, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
-            name IN ('AASP 201', 'CCJS 100', 'CCJS 105', 'CCJS 350', 'CCJS 360', 'CCJS 461', 'WMST 200')
- 			OR name LIKE 'ANTH %'
- 			OR name LIKE 'ASTD %'
- 			OR name LIKE 'BEHS %' 
- 			OR name LIKE 'ECON %' 
- 			OR name LIKE 'GEOG %' 
- 			OR name LIKE 'GERO %'
- 			OR name LIKE 'GVPT %' 
- 			OR name LIKE 'PSYC %' 
- 			OR name LIKE 'SOCY %')
-        AND name NOT IN ('GERO 342', 'GERO 351')
-        AND name NOT LIKE '% 486A'
+            course IN ('AASP 201', 'CCJS 100', 'CCJS 105', 'CCJS 350', 'CCJS 360', 'CCJS 461', 'WMST 200')
+ 			OR course LIKE 'ANTH %'
+ 			OR course LIKE 'ASTD %'
+ 			OR course LIKE 'BEHS %' 
+ 			OR course LIKE 'ECON %' 
+ 			OR course LIKE 'GEOG %' 
+ 			OR course LIKE 'GERO %'
+ 			OR course LIKE 'GVPT %' 
+ 			OR course LIKE 'PSYC %' 
+ 			OR course LIKE 'SOCY %')
+        AND course NOT IN ('GERO 342', 'GERO 351')
+        AND course NOT LIKE '% 486A'
 '''
 c.execute(query)
 
@@ -415,43 +415,43 @@ query = '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        12, id, name 
+        12, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
-		AND name LIKE 'PACE 111_'
+		AND course LIKE 'PACE 111_'
 '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        13, id, name 
+        13, id, course 
 	FROM courses
 	WHERE 
 		credits = '1' 
-		AND name IN ('LIBS 150', 'CAPL 398A')
+		AND course IN ('LIBS 150', 'CAPL 398A')
 '''
 c.execute(query)
 
 query = '''
-INSERT INTO general_education (general_education_requirements_id, course_id, name)
+INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        14, id, name 
+        14, id, course 
 	FROM courses
 	WHERE 
 		credits IN ('1', '3') 
 		AND (
-            name IN ('DATA 200', 'IFSM 201')
- 			OR name LIKE 'CMIT %'
- 			OR name LIKE 'CMSC %'
- 			OR name LIKE 'CMST %' 
- 			OR name LIKE 'CSIA %' 
- 			OR name LIKE 'IFSM %' 
- 			OR name LIKE 'SDEV %')
-        AND name NOT LIKE '% 486A'
+            course IN ('DATA 200', 'IFSM 201')
+ 			OR course LIKE 'CMIT %'
+ 			OR course LIKE 'CMSC %'
+ 			OR course LIKE 'CMST %' 
+ 			OR course LIKE 'CSIA %' 
+ 			OR course LIKE 'IFSM %' 
+ 			OR course LIKE 'SDEV %')
+        AND course NOT LIKE '% 486A'
 '''
 c.execute(query)
 conn.commit()

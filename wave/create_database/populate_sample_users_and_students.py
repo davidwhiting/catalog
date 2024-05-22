@@ -12,9 +12,10 @@ users = [
     { 
         "id": 2, 
         "role_id": 2, 
-        "username": "counselor", 
-        "firstname": "Dr.", 
-        "lastname": "Counselor",
+        "username": "coach", 
+        "firstname": "The", 
+        "lastname": "Coach",
+        "sso_role": "staff",
         "notes": "example coach"
     },
     { 
@@ -23,6 +24,7 @@ users = [
         "username": "johndoe", 
         "firstname": "John", 
         "lastname": "Doe",
+        "sso_role": "student",
         "notes": "Example new undergrad student, major selected"
     },
     { 
@@ -31,6 +33,7 @@ users = [
         "username": "janedoe", 
         "firstname": "Jane", 
         "lastname": "Doe",
+        "sso_role": "student",
         "notes": "Example transfer undergrad student, major selected and transfer credits applied"
     },
     { 
@@ -39,6 +42,7 @@ users = [
         "username": "jimdoe", 
         "firstname": "Jim", 
         "lastname": "Doe",
+        "sso_role": "student",
         "notes": "Example undergrad student, new to UMGC and no major selected" 
     },
     { 
@@ -47,13 +51,14 @@ users = [
         "username": "sgtdoe", 
         "firstname": "Sgt", 
         "lastname": "Doe",
+        "sso_role": "student",
         "notes": "Example military student, evening classes only"
     },
 ]
 
 c.executemany('''
-    INSERT INTO users ( id, role_id, username, firstname, lastname, notes )
-        VALUES (:id, :role_id, :username, :firstname, :lastname, :notes)
+    INSERT INTO users ( id, role_id, username, firstname, lastname, sso_role, notes )
+        VALUES (:id, :role_id, :username, :firstname, :lastname, :sso_role, :notes)
 ''', users)
 conn.commit()
 
