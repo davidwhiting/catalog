@@ -64,13 +64,7 @@ async def course(q: Q):
                     ## retrieve schedule from database
                     q.user.student_info['df']['schedule'] = await get_student_progress_d3(q)
 
-                    add_card(q, 'courses_instructions', ui.form_card(
-                        box='1 2 7 1',
-                        items=[
-                            ui.text('**Instructions**: You have selected courses. You may now add electives or view your schedule.')
-                        ]
-                    ))
-                    await cards.render_course_page_table(q, q.user.student_data['schedule'], box='1 3 7 7')
+
 
                 else: # stage_id==3:
                     cards.render_courses_header(q, box='1 2 7 1')
@@ -308,48 +302,6 @@ async def user_role(q: Q):
 
 
 
-########################################################
-### Program page: For "Program" dropdown menu events ###
-########################################################
-
-@on()
-async def menu_program(q: Q):
-    logging.info('The value of program is ' + str(q.args.menu_program))
-    timedConnection = q.user.conn
-    q.user.student_info['menu']['program'] = q.args.menu_program
-    q.user.student_info['program_id'] = q.user.student_info['menu']['program'] # program_id an alias used throughout
-    result = await get_program_title(timedConnection, q.user.student_info['program_id'])
-    q.user.student_info['degree_program'] = result['title']
-    
-    # have the size of this depend on the degree (?)
-    if q.user.student_info['menu']['degree'] == '2':
-        await cards.render_program(q)
-    #else:
-        # Insert a blank card with a message - "has to be completed"
-
-        ##await cards.render_program_description(q, box='1 3 7 2')
-        ##await cards.render_program_dashboard(q, box='7 5 1 5') # need to fix
-        ##await cards.render_program_coursework_table(q, box='1 5 6 5')
-
-#    else:
-#        clear_cards(q,['major_recommendations', 'dropdown'])
-#        if hasattr(q.client, 'program_df'):
-#            del q.client.program_df
-
-#    if q.client.major_debug:
-#        q.page['debug_info'] = cards.render_debug_card(q) # update debug card
-#        q.page['debug_client_info'] = cards.render_debug_client_card(q)
-#        q.page['debug_user_info'] = cards.render_debug_user_card(q)
-    q.page['debug_info'] = cards.render_debug_card(q, box='1 10 7 4') # update debug card
-    await q.page.save()
-
-################################################################################
-
-
-################################################################################
-
-################################################################################
-
 ################################################################################
 
 @on()
@@ -374,7 +326,6 @@ async def submit_schedule_menu(q: Q):
     await q.page.save()
     
 @on()
-
 async def reset_schedule_menu(q: Q):
     '''
     Click 'Reset' on options on Schedule page for card 'schedule_menu'

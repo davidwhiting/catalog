@@ -837,6 +837,122 @@ async def render_program(q):
 ####################  COURSES PAGE  ##########################
 ##############################################################
 
+def render_courses_header(q, box='1 2 7 1', location='horizontal'):
+    flex = q.app.flex
+    degree_program = q.user.student_info['degree_program']
+    if flex:
+        box = ui.box(location)
+    content=f'**Program Selected**: {degree_program}'
+    add_card(q, 'courses_header', ui.form_card(
+        box=box,
+        items=[
+            ui.text_l(content),
+            #ui.text('We will guide you through this experience.')
+        ]
+    ))
+
+async def render_course_page_table_use(q, box=None, location=None, width=None, height=None, check=True, ge=False, elective=False):
+    '''
+    Input comes from 
+    q:
+    data: a list of dictionaries, each element corresponding to a row of the table 
+    location:
+    cardname:
+    width:
+    height:
+    '''
+    flex = q.app.flex
+    df = q.user.student_data['schedule']
+
+    def _get_commands(course, type):
+        # for creating adaptive menus
+        # to complete later
+        if course == 'ELECTIVE':
+            commands = [ui.command(name='select_elective', label='Select Elective')]
+        elif course == 'GENERAL':
+            commands = [ui.command(name='select_general', label='Select GE Course')]
+        else:
+            commands = [
+                ui.command(name='view_description', label='Course Description'),
+            ]
+            if type in ['ELECTIVE', 'GENERAL']:
+                commands.append(ui.command(name='change_course', label='Change Course'))
+
+        return commands
+
+    columns = [
+        #ui.table_column(name='seq', label='Seq', data_type='number'),
+        ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
+        ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300', cell_overflow='wrap'),
+        ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
+                        align='center'),
+        ui.table_column(
+            name='tag',
+            label='Type',
+            min_width='190',
+            filterable=True,
+            cell_type=ui.tag_table_cell_type(
+                name='tags',
+                tags=UMGC_tags
+            )
+        ),
+        ui.table_column(name='menu', label='Menu', max_width='150',
+            cell_type=ui.menu_table_cell_type(name='commands', 
+                commands=[
+                    ui.command(name='view_description', label='Course Description'),
+                    ui.command(name='select_elective', label='Select Elective'),
+                ]
+        ))
+        #ui.table_column(name='menu', label='Menu', max_width='150',
+        #    cell_type=ui.menu_table_cell_type(name='commands', 
+        #        commands=[
+        #            ui.command(name='view_description', label='Course Description'),
+        #            ui.command(name='show_prereq', label='Show Prerequisites'),
+        #            ui.command(name='select_elective', label='Select Elective'),
+        #        ]
+        #))
+    ]
+    rows = [
+        ui.table_row(
+            #name=str(row['id']),
+            name=row['name'],
+            cells=[
+                #str(row['seq']),
+                row['name'],
+                row['title'],
+                str(row['credits']),
+                row['course_type'].upper(),
+            ]
+        ) for _, row in df.iterrows()
+    ]
+
+    if flex:
+        box = ui.box(location, height=height, width=width)
+    degree_program = q.user.student_info['degree_program']
+    title = f'**{degree_program}**: Courses'
+    #title = 'Courses'
+    card = add_card(q, 'course_table', ui.form_card(
+        box=box,
+        items=[
+            ui.inline(justify='between', align='center', items=[
+                ui.text(title, size=ui.TextSize.L),
+                ui.button(name='schedule_coursework', label='Schedule', 
+                    #caption='Description', 
+                    primary=True, disabled=False)
+            ]),
+            ui.table(
+                name='course_table',
+                downloadable=False,
+                resettable=True,
+                groupable=False,
+                height=height,
+                columns=columns,
+                rows=rows
+            )
+        ]
+    ))
+    return card
+
 async def render_course_page_table(q, df, box=None, location=None, width=None, height=None, 
                                    check=True, ge=False, elective=False):
     '''
