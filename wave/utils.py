@@ -121,27 +121,59 @@ def initialize_ge():
     }
     return ge
 
+def reset_program(q):
+    '''
+    When program is changed, multiple variables need to be reset
+    '''
+    q.user.student_info['menu']['program'] = None
+    q.user.student_info['program_id'] = None
+    q.user.student_info['degree_program'] = None
+
+    q.user.student_data['required'] = None
+    q.user.student_data['schedule'] = None
+
+    q.page['dropdown'].menu_program.value = None
+    q.page['dropdown'].menu_program.choices = None
+
 ############################################################
 ####################  Populate Functions  ##################
 ############################################################
 
 async def populate_student_info(q, user_id):
     '''
-    Get information from student_info table and populate the q.user.student_info parameters
+    Get information from student_info table and populate the q.user.student_info variables
+    and q.user.student_data dataframes
     '''
     timedConnection = q.user.conn
     attributes = ['resident_status', 'app_stage_id', 'app_stage', 'student_profile', 'financial_aid', 
         'transfer_credits', 'program_id']
-    query = 'SELECT * FROM student_info_view WHERE user_id = ?'
+    query = '''
+    SELECT user_id, fullname AS name, resident_status, app_stage_id, app_stage, student_profile,
+        transfer_credits, financial_aid, program_id
+    FROM student_info_view WHERE user_id = ?
+    '''
     row = await get_query_one(timedConnection, query, params=(user_id,))
     if row:
         q.user.student_info.update({name: row[name] for name in attributes})
+#                q.user.student_data['user_id'] = user_id
+
+        q.user.student_info['user_id'] = user_id
+        q.user.student_info['name'] = row['name']
+        q.user.student_data['user_id'] = user_id
+
         if q.user.student_info['program_id'] is not None:
             row = await get_program_title(timedConnection, q.user.student_info['program_id'])
             if row:
                 q.user.student_info['degree_program'] = row['title']
                 q.user.student_info['degree_id'] = row['id']
+            q.user.student_data['required'] = await get_required_program_courses(q)
+
+        if q.user.student_info['app_stage_id'] == 4:
+            q.user.student_data['schedule'] = await get_student_progress_d3(q)
     
+        if q.user.student_info['first_term'] is None:
+            q.user.student_info['first_term'] = q.app.default_first_term
+
     # Recreate dropdown menus for students
     # Need to do this only if dropdown menu status was not saved
     # (We should save this status in the future)
@@ -168,9 +200,31 @@ async def populate_student_info(q, user_id):
 #######################################################
 
 async def get_student_progress_d3(q):
+    timedConnection = q.user.conn
+    user_id = q.user.student_info['user_id']
     query = 'SELECT * FROM student_progress_d3_view WHERE user_id = ?'
     # note: 'course' is named 'name' in student_progress_d3_view 
-    df = await get_query_df(q.user.conn, query, params=(q.user.student_info['user_id'],))
+    df = await get_query_df(timedConnection, query, params=(user_id,))
+    return df
+
+async def get_required_program_courses(q):
+    timedConnection = q.user.conn
+    program_id = q.user.student_info['program_id']
+    query = '''
+        SELECT 
+            id,
+            course, 
+            course_type as type,
+            title,
+            credits,
+            pre,
+            pre_credits,
+            substitutions,
+            description
+        FROM program_requirements_view
+        WHERE program_id = ?
+    '''
+    df = await get_query_df(timedConnection, query, params=(program_id,))
     return df
 
 async def get_choices(timedConnection, query, params=(), disabled={}):
@@ -198,6 +252,20 @@ async def get_choices(timedConnection, query, params=(), disabled={}):
 #######################################################
 #######  Set Functions (for setting variables)  #######
 #######################################################
+
+async def reset_student_info_data(q):
+    '''
+    All the steps needed to initialize q.user.student_info and q.user.student_data
+    and set multiple q.user parameters
+
+    Will be called at startup in initialize_user and when switching to a new student 
+    for admin and coaches
+    '''
+    q.user.student_info = initialize_student_info()
+    q.user.student_info['ge'] = initialize_ge() # only if undergraduate
+    q.user.student_info_populated = False # may be needed later 
+    q.user.student_data = initialize_student_data() # will have required, periods, schedule
+
 
 async def set_user_vars_given_role(q):
     '''
@@ -525,6 +593,7 @@ def create_html_template(df, start_term):
 def prepare_d3_data(df, start_term='SPRING 2024'):
     '''
     Prepare data for input into D3 figure
+    Note: Uses 'period' instead of 'term'
     '''
     # Use UMGC Colors
     green = '#3b8132'
@@ -631,6 +700,7 @@ def prepare_d3_data(df, start_term='SPRING 2024'):
 
     return df, headers
 
+
 def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=18, 
                      summer=False, sessions=[1,3], as_df=True):
     '''
@@ -639,13 +709,13 @@ def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credi
 
     Parameters:
 
-    start_term: first term classes are to be scheduled into
-    years: number of years to create periods for (this can be larger than needed)
-    max_courses: maximum number of courses per session
-    max_credits: maximum number of credits per term
-    summer: whether attending summer (as default)
-    sessions: which sessions (1-3) to schedule classes in (excluding summer term, which has only sessions 1 & 2)
-    as_df: return results as Pandas dataframe, otherwise return as list of dictionaries
+    - start_term: first term classes are to be scheduled into
+    - years: number of years to create periods for (this can be larger than needed)
+    - max_courses: maximum number of courses per session
+    - max_credits: maximum number of credits per term
+    - summer: whether attending summer (as default)
+    - sessions: which sessions (1-3) to schedule classes in (excluding summer term, which has only sessions 1 & 2)
+    - as_df: return results as Pandas dataframe, otherwise return as list of dictionaries
 
     Output includes 'previous', a value used to determine placement of prerequisites. Because Sessions 1 & 2 and 
     Sessions 2 & 3 overlap, a Session 2 class cannot have a Session 1 prerequisite, it's previous value is 2 (two
@@ -667,8 +737,8 @@ def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credi
         'FALL': 3
     }
 
-    # Split the start term into the term and the year
-    start_term, start_year = start_term.split()
+    # Split the start term into the term and the year (ensure we uppercase term)
+    start_term, start_year = start_term.upper().split()
 
     # Convert the start year to an integer
     start_year = int(start_year)
@@ -726,3 +796,197 @@ def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credi
         return pd.DataFrame(schedule)
     else:
         return schedule
+
+def update_periods(periods, condition, update_values):
+    '''
+    Update the 'periods' structure. Will return a DataFrame if a DataFrame is input,
+    otherwise will return a list of dictionaries.
+
+    periods: a list of dictionaries or a DataFrame with periods information returned from 'generate_periods'
+
+    This will be used in the menu of the schedule page to update people's schedules
+
+    Example usage
+    # Update max_courses for SPRING 2024 to 0
+    update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
+    '''
+
+    # Check whether input periods is a DataFrame
+    if isinstance(periods, pd.DataFrame):
+        return_as_list = False
+    else:
+        periods = pd.DataFrame(periods)
+        return_as_list = True
+    
+    # Apply conditions
+    mask = periods.eval(condition)
+    
+    # Update values
+    for key, value in update_values.items():
+        periods.loc[mask, key] = value
+
+    # Convert DataFrame back to a list of dictionaries
+    if return_as_list:
+        return periods.to_dict(orient='records')
+    else:
+        return periods
+
+
+def update_prerequisites(prereq_name):
+    '''
+    Mock function to update prerequisites. Replace this with the actual implementation.
+    '''
+    # Placeholder implementation
+    return {
+        'name': prereq_name,
+        'term': '',
+        'year': '',
+        'session': '',
+        'credits': 0,
+        'locked': 0,
+        'pre': ''
+    }
+
+def parse_prerequisites(prereq_string):
+    '''
+    Parse the prerequisites string and return a list of prerequisite groups.
+    Each group contains lists of courses that satisfy the 'or' and 'and' patterns.
+    '''
+    import re
+    prereq_string = prereq_string.strip()
+    prereq_string = re.sub(r'\s+', ' ', prereq_string)
+    prereq_string = re.sub(r'\(', '', prereq_string)
+    prereq_string = re.sub(r'\)', '', prereq_string)
+    
+    and_groups = prereq_string.split('&')
+    prereq_groups = [group.split('|') for group in and_groups]
+    
+    # Strip whitespace from each course in the groups
+    prereq_groups = [[course.strip() for course in group] for group in prereq_groups]
+    
+    return prereq_groups
+
+def handle_prerequisites(course_df):
+    '''
+    Expand the course list to include necessary prerequisites.
+    '''
+    courses_dict = course_df.set_index('name').to_dict('index')
+    rows_to_append = []
+    
+    for idx, course in course_df.iterrows():
+        if pd.notna(course.get('pre', '')):
+            prerequisites = parse_prerequisites(course['pre'])
+            for prereq_group in prerequisites:
+                branch_prereqs_info = []
+                for prereq_name in prereq_group:
+                    prereq_name = prereq_name.strip()
+                    matched = False
+                    
+                    # Check for '*' wildcard match
+                    if prereq_name.endswith('*'):
+                        base_name = prereq_name.rstrip('*')
+                        for existing_course in courses_dict.keys():
+                            if existing_course.startswith(base_name):
+                                branch_prereqs_info.append(courses_dict[existing_course])
+                                matched = True
+                                break
+
+                    # Check for '+' match
+                    elif prereq_name.endswith('+'):
+                        base_name = prereq_name.rstrip('+')
+                        for existing_course in courses_dict.keys():
+                            if existing_course.startswith(base_name) and existing_course > base_name:
+                                branch_prereqs_info.append(courses_dict[existing_course])
+                                matched = True
+                                break
+
+                    # Direct match
+                    if not matched:
+                        if prereq_name not in courses_dict:
+                            prereq_info = update_prerequisites(prereq_name)
+                            if prereq_info:
+                                branch_prereqs_info.append(prereq_info)
+                                courses_dict[prereq_name] = prereq_info
+                        else:
+                            branch_prereqs_info.append(courses_dict[prereq_name])
+
+                for prereq in branch_prereqs_info:
+                    if prereq not in rows_to_append:
+                        rows_to_append.append(prereq)
+    
+    prereq_df = pd.DataFrame(rows_to_append)
+    updated_course_df = pd.concat([prereq_df, course_df]).drop_duplicates(subset='name').reset_index(drop=True)
+    return updated_course_df
+
+def generate_schedule(course_df, periods_df):
+    '''
+    Generate a schedule that respects prerequisites and schedules courses into available periods.
+    '''
+    schedule = []
+    max_credits_by_term_year = {}
+
+    # Handle prerequisites and expand the course list
+    course_df = handle_prerequisites(course_df)
+
+    # Convert 'locked' column to boolean
+    course_df['locked'] = course_df['locked'].astype(bool)
+    
+    # Iterate over locked courses to update periods and max_credits_by_term_year
+    for idx, course in course_df[course_df['locked']].iterrows():
+        term_year = (course['term'], course['year'])
+        session = course['session']
+        
+        for period_idx, period in periods_df.iterrows():
+            if (period['term'], period['year'], period['session']) == (course['term'], course['year'], course['session']):
+                if periods_df.at[period_idx, 'max_courses'] > 0:
+                    periods_df.at[period_idx, 'max_courses'] -= 1
+                    
+                    if term_year not in max_credits_by_term_year:
+                        max_credits_by_term_year[term_year] = period['max_credits']
+                    else:
+                        max_credits_by_term_year[term_year] -= course['credits']
+                    
+                    schedule.append({
+                        'seq': len(schedule) + 1,
+                        'course': course['name'],
+                        'term': course['term'],
+                        'year': course['year'],
+                        'session': course['session'],
+                        'locked': True
+                    })
+                else:
+                    print(f"Unable to assign locked course '{course['name']}' to period {period['id']}.")
+                break
+
+    # Iterate over unlocked courses to schedule them
+    for idx, course in course_df[~course_df['locked']].iterrows():
+        assigned = False
+        
+        for period_idx, period in periods_df.iterrows():
+            term_year = (period['term'], period['year'])
+            previous_period_idx = period_idx - period['previous']
+            
+            if previous_period_idx >= 0:
+                previous_period = periods_df.iloc[previous_period_idx]
+                
+                if periods_df.at[period_idx, 'max_courses'] > 0 and max_credits_by_term_year.get(term_year, 0) >= course['credits']:
+                    # Add the course to the schedule
+                    schedule.append({
+                        'seq': len(schedule) + 1,
+                        'course': course['name'],
+                        'term': period['term'],
+                        'year': period['year'],
+                        'session': period['session'],
+                        'locked': False
+                    })
+                    
+                    periods_df.at[period_idx, 'max_courses'] -= 1
+                    max_credits_by_term_year[term_year] -= course['credits']
+                    
+                    assigned = True
+                    break
+        
+        if not assigned:
+            print(f"Unable to assign unlocked course '{course['name']}' to any period.")
+
+    return pd.DataFrame(schedule)

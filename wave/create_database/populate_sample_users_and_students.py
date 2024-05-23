@@ -13,7 +13,7 @@ users = [
         "id": 2, 
         "role_id": 2, 
         "username": "coach", 
-        "firstname": "The", 
+        "firstname": "", 
         "lastname": "Coach",
         "sso_role": "staff",
         "notes": "example coach"
@@ -48,8 +48,8 @@ users = [
     { 
         "id": 6, 
         "role_id": 3, 
-        "username": "sgtdoe", 
-        "firstname": "Sgt", 
+        "username": "tomdoe", 
+        "firstname": "Tom", 
         "lastname": "Doe",
         "sso_role": "student",
         "notes": "Example military student, evening classes only"

@@ -12,19 +12,7 @@
 
 ######################################################################
 
-def reset_program(q):
-    '''
-    When program is changed, multiple variables need to be reset
-    '''
-    q.user.student_info['menu']['program'] = None
-    q.user.student_info['program_id'] = None
-    q.user.student_info['degree_program'] = None
 
-    q.user.student_data['required'] = None
-    q.user.student_data['schedule'] = None
-
-    q.page['dropdown'].menu_program.value = None
-    q.page['dropdown'].menu_program.choices = None
 
 ######################################################################
 #####################  QUERIES & FUNCTIONS  ##########################
@@ -109,203 +97,9 @@ async def recommend_a_major(q, choice):
 #################  COURSE SCHEDULING FUNCTIONS  ######################
 ######################################################################
 
-def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=15, 
-                     summer=False, sessions=[1,3], as_df=False):
-    '''
-    A periods structure is a list of dictionaries (or a Pandas dataframe) containing information about terms and sessions,
-    into which we will place classes when scheduling.
-
-    Parameters:
-
-    start_term: first term classes are to be scheduled into
-    years: number of years to create periods for (this can be larger than needed)
-    max_courses: maximum number of courses per session
-    max_credits: maximum number of credits per term
-    summer: whether attending summer (as default)
-    sessions: which sessions (1-3) to schedule classes in (excluding summer term, which has only sessions 1 & 2)
-    as_df: return results as Pandas dataframe, otherwise return as list of dictionaries
-
-    Output includes 'previous', a value used to determine placement of prerequisites. Because Sessions 1 & 2 and 
-    Sessions 2 & 3 overlap, a Session 2 class cannot have a Session 1 prerequisite, it's previous value is 2 (two
-    time-slots previous). Similarly, Session 3 cannot have a Session 2 prerequisite, it's previous value is also 2.
-    For all others, the 'previous' value is 1.
-    
-    Note: We create all terms a student could potentially attend and set max_courses=0 and max_credits=0 for periods they
-    are not attending.
-    '''
-    
-    # List terms
-    terms = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
-
-    # Define the number of sessions for each term
-    sessions_per_term = {
-        'WINTER': 3,
-        'SPRING': 3,
-        'SUMMER': 2,
-        'FALL': 3
-    }
-
-    # Split the start term into the term and the year
-    start_term, start_year = start_term.split()
-
-    # Convert the start year to an integer
-    start_year = int(start_year)
-
-    # Initialize the schedule and the id
-    schedule = []
-    id = 1
-
-    # Loop over the next 'years' years
-    for year in range(start_year, start_year + years):
-        # Loop over each term
-        for term in terms:
-            # If the year is the start year and the term is before the start term, skip it
-            if year == start_year and terms.index(term) < terms.index(start_term):
-                continue
-            # Loop over each session
-            for session in range(1, sessions_per_term[term] + 1):
-                # Set max_courses=0 and max_credits=0 if (term='SUMMER' and summer==False)
-                if term=='SUMMER': 
-                    if not summer:
-                        max_courses_value = 0
-                        max_credits_value = 0
-                    else:
-                        max_courses_value = max_courses
-                        # only 2 sessions in summer, adjust max_credits accordingly
-                        max_credits_value = 2*int(np.floor(max_credits/3))
-                
-                # Set max_courses=0 and max_credits=0 if session not in sessions
-                else:
-                    if session not in sessions:
-                        max_courses_value = 0
-                        max_credits_value = 0
-                    else: # spring, fall, winter
-                        max_courses_value = max_courses
-                        max_credits_value = max_credits
-                       
-                # Calculate previous value
-                # 
-                previous = 1 if session == 1 else 2
- 
-                # Add the entry to the schedule
-                schedule.append({
-                    'id': id,
-                    'term': term,
-                    'session': session,
-                    'year': year,
-                    'max_courses': max_courses_value,
-                    'max_credits': max_credits_value,
-                    'previous': previous
-                })
-                # Increment the id
-                id += 1
-    # either return as a dataframe or as a list of dictionaries
-    if as_df:
-        return pd.DataFrame(schedule)
-    else:
-        return schedule
-
-def update_periods(periods, condition, update_values):
-    '''
-    Update the 'periods' structure. Will return a DataFrame if a DataFrame is input,
-    otherwise will return a list of dictionaries.
-
-    periods: a list of dictionaries or a DataFrame with periods information returned from 'generate_periods'
-
-    Example usage
-    # Update max_courses for SPRING 2024 to 0
-    update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
-    '''
-
-    # Check whether input periods is a DataFrame
-    if isinstance(periods, pd.DataFrame):
-        return_as_list = False
-    else:
-        periods = pd.DataFrame(periods)
-        return_as_list = True
-    
-    # Apply conditions
-    mask = periods.eval(condition)
-    
-    # Update values
-    for key, value in update_values.items():
-        periods.loc[mask, key] = value
-
-    # Convert DataFrame back to a list of dictionaries
-    if return_as_list:
-        return periods.to_dict(orient='records')
-    else:
-        return periods
+## old find_prerequisites from 
 
 # note: renamed 'prerequisite' to 'prerequisites' to follow changes in the db table
-
-def generate_schedule(course_list, periods):
-    schedule = []
-    max_credits_by_term_year = {}
-    
-    # Iterate over locked courses to update periods and max_credits_by_term_year
-    for course in course_list:
-        if course.get('locked', False):
-            term_year = (course['term'], course['year'])
-            session = course['session']
-            
-            # Find the corresponding period
-            for period in periods:
-                if (period['term'], period['year'], period['session']) == (course['term'], course['year'], course['session']):
-                    if period['max_courses_remaining'] > 0:
-                        period['max_courses_remaining'] -= 1
-                        
-                        # Update max_credits_by_term_year
-                        if term_year not in max_credits_by_term_year:
-                            max_credits_by_term_year[term_year] = period['max_credits']
-                        else:
-                            max_credits_by_term_year[term_year] -= course['credits']
-                        
-                        # Add the locked course to the schedule
-                        schedule.append({
-                            'seq': len(schedule) + 1,
-                            'course': course['name'],
-                            'term': course['term'],
-                            'year': course['year'],
-                            'session': course['session'],
-                            'locked': True
-                        })
-                        
-                    else:
-                        print(f"Unable to assign locked course '{course['name']}' to period {period}.")
-                    break  # Exit the inner loop once the corresponding period is found
-    
-    # Iterate over unlocked courses to schedule them
-    for course in course_list:
-        if not course.get('locked', False):
-            assigned = False
-            
-            # Iterate over periods to find an appropriate slot
-            for period in periods:
-                term_year = (period['term'], period['year'])
-                
-                if period['max_courses_remaining'] > 0 and max_credits_by_term_year[term_year] >= course['credits']:
-                    # Add the course to the schedule
-                    schedule.append({
-                        'seq': len(schedule) + 1,
-                        'course': course['name'],
-                        'term': period['term'],
-                        'year': period['year'],
-                        'session': period['session'],
-                        'locked': False
-                    })
-                    
-                    # Update period information
-                    period['max_courses_remaining'] -= 1
-                    max_credits_by_term_year[term_year] -= course['credits']
-                    
-                    assigned = True
-                    break  # Exit the inner loop once a slot is found
-            
-            if not assigned:
-                print(f"Unable to assign unlocked course '{course['name']}' to any period.")
-    
-    return schedule
 
 def handle_prerequisites(course_list):
     # Create a dictionary to store courses by their name for easy lookup
@@ -482,3 +276,154 @@ def move_courses_forward(period_index, periods, scheduled_courses):
     ##        q.user.user_id, q.user.role_id = find_or_add_user(q)
     ##    else:
     ##        # fake it for now
+
+def generate_schedule_old(course_list, periods):
+    '''
+    '''
+    schedule = []
+    max_credits_by_term_year = {}
+    
+    # Iterate over locked courses to update periods and max_credits_by_term_year
+    # (i.e., show what scheduling availability remains after considering locked courses)
+    for course in course_list:
+        if course.get('locked', False):
+            term_year = (course['term'], course['year'])
+            session = course['session']
+            
+            # Find the corresponding period
+            for period in periods:
+                if (period['term'], period['year'], period['session']) == (course['term'], course['year'], course['session']):
+                    if period['max_courses_remaining'] > 0:
+                        period['max_courses_remaining'] -= 1
+                        
+                        # Update max_credits_by_term_year
+                        if term_year not in max_credits_by_term_year:
+                            max_credits_by_term_year[term_year] = period['max_credits']
+                        else:
+                            max_credits_by_term_year[term_year] -= course['credits']
+                        
+                        # Add the locked course to the schedule
+                        schedule.append({
+                            'seq': len(schedule) + 1,
+                            'name': course['name'],
+                            'term': course['term'],
+                            'year': course['year'],
+                            'session': course['session'],
+                            'locked': True
+                        })
+                        
+                    else:
+                        print(f"Unable to assign locked course '{course['name']}' to period {period}.")
+                    break  # Exit the inner loop once the corresponding period is found
+    
+    # Iterate over unlocked courses to schedule them
+    for course in course_list:
+        if not course.get('locked', False):
+            assigned = False
+            
+            # Iterate over periods to find an appropriate slot
+            for period in periods:
+                term_year = (period['term'], period['year'])
+                
+                if period['max_courses_remaining'] > 0 and max_credits_by_term_year[term_year] >= course['credits']:
+                    # Add the course to the schedule
+                    schedule.append({
+                        'seq': len(schedule) + 1,
+                        'name': course['name'],
+                        'term': period['term'],
+                        'year': period['year'],
+                        'session': period['session'],
+                        'locked': False
+                    })
+                    
+                    # Update period information
+                    period['max_courses_remaining'] -= 1
+                    max_credits_by_term_year[term_year] -= course['credits']
+                    
+                    assigned = True
+                    break  # Exit the inner loop once a slot is found
+            
+            if not assigned:
+                print(f"Unable to assign unlocked course '{course['name']}' to any period.")
+    
+    return schedule
+
+
+def generate_schedule_df_old(course_df, periods_df):
+    '''
+    Generate a schedule based on course list dataframe and periods dataframe.
+    
+    Parameters:
+    course_df (pd.DataFrame): DataFrame containing course information.
+    periods_df (pd.DataFrame): DataFrame containing periods information.
+    
+    Returns:
+    list of dict: Scheduled courses.
+
+    Note: the input dataframe has a column 'name' rather than 'course' (for convenience with d3 function)
+    to do: change all 'name' to 'course' after fixing student_progress_d3_view
+    '''
+    schedule = []
+    max_credits_by_term_year = {}
+    
+    # Iterate over locked courses to update periods and max_credits_by_term_year
+    for idx, row in course_df[course_df['locked'] == 1].iterrows():
+        term_year = (row['term'], row['year'])
+        session = row['session']
+        
+        # Find the corresponding period
+        for period_idx, period in periods_df.iterrows():
+            if (period['term'], period['year'], period['session']) == (row['term'], row['year'], row['session']):
+                if periods_df.at[period_idx, 'max_courses'] > 0:
+                    periods_df.at[period_idx, 'max_courses'] -= 1
+                    
+                    # Update max_credits_by_term_year
+                    if term_year not in max_credits_by_term_year:
+                        max_credits_by_term_year[term_year] = period['max_credits']
+                    else:
+                        max_credits_by_term_year[term_year] -= row['credits']
+                    
+                    # Add the locked course to the schedule
+                    schedule.append({
+                        'seq': len(schedule) + 1,
+                        'name': row['name'],
+                        'term': row['term'],
+                        'year': row['year'],
+                        'session': row['session'],
+                        'locked': True
+                    })
+                    
+                else:
+                    print(f"Unable to assign locked course '{row['name']}' to period {period['id']}.")
+                break  # Exit the inner loop once the corresponding period is found
+    
+    # Iterate over unlocked courses to schedule them
+    for idx, row in course_df[course_df['locked'] == 0].iterrows():
+        assigned = False
+        
+        # Iterate over periods to find an appropriate slot
+        for period_idx, period in periods_df.iterrows():
+            term_year = (period['term'], period['year'])
+            
+            if periods_df.at[period_idx, 'max_courses'] > 0 and max_credits_by_term_year.get(term_year, 0) >= row['credits']:
+                # Add the course to the schedule
+                schedule.append({
+                    'seq': len(schedule) + 1,
+                    'name': row['name'],
+                    'term': period['term'],
+                    'year': period['year'],
+                    'session': period['session'],
+                    'locked': False
+                })
+                
+                # Update period information
+                periods_df.at[period_idx, 'max_courses'] -= 1
+                max_credits_by_term_year[term_year] -= row['credits']
+                
+                assigned = True
+                break  # Exit the inner loop once a slot is found
+        
+        if not assigned:
+            print(f"Unable to assign unlocked course '{row['name']}' to any period.")
+    
+    return pd.DataFrame(schedule)

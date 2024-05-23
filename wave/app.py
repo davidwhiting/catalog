@@ -18,7 +18,7 @@ import templates
 import cards
 # 'utils' contains all other python functions
 import utils
-from utils import add_card, clear_cards
+from utils import add_card, clear_cards, get_choices
 
 ##########################################
 #############  Update Notes ##############
@@ -99,13 +99,16 @@ async def initialize_app(q: Q):
     #  - Development: start with Cartesian grid then move to flex
     #  - Flex looks better in general but it's easier to develop with grid
     q.app.flex = True 
+
+    # debug codes
     q.app.debug = True
+    q.app.debug_login = False
  
     ## upload logo
     q.app.umgc_logo, = await q.site.upload(['umgc-logo-white.png'])
 
     # set global default first term
-    q.app.default_first_term = 'spring2024'
+    q.app.default_first_term = 'Spring 2024'
 
     # as we fix the logic for these, will remove from disabled
     q.app.disabled_program_menu_items = {
@@ -137,10 +140,12 @@ async def initialize_user(q: Q):
     q.user.role = 'guest'
     q.user.logged_in = False 
 
+    await utils.reset_student_info_data(q)
+
     # Note: All user variables related to students will be saved in a dictionary
     # q.user.student_info
     #
-    # This will allow us to keep track of student information whether the role is admin/counselor 
+    # This will allow us to keep track of student information whether the role is admin/coach 
     # (where we can easily switch students by deleting q.user.student_info and starting over), or
     # student/guest roles (with single instance of q.user.student_info).
     #
@@ -153,67 +158,6 @@ async def initialize_user(q: Q):
     #   - role == 'student' will start new or from saved student info from database
     #   - role == 'guest' will always start new
 
-    q.user.student_info = utils.initialize_student_info()
-    q.user.student_info['ge'] = utils.initialize_ge() # only if undergraduate
-    q.user.student_info_populated = False # may be needed later 
-
-    q.user.student_data = utils.initialize_student_data() # will have required, periods, schedule
-
-    # Wrap this testing section in a pulldown menu
-    # 
-    #############
-    ## Testing ##
-    #############
-    #q.user.user_id = 0 # guest
-    #q.user.user_id = 1 # admin
-    #q.user.user_id = 2 # coach
-    q.user.user_id = 3 # John Doe, student
-    #q.user.user_id = 4 # Jane Doe, transfer student
-    #q.user.user_id = 5 # Jim Doe, new student no major selected
-    #q.user.user_id = 6 # Sgt Doe, military and evening student
-
-    ## The following code will usually be accessed via the login page
-    # get role for logged in user
-    await utils.set_user_vars_given_role(q) # assigns q.user.role_id, q.user.username, q.user.name
-    if q.user.role != 'guest':
-        q.user.logged_in = True
-
-    # normally pass this in from the login page
-    # we may initially not allow guests
-    #if q.user.role != 'guest':
-    #    q.user.logged_in = True
-
-    # Admin path:
-    #   - Can add users
-    #   - Can set or change user roles
-    #   - Can do other administrative tasks
-    #   - Can do everything a coach can do
-    #
-    # Coach path:
-    #   - Can add students
-    #   - Using pulldown menu to select student,
-    #     can profile, select program, select courses, schedule courses for students
-    #
-    # Student path:
-    #   - Can profile, select program, select courses, schedule courses for themselves
-    #
-    # Guest path:
-    #   - Can do everything a student can do except save their info to the database 
-    #
-
-    if str(q.user.role) == 'student':
-        #user_id = int(q.user.student_info['user_id'])
-        q.user.student_info['user_id'] = q.user.user_id
-        q.user.student_info['name'] = q.user.name
-        await utils.populate_student_info(q, q.user.student_info['user_id'])
-        q.user.student_info_populated = True
-
-        q.user.student_data['user_id'] = q.user.user_id
-        stage_id = int(q.user.student_info['app_stage_id'])
-        if stage_id == 4:
-            # retrieve previous schedule
-            q.user.student_data['schedule'] = await utils.get_student_progress_d3(q)
-
     await q.page.save()
 
 async def initialize_client(q: Q):
@@ -223,31 +167,17 @@ async def initialize_client(q: Q):
     logging.info('Initializing client')
     q.client.initialized = True
     q.client.cards = set()
-    q.page['meta'] = cards.render_meta_card(flex=True)
-    q.page['header'] = cards.render_header_card(q, flex=True)
-    q.page['footer'] = cards.render_footer_card(q, flex=True)
+    q.page['meta'] = cards.render_meta_card()
+#    q.page['header'] = cards.render_header_card(q)
+    q.page['header'] = cards.render_login_header_card(q)
+    q.page['footer'] = cards.render_footer_card(q)
 
-    if q.args['#'] is None:
-        await home(q)
+    #if q.args['#'] is None:
+    #    await home(q)
 
 ###############################################################################
 ##################  End initialize app, user, client Functions ################
 ###############################################################################
-
-#@on('#page1')
-#async def page1(q: Q):
-#    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-#    await delete.page1_1(q)
-#
-#@on('#page2')
-#async def page2(q: Q):
-#    clear_cards(q)  
-#    await delete.page2_1(q)
-#
-#@on('#page3')
-#async def page3(q: Q):
-#    clear_cards(q)  
-#    await delete.page3_1(q)
 
 #######################################################
 ####################  Page 4 page  ####################
@@ -278,20 +208,80 @@ async def page4_step3(q: Q):
 ####################  Login page  ####################
 ######################################################
 
-#@on('#login')
-#async def login(q: Q):
-#    clear_cards(q)
-#    await page2(q)
+@on('#login')
+async def login(q: Q):
+    clear_cards(q)
+    #q.page['header'] = cards.render_login_header_card(q)
 
-## If login functions change, do the following:
-#
-#@on('#coach/login')
-#async def coach_login(q: Q):
-#    await student_login(q)
-#
-#@on('#admin/login')
-#async def admin_login(q: Q):
-#    await student_login(q)
+    add_card(q, 'pseudo_login',
+        await cards.render_user_dropdown(q, location='top_horizontal', menu_width='300px')
+    )
+    if q.app.debug_login:
+        add_card(q, 'login_debug', await cards.render_debug_card(q, width='100%'))
+
+    await q.page.save()
+
+# respond to sample user selection
+@on()
+async def select_sample_user(q: Q):
+    choice = q.args.choice_group
+    logging.info('The selected user is: ' + choice)
+    q.user.user_id = choice
+    q.user.logged_in = True
+    # get role for logged in user
+    await utils.set_user_vars_given_role(q) # assigns q.user.role_id, q.user.username, q.user.name
+
+    # Admin path:
+    #   - Can add users
+    #   - Can set or change user roles
+    #   - Can do other administrative tasks
+    #   - Can do everything a coach can do
+    #
+    # Coach path:
+    #   - Can add students
+    #   - Using pulldown menu to select student,
+    #     can profile, select program, select courses, schedule courses for students
+    #
+    # Student path:
+    #   - Can profile, select program, select courses, schedule courses for themselves
+    #
+    # Guest path:
+    #   - Can do everything a student can do except save their info to the database 
+    #
+    if str(q.user.role) in ['coach', 'admin']:
+        # initialize all student_info stuff
+        await utils.reset_student_info_data(q)
+        q.user.student_info_populated = False
+
+    elif str(q.user.role) == 'student':
+        await utils.reset_student_info_data(q)
+        await utils.populate_student_info(q, q.user.user_id)
+        q.user.student_info_populated = True
+
+    # update header 
+    q.page['header'] = cards.render_header_card(q)
+
+    # update debug card
+    if q.app.debug_login:
+        q.page['login_debug'].content = f'''
+### q.args values:
+{q.args}
+
+### q.events values:
+{q.events}
+
+### q.client value:
+{q.client}
+
+### q.user.student_info values:
+{q.user.student_info}
+
+### q.user values:
+{q.user}
+        '''
+    # redirect to #home route
+    q.page['meta'].redirect = '#home'        
+    await q.page.save()
 
 ######################################################
 ####################  Admin page  ####################
@@ -329,6 +319,33 @@ async def coach_home(q: Q):
 
 async def student_home(q: Q):
     clear_cards(q)
+    cards.render_welcome_card_old(q, location='top_vertical', width='100%')
+    cards.render_welcome_back_card(q, box='horizontal')
+    add_card(q, 'philosophy', 
+        card = ui.wide_info_card(
+            box=ui.box('grid', width='400px'),
+            name='philosophy',
+            icon='LightningBolt',
+            title='First steps',
+            caption='''Welcome the student back. 
+
+Query about information.
+            '''
+    ))
+    add_card(q, 'assessments', cards.render_career_assessment_card(location='grid'))
+    add_card(q, 'ai_enablement', cards.render_ai_enablement_card(location='grid'))
+    add_card(q, 'student_stub', cards.render_student_information_stub_card(location='grid'))
+    add_card(q, 'to_do_next', ui.markdown_card(
+        box='grid',
+        title='Next steps',
+        content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
+    ))
+
+    add_card(q, 'dashboard_placeholder', ui.markdown_card(
+        box='grid',
+        title='Dashboard',
+        content='Add a summary dashboard here'
+    ))
 
 async def guest_home(q: Q):
     await student_home(q)
@@ -369,10 +386,16 @@ async def coach_program(q: Q):
     await student_program(q)
 
 async def student_program(q: Q):
-    add_card(q, 'dropdown',
-        await cards.render_dropdown_menus_horizontal(q, location='top_horizontal', menu_width='300px')
-    )
-    await q.page.save()
+    add_card(q, 'major1', ui.form_card(
+        box=ui.box('top_vertical', width='100%'),
+        items=[
+            ui.text('**EXPLORE PROGRAMS** using the menus below. Click **Select > Save Program** to select your program.'),
+            #ui.text('Explore Majors. Click **Select > Save Program** to select your program.'),
+        ]
+    ))
+
+    await cards.render_dropdown_menus_horizontal(q, location='top_vertical', menu_width='300px')
+    await cards.render_program(q)
 
 async def guest_program(q: Q):
     await student_program(q)
@@ -401,6 +424,103 @@ async def program(q: Q):
         add_card(q, 'program_debug', await cards.render_debug_card(q, width='100%'))
 
     await q.page.save()
+
+#############################################
+###  Program page: Dropdown Menu Actions  ###
+#############################################
+
+#######################################
+## For "Degree" dropdown menu events ##
+#######################################
+
+@on()
+async def menu_degree(q: Q):
+    logging.info('The value of menu_degree is ' + str(q.args.menu_degree))
+    timedConnection = q.user.conn
+    q.user.student_info['menu']['degree'] = q.args.menu_degree
+
+    # reset area_of_study if degree changes
+    q.user.student_info['menu']['area_of_study'] = None
+    q.page['dropdown'].menu_area.value = None
+    # update area_of_study choices based on degree chosen
+    q.page['dropdown'].menu_area.choices = await get_choices(timedConnection, cards.area_query, 
+        params=(q.user.student_info['menu']['degree'],))
+
+    # reset program if degree changes
+    utils.reset_program(q)
+
+    if q.user.student_info['menu']['degree'] == '2':
+        # insert ge into student_info for bachelor's degree students
+        q.user.student_info['ge'] = utils.initialize_ge()
+        pass
+    else:
+        clear_cards(q, ['dropdown']) # clear everything except dropdown menus
+        # remove ge from non-bachelor's degree students
+        if 'ge' in q.user.student_info:
+            del q.user.student_info['ge']
+
+    await q.page.save()
+
+##############################################
+## For "Area of Study" dropdown menu events ##
+##############################################
+
+@on()
+async def menu_area(q: Q):
+    logging.info('The value of area_of_study is ' + str(q.args.menu_area))
+    timedConnection = q.user.conn
+    q.user.student_info['menu']['area_of_study'] = q.args.menu_area
+
+    # reset program if area_of_study changes
+    utils.reset_program(q)
+
+    q.user.student_info['menu']['program'] = None
+    q.page['dropdown'].menu_program.value = None
+
+    # update program choices based on area_of_study chosen
+    q.page['dropdown'].menu_program.choices = await get_choices(timedConnection, cards.program_query, 
+        params=(q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']))
+
+#    if q.user.degree != '2':
+#        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
+#        del q.client.program_df
+
+#    q.page['debug_info'] = cards.render_debug_card(q, box='1 10 7 4') # update debug card
+    await q.page.save()
+
+###############################
+###  Program Table actions  ###
+###############################
+
+@on()
+async def program_table(q: Q):
+    '''
+    Respond to events (clicking Course link or double-clicking row)
+    in the table on Program page. This will display the course description
+    by default.
+
+    Notes:
+      - q.args.table_name is set to [row_name]
+      - the name of the table is 'program_table'
+      - the name of the row is name = row['name']    
+    '''
+    coursename = q.args.program_table[0] 
+    utils.course_description_dialog(q, coursename, which='required')
+    logging.info('The value of coursename in program_table is ' + coursename)
+    await q.page.save()
+
+@on()
+async def view_program_description(q: Q):
+    '''
+    Respond to the menu event 'Course Description'
+    (Calls same function as program_table above)
+    '''
+    coursename = q.args.view_program_description
+    utils.course_description_dialog(q, coursename, which='required')
+    logging.info('The value of coursename in view_program_description is ' + str(coursename))
+    await q.page.save()
+
+
 
 ########################################################
 ####################  Course pages  ####################
@@ -506,8 +626,67 @@ async def schedule(q: Q):
 #async def schedule_table.click(q: Q):
 #    pass
 
+###########################
+## Schedule Menu actions ##
+###########################
+
+@on()
+async def submit_schedule_menu(q: Q):
+    '''
+    Respond to Submit button on menu on Schedule page
+    Launch generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=18, 
+                     summer=False, sessions=[1,3], as_df=True):
+    '''
+    schedule_menu = {}
+    schedule_menu['first_term'] = q.args.first_term
+    schedule_menu['sessions'] = q.args.sessions_checklist
+    schedule_menu['max_courses'] = q.args.courses_per_session
+    schedule_menu['max_credits'] = q.args.max_credits
+    schedule_menu['attend_summer'] = q.args.attend_summer
+    q.user.student_info['schedule_menu'] = schedule_menu
+
+    q.user.student_data['periods'] = utils.generate_periods(
+            start_term=schedule_menu['first_term'],
+            max_courses=schedule_menu['max_courses'],
+            max_credits=schedule_menu['max_credits'],
+            summer=schedule_menu['attend_summer'],
+            sessions=schedule_menu['sessions'],
+            as_df=True
+        )
+    
+
+    q.page['schedule_debug'].content = f'''
+### q.args values:
+{q.args}
+
+### q.events values:
+{q.events}
+
+### q.client value:
+{q.client}
+
+### q.user.student_info values:
+{q.user.student_info}
+
+### q.user.student_info['schedule_menu'] values:
+{q.user.student_info['schedule_menu']}
+
+### q.user.student_data values:
+
+#### Required:
+{q.user.student_data['required']}
+
+#### Periods:
+{q.user.student_data['periods']}
+
+#### Schedule:
+{q.user.student_data['schedule']}
+    '''
+    await q.page.save()
+
+
 ############################
-## Schedule table actions ##
+## Schedule Table actions ##
 ############################
 
 @on()
@@ -565,6 +744,7 @@ async def select_elective(q: Q):
 @on('my_dialog.dismissed')
 @on('schedule_table.dismissed')
 @on('schedule_description_dialog.dismissed')
+@on('program_table.dismissed')
 @on('required_description_dialog.dismissed')
 async def dismiss_dialog(q: Q):
     logging.info('Dismissing dialog')

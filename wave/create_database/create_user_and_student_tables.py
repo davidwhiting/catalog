@@ -38,8 +38,8 @@ users = [
         "id": 1, 
         "role_id": 1, 
         "username": "admin", 
-        "firstname": "Default", 
-        "lastname": "Administrator",
+        "firstname": "", 
+        "lastname": "Admin",
         "sso_role": "staff",
         "notes": "default admin user"
     }

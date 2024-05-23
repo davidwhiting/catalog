@@ -12,23 +12,9 @@ from utils import generate_periods, update_periods, generate_schedule, handle_pr
 async def home(q: Q):
     clear_cards(q)  # Drop all cards except main ones (header, sidebar, meta).
 
-    ## get saved student information from the db and save to q.user.student_info variables
-    ## (this is currently done at the initialize_user level)
-    # - do this only at the first time, so we can navigate back to the home page and 
-    #   not discard all the changes
-    # - also, need to make this available for coaches by selecting that student
-    #
-    #if not q.user.student_info_populated:
-    #    if q.user.role == 'student':
-    #        await utils.populate_student_info(q, q.user.student_info['user_id'])
-    #        q.user.student_info_populated = True
-
-    # show this card only for guests and students with new status
-    # for folks not yet logged in
 #    if q.user.role == 'student' and q.user.student_info['app_stage_id'] > 1:
     if q.user.role == 'student':
-        cards.render_welcome_card_old(q)
-        cards.render_welcome_back_card(q, box='1 3 3 4')
+        
     else:
         cards.render_welcome_card(q)
         cards.render_please_login(q)
@@ -48,53 +34,17 @@ async def home(q: Q):
 #        ]
 #    ))
 
-    add_card(q, 'student_stub', cards.render_student_information_stub_card(box='4 3 4 2'))
-    add_card(q, 'assessments', cards.render_career_assessment_card(box='4 5 4 2'))
-    add_card(q, 'enable_ai', cards.render_ai_enablement_card(box='1 7 4 2'))
     add_card(q, 'major_recommendations', cards.render_major_recommendation_card(q, box='5 7 3 3'))
-
-    #add_card(q, 'dashboard_placeholder', ui.markdown_card(
-    #    box='6 6 2 2',
-    #    title='Dashboard',
-    #    content='Add a summary dashboard here'
-    #))
-
-    #add_card(q, 'to_do_next', ui.markdown_card(
-    #    box='4 3 2 2',
-    #    title='Next steps',
-    #    content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
-    #))
-    if q.client.debug:
-        add_card(q, 'debug_home', cards.render_debug_card(q, box='1 11 7 3')) 
     
-## # ##############################################################
-## # ###########  STUDENT PAGE                      ###############
-## # ##############################################################
-
 ##############################################################
 ###########  PROGRAM PAGE (PREVIOUSLY MAJOR)   ###############
 ##############################################################
 @on('#major')
 async def major(q: Q):
-    clear_cards(q)  
+    clear_cards(q)
 
-    # future: do this only for undergraduate degrees
-    await cards.render_program(q)
 
-    # if first time, add a blank card where table is 
-    # and a blank card for credits
-    #await render_program_dashboard(q, box='7 3 1 7')
-    #await render_program_coursework_table(q, box='1 3 6 7')
 
-#    #add_card(q, 'major1', ui.form_card(
-#    #    box=ui.box('top_horizontal', width='250px'),
-#    #    items=[
-#    #        ui.text('Browse Majors', size=ui.TextSize.XL),
-#    #        ui.text('State as **Browse Majors**'),
-#    #        ui.text('Compare Majors', size=ui.TextSize.XL),
-#    #        ui.text('Add **Compare Majors** functionality'),
-#    #    ]
-#    #))
 
 ##############################################################
 ####################  COURSES PAGE  ##########################
@@ -355,69 +305,8 @@ async def user_role(q: Q):
 #    #    del q.client.program_df
     await q.page.save()
 
-#######################################################
-### Program page: For "Degree" dropdown menu events ###
-#######################################################
 
-@on()
-async def menu_degree(q: Q):
-    logging.info('The value of menu_degree is ' + str(q.args.menu_degree))
-    timedConnection = q.user.conn
-    q.user.student_info['menu']['degree'] = q.args.menu_degree
 
-    # reset area_of_study if degree changes
-    q.user.student_info['menu']['area_of_study'] = None
-    q.page['dropdown'].menu_area.value = None
-    # update area_of_study choices based on degree chosen
-    q.page['dropdown'].menu_area.choices = await get_choices(timedConnection, cards.area_query, 
-        params=(q.user.student_info['menu']['degree'],))
-
-    # reset program if degree changes
-    utils.reset_program(q)
-
-    if q.user.student_info['menu']['degree'] == '2':
-        # insert ge into student_info for bachelor's degree students
-        q.user.student_info['ge'] = utils.initialize_ge()
-        pass
-    else:
-        clear_cards(q, ['dropdown']) # clear everything except dropdown menus
-        # remove ge from non-bachelor's degree students
-        if 'ge' in q.user.student_info:
-            del q.user.student_info['ge']
-
-##    if q.client.major_debug:
-    q.page['debug_info'] = cards.render_debug_card(q, box='1 10 7 4') # update debug card
-#
-##        q.page['debug_client_info'] = cards.render_debug_client_card(q)
-##        q.page['debug_user_info'] = cards.render_debug_user_card(q)
-    await q.page.save()
-
-##############################################################
-### Program page: For "Area of Study" dropdown menu events ###
-##############################################################
-
-@on()
-async def menu_area(q: Q):
-    logging.info('The value of area_of_study is ' + str(q.args.menu_area))
-    timedConnection = q.user.conn
-    q.user.student_info['menu']['area_of_study'] = q.args.menu_area
-
-    # reset program if area_of_study changes
-    utils.reset_program(q)
-
-    #q.user.student_info['menu']['program'] = None
-    #q.page['dropdown'].menu_program.value = None
-
-    # update program choices based on area_of_study chosen
-    q.page['dropdown'].menu_program.choices = await get_choices(timedConnection, cards.program_query, 
-        params=(q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']))
-
-#    if q.user.degree != '2':
-#        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
-#        del q.client.program_df
-
-    q.page['debug_info'] = cards.render_debug_card(q, box='1 10 7 4') # update debug card
-    await q.page.save()
 
 ########################################################
 ### Program page: For "Program" dropdown menu events ###
@@ -456,23 +345,6 @@ async def menu_program(q: Q):
 
 ################################################################################
 
-##################################################################################
-### Program page: Create Description popup for table by clicking on table row  ###
-### on course name link or double-clicking course row                          ###
-##################################################################################
-
-@on()
-async def program_table(q: Q):
-    # note: q.args.table_name is set to [row_name]
-    # the name of the table is 'program_table'
-    # the name of the row is name=row['course'], the course name
-    coursename = q.args.program_table[0] # am I getting coursename wrong here?
-
-    #cards.render_dialog_description(q, coursename)
-    cards.render_description_dialog(q, coursename)
-    logging.info('The value of coursename in program_table is ' + coursename)
-
-    await q.page.save()
 
 ################################################################################
 
