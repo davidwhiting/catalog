@@ -2,7 +2,7 @@ from h2o_wave import main, app, Q, ui, on, run_on, data
 from typing import Optional, List
 import logging
 import os
-from msal import ConfidentialClientApplication
+#from msal import ConfidentialClientApplication
 import requests
 import pandas as pd
 import numpy as np
@@ -73,27 +73,27 @@ async def initialize_app(q: Q):
     q.app.sso = 'off'
     #q.app.sso = 'local'
     #q.app.sso = 'azure'
-    if q.app.sso != 'off':
-        if q.app.sso == 'local':
-            AUTHORITY = 'http://localhost:8080/auth/realms/myrealm'
-            REQUESTS_GET_ADDRESS = 'http://localhost:8080/auth/realms/myrealm/protocol/openid-connect/userinfo'
-            CLIENT_ID = 'myclient'
-            CLIENT_SECRET = 'hAtwNXiXg3d2Eg9VayWFusJo1UWQZGb3' # only works for local macbook pro
-            #CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-            REDIRECT_URI = 'http://localhost:5000/callback'
-        elif q.app.sso == 'azure':
-            AUTHORITY = os.getenv('AUTHORITY_ADDRESS')
-            REQUESTS_GET_ADDRESS = os.getenv('REQUESTS_GET_ADDRESS')
-            CLIENT_ID = os.getenv('CLIENT_ID')
-            CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-            REDIRECT_URI = os.getenv('REDIRECT_URI')
-
-        q.app.SCOPE = ['openid', 'profile', 'email']
-        q.app.msal_app = ConfidentialClientApplication(
-            CLIENT_ID, 
-            authority=AUTHORITY, 
-            client_credential=CLIENT_SECRET
-        )
+#    if q.app.sso != 'off':
+#        if q.app.sso == 'local':
+#            AUTHORITY = 'http://localhost:8080/auth/realms/myrealm'
+#            REQUESTS_GET_ADDRESS = 'http://localhost:8080/auth/realms/myrealm/protocol/openid-connect/userinfo'
+#            CLIENT_ID = 'myclient'
+#            CLIENT_SECRET = 'hAtwNXiXg3d2Eg9VayWFusJo1UWQZGb3' # only works for local macbook pro
+#            #CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+#            REDIRECT_URI = 'http://localhost:5000/callback'
+#        elif q.app.sso == 'azure':
+#            AUTHORITY = os.getenv('AUTHORITY_ADDRESS')
+#            REQUESTS_GET_ADDRESS = os.getenv('REQUESTS_GET_ADDRESS')
+#            CLIENT_ID = os.getenv('CLIENT_ID')
+#            CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+#            REDIRECT_URI = os.getenv('REDIRECT_URI')
+#
+#        q.app.SCOPE = ['openid', 'profile', 'email']
+#        q.app.msal_app = ConfidentialClientApplication(
+#            CLIENT_ID, 
+#            authority=AUTHORITY, 
+#            client_credential=CLIENT_SECRET
+#        )
 
     # q.app.flex: use flexible layout rather than grid
     #  - Development: start with Cartesian grid then move to flex
