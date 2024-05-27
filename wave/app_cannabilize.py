@@ -37,16 +37,6 @@ async def home(q: Q):
     add_card(q, 'major_recommendations', cards.render_major_recommendation_card(q, box='5 7 3 3'))
     
 ##############################################################
-###########  PROGRAM PAGE (PREVIOUSLY MAJOR)   ###############
-##############################################################
-@on('#major')
-async def major(q: Q):
-    clear_cards(q)
-
-
-
-
-##############################################################
 ####################  COURSES PAGE  ##########################
 ##############################################################
 @on('#course')
@@ -76,10 +66,6 @@ async def course(q: Q):
 
     # starting to populate coursework... need to build this capability
 
-    # check first that we are at the stage where this is available
-    # instead of us having to build it. That stage is program_selected and catalog_selected. If
-    # a schedule was ever created, we can retrieve it. 
-    # if the_right_conditions_exist:
     
 #    add_card(q, 'selected_program',
 #        ui.form_card(
@@ -106,35 +92,6 @@ async def course(q: Q):
 #    ))
 #   
 
-    if q.client.debug:
-        add_card(q, 'debug_course', cards.render_debug_card(q, box='1 11 7 3')) 
-
-##############################################################
-####################  GE PAGE (START) ########################
-##############################################################
-@on('#ge')
-@on('goto_ge')
-async def ge(q: Q):
-    clear_cards(q)
-
-    add_card(q, 'welcome_ge', ui.form_card(
-        box='1 2 7 1',
-        items=[
-            ui.text_l('Select your General Education courses here.'),
-            #ui.text('We will guide you through this experience.')
-        ]
-    ))
-    menu_width = '300px'
-    add_card(q, 'ge_req1', await cards.render_ge_comm_card(q, menu_width, box='1 3 3 4'))
-    add_card(q, 'ge_req6', await cards.render_ge_research_card(q, menu_width, box='4 3 3 6'))
-    add_card(q, 'ge_req4', await cards.render_ge_bio_card(q, menu_width, box='1 7 3 4'))
-    add_card(q, 'ge_req2', await cards.render_ge_math_card(q, menu_width, box='4 9 3 2'))
-    add_card(q, 'ge_req3', await cards.render_ge_arts_card(q, menu_width, box='1 11 3 3'))
-    add_card(q, 'ge_req5', await cards.render_ge_beh_card(q, menu_width, box='4 11 3 3'))
- 
-#    
-#    cards.render_debug(q)
-
 ###########################################################
 
 @on('#electives')
@@ -147,10 +104,6 @@ async def electives(q: Q):
 @on('#schedule')
 async def schedule(q: Q):
     clear_cards(q)
-
-    if q.user.student_info['first_term'] is None:
-        q.user.student_info['first_term'] = 'spring2024' # need to set this default elsewhere
-
 
     # this should be carried over from previous step, or any changes in course should be 
     # written to DB, our source of truth
@@ -185,23 +138,6 @@ async def schedule(q: Q):
                 ui.text(f'**{degree_program}**')
             ]
         ))
-
-#        # rename because the function uses 'period' rather than 'term'
-#        # to do: inefficient, need to rewrite
-#        df_input = df.copy()
-#        df_input.rename(columns={'term': 'period'}, inplace=True)
-#
-#        df_display, headers_display = utils.prepare_d3_data(df_input, start_term.upper())
-#        df_json = df_display.to_json(orient='records')
-#        headers_json = headers_display.to_json(orient='records')
-#
-#        html_template = templates.html_code_minimal.format(
-#            javascript=templates.javascript_draw_only,
-#            headers=headers_json, 
-#            data=df_json)
-
-        html_template = utils.create_html_template(df, start_term)
-        add_card(q, 'd3plot', cards.d3plot(html_template, box='1 3 5 4'))
 
         #######################################
         ## Scheduling and updating schedules ##
@@ -298,16 +234,6 @@ async def user_role(q: Q):
 #    #    clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
 #    #    del q.client.program_df
     await q.page.save()
-
-
-
-
-################################################################################
-
-@on()
-async def student_dropdown(q: Q):
-    logging.info('The value of user_dropdown is ' + str(q.args.user_dropdown))
-    q.user.user_dropdown = q.args.user_dropdown
 
 ################################################################################
 

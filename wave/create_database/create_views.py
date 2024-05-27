@@ -152,16 +152,27 @@ create_view_query = '''
 		a.menu_area_id,
 		c.name AS area_name,
 		a.program_id,
-		d.name AS program_name
+		d.name AS program_name,
+        CASE
+            WHEN a.menu_degree_id != 2 OR (
+                a.menu_degree_id = 2 AND d.name IN (
+                    'Cybersecurity Technology', 
+                    'Social Science', 
+                    'Applied Technology', 
+                    'Web and Digital Design', 
+                    'East Asian Studies', 
+                    'English', 
+                    'General Studies', 
+                    'History'
+                ))
+            THEN 1
+            ELSE 0
+        END AS disabled
 	FROM 
-		menu_programs_by_areas a,
-		menu_degrees b,
-		menu_areas c,
-		programs d
-	WHERE 
-		a.menu_degree_id = b.id
-		AND a.menu_area_id = c.id
-		AND a.program_id = d.id
+		menu_programs_by_areas a
+    JOIN menu_degrees b ON a.menu_degree_id = b.id
+    JOIN menu_areas c ON a.menu_area_id = c.id
+	JOIN programs d ON a.program_id = d.id
 '''
 c.execute(create_view_query)
 conn.commit()

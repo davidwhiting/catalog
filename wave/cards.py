@@ -6,8 +6,7 @@ import numpy as np
 import utils
 from utils import add_card, clear_cards
 from utils import get_query, get_query_one, get_query_dict, get_query_df
-#from utils import get_choices, get_choices_with_disabled, get_role, \
-#    get_ge_choices, get_catalog_program_sequence, get_student_progress_d3
+from utils import get_choices
 #from utils import generate_periods, update_periods, generate_schedule, handle_prerequisites, \
 #    schedule_courses_old, update_courses, move_courses_forward
 #import sys
@@ -39,8 +38,13 @@ area_query = '''
     FROM menu_all_view 
     WHERE menu_degree_id = ?
 '''
-program_query = '''
+program_query_old = '''
     SELECT program_id AS name, program_name AS label
+    FROM menu_all_view 
+    WHERE menu_degree_id = ? AND menu_area_id = ?
+'''
+program_query = '''
+    SELECT program_id AS name, program_name AS label, disabled
     FROM menu_all_view 
     WHERE menu_degree_id = ? AND menu_area_id = ?
 '''
@@ -53,7 +57,7 @@ program_query = '''
 ####################  LAYOUT CARDS  ####################
 ########################################################
 
-def render_meta_card(flex=True):
+def return_meta_card(flex=True):
     title='UMGC Wave App'
     theme_name='UMGC'
     content_zones = [
@@ -94,7 +98,7 @@ def render_meta_card(flex=True):
     )
     return card 
 
-def render_header_card(q, box='1 1 7 1'):
+def return_header_card(q, box='1 1 7 1'):
     '''
     flex: Use the old flex layout system rather than the grid system
           (flex was not working correctly, can debug later)
@@ -147,7 +151,7 @@ def render_header_card(q, box='1 1 7 1'):
     else:
         tab_items = guest_tab_items
         textbox_label = 'Guest'
-        textbox_value = '[Login button here]'
+        textbox_value = ' '
 
     older_tab_items = [
         ui.tab(name='#home', label='Home'),
@@ -184,7 +188,92 @@ def render_header_card(q, box='1 1 7 1'):
     )
     return card
 
-def render_login_header_card(q, box='1 1 7 1'):
+def return_header_card(q, box='1 1 7 1'):
+    '''
+    flex: Use the old flex layout system rather than the grid system
+          (flex was not working correctly, can debug later)
+    Create separate tabs for different roles: guest, student, coach, admin
+    '''
+    flex = q.app.flex
+    admin_tab_items = [
+        #ui.tab(name='#login',    label='Login'),
+        #ui.tab(name='#admin',    label='Admin'),
+        ui.tab(name='#home',     label='Admin Home'),
+        ui.tab(name='#program',  label='Choose Program'),
+        ui.tab(name='#course',   label='Select Courses'),
+        ui.tab(name='#schedule', label='Set Schedule'),
+    ]
+    coach_tab_items = [
+        #ui.tab(name='#login',    label='Login'),
+        #ui.tab(name='#admin',    label='Admin'),
+        ui.tab(name='#home',     label='Coach Home'),
+        ui.tab(name='#program',  label='Choose Program'),
+        ui.tab(name='#course',   label='Select Courses'),
+        ui.tab(name='#schedule', label='Set Schedule'),
+    ]
+
+    student_tab_items = [
+        #ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#home',     label='Student Home'),
+        ui.tab(name='#program',  label='Choose Program'),
+        ui.tab(name='#course',   label='Select Courses'),
+        ui.tab(name='#schedule', label='Set Schedule'),
+    ]
+    guest_tab_items = student_tab_items
+
+    if q.user.role == 'admin':
+        tab_items = admin_tab_items
+        textbox_label = 'Admin Name'
+        textbox_value = q.user.name
+    elif q.user.role == 'coach':
+        tab_items = coach_tab_items
+        textbox_label = 'Coach Name'
+        textbox_value = q.user.name
+    elif q.user.role == 'student':
+        tab_items = student_tab_items
+        textbox_label = 'Student Name'
+        textbox_value = q.user.name
+    else:
+        tab_items = guest_tab_items
+        textbox_label = 'Guest'
+        textbox_value = ' '
+
+    older_tab_items = [
+        ui.tab(name='#home', label='Home'),
+        #ui.tab(name='#student', label='Student Info'),
+        ui.tab(name='#major', label='Program'), # 'Select Program'
+        ui.tab(name='#course', label='Course'), # 'Select Courses'
+        #ui.tab(name='#ge', label='GE'), 
+        #ui.tab(name='#electives', label='Electives'), # 'Select Courses'
+        ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
+        #ui.tab(name='#project', label='Status'), # 'Project Plan'
+    ]
+    if flex:
+        box='header'
+    card = ui.header_card(
+        box=box, 
+        title='UMGC', 
+        subtitle='Registration Assistant',
+        image=q.app.umgc_logo,
+        secondary_items=[
+            ui.tabs(
+                name='tabs', 
+                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
+                items=tab_items,
+            ),
+        ],
+        items=[
+            ui.textbox(
+                name='textbox_default', 
+                label=textbox_label,
+                value=textbox_value, 
+                disabled=True
+            )
+        ]
+    )
+    return card
+
+def return_login_header_card(q, box='1 1 7 1'):
     '''
     flex: Use the old flex layout system rather than the grid system
           (flex was not working correctly, can debug later)
@@ -222,7 +311,7 @@ def render_login_header_card(q, box='1 1 7 1'):
     )
     return card
 
-def render_footer_card(box='1 10 7 1', flex=True):
+def return_footer_card(box='1 10 7 1', flex=True):
     '''
     flex: Use the flex layout system rather than the grid system
     '''
@@ -242,7 +331,7 @@ This app is in pre-alpha stage. Feedback welcomed.
 ####################  DEBUG CARDS  ####################
 #######################################################
 
-async def render_debug_card(q, box='3 3 1 1', location='debug', width='100%', height='300px'):
+async def return_debug_card(q, box='3 3 1 1', location='debug', width='100%', height='300px'):
     '''
     Show q.client information in a card for debugging
     '''
@@ -252,7 +341,6 @@ async def render_debug_card(q, box='3 3 1 1', location='debug', width='100%', he
     #### q.user.student_data values:
     #{q.user.student_data}
     flex = q.app.flex
-
 
     if flex:
         box = ui.box(location, width=width, height=height)
@@ -298,8 +386,22 @@ async def render_debug_card(q, box='3 3 1 1', location='debug', width='100%', he
 ####################  LOGIN PAGE  #############################
 ###############################################################
 
+def render_login_welcome_card(q, location='top_vertical', width='100%', box='1 2 7 1',
+                              cardname='welcome_login'):
+    flex = q.app.flex
+    if flex:
+        box = ui.box(location, width=width)
 
-async def render_user_dropdown(q, box=None, location='horizontal', menu_width='300px'):
+    add_card(q, cardname, ui.form_card(
+        box=box,
+        items=[
+            ui.text_l('Select a user below to simulate their login.')
+            #ui.text('(The Home page will collect student information)')
+        ]
+    ))
+
+async def render_user_dropdown(q, box=None, location='horizontal', menu_width='300px',
+                               cardname='pseudo_login'):
     '''
     Function to create a dropdown menu of sample users to demo the wave app
     '''
@@ -319,10 +421,11 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
     choicesdict = [
         {'name': 1, 'label': 'Admin (admin role)'},
         {'name': 2, 'label': 'Coach (coach role)'},
+        {'name': 0, 'label': 'New Student'},
         {'name': 3, 'label': 'John Doe (full-time student with program selected)'},
         {'name': 4, 'label': 'Jane Doe (part-time transfer student with program selected)'},
-        {'name': 5, 'label': 'Jim Doe (new student)'},
-        {'name': 6, 'label': 'Tom Doe (military student, no program selected)'},
+        #{'name': 5, 'label': 'Jim Doe (new student)'},
+        #{'name': 6, 'label': 'Tom Doe (military student, no program selected)'},
     ]
 
     choices = [ui.choice(str(row['name']), row['label']) for row in choicesdict]
@@ -333,7 +436,8 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
         required=True, 
         choices=choices
     )
-    button = ui.button(name='select_sample_user', label='Submit', primary=True)
+    button = ui.button(name='select_sample_user', label='Submit', 
+                       primary=True)
 
     dropdown = ui.dropdown(
         name='sample_user',
@@ -349,45 +453,65 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
             ui.text_xl('Example users'),
             choicegroup,
             #dropdown, 
+            ui.separator(),
             button
         ]
     ) 
-    return card
-
+    #return card
+    add_card(q, cardname, card)
 
 ##############################################################
 ####################  HOME PAGE  #############################
 ##############################################################
 
-def render_welcome_back_card(q, location='vertical', box='1 3 3 3', title=''):
+def render_registration_card(q, location='top_horizontal', width='40%', 
+                             height='400px', cardname='registration'):
+    '''
+    This is the registration form for an new student
+    '''
+    card = ui.form_card(
+        box=ui.box(location, width=width, height=height),
+        items=[
+            ui.text_xl('Welcome to the UMGC Registration Assistant'),
+            ui.separator(),
+            ui.text_xl('Please register to use this tool:'),
+            ui.textbox(name='firstname', label='First Name', required=True),
+            ui.textbox(name='lastname', label='Last Name', required=True),
+            ui.separator(),
+            ui.button(name='register_submit', label='Submit', primary=True),
+        ]
+    )
+    add_card(q, cardname, card)
+
+def render_welcome_back_card(q, location='vertical', height='400px', width='100%', cardname='user_info',
+                             box='1 3 3 3', title=''):
     student_info = q.user.student_info
     flex = q.app.flex
 
     if flex:
-        box = location
+        box = ui.box(location, height=height, width=width)
     content = f'''## Welcome back, {student_info['name']}.
 
 ### Here is your current selected student information:
 
 - **Residency status**: {student_info['resident_status']}
 
-- **Student type**: {student_info['student_profile']}
+- **Attendance type**: {student_info['student_profile']}
 
-- **Transfer credits**: {student_info['transfer_credits']==1}
+- **Transfer credits**: {'Yes' if student_info['transfer_credits']==1 else 'No'}
 
 - **Financial aid**: {student_info['financial_aid']==1}
 
 - **Selected program**: {student_info['degree_program']}
 
 '''
-    
-    add_card(q, 'user_info',
-        ui.markdown_card(
-            box=box,
-            title=title,
-            content=content
-        )
+    card = ui.markdown_card(
+        box=box,
+        title=title,
+        content=content
     )
+
+    add_card(q, cardname, card)
 
     #add_card(q, 'user_info', 
     #    ui.form_card(
@@ -401,21 +525,7 @@ def render_welcome_back_card(q, location='vertical', box='1 3 3 3', title=''):
     #                ]
     #)]))
 
-
-def render_welcome_card_old(q, location='top_vertical', width='400px', box='1 2 7 1'):
-    flex = q.app.flex
-    if flex:
-        box = ui.box(location, width=width)
-
-    add_card(q, 'welcome_home', ui.form_card(
-        box=box,
-        items=[
-            ui.text_l('Welcome to the UMGC Registration Assistant'),
-            ui.text('(The Home page will collect student information)')
-        ]
-    ))
-
-def render_ai_enablement_card(box='1 1 2 2', location='grid', width='400px', flex=True):
+def return_ai_enablement_card(box='1 1 2 2', location='grid', width='400px', flex=True):
     if flex:
         box=ui.box(location, width=width)
     card = ui.wide_info_card(
@@ -427,7 +537,12 @@ def render_ai_enablement_card(box='1 1 2 2', location='grid', width='400px', fle
     )
     return card
 
-def render_career_assessment_card(box='1 1 2 2', location='horizontal', width='400px', flex=True):
+async def render_career_assessment_card(q, box='1 1 2 2', location='horizontal', 
+                                        width='400px', cardname='assessments'):
+    '''
+    Create career assessment card
+    '''
+    flex = q.app.flex
     if flex:
         box=ui.box(location, width=width)
     yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
@@ -439,7 +554,8 @@ def render_career_assessment_card(box='1 1 2 2', location='horizontal', width='4
         title='Career Assessments',
         caption=caption
     )
-    return card
+    add_card(q, cardname, card)
+
 
 def render_student_information_stub_card(box='1 1 2 2', location='horizontal', width='400px', flex=True):
     if flex:
@@ -466,17 +582,22 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
     flex = q.app.flex
     timedConnection = q.user.conn
 
-    degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
-    area_query = '''
-        SELECT DISTINCT menu_area_id AS name, area_name AS label
-        FROM menu_all_view 
-        WHERE menu_degree_id = ?
-    '''
-    program_query = '''
-        SELECT program_id AS name, program_name AS label
-        FROM menu_all_view 
-        WHERE menu_degree_id = ? AND menu_area_id = ?
-    '''
+    #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
+    #area_query = '''
+    #    SELECT DISTINCT menu_area_id AS name, area_name AS label
+    #    FROM menu_all_view 
+    #    WHERE menu_degree_id = ?
+    #'''
+    #program_query_old = '''
+    #    SELECT program_id AS name, program_name AS label
+    #    FROM menu_all_view 
+    #    WHERE menu_degree_id = ? AND menu_area_id = ?
+    #'''
+    #program_query = '''
+    #    SELECT program_id AS name, program_name AS label, disabled
+    #    FROM menu_all_view 
+    #    WHERE menu_degree_id = ? AND menu_area_id = ?
+    #'''
 
     current_disabled = q.app.disabled_program_menu_items
     
@@ -512,11 +633,10 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
             disabled=False,
             width='300px',
             choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
-                await utils.get_choices(
+                await utils.get_choices_disable_all(
                     timedConnection, 
                     program_query, 
-                    (q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']),
-                    disabled = current_disabled
+                    (q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study'])
                 )
         )
     ], justify='start', align='start')
@@ -527,16 +647,16 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
         disabled=False,
         commands=[
             ui.command(name='program', label='Save Program'),
-            ui.command(name='classes_menu', label='Classes', 
-                items=[
-                    ui.command(name='add_ge', label='Add GE'),
-                    ui.command(name='add_elective', label='Add Electives'),  
-            ])
+            #ui.command(name='classes_menu', label='Classes', 
+            #    items=[
+            #        ui.command(name='add_ge', label='Add GE'),
+            #        ui.command(name='add_elective', label='Add Electives'),  
+            #]),
+            ui.command(name='add_ge', label='Add GE'),
+            ui.command(name='add_elective', label='Add Electives')  
     ])
-
     if flex:
         box = location
-
     card = ui.form_card(box=box,
         items=[
             #ui.text_xl('Browse Programs'),
@@ -549,7 +669,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
         ]
     )
         
-    return add_card(q, 'dropdown', card)
+    add_card(q, 'dropdown', card)
 
     ########################
 
@@ -832,7 +952,6 @@ async def render_program(q):
     await render_program_table(q, location='horizontal', width='90%')
     await render_program_dashboard(q, location='horizontal', width='150px')
 
-
 ##############################################################
 ####################  COURSES PAGE  ##########################
 ##############################################################
@@ -1057,6 +1176,370 @@ async def render_course_page_table(q, df, box=None, location=None, width=None, h
 #######################################################
 ####################  GE PAGE  ########################
 #######################################################
+
+ge_query = '''
+    SELECT course AS name, course || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=? 
+    ORDER BY course
+'''
+ge_query_nopre = '''
+    SELECT course AS name, course || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=? 
+        AND pre='' 
+        AND pre_credits=''
+    ORDER BY course
+'''
+ge_credits_query = '''
+    SELECT course AS name, course || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=? AND credits=? 
+    ORDER BY course
+'''
+ge_pairs_query = '''
+    SELECT 
+        course AS name, 
+        course || ' & ' || substr(note, 27, 3) || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=10 AND credits=3
+    ORDER BY course
+'''
+
+async def render_ge_arts_card(q, menu_width='300px', box='1 11 3 3', location='grid', 
+                              cardname='ge_arts', width='300px'):
+    '''
+    Create the General Education - Arts card
+    '''
+    ge = q.user.student_info['ge']['arts']
+    nopre = ge['nopre']
+    timedConnection = q.user.conn
+    flex = q.app.flex
+    if flex:
+        box = ui.box(location, width=width)
+    card = ui.form_card(
+        box=box,
+        items=[
+            ui.inline([
+                ui.text('Arts and Humanities', size=ui.TextSize.L),
+                ui.checkbox(name='ge_arts_check', label='')
+            ], justify='between', align='start'),
+            ui.dropdown(
+                name='ge_arts_1',
+                label='1. Course (3 credits)',
+                value=ge['1'] if (ge['1'] is not None) else q.args.ge_arts_1,
+                trigger=True,
+                placeholder='(Select One)',
+                required=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (6,))
+            ),
+            ui.dropdown(
+                name='ge_arts_2',
+                label='2. Course (3 credits)',
+                value=ge['2'] if (ge['2'] is not None) else q.args.ge_arts_2,
+                trigger=True,
+                placeholder='(Select One)',
+                required=True,
+                width=menu_width,
+                # figure out how to omit choice selected in Course 1
+                choices=await get_choices(timedConnection, ge_query, (7,))
+            ),
+        ]
+    )
+    add_card(q, cardname, card)
+
+
+async def render_ge_beh_card(q, menu_width='300px', box='4 11 3 3', location='grid', 
+                             cardname='ge_beh', width='300px'):
+    '''
+    Create the General Education - Behavioral and Social Sciences card
+    '''
+    ge = q.user.student_info['ge']['beh']
+    nopre = ge['nopre']
+    timedConnection = q.user.conn
+    flex = q.app.flex
+    if flex:
+        box = ui.box(location, width=width)
+    card = ui.form_card(
+        box=box,
+        items=[
+            #ui.separator(label=''),
+            ui.inline([
+                ui.text('Behavioral and Social Sciences', size=ui.TextSize.L),
+                ui.checkbox(name='ge_beh_check', label='')
+            ], justify='between', align='start'),
+            ui.dropdown(
+                name='ge_beh_1',
+                label='1. Course (3 credits)',
+                value=ge['1'] if (ge['1'] is not None) else q.args.ge_beh_1,
+                trigger=True,
+                popup='always',
+                placeholder='(Select One)',
+                required=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (12,))
+                #choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (11,))
+            ),
+            ui.dropdown(
+                name='ge_beh_2',
+                label='2. Course (3 credits)',
+                value=ge['2'] if (ge['2'] is not None) else q.args.ge_beh_2,
+                trigger=True,
+                popup='always',
+                placeholder='(Select One)',
+                required=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (13,))
+#                choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (11,))
+            ),
+        ]
+    )
+    add_card(q, cardname, card)
+
+
+async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='grid', 
+                             cardname='ge_bio', width='300px'):
+    '''
+    Create the General Education - Science card
+    '''
+    timedConnection = q.user.conn
+    ge = q.user.student_info['ge']['bio']
+    nopre = ge['nopre']
+    flex = q.app.flex
+    if flex:
+        box = ui.box(location, width=width)
+    card = ui.form_card(
+        box=box,
+        items=[
+            ui.inline([
+                ui.text('Biological and Physical Sciences', size=ui.TextSize.L),
+                ui.checkbox(name='ge_bio_check', label='')
+            ], justify='between', align='start'),
+            #ui.text('Select one of the following:', size=ui.TextSize.L),
+            #ui.separator(label='1. Select one of the following three choices:'),
+            ui.dropdown(
+                name='ge_bio_1a',
+                label='1. Lecture & Lab (4 credits): Select one',
+                value = ge['1a'] if (ge['1a'] is not None) else q.args.ge_bio_1a,
+                trigger=True,
+                placeholder='(Combined Lecture & Lab)',
+                required=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (8,))
+            ),
+            ui.dropdown(
+                name='ge_bio_1c',
+                #label='Separate Lecture and Laboratory',
+                value=ge['1c'] if (ge['1c'] is not None) else q.args.ge_bio_1c,
+                trigger=True,
+                placeholder='or (Separate Lecture & Lab)',
+                width=menu_width,
+                choices=await utils.get_choices_disable_all(timedConnection, ge_pairs_query, ())
+            ),
+            ui.dropdown(
+                name='ge_bio_1b',
+                #label='For Science Majors and Minors only:',
+                value=ge['1b'] if (ge['1b'] is not None) else q.args.ge_bio_1b,
+                trigger=True,
+                placeholder='or (Science Majors and Minors)',
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (9,))
+            ),
+            #ui.separator(label='Select an additional science course:'),
+            #nopre=True # check for easy classes by selecting those w/o prerequisites
+            ui.dropdown(
+                name='ge_bio_2',
+                label='2. An additional course (3 credits)',
+                value=ge['2'] if (ge['2'] is not None) else q.args.ge_bio_2,
+                trigger=True,
+                popup='always',
+                placeholder='(Select One)',
+                required=True,
+                width=menu_width,
+#                choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (10,))
+                choices=await get_choices(timedConnection, ge_query, (11,))
+            ),
+        ]
+    )
+    add_card(q, cardname, card)
+
+
+async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='grid', 
+                             cardname='ge_comm', width='300px'):
+    '''
+    Create the General Education - Communications card
+    '''
+    timedConnection = q.user.conn
+    ge = q.user.student_info['ge']['comm']
+    nopre = ge['nopre']
+    flex = q.app.flex
+    if flex:
+        box = ui.box(location, width=width)
+    card = ui.form_card(
+        box=box,
+        items=[
+            ui.inline([
+                ui.text('Communications', size=ui.TextSize.L),
+                ui.checkbox(name='ge_comm_check', label='')
+            ], justify='between', align='start'),
+            ui.dropdown(
+                name='ge_comm_1',
+                label='1. WRTG 111 or equivalent (3 credits)',
+                value=ge['1'] if (ge['1'] is not None) else q.args.ge_comm_1,
+                trigger=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (1,))
+            ),
+            ui.dropdown(
+                name='ge_comm_2',
+                label='2. WRTG 112 (3 credits)',
+                value=ge['2'] if (ge['2'] is not None) else q.args.ge_comm_2,
+                disabled=False,
+                trigger=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (2,))
+            ),
+            ui.dropdown(
+                name='ge_comm_3',
+                label='3. Another course (3 credits)',
+                placeholder='(Select One)',
+                value=ge['3'] if (ge['3'] is not None) else q.args.ge_comm_3,
+                trigger=True,
+                popup='always',
+                required=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (3,))
+            ),
+            ui.dropdown(
+                name='ge_comm_4',
+                label='4. Advanced writing course (3 credits)',
+                placeholder='(Select One)',
+                value=ge['4'] if (ge['4'] is not None) else q.args.ge_comm_4,
+                trigger=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (4,))
+            ),
+        ]
+    )
+    add_card(q, cardname, card)
+
+
+async def render_ge_math_card(q, menu_width='300px', box='4 9 3 2', location='grid', 
+                             cardname='ge_math', width='300px'):
+    '''
+    Create the General Education - Mathematics card
+    '''
+    ge = q.user.student_info['ge']['math']
+    timedConnection = q.user.conn
+    nopre = ge['nopre']
+    flex = q.app.flex
+    if flex:
+        box = ui.box(location, width=width)
+    card = ui.form_card(
+        box=box,
+        items=[
+            ui.inline([
+                ui.text('Mathematics', size=ui.TextSize.L),
+                ui.checkbox(name='ge_math_check', label='')
+            ], justify='between', align='start'),
+            ui.dropdown(
+                name='ge_math_1',
+                label='One Course (3 credits)',
+                value=ge['1'] if (ge['1'] is not None) else q.args.ge_math,
+                placeholder='(Select One)',
+                trigger=True,
+                required=True,
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (5,))
+            ),
+        ]
+    )
+    add_card(q, cardname, card)
+
+
+async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='grid', 
+                             cardname='ge_res', width='300px'):
+    '''
+    Create the General Education - Research and Computing Literacy card
+    '''
+    timedConnection = q.user.conn
+    ge = q.user.student_info['ge']['res']
+    nopre = ge['nopre']
+    flex = q.app.flex
+    if flex:
+        box = ui.box(location, width=width)
+    # make some defaults based on area of program chosen:
+    if q.user.student_info['menu']['area_of_study'] == '1':
+        ge['1'] = 'PACE 111B'
+    card = ui.form_card(
+        box=box,
+        items=[
+            ui.inline([
+                ui.text('Research and Computing Literacy', size=ui.TextSize.L),
+                ui.checkbox(name='ge_res_check', label='')
+            ], justify='between', align='start'),
+            ui.dropdown(
+                name='ge_res_1',
+                label='1. Professional Exploration (3 credits)',
+                value=ge['1'] if (ge['1'] is not None) else q.args.ge_res_1,
+                # default value will depend on the major chosen
+                trigger=True,
+                placeholder='(Select One)',
+                popup='always',
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (14,))
+            ),
+            ui.dropdown(
+                name='ge_res_2',
+                label='2. Research Skills / Professional Development (1 credit)',
+                value=ge['2'] if (ge['2'] is not None) else q.args.ge_res_2,
+                trigger=True,
+                placeholder='(Select One)',
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_query, (15,))
+            ),
+            ui.dropdown(
+                name='ge_res_3',
+                label='3. Computing or IT (3 credits)',
+                value=ge['3'] if (ge['3'] is not None) else q.args.ge_res_3,
+                trigger=True,
+                required=True,
+                placeholder='(Select 3-credit Course)',
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_credits_query, (16,3))
+            ),
+           ui.dropdown(
+                name='ge_res_3a',
+                label='[or three 1-credit courses]:',
+                required=True,
+                value=ge['3a'] if (ge['3a'] is not None) else q.args.ge_res_3a,
+                trigger=True,
+                placeholder='(Select 1-credit Course)',
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_credits_query, (16,1))
+            ),
+            ui.dropdown(
+                name='ge_res_3b',
+                #label='Computing or Information Technology (1 credit)',
+                value=ge['3b'] if (ge['3b'] is not None) else q.args.ge_res_3b,
+                trigger=True,
+                placeholder='and (Select 1-credit Course)',
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_credits_query, (16,1))
+            ),
+            ui.dropdown(
+                name='ge_res_3c',
+                #label='Computing or Information Technology (1 credit each)',
+                value=ge['3c'] if (ge['3c'] is not None) else q.args.ge_res_3c,
+                trigger=True,
+                placeholder='and (Select 1-credit Course)',
+                width=menu_width,
+                choices=await get_choices(timedConnection, ge_credits_query, (16,1))
+            ),
+        ]
+    )
+    add_card(q, cardname, card)
 
 
 ########################################################

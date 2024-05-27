@@ -11,6 +11,7 @@ c.execute('''
         id INTEGER PRIMARY KEY,
         requirement INTEGER,
         type TEXT,
+        abbr TEXT,
         part TEXT DEFAULT '',
         description TEXT,
         credits INTEGER,
@@ -35,65 +36,79 @@ c.execute('''
     )
 ''')
 
+ge_req_query = '''
+    INSERT INTO general_education_requirements (id, requirement, type, abbr, part, description, credits, note)
+    SELECT ?, ?, ?, ?, ?, ?, ?, ?
+'''
+
 # General Education Requirement 1
 ## Communications: 12 credits
+
+type = 'Communications'
+abbr = 'comm'
+req = 1
+
 ## 1. WRTG 111 or another writing course (3 credits)
 ##    (I am making the assumption that there are no prerequisites)
 
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, part, description, credits)
-    SELECT 1, 1, 'Communications', '1', 'WRTG 111 or another writing course', 3
-'''
-c.execute(query)
+id = 1
+part = '1'
+description = 'WRTG 111 or another writing course'
+credits = 3
+note = ''
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
+# Check whether 'COMM 390', 'COMM 492' really are ok substitutes for 'WRTG 111'.
+# Seems odd.
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        1, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND (
 		    course LIKE 'WRTG 111'  
-			OR course IN ('COMM 390', 'COMM 492','ENGL 102','JOUR 201')
+			OR course IN ('ENGL 102','JOUR 201')
 		)
 		AND course NOT IN ('WRTG 112', 'WRTG 288', 'WRTG 388','WRTG 486%')
 '''
 #        AND pre == ''
-c.execute(query)
+c.execute(query, (id,))
 
 ## 2. WRTG 112
 ## Must be completed within the first 24 credits
 
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, part, description, credits, note)
-    SELECT 2, 1, 'Communications', '2', 'WRTG 112', 3, 'Must be completed within the first 24 credits'
-'''
-c.execute(query)
+id = 2
+part = '2'
+description = 'WRTG 112'
+credits = 3
+note = 'Must be completed within the first 24 credits'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        2, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
         course = 'WRTG 112'
 '''
-c.execute(query)
+c.execute(query, (id,))
 
 ## 3. A course in communication, writing, or speech
 ## 
-
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, part, description, credits)
-    SELECT 3, 1, 'Communications', '3', 'A course in communication, writing, or speech', 3
-'''
-c.execute(query)
+id = 3
+part = '3'
+description = 'A course in communication, writing, or speech'
+credits = 3
+note = ''
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        3, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
@@ -108,20 +123,25 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
 		AND course NOT LIKE 'WRTG 111'
 		AND course NOT LIKE 'WRTG 112'
 '''
-c.execute(query)
+c.execute(query, (id,))
 
 ## 4. An upper-level advanced writing course
 ## 
 query = '''
     INSERT INTO general_education_requirements (id, requirement, type, part, description, credits)
-    SELECT 4, 1, 'Communications', '4', 'An upper-level advanced writing course', 3
+    SELECT 4, 1, 'Communications', '4', '', 3
 '''
-c.execute(query)
+id = 4
+part = '4'
+description = 'An upper-level advanced writing course'
+credits = 3
+note = ''
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        4, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
@@ -129,39 +149,48 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
             course IN ('WRTG 391', 'WRTG 393','WRTG 394')
 ;
 '''
-c.execute(query)
+c.execute(query, (id,))
 
 ## Mathematics: 3 credits
 ## Must be completed within the first 24 credits
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, description, credits, note)
-    SELECT 5, 2, 'Mathematics', 'Mathematics', 3, 'Must be completed within the first 24 credits'
-'''
-c.execute(query)
+type = 'Mathematics'
+abbr = 'math'
+req = 2
+
+id = 5
+part = '1'
+description = type
+credits = 3
+note = 'Must be completed within the first 24 credits'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        5, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		course IN ('MATH 105', 'MATH 107', 'MATH 115', 'MATH 140', 'STAT 200')
 '''
-c.execute(query)
+c.execute(query, (id,))
 
 ## Arts and Humanities: 6 credits
-## Two 3-credit courses
+type = 'Arts and Humanities'
+abbr = 'arts'
+req = 3
 
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, description, credits, note)
-    SELECT 6, 3, 'Arts and Humanities', 'Arts and Humanities', 6, 'Two 3-credit courses'
-'''
-c.execute(query)
+## Course 1
+id = 6
+part = '1'
+description = type
+credits = 3
+note = ''
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        6, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
@@ -209,30 +238,36 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
           )
           AND course NOT IN ('ENGL 281', 'ENGL 384')
 '''
-c.execute(query)
+c.execute(query, (id,))
 
-# 7.
+## Course 2
+id = 7
+part = '2'
+description = type
+credits = 3
+note = ''
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
+
+c.execute(query, (id,))
+
+# 8.
 ## Biological and Physical Sciences
 ## 1a. A science course combining lecture and laboratory (4 credits)
-## 1b. A science course combining lecture and laboratory for science majors and minors (4 credits)
-## 1c. A science lecture course (3 credits) with related laboratory course (1 credit)
+type = 'Biological and Physical Sciences'
+abbr = 'bio'
+req = 4
 
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, part, description, credits, note)
-    VALUES 
-        (7, 4, 'Biological and Physical Sciences', '1a', 'Science lecture with laboratory', 4, 
-            'A science course combining lecture and laboratory (4 credits)'),
-        (8, 4, 'Biological and Physical Sciences', '1b', 'Science lecture with laboratory for science majors or minors', 4, 
-            'A science course combining lecture and laboratory (4 credits)'),
-        (9, 4, 'Biological and Physical Sciences', '1c', 'Science lecture with laboratory', 4, 
-            'A science lecture course (3 credits) with related laboratory course (1 credit)')
-'''
-c.execute(query)
+id = 8
+part = '1a'
+description = 'Science lecture with laboratory'
+credits = 4
+note = 'A science course combining lecture and laboratory (4 credits)'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        7, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		course in (
@@ -241,12 +276,21 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
 			'NSCI 103'
         )
 '''
-c.execute(query)
+c.execute(query, (id,))
+
+## 1b. A science course combining lecture and laboratory for science majors and minors (4 credits)
+
+id = 9
+part = '1b'
+description = 'Science lecture with laboratory for science majors or minors'
+credits = 4
+note = 'A science course combining lecture and laboratory (4 credits)'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        8, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		course in (
@@ -255,12 +299,21 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
 			'PHYS 122'
         )
 '''
-c.execute(query)
+c.execute(query, (id,))
 
-query = '''
+## 1c. A science lecture course (3 credits) with related laboratory course (1 credit)
+
+id = 10
+part = '1c'
+description = 'Science lecture with laboratory'
+credits = 4
+note = 'A science lecture course (3 credits) with related laboratory course (1 credit)'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
+
+query1 = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, course, 'Pair: BIOL 101 (3) & BIOL 102 (1)' 
+        ?, id, course, 'Pair: BIOL 101 (3) & BIOL 102 (1)' 
 	FROM courses
 	WHERE 
 		course in (
@@ -268,12 +321,11 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
             'BIOL 102'
         )
 '''
-c.execute(query)
 
-query = '''
+query2 = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, course, 'Pair: BIOL 160 (3) & BIOL 161 (1)' 
+        ?, id, course, 'Pair: BIOL 160 (3) & BIOL 161 (1)' 
 	FROM courses
 	WHERE 
 		course in (
@@ -281,12 +333,11 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
             'BIOL 161'
         )
 '''
-c.execute(query)
 
-query = '''
+query3 = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, course, 'Pair: NSCI 100 (3) & NSCI 101 (1)' 
+        ?, id, course, 'Pair: NSCI 100 (3) & NSCI 101 (1)' 
 	FROM courses
 	WHERE 
 		course in (
@@ -294,12 +345,11 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
             'NSCI 101'
         )
 '''
-c.execute(query)
 
-query = '''
+query4 = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, course, 'Pair: NSCI 170 (3) & NSCI 171 (1)' 
+        ?, id, course, 'Pair: NSCI 170 (3) & NSCI 171 (1)' 
 	FROM courses
 	WHERE 
 		course IN (
@@ -307,12 +357,11 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
             'NSCI 171'
         )
 '''
-c.execute(query)
 
-query = '''
+query5 = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, course, 'Pair: NUTR 100 (3) & NUTR 101 (1)' 
+        ?, id, course, 'Pair: NUTR 100 (3) & NUTR 101 (1)' 
 	FROM courses
 	WHERE 
 		course in (
@@ -320,34 +369,39 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
             'NUTR 101'
         )
 '''
-c.execute(query)
 
-query = '''
+query6 = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course, note)
     SELECT 
-        9, id, course, '' 
+        ?, id, course, '' 
 	FROM courses
 	WHERE 
 		course in (
             'NSCI 120'
         )
 '''
-c.execute(query)
+
+c.execute(query1, (id,))
+c.execute(query2, (id,))
+c.execute(query3, (id,))
+c.execute(query4, (id,))
+c.execute(query5, (id,))
+c.execute(query6, (id,))
 
 ## 2. Any other science course (3 credits)
 ## Courses from the following disciplines apply: ASTR, BIOL, CHEM, GEOL, NSCI, NUTR, or PHYS. 
 
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, part, description, credits, note)
-    SELECT 10, 4, 'Biological and Physical Sciences', '2', 'Any other science course', 3, 
-        'Courses from the following disciplines apply: ASTR, BIOL, CHEM, GEOL, NSCI, NUTR, or PHYS.'
-'''
-c.execute(query)
+id = 11
+part = '2'
+description = 'Any other science course'
+credits = 3
+note = 'Courses from the following disciplines apply: ASTR, BIOL, CHEM, GEOL, NSCI, NUTR, or PHYS.'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        10, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
@@ -361,23 +415,27 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
  			OR course LIKE 'PHYS %'
         )
 '''
-c.execute(query)
+c.execute(query, (id,))
 
 # 8.
 ## Behavioral and Social Sciences: 6 credits
-## Two 3-credit hour courses from the following:
+## Two 3-credit hour courses 
+type = 'Behavioral and Social Sciences'
+abbr = 'beh'
+req = 5
 
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, description, credits, note)
-    VALUES 
-        (11, 5, 'Behavioral and Social Sciences', 'Behavioral and Social Sciences', 6, 'Two 3-credit hour courses') 
-'''
-c.execute(query)
+# Course 1
+id = 12
+part = '1'
+description = type
+credits = 3
+note = ''
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        11, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
@@ -395,51 +453,76 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
         AND course NOT IN ('GERO 342', 'GERO 351')
         AND course NOT LIKE '% 486A'
 '''
-c.execute(query)
+c.execute(query, (id,))
+
+# Course 2
+id = 13
+part = '2'
+description = type
+credits = 3
+note = ''
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
+
+c.execute(query, (id,))
+
 
 ## Research and Computing Literacy: 7 credits
+type = 'Research and Computing Literacy'
+abbr = 'res'
+req = 6
 
-## Professional exploration course (3 credits)
+## 1. Professional exploration course (3 credits)
 ## PACE 111B, PACE 111C, PACE 111M, PACE 111P, PACE 111S, and PACE 111T apply. To be taken as the first course.
 
-query = '''
-    INSERT INTO general_education_requirements (id, requirement, type, part, description, credits, note)
-    VALUES 
-        (12, 6, 'Research and Computing Literacy', '1', 'Professional exploration course', 3, 
-            'To be taken as the first course'),
-        (13, 6, 'Research and Computing Literacy', '2', 'Research skills and professional development course', 1, 
-            'LIBS 150, CAPL 398A, and any general education course apply'),
-        (14, 6, 'Research and Computing Literacy', '3', 'Computing or information technology course', 3, 
-            'One 3-credit course or three 1-credit courses')
-'''
-c.execute(query)
+id = 14
+part = '1'
+description = 'Professional exploration course'
+credits = 3
+note = 'To be taken as the first course'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        12, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '3' 
 		AND course LIKE 'PACE 111_'
 '''
-c.execute(query)
+c.execute(query, (id,))
+
+## 2. Research skills and professional development course
+id = 15
+part = '2'
+description = 'Research skills and professional development course'
+credits = 1
+note = 'LIBS 150, CAPL 398A, and any general education course apply'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        13, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits = '1' 
 		AND course IN ('LIBS 150', 'CAPL 398A')
 '''
-c.execute(query)
+c.execute(query, (id,))
+
+## 3. Computing or information technology course
+id = 16
+part = '3'
+description = 'Computing or information technology course'
+credits = 3
+note = 'One 3-credit course or three 1-credit courses'
+c.execute(ge_req_query, (id, req, type, abbr, part, description, credits, note))
 
 query = '''
 INSERT INTO general_education (general_education_requirements_id, course_id, course)
     SELECT 
-        14, id, course 
+        ?, id, course 
 	FROM courses
 	WHERE 
 		credits IN ('1', '3') 
@@ -453,7 +536,8 @@ INSERT INTO general_education (general_education_requirements_id, course_id, cou
  			OR course LIKE 'SDEV %')
         AND course NOT LIKE '% 486A'
 '''
-c.execute(query)
+c.execute(query, (id,))
+
 conn.commit()
 
 ################################################################
