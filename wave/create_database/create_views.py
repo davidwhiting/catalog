@@ -206,6 +206,7 @@ create_view_query = '''
         b.title,
         0 AS completed,
         0 AS term,
+        0 AS year,
         0 AS session,
         0 AS locked,
         b.pre,

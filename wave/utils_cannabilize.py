@@ -23,10 +23,6 @@ async def get_ge_choices(conn, query, params=()):
     choices = [ui.choice(name=str(row['name']), label=row['name'] + ': ' + row['title']) for row in rows]
     return choices
 
-async def get_catalog_program_sequence(q):
-    query = 'SELECT * FROM catalog_program_sequence_view WHERE program_id = ?'
-    df = await get_query_df(q.user.conn, query, params=(q.user.student_info['program_id'],))
-    return df
 
 
 

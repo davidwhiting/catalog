@@ -196,7 +196,7 @@ def return_header_card(q, box='1 1 7 1'):
     '''
     flex = q.app.flex
     admin_tab_items = [
-        #ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='Login'),
         #ui.tab(name='#admin',    label='Admin'),
         ui.tab(name='#home',     label='Admin Home'),
         ui.tab(name='#program',  label='Choose Program'),
@@ -204,7 +204,7 @@ def return_header_card(q, box='1 1 7 1'):
         ui.tab(name='#schedule', label='Set Schedule'),
     ]
     coach_tab_items = [
-        #ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='Login'),
         #ui.tab(name='#admin',    label='Admin'),
         ui.tab(name='#home',     label='Coach Home'),
         ui.tab(name='#program',  label='Choose Program'),
@@ -213,11 +213,11 @@ def return_header_card(q, box='1 1 7 1'):
     ]
 
     student_tab_items = [
-        #ui.tab(name='#login',    label='Login'),
-        ui.tab(name='#home',     label='Student Home'),
-        ui.tab(name='#program',  label='Choose Program'),
-        ui.tab(name='#course',   label='Select Courses'),
-        ui.tab(name='#schedule', label='Set Schedule'),
+        ui.tab(name='#login',    label='Student'),
+        ui.tab(name='#home',     label='Home'),
+        ui.tab(name='#program',  label='Program'),
+        ui.tab(name='#course',   label='Courses'),
+        ui.tab(name='#schedule', label='Schedule'),
     ]
     guest_tab_items = student_tab_items
 
@@ -234,8 +234,8 @@ def return_header_card(q, box='1 1 7 1'):
         textbox_label = 'Student Name'
         textbox_value = q.user.name
     else:
-        tab_items = guest_tab_items
-        textbox_label = 'Guest'
+        tab_items = student_tab_items
+        textbox_label = 'Student Name'
         textbox_value = ' '
 
     older_tab_items = [
@@ -419,12 +419,12 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
     #choices=await utils.get_choices(timedConnection, query)
 
     choicesdict = [
-        {'name': 1, 'label': 'Admin (admin role)'},
-        {'name': 2, 'label': 'Coach (coach role)'},
-        {'name': 0, 'label': 'New Student'},
+        #{'name': 1, 'label': 'Admin (admin role)'},
+        {'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
+        {'name': 5, 'label': 'New Student'},
+        #{'name': 0, 'label': 'New Student'},
         {'name': 3, 'label': 'John Doe (full-time student with program selected)'},
-        {'name': 4, 'label': 'Jane Doe (part-time transfer student with program selected)'},
-        #{'name': 5, 'label': 'Jim Doe (new student)'},
+        #{'name': 4, 'label': 'Jane Doe (part-time transfer student with program selected)'},
         #{'name': 6, 'label': 'Tom Doe (military student, no program selected)'},
     ]
 
@@ -464,6 +464,210 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
 ####################  HOME PAGE  #############################
 ##############################################################
 
+def task1(q):
+    '''
+    Task 1 Card repeated on home page and home/1, home/2, etc.
+    '''
+    task_1_caption = f'''
+### Enter selected information 
+- Residency status
+- Attendance type
+- Financial aid
+- Transfer credits
+'''
+    add_card(q, 'task1', 
+        card = ui.wide_info_card(
+            box=ui.box('top_horizontal', width='350px'),
+            name='task1',
+            icon='AccountActivity',
+            title='Task 1',
+            caption=task_1_caption
+        )
+    )
+
+
+def demographics1(q, card_height = '400px'):
+    '''
+    Demographics card for home page
+    '''
+    resident_choices = [
+        ui.choice('A', 'In-State'),
+        ui.choice('B', 'Out-of-State'),
+        ui.choice('C', 'Military'),
+    ]
+    attendance_choices = [
+        ui.choice('A', 'Full Time'),
+        ui.choice('B', 'Part Time'),
+        ui.choice('C', 'Evening only'),
+    ]
+
+    add_card(q, 'demographics1', 
+        ui.form_card(
+            box=ui.box('top_horizontal', width='400px'),
+            items=[
+                ui.text_xl('Tell us about yourself'),
+                ui.text('This information will help us build a course schedule'),
+                ui.inline(items=[
+                    #ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
+                    #ui.text_xl(''),
+                    ui.choice_group(name='attendance', label='I will be attending', choices=attendance_choices, required=True),
+                ]),
+                ui.separator(name='my_separator', width='100%', visible=True),
+                ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
+                ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
+                #ui.separator(),
+                #ui.text('(Other appropriate questions here...)'),
+                #ui.separator(),
+
+                ui.button(name='next_demographic_1', label='Next', primary=True),
+            ]
+        )
+    )
+
+
+def demographics2(q):
+    '''
+
+    '''
+    resident_choices = [
+        ui.choice('A', 'In-State'),
+        ui.choice('B', 'Out-of-State'),
+        ui.choice('C', 'Military'),
+    ]
+    add_card(q, 'demographics2', 
+        ui.form_card(
+            box=ui.box('top_horizontal', width='400px'),
+            items=[
+                ui.text_xl('Tell us more about yourself:'),
+                ui.text('This information will help us estimate your tuition costs'),
+                ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
+                ui.separator(label='', name='my_separator2', width='100%', visible=True),
+                ui.button(name='next_demographic_2', label='Next', primary=True),
+            ]
+        )
+    )
+
+def tasks_unchecked(q):
+    '''
+    All tasks unchecked
+    '''
+
+    add_card(q, 'unchecked_tasks', 
+        ui.form_card(
+            box=ui.box('top_horizontal', width='350px', height='400px'),
+            items=[
+        #ui.text(title + ': Credits', size=ui.TextSize.L),
+        ui.text('Task Tracker', size=ui.TextSize.L),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='1. Information',
+            caption='Tell us about yourself',
+            icon='Checkbox',
+            icon_color='#135f96'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='2. Select Program',
+            caption='Decide what you want to study',
+            icon='Checkbox',
+            icon_color='#a30606'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='3. Add Courses',
+            caption='Add GE and Electives',
+            icon='Checkbox',
+            #icon_color='#787800'
+            icon_color='#3c3c43'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='4. Create Schedule',
+            caption='Optimize your schedule',
+            icon='Checkbox',
+            icon_color='#da1a32'
+        )]),
+    ]))
+
+def tasks_checked1(q):
+    '''
+    First task checked
+    '''
+
+    add_card(q, 'checked1_tasks', 
+        ui.form_card(
+            box=ui.box('top_horizontal', width='350px', height='400px'),
+            items=[
+        #ui.text(title + ': Credits', size=ui.TextSize.L),
+        ui.text('Task Tracker', size=ui.TextSize.L),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='1. Information',
+            caption='Tell us about yourself',
+            icon='CheckboxComposite',
+            icon_color='#135f96'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='2. Select Program',
+            caption='Decide what you want to study',
+            icon='Checkbox',
+            icon_color='#a30606'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='3. Add Courses',
+            caption='Add GE and Electives',
+            icon='Checkbox',
+            #icon_color='#787800'
+            icon_color='#3c3c43'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='4. Create Schedule',
+            caption='Optimize your schedule',
+            icon='Checkbox',
+            icon_color='#da1a32'
+        )]),
+    ]))
+
+def task2(q):
+    '''
+    '''
+    task_2b_caption = f'''
+### Option 2: With the help of AI:
+
+- Take a **Skills Assessment** and find programs that best fit your Skills
+- Take an **Interests Assessment** and find programs that best fit your Interests
+- Take a **Personality Assessment** and find programs that best fit your Personality
+- If you have transfer credits, find programs that let you graduate the soonest
+'''
+    task_2a_caption = f'''
+### Option 1: Explore Programs on your own. 
+The Program tab above will take you to the program exploration page
+
+### Option 2 (Coming soon): Let AI suggest programs for you
+'''
+    add_card(q, 'task2a', 
+        card = ui.wide_info_card(
+            box=ui.box('top_horizontal', width='400px'),
+            name='task2a',
+            icon='AccountActivity',
+            title='Select a UMGC Program',
+            caption=task_2a_caption
+        )
+    )
+
+#    add_card(q, 'task2b', 
+#        card = ui.wide_info_card(
+#            box=ui.box('top_horizontal', width='400px'),
+#            name='task2b',
+#            icon='AccountActivity',
+#            title='Task 2b',
+#            caption=task_2b_caption
+#        )
+#    )
+
 def render_registration_card(q, location='top_horizontal', width='40%', 
                              height='400px', cardname='registration'):
     '''
@@ -474,7 +678,7 @@ def render_registration_card(q, location='top_horizontal', width='40%',
         items=[
             ui.text_xl('Welcome to the UMGC Registration Assistant'),
             ui.separator(),
-            ui.text_xl('Please register to use this tool:'),
+            ui.text_xl('Please register:'),
             ui.textbox(name='firstname', label='First Name', required=True),
             ui.textbox(name='lastname', label='Last Name', required=True),
             ui.separator(),
@@ -484,6 +688,42 @@ def render_registration_card(q, location='top_horizontal', width='40%',
     add_card(q, cardname, card)
 
 def render_welcome_back_card(q, location='vertical', height='400px', width='100%', cardname='user_info',
+                             box='1 3 3 3', title=''):
+    student_info = q.user.student_info
+    flex = q.app.flex
+
+    if flex:
+        box = ui.box(location, height=height, width=width)
+    content1 = f'''## Welcome back, {student_info['name']}.
+
+### We need to gather some information from you
+
+'''
+
+    content4 = f'''## Welcome back, {student_info['name']}.
+
+### Here is your current selected student information:
+
+- **Residency status**: {student_info['resident_status']}
+
+- **Attendance type**: {student_info['student_profile']}
+
+- **Transfer credits**: {'Yes' if student_info['transfer_credits']==1 else 'No'}
+
+- **Financial aid**: {student_info['financial_aid']==1}
+
+- **Selected program**: {student_info['degree_program']}
+
+'''
+    card = ui.markdown_card(
+        box=box,
+        title=title,
+        content=content1 if int(q.user.student_info['app_stage_id']) else content4
+    )
+
+    add_card(q, cardname, card)
+
+def render_welcome_back_card_stage1(q, location='vertical', height='400px', width='100%', cardname='user_info',
                              box='1 3 3 3', title=''):
     student_info = q.user.student_info
     flex = q.app.flex
@@ -533,7 +773,7 @@ def return_ai_enablement_card(box='1 1 2 2', location='grid', width='400px', fle
         name='ai',
         icon='LightningBolt',
         title='AI Enablement',
-        caption='*Interest* or *Skills* assessments critical for AI recommendations.'
+        caption='*Interest*, *Skills*, or **Personality** assessments critical for AI recommendations.'
     )
     return card
 
@@ -556,6 +796,62 @@ async def render_career_assessment_card(q, box='1 1 2 2', location='horizontal',
     )
     add_card(q, cardname, card)
 
+async def render_skills_assessment_card(q, box='1 1 2 2', location='horizontal', 
+                                        width='400px', cardname='assessments'):
+    '''
+    Create career assessment card
+    '''
+    flex = q.app.flex
+    if flex:
+        box=ui.box(location, width=width)
+    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
+    caption=f'Take a **Skills Assessment** to find programs that best fit your **skills**. *UMGC CareerQuest* '
+    card = ui.wide_info_card(
+        box=box,
+        name='SkillsAssessment',
+        icon='AccountActivity',
+        title='Let AI suggest Programs based on your Skills',
+        caption=caption
+    )
+    add_card(q, cardname, card)
+
+async def render_interest_assessment_card(q, box='1 1 2 2', location='horizontal', 
+                                        width='400px', cardname='interest_assessments'):
+    '''
+    Create career assessment card
+    '''
+    flex = q.app.flex
+    if flex:
+        box=ui.box(location, width=width)
+    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
+    caption=f'Take an **Interests Assessment** to find programs that best fit your **interests**. *UMGC CareerQuest* '
+    card = ui.wide_info_card(
+        box=box,
+        name='InterestsAssessment',
+        icon='AccountActivity',
+        title='Let AI suggest Programs based on your Interests',
+        caption=caption
+    )
+    add_card(q, cardname, card)
+
+async def render_personality_assessment_card(q, box='1 1 2 2', location='horizontal', 
+                                        width='400px', cardname='personality_assessments'):
+    '''
+    Create career assessment card
+    '''
+    flex = q.app.flex
+    if flex:
+        box=ui.box(location, width=width)
+    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
+    caption=f'Take a **Personality Assessment** to find programs that best fit your **personality**. *UMGC CareerQuest* '
+    card = ui.wide_info_card(
+        box=box,
+        name='InterestsAssessment',
+        icon='AccountActivity',
+        title='Let AI suggest Programs based on your Personality',
+        caption=caption
+    )
+    add_card(q, cardname, card)
 
 def render_student_information_stub_card(box='1 1 2 2', location='horizontal', width='400px', flex=True):
     if flex:
@@ -633,7 +929,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
             disabled=False,
             width='300px',
             choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
-                await utils.get_choices_disable_all(
+                await utils.get_choices(
                     timedConnection, 
                     program_query, 
                     (q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study'])
@@ -1748,4 +2044,38 @@ async def render_schedule_page_table(q, box=None, location='horizontal', width='
 ######################################################
 ####################  PROJECT PAGE  ##################
 ######################################################
+
+def render_home_cards(q, location='top_horizontal', width='25%'):
+    add_card(q, 'student_guest', ui.wide_info_card(
+        box=ui.box(location, width=width),
+        name='',
+        icon='Contact',
+        title='Guests',
+        caption='Login not required to use this app.'
+    ))
+    add_card(q, 'login',
+        ui.wide_info_card(
+            box=ui.box(location, width=width),
+            name='login',
+            title='Login',
+            caption='User roles: *admin*, *coach*, *student*, *prospect*.',
+            icon='Signin')
+    )
+    add_card(q, 'import',
+        ui.wide_info_card(
+            box=ui.box(location, width=width),
+            name='import',
+            title='Import',
+            caption='Future state: Import UMGC student info.',
+            icon='Import')
+    )
+    add_card(q, 'personalize',
+        ui.wide_info_card(
+            box=ui.box(location, width=width),
+            name='person',
+            title='Personalize',
+            caption='User adds new info or confirms imported info.',
+            icon='UserFollowed')
+    )
+
 
