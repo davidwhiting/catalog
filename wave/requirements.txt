@@ -28,6 +28,7 @@ exceptiongroup==1.2.0
 executing==2.0.1
 fastjsonschema==2.19.1
 fqdn==1.5.1
+graphlib==0.9.5
 h11==0.14.0
 h2o-wave==1.1.1
 httpcore==1.0.3
