@@ -8,20 +8,17 @@ clone_venv:
 
 build_amd:
 	docker build --platform linux/amd64 \
-	-t umgc-catalog-wave:latest \
+	-t umgc-wave-app:latest \
 	-f Dockerfile .
 
 build_arm:
 	docker build --platform linux/arm64 \
-	-t umgc-catalog-wave_arm:latest \
+	-t umgc-wave-app_arm:latest \
 	-f Dockerfile_arm .
 
-build_all:
-	build_amd
-	build_arm
+build_all: build_amd build_arm
 
-build: 
-	build_amd
+build: build_amd
 
 run_amd:
 	docker run --rm --name umgc_catalog \
