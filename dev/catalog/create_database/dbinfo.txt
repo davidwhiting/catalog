@@ -1,0 +1,259 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Project UMGC_catalog {
+    database_type: 'SQLite3'
+    Note: 'Database for UMGC registration assistant'
+}
+
+Table courses {
+  id integer [primary key]  
+  name text
+  title text
+  credits text
+  description text
+  prerequisites text
+  recommended text
+  warnings text
+  substitutions text
+  pre text
+  pre_credits text
+  pre_notes text 
+  catalog_id integer [ref: > catalogs.id]
+
+  Note: 'formerly "classes"'
+}
+
+Table catalogs {
+  id integer [primary key]
+  version text
+}
+
+Table degrees {
+  id integer [primary key]
+  name text
+  type text
+}
+
+Table course_types {
+  id integer [primary key]
+  name text
+  label text
+}
+
+Table programs {
+  id integer [primary key]
+  name text
+  degree_id integer [ref: > degrees.id]
+  catalog_id integer [ref: > catalogs.id]
+
+  Note: 'UMGC degree programs table'
+}
+
+Table bachelors_major_requirements {
+  id integer [primary key]
+  program_id integer [ref: > programs.id]
+  major integer
+  related_ge integer
+  related_elective integer
+  remaining_ge integer
+  remaining_elective integer
+  total integer [default: 120]
+}
+
+Table program_requirement_courses {
+  id integer [primary key]
+  program_id integer [ref: > programs.id]
+  course_type_id integer [ref: > course_types.id]
+  course text
+  substitutions text
+  notes text
+}
+
+Table program_descriptions {
+  id integer [primary key]
+  program_id integer [ref: > programs.id]
+  info text [default: '']
+  description text [default: '']
+  learn text [default: '']
+  certification text [default: '']
+  notes text [default: '']
+
+  Note: 'Program descriptions from the catalog'
+}
+
+Table general_education_requirements {
+  id integer [primary key]
+  requirement integer
+  type text
+  part text [default: '']
+  description text
+  credits integer
+  note text [default: '']
+}
+
+Table general_education {
+  id integer [primary key]
+  general_education_requirements_id integer [ref: > general_education_requirements.id]
+  course_id integer [ref: > courses.id]
+  name text
+  note text [default: '']
+}
+
+Table ge_defaults {
+  id integer [primary key]
+  program_id integer [ref: > programs.id]
+  ge text
+  course text
+}
+
+Table catalog_program_sequences {
+  id integer [primary key]
+  program_id integer [ref: > programs.id]
+  seq integer
+  option integer [default: 0]
+  course_type_id integer [ref: > course_type.id]
+  course text
+}
+
+Table roles {
+  id integer [primary key]
+  type text
+}
+
+Table users {
+  id integer [primary key]
+  role_id integer [ref: > roles.id]
+  username text
+  firstname text
+  lastname text
+  notes text
+}
+
+Table student_profile {
+  id integer [primary key]
+  type text
+  label text
+}
+
+Table resident_status {
+  id integer [primary key]
+  type text
+  label text
+}
+
+Table tuition {
+  id integer [primary key]
+  term text
+  program text
+  resident_status_id integer [ref: > resident_status.id]
+  cost integer
+}
+
+Table student_info {
+  id integer [primary key]
+  student_id integer [default: Null]
+  user_id integer  [default: Null, ref: > users.id]
+  resident_status_id integer  [default: Null, ref: > resident_status.id]
+  transfer_credits integer [default: Null]
+  financial_aid integer [default: Null]
+  app_stage_id integer [default: Null, ref: > app_stage.id]
+  program_id integer [default: Null, ref: > programs.id]
+  student_profile_id integer [default: Null, ref: > student_profile.id]
+  notes text
+}
+
+Table app_stage {
+  id integer [primary key]
+  stage text
+}
+
+Table menu_areas {
+  id integer [primary key]
+  name text
+}
+
+Table menu_degrees {
+  id integer [primary key]
+  name text
+}
+
+Table menu_programs_by_areas {
+  id integer
+  menu_area_id integer [ref: > menu_areas.id]
+  menu_degree_id integer [ref: > menu_degrees.id]
+  program_id integer [ref: > programs.id]
+}
+
+Table student_history {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  name text
+  credits integer
+  transfer integer
+}
+
+Table student_progress {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  seq integer
+  name text
+  course_type text
+  credits integer
+  completed integer [default: 0]
+  term integer [default: 0]
+  session integer [default: 0]
+  locked integer [default: 0]
+}
+
+Table student_progress_old {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  seq integer
+  name text
+  course_type text
+  type text
+  credits integer
+  title text
+  completed integer 
+  term integer 
+  session integer 
+  locked integer 
+  pre text
+  pre_credits text
+  substitutions text
+  prerequisites text
+  description text
+}
+
+Table student_progress_d3 {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  seq integer
+  name text
+  credits integer
+  course_type text
+  type text
+  completed integer 
+  term integer 
+  session integer 
+  locked integer 
+  prerequisites text
+}
+
+Table student_progress_d3_old {
+  id integer [primary key]
+  user_id integer [ref: > users.id]
+  seq integer
+  name text
+  credits integer
+  course_type text
+  type text
+  completed integer 
+  term integer 
+  session integer 
+  locked integer 
+  prerequisites text
+  pre text 
+  pre_credits text 
+}

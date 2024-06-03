@@ -1,0 +1,86 @@
+## See https://github.com/h2oai/wave/issues/1229
+#---
+
+version: "3.9"
+services:
+  server:
+    build:
+      context: ./server # what is this for? is it the location?
+      args:
+        WAVE_VERSION: 1.1.1
+    ports:
+      - "10101:10101"
+    dns:
+      - 8.8.8.8 #GOOGLE DNS
+    environment:
+      - H2O_WAVE_PORT=:10101
+  app:
+    build:
+      context: .
+      args:
+        WAVE_VERSION: 1.1.1
+    dns:
+      - 8.8.8.8 #GOOGLE DNS
+    environment:
+      - H2O_WAVE_APP_ADDRESS=http://app:8000
+      - H2O_WAVE_ADDRESS=http://server:10101
+    volumes:
+      - .:/app:ro
+    stdin_open: true
+    tty: true
+
+### Second version
+#version: "3.9"
+#services:
+#  server:
+#    build:
+#      context: ./server
+#      args:
+#        WAVE_VERSION: 0.20.0
+#    ports:
+#      - "10101:445"
+#    dns:
+#      - 8.8.8.8 #GOOGLE DNS
+#    environment:
+#      - H2O_WAVE_PORT=:445
+#  app:
+#    build:
+#      context: .
+#      args:
+#        WAVE_VERSION: 0.20.0
+#    dns:
+#      - 8.8.8.8 #GOOGLE DNS
+#    environment:
+#      - H2O_WAVE_APP_ADDRESS=http://app:8000
+#      - H2O_WAVE_ADDRESS=http://server:445
+#    volumes:
+#      - .:/app:ro
+#    stdin_open: true
+#    tty: true
+
+## Corresponding Dockerfile
+#
+#FROM python:3.8
+#ARG WAVE_VERSION
+#RUN bash -c 'wget --directory-prefix=/tmp/ \
+#  https://github.com/h2oai/wave/releases/download/v${WAVE_VERSION}/wave-${WAVE_VERSION}-linux-amd64.tar.gz \
+#  && tar -xzf /tmp/wave-${WAVE_VERSION}-linux-amd64.tar.gz \
+#  && mv wave-${WAVE_VERSION}-linux-amd64 /wave'
+#WORKDIR /wave
+#EXPOSE "${H2O_WAVE_PORT}"
+#CMD ./waved -listen "$H2O_WAVE_PORT"
+
+## Original version of docker-compose.yml
+#---
+#version: '3.8'
+#    
+#services:
+#  wave_local_dev:
+#    build: 
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "10101:10101"
+#    volumes:
+#      - ./src:/app/src
+#...

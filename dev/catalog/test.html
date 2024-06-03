@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Padlock Icon</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <svg width="200" height="100"></svg>
+
+    <script>
+        const svg = d3.select("svg");
+        const width = 100;
+        const height = 40;
+        const locked = false; // Change to false for unlocked icon
+
+        const closedPadlockPath = "M12 17.25C12 16.56 12.56 16 13.25 16H15.75C16.44 16 17 16.56 17 17.25V20.75C17 21.44 16.44 22 15.75 22H13.25C12.56 22 12 21.44 12 20.75V17.25ZM10 7V6C10 3.79 11.79 2 14 2C16.21 2 18 3.79 18 6V7H20C20.55 7 21 7.45 21 8V19C21 20.1 20.1 21 19 21H9C7.9 21 7 20.1 7 19V8C7 7.45 7.45 7 8 7H10ZM12 7H16V6C16 4.9 15.1 4 14 4C12.9 4 12 4.9 12 6V7Z";
+        const openPadlockPath = "M12 17.25C12 16.56 12.56 16 13.25 16H15.75C16.44 16 17 16.56 17 17.25V20.75C17 21.44 16.44 22 15.75 22H13.25C12.56 22 12 21.44 12 20.75V17.25ZM10 7V6C10 3.79 11.79 2 14 2C16.21 2 18 3.79 18 6V8C18 8.55 17.55 9 17 9C16.45 9 16 8.55 16 8V6C16 4.9 15.1 4 14 4C12.9 4 12 4.9 12 6V7H20C20.55 7 21 7.45 21 8V19C21 20.1 20.1 21 19 21H9C7.9 21 7 20.1 7 19V8C7 7.45 7.45 7 8 7H10Z";
+        const closedPadlock = "M6 6c0-3.311 2.689-6 6-6s6 2.688 6 6v4h3v14h-18v-14h3v-4zm14 5h-16v12h16v-12zm-13-5v4h10v-4c0-2.76-2.24-5-5-5s-5 2.24-5 5z";
+        const openPadlock = "M11 10v-4c0-2.76-2.24-5-5-5s-5 2.24-5 5v2h-1v-2c0-3.312 2.689-6 6-6s6 2.689 6 6v4h10v14h-18v-14h7zm10 1h-16v12h16v-12z";
+        const closedPadlock2 = "M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8v-4zm11 16h-14v-10h14v10z";
+        const openPadlock2 = "M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12zm10 12h-14v-10h14v10z";
+        // Create a group to hold the rectangle and icon
+        const group = svg.append("g")
+            .attr("transform", "translate(50, 25)");
+
+        // Add the red rectangle
+        group.append("rect")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("fill", "red");
+
+        // Add the padlock icon
+        group.append("path")
+            .attr("d", locked ? closedPadlock2 : openPadlock2)
+            .attr("transform", `translate(${width - 24}, 4) scale(.8)`)
+            .attr("fill", "black");
+    </script>
+</body>
+</html>
+
