@@ -1,44 +1,46 @@
-default: start
+default: run
 
-activate:
-	bash -c "source .venv/bin/activate"
+## Docker build commands
 
-run:
-	.venv/bin/wave run app
+build_amd:
+	docker build --platform linux/amd64 \
+	--build-arg PLATFORM=linux/amd64 \
+	--build-arg PYTHON_VERSION=3.10.12 \
+	-t umgc-wave-app:latest \
+	-f dockerfile .
 
-server:
-	cd .venv && ./waved
+build_arm:
+	docker build --platform linux/arm64 \
+	--build-arg PLATFORM=linux/arm64 \
+	--build-arg PYTHON_VERSION=3.10.12 \
+	-t umgc-wave-app_arm:latest \
+	-f dockerfile .
 
-#wavedb: 
-#	./bin/wavedb -access-key-id uzer -access-key-secret pa55word
-#
-#wavedb_test: 
-#	./bin/wavedb
+build: build_amd
+
+build_all: build_amd build_arm
+
+# Docker run commands
+
+run_amd:
+	docker run --rm --name umgc_catalog \
+	-p 10101:10101 \
+	-p 8000:8000 \
+	-e PORT=10101 \
+	umgc-wave-app:latest
+
+run_arm:
+	docker run --rm --name umgc_catalog_arm \
+	-p 10101:10101 \
+	-p 8000:8000 \
+	-e PORT=10101 \
+	umgc-wave-app_arm:latest
+
+run: run_amd
+
 
 copy_venv:
 	.venv/bin/pip freeze > requirements.txt
 
 clone_venv:
 	.venv/bin/pip install -r requirements.txt
-
-docker:
-	docker buildx build --platform linux/amd64 \
-	-t umgc-catalog-wave:0.1.0 \
-	--build-arg PYTHON_VERSION=3.10.12 \
-	--build-arg WAVE_VERSION=1.1.1 \
-	--build-arg PYTHON_MODULE="app.py" \
-	-f Dockerfile .
-
-docker_local:
-	docker buildx build \
-	-t umgc-catalog-wave:0.2.0 \
-	--build-arg PYTHON_VERSION=3.10.12 \
-	--build-arg WAVE_VERSION=1.1.1 \
-	--build-arg PYTHON_MODULE="app.py" \
-	-f Dockerfile .
-
-run_docker:
-	docker run --rm --name umgc_catalog \
-	-p 10101:10101 \
-	-e PORT=10101 \
-	umgc-catalog-wave:0.2.0
