@@ -4,14 +4,14 @@ default: run
 
 build_amd:
 	docker build --platform linux/amd64 \
-	--build-arg PLATFORM=linux/amd64 \
+	--build-arg PLATFORM=amd64 \
 	--build-arg PYTHON_VERSION=3.10.12 \
 	-t umgc-wave-app:latest \
 	-f dockerfile .
 
 build_arm:
 	docker build --platform linux/arm64 \
-	--build-arg PLATFORM=linux/arm64 \
+	--build-arg PLATFORM=arm64 \
 	--build-arg PYTHON_VERSION=3.10.12 \
 	-t umgc-wave-app_arm:latest \
 	-f dockerfile .

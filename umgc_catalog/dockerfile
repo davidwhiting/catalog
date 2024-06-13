@@ -2,28 +2,29 @@
 # An alternative is to either download wheel manually or 
 # download and run waved separately.
 
+## These args are replacable as build-time arguments
 ARG PYTHON_VERSION="3.10.12"
-FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim
+ARG PLATFORM=amd64
+ARG WAVE_VERSION="1.1.1"
 
-ENV H2O_WAVE_PORT="10101"
-ENV PYTHON_MODULE="app.py"
+FROM --platform=linux/${PLATFORM} python:${PYTHON_VERSION}-slim
+
 ENV USER="appuser"
+ENV WAVE_HOME="$HOME/wave"
 ENV HOME="/home/$USER"
 
-ENV WAVE_VERSION="1.1.1"
-ENV WAVE_HOME="$HOME/wave"
-ARG WAVE_FILENAME="https://h2o-wave.s3.amazonaws.com/releases/wave-${WAVE_VERSION}-linux-amd64.tar.gz"
+## Used in docker-entrypoint.sh file
+ENV H2O_WAVE_PORT="10101"
+ENV H2O_WAVE_PATH="${WAVE_HOME}/wave-${WAVE_VERSION}-linux-${PLATFORM}"
+ENV PYTHON_MODULE="app.py"
 
-ENV WAVE_PATH="${WAVE_HOME}/wave-${WAVE_VERSION}-linux-amd64"
-ENV PATH="${HOME}/venv/bin:$WAVE_PATH:$PATH"
+ENV WAVE_FILENAME="https://h2o-wave.s3.amazonaws.com/releases/wave-${WAVE_VERSION}-linux-amd64.tar.gz"
+ENV PATH="$HOME/.venv/bin:$WAVE_PATH:$PATH"
 
 # Install OS dependencies
 RUN apt-get update && apt-get -y upgrade \
     && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends curl build-essential libsqlite3-dev 
-#       qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
-# qemu required to get waved server to run
-# need to debug in the future
 
 # Create a non-root user
 RUN useradd --create-home $USER
@@ -31,48 +32,48 @@ USER $USER
 WORKDIR $HOME
 
 # Install Python dependencies.
+ENV REQUIREMENTS="requirements_docker.txt"
 
 # assumes all wave files live in src directory
 # they will be copied to main directory in docker image
-COPY --chown=$USER:$USER  src docker-entrypoint.sh .
-
-ARG REQUIREMENTS="requirements.txt"
-
-RUN python3 -m venv venv && \
-    venv/bin/pip install --upgrade pip && \
-    venv/bin/pip install --no-cache-dir -r ${REQUIREMENTS}
-
-## Install Wave server
-
-RUN \
-    mkdir -p "${WAVE_HOME}" && \
-    curl -fsSL ${WAVE_FILENAME} | tar -C ${WAVE_HOME} -xzv 2>&1
-
-EXPOSE "${H2O_WAVE_PORT}"
-EXPOSE 8000
-
-### Run your app.
-##CMD ["wave", "run", "src/app.py"]
-
-## Set permissions for the Entrypoint script
-RUN chmod +x docker-entrypoint.sh
-ENTRYPOINT [ "./docker-entrypoint.sh" ]
-
-####################################
-
-## NOTES:
-
-## To build for multiple platforms, do 
-#docker buildx build --platform linux/amd64,linux/arm64 -t your-image-name:tag .
-
-# docker buildx build --platform linux/amd64,linux/arm64 -t umgc-catalog-wave:latest .
+COPY --chown=$USER:$USER  src docker-entrypoint.sh $REQUIREMENTS requirements.txt .
 
 
-## Ensure QEMU is installed and registered to handle emulation 
-## of different CPU architectures if building on a platform that 
-## is not native to the target architecture.
+RUN python3 -m venv .venv && \
+    .venv/bin/pip install --upgrade pip
+##    .venv/bin/pip install --upgrade pip && \
+##     .venv/bin/pip install --no-cache-dir -r ${REQUIREMENTS}
 
-#docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-## Can build Docker images compatible with both macOS (Apple 
-## Silicon) and traditional Linux (AMD64) systems.
+## ## Install Wave server
+## 
+## RUN \
+##     mkdir -p "${WAVE_HOME}" && \
+##     curl -fsSL ${WAVE_FILENAME} | tar -C ${WAVE_HOME} -xzv 2>&1
+## 
+## EXPOSE "${H2O_WAVE_PORT}"
+## EXPOSE 8000
+## 
+## ### Run your app.
+## ##CMD ["wave", "run", "src/app.py"]
+## 
+## ## Set permissions for the Entrypoint script
+## RUN chmod +x docker-entrypoint.sh
+## ENTRYPOINT [ "./docker-entrypoint.sh" ]
+## 
+## ####################################
+## 
+## ## NOTES:
+## 
+## ## To build for multiple platforms, do 
+## #docker buildx build --platform linux/amd64,linux/arm64 -t your-image-name:tag .
+## 
+## # docker buildx build --platform linux/amd64,linux/arm64 -t umgc-catalog-wave:latest .
+## 
+## ## Ensure QEMU is installed and registered to handle emulation 
+## ## of different CPU architectures if building on a platform that 
+## ## is not native to the target architecture.
+## 
+## #docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+## 
+## ## Can build Docker images compatible with both macOS (Apple 
+## ## Silicon) and traditional Linux (AMD64) systems.
