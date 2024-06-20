@@ -53,8 +53,6 @@ async def initialize_app(q: Q):
     logging.info('Initializing app')
     q.app.initialized = True
 
-    q.app.sso = 'off'
-
     # q.app.flex: use flexible layout rather than grid
     #  - Development: start with Cartesian grid then move to flex
     #  - Flex looks better in general but it's easier to develop with grid
@@ -252,7 +250,7 @@ async def select_sample_user(q: Q):
     await q.page.save()
 
 ######################################################
-####################  Home page  ####################
+####################  Home page  #####################
 ######################################################
 
 @on('#home')
