@@ -32,15 +32,15 @@ WORKDIR $HOME
 
 # Install Python dependencies.
 
+ARG REQUIREMENTS="requirements.txt"
+
 # assumes all wave files live in src directory
 # they will be copied to main directory in docker image
-COPY --chown=$USER:$USER  src docker-entrypoint.sh .
-
-ARG REQUIREMENTS="requirements.txt"
+COPY --chown=$USER:$USER  src $REQUIREMENTS docker-entrypoint.sh .
 
 RUN python3 -m venv venv && \
     venv/bin/pip install --upgrade pip && \
-    venv/bin/pip install --no-cache-dir -r ${REQUIREMENTS}
+    venv/bin/pip install --no-cache-dir -r $REQUIREMENTS
 
 ## Install Wave server
 
