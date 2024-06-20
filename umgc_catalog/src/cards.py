@@ -386,22 +386,26 @@ async def return_debug_card(q, box='3 3 1 1', location='debug', width='100%', he
 ####################  LOGIN PAGE  #############################
 ###############################################################
 
-def render_login_welcome_card(q, location='top_vertical', width='100%', box='1 2 7 1',
-                              cardname='welcome_login'):
+def return_login_welcome_card(q, location='top_vertical', width='100%', box='1 2 7 1'):
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
 
-    add_card(q, cardname, ui.form_card(
+    card = ui.form_card(
         box=box,
         items=[
             ui.text_l('Select a user below to simulate their login.')
             #ui.text('(The Home page will collect student information)')
         ]
-    ))
+    )
+    return card
 
-async def render_user_dropdown(q, box=None, location='horizontal', menu_width='300px',
-                               cardname='pseudo_login'):
+def render_login_welcome_card(q, location='top_vertical', width='100%', box='1 2 7 1',
+                              cardname='login/welcome'):
+    card = return_login_welcome_card(q, location, width, box)
+    add_card(q, cardname, card)
+
+async def return_user_login_dropdown(q, box=None, location='horizontal', menu_width='300px'):
     '''
     Function to create a dropdown menu of sample users to demo the wave app
     '''
@@ -410,14 +414,15 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
     if flex:
         box = location
 
-    query = '''
-        SELECT a.id AS name, 
-            trim(a.firstname || ' ' || a.lastname || ' (' || b.role || ')') AS label
-        FROM users a, roles b
-        WHERE a.role_id = b.id
-    '''
-    #choices=await utils.get_choices(timedConnection, query)
+    #query = '''
+    #    SELECT a.id AS name, 
+    #        trim(a.firstname || ' ' || a.lastname || ' (' || b.role || ')') AS label
+    #    FROM users a, roles b
+    #    WHERE a.role_id = b.id
+    #'''
+    #choicesdict=await utils.get_choices(timedConnection, query)
 
+    ## tmp fix for demo
     choicesdict = [
         #{'name': 1, 'label': 'Admin (admin role)'},
         {'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
@@ -436,18 +441,18 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
         required=True, 
         choices=choices
     )
-    button = ui.button(name='select_sample_user', label='Submit', 
-                       primary=True)
+    button = ui.button(name='select_sample_user', label='Submit', primary=True)
 
-    dropdown = ui.dropdown(
-        name='sample_user',
-        label='Sample User',
-        value=q.args.sample_user,
-        trigger=True,
-        placeholder='(Select)',
-        width=menu_width,
-        choices=choices
-    )
+    #dropdown = ui.dropdown(
+    #    name='sample_user',
+    #    label='Sample User',
+    #    value=q.args.sample_user,
+    #    trigger=True,
+    #    placeholder='(Select)',
+    #    width=menu_width,
+    #    choices=choices
+    #)
+
     card = ui.form_card(box=box,
         items=[
             ui.text_xl('Example users'),
@@ -457,14 +462,21 @@ async def render_user_dropdown(q, box=None, location='horizontal', menu_width='3
             button
         ]
     ) 
-    #return card
+    return card
+
+async def render_user_login_dropdown(q, box=None, location='horizontal', menu_width='300px',
+                                     cardname='login/demo_login'):
+    '''
+    Function to create a dropdown menu of sample users to demo the wave app
+    '''
+    card = await return_user_login_dropdown(q, box, location, menu_width)
     add_card(q, cardname, card)
 
 ##############################################################
 ####################  HOME PAGE  #############################
 ##############################################################
 
-def task1(q):
+def return_task1_card(location='top_horizontal', width='350px'):
     '''
     Task 1 Card repeated on home page and home/1, home/2, etc.
     '''
@@ -475,18 +487,23 @@ def task1(q):
 - Financial aid
 - Transfer credits
 '''
-    add_card(q, 'task1', 
-        card = ui.wide_info_card(
-            box=ui.box('top_horizontal', width='350px'),
-            name='task1',
-            icon='AccountActivity',
-            title='Task 1',
-            caption=task_1_caption
-        )
+    card = ui.wide_info_card(
+        box=ui.box(location, width=width),
+        name='task1',
+        icon='AccountActivity',
+        title='Task 1',
+        caption=task_1_caption
     )
+    return card
 
+def render_task1_card(q, location='top_horizontal', width='350px'):
+    '''
+    Task 1 Card repeated on home page and home/1, home/2, etc.
+    '''
+    card = return_task1_card(location=location, width=width)
+    add_card(q, 'home/task1', card=card)
 
-def demographics1(q, card_height = '400px'):
+def return_demographics_card1(card_height = '400px', location='top_horizontal', width='400px'):
     '''
     Demographics card for home page
     '''
@@ -500,29 +517,54 @@ def demographics1(q, card_height = '400px'):
         ui.choice('B', 'Part Time'),
         ui.choice('C', 'Evening only'),
     ]
-
-    add_card(q, 'demographics1', 
-        ui.form_card(
-            box=ui.box('top_horizontal', width='400px'),
-            items=[
-                ui.text_xl('Tell us about yourself'),
-                ui.text('This information will help us build a course schedule'),
-                ui.inline(items=[
-                    #ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
-                    #ui.text_xl(''),
-                    ui.choice_group(name='attendance', label='I will be attending', choices=attendance_choices, required=True),
-                ]),
-                ui.separator(name='my_separator', width='100%', visible=True),
-                ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
-                ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
-                #ui.separator(),
-                #ui.text('(Other appropriate questions here...)'),
-                #ui.separator(),
-
-                ui.button(name='next_demographic_1', label='Next', primary=True),
-            ]
-        )
+    card = ui.form_card(
+        box=ui.box(location, width=width),
+        items=[
+            ui.text_xl('Tell us about yourself'),
+            ui.text('This information will help us build a course schedule'),
+            ui.inline(items=[
+                #ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
+                #ui.text_xl(''),
+                ui.choice_group(name='attendance', label='I will be attending', choices=attendance_choices, required=True),
+            ]),
+            ui.separator(name='my_separator', width='100%', visible=True),
+            ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
+            ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
+            #ui.separator(),
+            #ui.text('(Other appropriate questions here...)'),
+            #ui.separator(),
+            ui.button(name='next_demographic_1', label='Next', primary=True),
+        ]
     )
+    return card
+
+def render_demographics_card1(q, card_height = '400px', location='top_horizontal', width='400px'):
+    '''
+    Demographics card for home page
+    '''
+    card = return_demographics_card1(location=location, width=width)
+    add_card(q, 'home/demographics1', card)
+
+def return_demographics_card2(location='top_horizontal', width='400px'):
+    '''
+
+    '''
+    resident_choices = [
+        ui.choice('A', 'In-State'),
+        ui.choice('B', 'Out-of-State'),
+        ui.choice('C', 'Military'),
+    ]
+    card = ui.form_card(
+        box=ui.box(location, width=width),
+        items=[
+            ui.text_xl('Tell us more about yourself:'),
+            ui.text('This information will help us estimate your tuition costs'),
+            ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
+            ui.separator(label='', name='my_separator2', width='100%', visible=True),
+            ui.button(name='next_demographic_2', label='Next', primary=True),
+        ]
+    )
+    return card
 
 
 def demographics2(q):
@@ -546,6 +588,54 @@ def demographics2(q):
             ]
         )
     )
+
+def return_tasks_card(checked=0, location='top_horizontal', width='350px', height='400px'):
+    '''
+    Return tasks optionally checked off
+    '''
+    icons = ['Checkbox', 'Checkbox', 'Checkbox', 'Checkbox']
+    checked_icon = 'CheckboxComposite'
+    # checked needs to be a value between 0 and 4
+    if checked > 0:
+        for i in range(checked):
+            icons[i] = checked_icon
+
+    card = ui.form_card(
+        box=ui.box(location, width=width, height=height),
+        items=[
+            #ui.text(title + ': Credits', size=ui.TextSize.L),
+            ui.text('Task Tracker', size=ui.TextSize.L),
+            ui.stats(items=[ui.stat(
+                label=' ',
+                value='1. Information',
+                caption='Tell us about yourself',
+                icon=icons[0],
+                icon_color='#135f96'
+            )]),
+            ui.stats(items=[ui.stat(
+                label=' ',
+                value='2. Select Program',
+                caption='Decide what you want to study',
+                icon=icons[1],
+                icon_color='#a30606'
+            )]),
+            ui.stats(items=[ui.stat(
+                label=' ',
+                value='3. Add Courses',
+                caption='Add GE and Electives',
+                icon=icons[2],
+                #icon_color='#787800'
+                icon_color='#3c3c43'
+            )]),
+            ui.stats(items=[ui.stat(
+                label=' ',
+                value='4. Create Schedule',
+                caption='Optimize your schedule',
+                icon=icons[3],
+                icon_color='#da1a32'
+            )]),
+        ])
+    return card
 
 def tasks_unchecked(q):
     '''
@@ -588,6 +678,7 @@ def tasks_unchecked(q):
             icon_color='#da1a32'
         )]),
     ]))
+
 
 def tasks_checked1(q):
     '''
@@ -686,6 +777,86 @@ def render_registration_card(q, location='top_horizontal', width='40%',
         ]
     )
     add_card(q, cardname, card)
+
+def return_welcome_back_card(q, location='vertical', height='400px', width='100%', 
+                             box='1 3 3 3', title=''):
+    student_info = q.user.student_info
+    flex = q.app.flex
+
+    if flex:
+        box = ui.box(location, height=height, width=width)
+
+    content2 = f'''## Welcome back, {student_info['name']}.
+
+### Here is your current selected student information:
+
+- **Residency status**: {student_info['resident_status']}
+
+- **Attendance type**: {student_info['student_profile']}
+
+- **Transfer credits**: {'Yes' if student_info['transfer_credits']==1 else 'No'}
+
+- **Financial aid**: {student_info['financial_aid']==1}
+
+#### You need to select a degree program.
+
+'''
+
+    content3 = f'''## Welcome back, {student_info['name']}.
+
+### Here is your current selected student information:
+
+- **Residency status**: {student_info['resident_status']}
+
+- **Attendance type**: {student_info['student_profile']}
+
+- **Transfer credits**: {'Yes' if student_info['transfer_credits']==1 else 'No'}
+
+- **Financial aid**: {student_info['financial_aid']==1}
+
+- **Selected program**: {student_info['degree_program']}
+
+#### You need to create a schedule.
+
+'''
+
+    content4 = f'''## Welcome back, {student_info['name']}.
+
+### Here is your current selected student information:
+
+- **Residency status**: {student_info['resident_status']}
+
+- **Attendance type**: {student_info['student_profile']}
+
+- **Transfer credits**: {'Yes' if student_info['transfer_credits']==1 else 'No'}
+
+- **Financial aid**: {student_info['financial_aid']==1}
+
+- **Selected program**: {student_info['degree_program']}
+
+#### Congratulations, you have a saved schedule.
+
+- Select the **Program** tab to review or change your program.
+- Select the **Courses** tab to add or change courses.
+- Select the **Schedule** tab to update your schedule.
+'''
+    app_stage_id = int(q.user.student_info['app_stage_id'])
+    if app_stage_id == 2:
+        content = content2
+    elif app_stage_id == 3:
+        content = content3
+    elif app_stage_id == 4:
+        content = content4
+
+    if content:
+        card = ui.markdown_card(
+            box=box,
+            title=title,
+            content=content
+        )
+    else:
+        card = None
+    return card
 
 def render_welcome_back_card(q, location='vertical', height='400px', width='100%', cardname='user_info',
                              box='1 3 3 3', title=''):
@@ -1545,7 +1716,6 @@ async def render_ge_arts_card(q, menu_width='300px', box='1 11 3 3', location='g
     )
     add_card(q, cardname, card)
 
-
 async def render_ge_beh_card(q, menu_width='300px', box='4 11 3 3', location='grid', 
                              cardname='ge_beh', width='300px'):
     '''
@@ -1592,7 +1762,6 @@ async def render_ge_beh_card(q, menu_width='300px', box='4 11 3 3', location='gr
         ]
     )
     add_card(q, cardname, card)
-
 
 async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='grid', 
                              cardname='ge_bio', width='300px'):
@@ -1660,7 +1829,6 @@ async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='gri
     )
     add_card(q, cardname, card)
 
-
 async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='grid', 
                              cardname='ge_comm', width='300px'):
     '''
@@ -1720,7 +1888,6 @@ async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='gr
     )
     add_card(q, cardname, card)
 
-
 async def render_ge_math_card(q, menu_width='300px', box='4 9 3 2', location='grid', 
                              cardname='ge_math', width='300px'):
     '''
@@ -1752,7 +1919,6 @@ async def render_ge_math_card(q, menu_width='300px', box='4 9 3 2', location='gr
         ]
     )
     add_card(q, cardname, card)
-
 
 async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='grid', 
                              cardname='ge_res', width='300px'):
@@ -1837,30 +2003,29 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
     )
     add_card(q, cardname, card)
 
-
 ########################################################
 ####################  SCHEDULE PAGE  ###################
 ########################################################
 
-async def render_d3plot(q, html, box='1 2 5 6', location='horizontal', 
-        height='500px', width='100%'):
+async def return_d3plot(q, html, box='1 2 5 6', location='horizontal', 
+                        height='500px', width='100%', add_title=False):
     '''
     Create the D3 display from html input
     '''
     flex = q.app.flex
     if flex:
         box=ui.box(location, height=height, width=width)
+    title = 'Course Schedule' if add_title else ''
+
     card = ui.frame_card(
         box=box,
-        #title='Course Schedule',
-        title='',
+        title=title,
         content=html
     )
-    #return card
-    add_card(q, 'd3_display', card)
+    return card
 
-async def render_schedule_menu(q, box='6 2 2 5', location='vertical', 
-                               width='300px'):
+
+async def return_schedule_menu(q, box='6 2 2 5', location='vertical', width='300px'):
     '''
     Create menu for schedule page
     (retrieve defaults from DB or from q.user.student_info fields)
@@ -1934,7 +2099,7 @@ async def render_schedule_menu(q, box='6 2 2 5', location='vertical',
             #ui.button(name='submit_schedule_menu', label='Submit', primary=True),
         ]
     )
-    add_card(q, 'schedule_menu', card)
+    return card
 
 async def render_schedule_page_table(q, box=None, location='horizontal', width='90%', height=None):
     '''
@@ -2039,6 +2204,22 @@ async def render_schedule_page_table(q, box=None, location='horizontal', width='
         ]
     ))
     return card
+
+async def render_d3plot(q, html, box='1 2 5 6', location='horizontal', height='500px', 
+                        width='100%', cardname='schedule/d3_display', add_title=False):
+    '''
+    Create the D3 display from html input
+    '''
+    card = await return_d3plot(q, html, box, location, height, width, add_title)
+    add_card(q, cardname, card)
+async def render_schedule_menu(q, box='6 2 2 5', location='horizontal', width='300px',
+                               cardname='schedule/menu'):
+    '''
+    Create menu for schedule page
+    (retrieve defaults from DB or from q.user.student_info fields)
+    '''
+    card = await return_schedule_menu(q, box='6 2 2 5', location=location, width=width )
+    add_card(q, cardname, card)
 
 
 ######################################################
