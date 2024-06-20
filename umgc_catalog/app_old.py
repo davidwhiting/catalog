@@ -24,10 +24,22 @@ from utils import add_card, clear_cards, get_choices, get_choices_disable_all
 #############  Update Notes ##############
 ##########################################
 
-# This is a simplified version for demos
-# There is still a lot of work that needs to be done
-# Tasks:
-#   - 
+# Adding user authentication information, assuming an external OAuth2 or similar SSO service.
+# Within the Wave app, users will be mapped to one of three roles: admin, coach, or student.
+#   - Default roles from the SSO service may be used to map default SSO roles to Wave roles
+#     (e.g., 'student' -> 'student', 'staff' -> 'coach', 'faculty' -> 'coach', etc.). 
+#   - Another option is to map all new Wave users to 'student' and allow only the Wave admin 
+#     to change user roles to 'coach' or 'admin'.
+#
+# Instructions for setting up a SSO docker for local development are now in the README.md file.
+#
+# Updated routing to include '#student/home', '#coach/home', '#admin/home', etc.
+#   - admin role will be able to access all '#admin/...', '#coach/...' and '#student/...' pages
+#   - coach role will be able to access all '#coach/...' and '#student/...' pages
+#   - student role will be able to only access '#student/...' pages
+#
+# Some universal pages, like a login page, will thus be dubbed '#student/login' since it is 
+# accessible by all.
 #
 
 ###############################################################################
@@ -52,6 +64,36 @@ async def initialize_app(q: Q):
     """
     logging.info('Initializing app')
     q.app.initialized = True
+
+    # Variables for SSO through Azure Ensure ID.
+    #   'off' will turn SSO capability off 
+    #   'local' is for local development using keycloak
+    #   'azure' needs to be set before deployment
+
+    q.app.sso = 'off'
+    #q.app.sso = 'local'
+    #q.app.sso = 'azure'
+#    if q.app.sso != 'off':
+#        if q.app.sso == 'local':
+#            AUTHORITY = 'http://localhost:8080/auth/realms/myrealm'
+#            REQUESTS_GET_ADDRESS = 'http://localhost:8080/auth/realms/myrealm/protocol/openid-connect/userinfo'
+#            CLIENT_ID = 'myclient'
+#            CLIENT_SECRET = 'hAtwNXiXg3d2Eg9VayWFusJo1UWQZGb3' # only works for local macbook pro
+#            #CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+#            REDIRECT_URI = 'http://localhost:5000/callback'
+#        elif q.app.sso == 'azure':
+#            AUTHORITY = os.getenv('AUTHORITY_ADDRESS')
+#            REQUESTS_GET_ADDRESS = os.getenv('REQUESTS_GET_ADDRESS')
+#            CLIENT_ID = os.getenv('CLIENT_ID')
+#            CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+#            REDIRECT_URI = os.getenv('REDIRECT_URI')
+#
+#        q.app.SCOPE = ['openid', 'profile', 'email']
+#        q.app.msal_app = ConfidentialClientApplication(
+#            CLIENT_ID, 
+#            authority=AUTHORITY, 
+#            client_credential=CLIENT_SECRET
+#        )
 
     # q.app.flex: use flexible layout rather than grid
     #  - Development: start with Cartesian grid then move to flex
@@ -94,16 +136,11 @@ async def initialize_user(q: Q):
     q.user.initialized = True
     q.user.conn = utils.TimedSQLiteConnection('UMGC.db')
 
-    ## Until logged in, user is a guest
-    #q.user.role = 'guest'
-    #q.user.logged_in = False 
+    # Until logged in, user is a guest
+    q.user.role = 'guest'
+    q.user.logged_in = False 
 
     await utils.reset_student_info_data(q)
-
-    q.user.user_id = 5
-    q.user.role == 'student'
-    await utils.populate_student_info(q, q.user.user_id)
-    q.user.student_info_populated = True
 
     # Note: All user variables related to students will be saved in a dictionary
     # q.user.student_info
@@ -131,16 +168,16 @@ async def initialize_client(q: Q):
     q.client.initialized = True
     q.client.cards = set()
     q.page['meta'] = cards.return_meta_card()
-    q.page['header'] = cards.return_header_card(q)
-    #q.page['header'] = cards.return_login_header_card(q)
+#    q.page['header'] = cards.return_header_card(q)
+    q.page['header'] = cards.return_login_header_card(q)
     q.page['footer'] = cards.return_footer_card(q)
 
 #    if q.app.debug:
 #        q.page['debug'] = ui.markdown_card(box=ui.box('debugcards.return_debug_card(q)
 
     await q.page.save()
-    if q.args['#'] is None:
-        await home(q)
+    #if q.args['#'] is None:
+    #    await home(q)
 
 ###############################################################################
 ##################  End initialize app, user, client Functions ################
@@ -154,17 +191,10 @@ async def initialize_client(q: Q):
 @on('#login')
 async def login(q: Q):
     clear_cards(q)
-    card_height = '400px'
-
     #q.page['header'] = cards.return_login_header_card(q)
-    #cards.render_welcome_back_card(q, width='400px', height=card_height, location='top_vertical')
 
-    #cards.render_login_welcome_card(q, cardname='welcome_login', location='top_horizontal')
-    card = cards.return_login_welcome_card(q, location='top_horizontal', width='100%')
-    add_card(q, 'login/welcome', card)
-
-    card = await cards.return_user_login_dropdown(q, location='horizontal', menu_width='300px')
-    add_card(q, 'login/demo_login', card)
+    cards.render_login_welcome_card(q, cardname='welcome_login', location='top_horizontal')
+    await cards.render_user_dropdown(q, cardname='pseudo_login', location='horizontal', menu_width='300px')
 
     if q.app.debug:
         q.page['debug'] = await cards.return_debug_card(q)
@@ -250,85 +280,109 @@ async def select_sample_user(q: Q):
     await q.page.save()
 
 ######################################################
-####################  Home page  #####################
+####################  Home pages  ####################
 ######################################################
 
-@on('#home')
-async def home(q: Q):
+async def admin_home(q: Q):
+    await student_home(q)
+
+async def coach_home(q: Q):
+    await student_home(q)
+
+async def student_home(q: Q):
     clear_cards(q)
-    card_height = '400px'
-
-    # this depends on student stage:
-
-
-    #cards.render_home_cards(q)
-
     # By definition, students are registered so we at least know their name
+    # The registration card stays under the 'Guest' heading and happens in guest_home
+    cards.render_welcome_back_card(q, width='500px', height='500px', location='top_horizontal')
+    
+    task_list_caption = f'''
+Tasks to be completed:
 
-    if int(q.user.student_info['app_stage_id']) == 1:
-        card = cards.return_task1_card(location='top_horizontal', width='350px')
-        add_card(q, 'home/task1', card=card)
+### Task 1. Enter selected information 
+- Residency status
+- Attendance type
+- Financial aid
+- Transfer credits
 
-        card = cards.return_demographics_card1(location='top_horizontal', width='400px')
-        add_card(q, 'home/demographics1', card)
+### Task 2. Choose a Program 
+#### Option 1: On your own:
+- Browse programs
 
-        card = cards.return_tasks_card(checked=0, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
+#### Option 2: With the help of AI:
 
-    elif int(q.user.student_info['app_stage_id']) == 2:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
+- Take a **Skills Assessment** and find programs that best fit your Skills
+- Take an **Interests Assessment** and find programs that best fit your Interests
+- Take a **Personality Assessment** and find programs that best fit your Personality
+- If you have transfer credits, find programs that let you graduate the soonest
 
-        card = cards.return_tasks_card(checked=1, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
+### Task 3. Select Courses
+#### Required courses:
+- Your selected program includes required Major courses
+- Selected General Education and Elective courses may also be required
 
-    elif int(q.user.student_info['app_stage_id']) == 3:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=2, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    else:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=4, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    await q.page.save()
-
-@on('#home/1')
-async def home1(q: Q):
-    clear_cards(q)
-
-    card = cards.return_task1_card(location='top_horizontal', width='350px')
-    add_card(q, 'home/task1', card=card)
-
-    cards.demographics2(q)
-    cards.tasks_unchecked(q)
-
-    await q.page.save()
+### General Education and Elective courses:
+- Select courses manually
+  - Explore minors and use those courses to satisfy GE and Elective graduation requirements
 
 
-@on('#home/2')
-async def home2(q: Q):
-    clear_cards(q)
+### Task 4. Set a Schedule
 
-    #add_card(q, 'ai_enablement', return_ai_enablement_card(location='horizontal'))
-    await cards.render_interest_assessment_card(q, location='horizontal', width='33%')
-    await cards.render_personality_assessment_card(q, location='horizontal', width='33%')
+'''
 
-    cards.task2(q)
-    await cards.render_skills_assessment_card(q, location='top_horizontal', width='33%')
+    task_list_caption = f'''
+Tasks to be completed:
 
-    cards.tasks_checked1(q)
+### Task 1. Enter selected information 
+- Residency status
+- Attendance type
+- Financial aid
+- Transfer credits
 
-    await q.page.save()
+### Task 2. Choose a Program 
+#### Option 1: On your own:
+- Browse programs
 
-@on('#home/3')
-async def home3(q: Q):
-    clear_cards(q)
+#### Option 2: With the help of AI:
+
+- Take a **Skills Assessment** and find programs that best fit your Skills
+- Take an **Interests Assessment** and find programs that best fit your Interests
+- Take a **Personality Assessment** and find programs that best fit your Personality
+- If you have transfer credits, find programs that let you graduate the soonest
+
+### Task 3. Select Courses
+#### Required courses:
+- Your selected program includes required Major courses
+- Selected General Education and Elective courses may also be required
+
+### General Education and Elective courses:
+- Select courses manually
+  - Explore minors and use those courses to satisfy GE and Elective graduation requirements
+
+
+### Task 4. Set a Schedule
+
+'''
+
+    task_1_caption = f'''
+### Task 1. Enter selected information 
+- Residency status
+- Attendance type
+- Financial aid
+- Transfer credits
+'''
+
+    task_2_caption = f'''
+### Task 2. Choose a Program 
+#### Option 1: On your own:
+- Browse programs
+
+#### Option 2: With the help of AI:
+
+- Take a **Skills Assessment** and find programs that best fit your Skills
+- Take an **Interests Assessment** and find programs that best fit your Interests
+- Take a **Personality Assessment** and find programs that best fit your Personality
+- If you have transfer credits, find programs that let you graduate the soonest
+'''
 
     task_3_caption = f'''
 ### Task 3. Select Courses
@@ -361,6 +415,26 @@ async def home3(q: Q):
 #        )
 #    )
 
+    add_card(q, 'task1', 
+        card = ui.wide_info_card(
+            box=ui.box('grid', width='400px'),
+            name='task1',
+            icon='AccountActivity',
+            title='Task 1',
+            caption=task_1_caption
+        )
+    )
+
+    add_card(q, 'task2', 
+        card = ui.wide_info_card(
+            box=ui.box('grid', width='400px'),
+            name='task2',
+            icon='AccountActivity',
+            title='Task 2',
+            caption=task_2_caption
+        )
+    )
+
     add_card(q, 'task3', 
         card = ui.wide_info_card(
             box=ui.box('grid', width='400px'),
@@ -377,7 +451,7 @@ async def home3(q: Q):
             name='task4',
             icon='AccountActivity',
             title='Task 4',
-            caption=task_4_caption
+            caption=task_list_caption
         )
     )
 
@@ -406,15 +480,125 @@ async def home3(q: Q):
     #    content='Add links to continue, such as "Add Elective", "Update Schedule", etc.'
     #))
 
-    #cards.render_registration_card(q)
-    #cards.render_registration_card(q, width='40%', height=card_height, location='top_horizontal')
+    add_card(q, 'dashboard_placeholder', ui.markdown_card(
+        box='grid',
+        title='Dashboard',
+        content='Add a summary dashboard here'
+    ))
 
-    #add_card(q, 'blank_card', 
+async def guest_home(q: Q):
+    clear_cards(q)
+    card_height = '400px'
+    #cards.render_registration_card(q)
+    cards.render_registration_card(q, width='40%', height=card_height, location='top_horizontal')
+
+    task_items = [
+        #ui.text(title + ': Credits', size=ui.TextSize.L),
+        ui.text('Task Tracker', size=ui.TextSize.L),
+        #ui.stats(
+        #    items=[
+        #        ui.stat(
+        #            label='Task 1',
+        #            value='1',
+        #            caption='Personal Information',
+        #            icon='Checkbox',
+        #            icon_color='#135f96'
+        #    )]
+        #),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='1. Information',
+            caption='Tell us about yourself',
+            icon='Checkbox',
+            icon_color='#135f96'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='2. Select Program',
+            caption='Decide what you want to study',
+            icon='Checkbox',
+            icon_color='#a30606'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='3. Add Courses',
+            caption='Add GE and Electives',
+            icon='Checkbox',
+            #icon_color='#787800'
+            icon_color='#3c3c43'
+        )]),
+        ui.stats(items=[ui.stat(
+            label=' ',
+            value='4. Create Schedule',
+            caption='Optimize your schedule',
+            icon='Checkbox',
+            icon_color='#da1a32'
+        )]),
+    ]
+
+
+    ## Set up a blank card
+    add_card(q, 'demographics', 
+        ui.form_card(
+            box=ui.box('top_horizontal', width='60%', height=card_height),
+            items=task_items
+        )
+    )
+
+    #add_card(q, 'demographics', 
     #    ui.form_card(
     #        box=ui.box('top_horizontal', width='60%', height=card_height),
     #        items=task_items
     #    )
     #)
+
+
+    resident_choices = [
+        ui.choice('A', 'In-State'),
+        ui.choice('B', 'Out-of-State'),
+        ui.choice('C', 'Military'),
+    ]
+    attendance_choices = [
+        ui.choice('A', 'Full Time'),
+        ui.choice('B', 'Part Time'),
+        ui.choice('C', 'Evening only'),
+    ]
+
+#    add_card(q, 'demographics', 
+#        ui.form_card(
+#            box=ui.box('top_horizontal', width='60%'),
+#            items=[
+#                ui.text_xl('Tell us about yourself'),
+#                ui.inline(items=[
+#                    ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
+#                    ui.text_xl(''),
+#                    ui.choice_group(name='attendance', label='I will be attending', choices=attendance_choices, required=True),
+#                ]),
+#                ui.separator(label='This?', name='my_separator', width='100%', visible=True),
+#                ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
+#                ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
+#                ui.button(name='submit', label='Submit', primary=True),
+#            ]
+#        )
+#    )
+
+
+#   ## Set up a blank card
+#    add_card(q, 'demographics', 
+#        ui.form_card(
+#            box=ui.box('top_horizontal', width='600px', height='500px'),
+#            items=[
+#                ui.text_xl(' '),Tell us about yourself:'),
+#                ui.text('This information will help us to create your schedule'),
+#                ui.choice_group(name='attendance', label='I will be attending', choices=attendance_choices, required=True),
+#                ui.separator(label='', name='my_separator', width='100%', visible=True),
+#                ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
+#                ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
+#                ui.button(name='submit', label='Submit', primary=True),
+#            ]
+#        )
+#    )
+
 
     ## Show this card after entering 
     #add_card(q, 'demographics', 
@@ -432,13 +616,46 @@ async def home3(q: Q):
     #    )
     #)
 
+#    add_card(q, 'demographics2', 
+#        ui.form_card(
+#            box=ui.box('top_horizontal', width='30%'),
+#            items=[
+#                ui.text_xl('Tell us more about yourself:'),
+#                ui.text('This information will help us estimate your tuition costs'),
+#                ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
+#                ui.separator(label='', name='my_separator2', width='100%', visible=True),
+#                ui.button(name='next', label='Next', primary=True),
+#            ]
+#        )
+#    )
+#
+
     #await student_home(q)
+
+@on('#home')
+async def home(q: Q):
+    clear_cards(q)
+
+    if q.user.role == 'admin':
+        # admin home page
+        await admin_home(q)
+
+    elif q.user.role == 'coach':
+        # coach home page
+        await coach_home(q)
+        
+    elif q.user.role == 'student':
+        # student home page
+        await student_home(q)
+        
+    else:
+        # guest home page
+        await guest_home(q)
 
     if q.app.debug:
         q.page['debug'] = await cards.return_debug_card(q)
     
     await q.page.save()
-
 
 #############################
 ## Events on the Home page ##
@@ -467,38 +684,6 @@ async def register_submit(q):
 
     await q.page.save()
 
-@on()
-async def next_demographic_1(q):
-    '''
-    Respond to submission by clicking next on 'Tell us about yourself' card 1
-    (from demographics1 function)
-    '''
-    # need to map these to the right place, this is a placeholder for now
-    q.client.my_dict = {
-        'attendance': q.args.attendance,
-        'financial_aid': q.args.financial_aid,
-        'transfer_credits': q.args.transfer_credits
-    }
-
-    logging.info('Redirecting to the #home/1 page')
-    q.page['meta'].redirect = '#home/1'
-    await q.page.save()
-
-@on()
-async def next_demographic_2(q):
-    '''
-    Respond to submission by clicking next on 'Tell us about yourself' card 1
-    (from demographics1 function)
-    '''
-    # need to map these to the right place, this is a placeholder for now
-    q.client.my_dict2 = {'resident_status': q.args.resident_status}
-
-    logging.info('Redirecting to the #home/2 page')
-    q.page['meta'].redirect = '#home/2'
-    await q.page.save()
-
-
-
 #########################################################
 ####################  Program pages  ####################
 #########################################################
@@ -511,7 +696,6 @@ async def coach_program(q: Q):
 
 async def student_program(q: Q):
 
-    clear_cards(q)
     if q.user.student_info['menu']['degree']:
         degree_id = int(q.user.student_info['menu']['degree'])
 
@@ -521,32 +705,29 @@ async def student_program(q: Q):
             ui.text('**EXPLORE PROGRAMS** using the menus below. Click **Select > Save Program** to select your program.'),
             #ui.text('Explore Majors. Click **Select > Save Program** to select your program.'),
         ]
-    ))    
+    ))
     await cards.render_dropdown_menus_horizontal(q, location='top_vertical', menu_width='300px')
+    
+    if menu_degree == 1:
+        # Associate's Degree
+        clear_cards(['explore_programs', 'dropdown']) # clear all but the 
+        #await cards.render_program_description(q, location='top_vertical', height='250px', width='100%')
+        pass
 
-    if q.user.student_info['program_id']:
-        await cards.render_program(q)
+    elif menu_degree == 2: 
+        # Bachelor's Degree
+        clear_cards(['explore_programs', 'dropdown']) # clear all but the 
+        await cards.render_program_description(q, location='top_vertical', height='250px', width='100%')
+        await cards.render_program_table(q, location='horizontal', width='90%')
+        await cards.render_program_dashboard(q, location='horizontal', width='150px')
 
-#    if menu_degree == 1:
-#        # Associate's Degree
-#        clear_cards(['explore_programs', 'dropdown']) # clear all but the 
-#        #await cards.render_program_description(q, location='top_vertical', height='250px', width='100%')
-#        pass
-#
-#    elif menu_degree == 2: 
-#        # Bachelor's Degree
-#        clear_cards(['explore_programs', 'dropdown']) # clear all but the 
-#        await cards.render_program_description(q, location='top_vertical', height='250px', width='100%')
-#        await cards.render_program_table(q, location='horizontal', width='90%')
-#        await cards.render_program_dashboard(q, location='horizontal', width='150px')
-#
-#    elif menu_degree == 5: 
-#        # Undergraduate Certificate
-#        pass
-#
-#    else:
-#        # Graduate Certificate
-#        pass
+    elif menu_degree == 5: 
+        # Undergraduate Certificate
+        pass
+
+    else:
+        # Graduate Certificate
+        pass
 
 
 async def guest_program(q: Q):
@@ -554,7 +735,7 @@ async def guest_program(q: Q):
 
 @on('#program')
 async def program(q: Q):
-    clear_cards(q) # will use in the individual functions
+    #clear_cards(q) # will use in the individual functions
 
     if q.user.role == 'admin':
         # admin program page
@@ -1159,8 +1340,8 @@ async def student_schedule(q: Q):
             start_term = q.user.student_info['first_term']
         )
         #add_card(q, 'd3plot', cards.render_d3plot(html_template, location='horizontal', width='80%'))
-        await cards.render_d3plot(q, html_template, location='horizontal', width='75%', height='400px')
-        await cards.render_schedule_menu(q, location='horizontal', width='20%')
+        await cards.render_d3plot(q, html_template, location='horizontal', width='85%', height='400px')
+        await cards.render_schedule_menu(q, location='horizontal')
         await cards.render_schedule_page_table(q, location='bottom_horizontal', width='100%')
 
 async def guest_schedule(q: Q):
@@ -1191,8 +1372,8 @@ async def schedule(q: Q):
         # guest schedule page
         await guest_schedule(q)
 
-    #if q.app.debug:
-    #    add_card(q, 'schedule_debug', await cards.return_debug_card(q))
+    if q.app.debug:
+        add_card(q, 'schedule_debug', await cards.return_debug_card(q))
         
     await q.page.save()
 

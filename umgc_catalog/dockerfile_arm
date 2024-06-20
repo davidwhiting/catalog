@@ -2,29 +2,28 @@
 # An alternative is to either download wheel manually or 
 # download and run waved separately.
 
-## These args are replacable as build-time arguments
 ARG PYTHON_VERSION="3.10.12"
-ARG PLATFORM=amd64
-ARG WAVE_VERSION="1.1.1"
+FROM --platform=linux/arm64 python:${PYTHON_VERSION}-slim
 
-FROM --platform=linux/${PLATFORM} python:${PYTHON_VERSION}-slim
-
+ENV H2O_WAVE_PORT="10101"
+ENV PYTHON_MODULE="app.py"
 ENV USER="appuser"
-ENV WAVE_HOME="$HOME/wave"
 ENV HOME="/home/$USER"
 
-## Used in docker-entrypoint.sh file
-ENV H2O_WAVE_PORT="10101"
-ENV H2O_WAVE_PATH="${WAVE_HOME}/wave-${WAVE_VERSION}-linux-${PLATFORM}"
-ENV PYTHON_MODULE="app.py"
+ENV WAVE_VERSION="1.1.1"
+ENV WAVE_HOME="$HOME/wave"
+ARG WAVE_FILENAME="https://h2o-wave.s3.amazonaws.com/releases/wave-${WAVE_VERSION}-linux-amd64.tar.gz"
 
-ENV WAVE_FILENAME="https://h2o-wave.s3.amazonaws.com/releases/wave-${WAVE_VERSION}-linux-amd64.tar.gz"
-ENV PATH="$HOME/.venv/bin:$WAVE_PATH:$PATH"
+ENV WAVE_PATH="${WAVE_HOME}/wave-${WAVE_VERSION}-linux-amd64"
+ENV PATH="${HOME}/venv/bin:$WAVE_PATH:$PATH"
 
 # Install OS dependencies
 RUN apt-get update && apt-get -y upgrade \
     && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends curl build-essential libsqlite3-dev 
+#       qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
+# qemu required to get waved server to run
+# need to debug in the future
 
 # Create a non-root user
 RUN useradd --create-home $USER
@@ -38,7 +37,6 @@ ARG REQUIREMENTS="requirements.txt"
 # assumes all wave files live in src directory
 # they will be copied to main directory in docker image
 COPY --chown=$USER:$USER  src $REQUIREMENTS docker-entrypoint.sh .
-
 
 RUN python3 -m venv venv && \
     venv/bin/pip install --upgrade pip && \

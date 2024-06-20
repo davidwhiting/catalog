@@ -53,6 +53,8 @@ async def initialize_app(q: Q):
     logging.info('Initializing app')
     q.app.initialized = True
 
+    q.app.sso = 'off'
+
     # q.app.flex: use flexible layout rather than grid
     #  - Development: start with Cartesian grid then move to flex
     #  - Flex looks better in general but it's easier to develop with grid
@@ -105,6 +107,7 @@ async def initialize_user(q: Q):
     await utils.populate_student_info(q, q.user.user_id)
     q.user.student_info_populated = True
 
+
     # Note: All user variables related to students will be saved in a dictionary
     # q.user.student_info
     #
@@ -139,8 +142,8 @@ async def initialize_client(q: Q):
 #        q.page['debug'] = ui.markdown_card(box=ui.box('debugcards.return_debug_card(q)
 
     await q.page.save()
-    if q.args['#'] is None:
-        await home(q)
+    #if q.args['#'] is None:
+    #    await home(q)
 
 ###############################################################################
 ##################  End initialize app, user, client Functions ################
@@ -159,17 +162,14 @@ async def login(q: Q):
     #q.page['header'] = cards.return_login_header_card(q)
     #cards.render_welcome_back_card(q, width='400px', height=card_height, location='top_vertical')
 
-    #cards.render_login_welcome_card(q, cardname='welcome_login', location='top_horizontal')
-    card = cards.return_login_welcome_card(q, location='top_horizontal', width='100%')
-    add_card(q, 'login/welcome', card)
-
-    card = await cards.return_user_login_dropdown(q, location='horizontal', menu_width='300px')
-    add_card(q, 'login/demo_login', card)
+    cards.render_login_welcome_card(q, cardname='welcome_login', location='top_horizontal')
+    await cards.render_user_dropdown(q, cardname='pseudo_login', location='horizontal', menu_width='300px')
 
     if q.app.debug:
         q.page['debug'] = await cards.return_debug_card(q)
 
     await q.page.save()
+
 
 # respond to sample user selection
 @on()
@@ -250,7 +250,7 @@ async def select_sample_user(q: Q):
     await q.page.save()
 
 ######################################################
-####################  Home page  #####################
+####################  Home page  ####################
 ######################################################
 
 @on('#home')
@@ -258,43 +258,13 @@ async def home(q: Q):
     clear_cards(q)
     card_height = '400px'
 
-    # this depends on student stage:
-
-
     #cards.render_home_cards(q)
 
     # By definition, students are registered so we at least know their name
 
-    if int(q.user.student_info['app_stage_id']) == 1:
-        card = cards.return_task1_card(location='top_horizontal', width='350px')
-        add_card(q, 'home/task1', card=card)
-
-        card = cards.return_demographics_card1(location='top_horizontal', width='400px')
-        add_card(q, 'home/demographics1', card)
-
-        card = cards.return_tasks_card(checked=0, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    elif int(q.user.student_info['app_stage_id']) == 2:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=1, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    elif int(q.user.student_info['app_stage_id']) == 3:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=2, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    else:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=4, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
+    cards.task1(q)
+    cards.demographics1(q)
+    cards.tasks_unchecked(q)
 
     await q.page.save()
 
@@ -302,14 +272,11 @@ async def home(q: Q):
 async def home1(q: Q):
     clear_cards(q)
 
-    card = cards.return_task1_card(location='top_horizontal', width='350px')
-    add_card(q, 'home/task1', card=card)
-
+    cards.task1(q)
     cards.demographics2(q)
     cards.tasks_unchecked(q)
 
     await q.page.save()
-
 
 @on('#home/2')
 async def home2(q: Q):
@@ -325,6 +292,8 @@ async def home2(q: Q):
     cards.tasks_checked1(q)
 
     await q.page.save()
+
+
 
 @on('#home/3')
 async def home3(q: Q):
@@ -360,6 +329,8 @@ async def home3(q: Q):
 #            caption=task_list_caption
 #        )
 #    )
+
+
 
     add_card(q, 'task3', 
         card = ui.wide_info_card(
@@ -511,7 +482,6 @@ async def coach_program(q: Q):
 
 async def student_program(q: Q):
 
-    clear_cards(q)
     if q.user.student_info['menu']['degree']:
         degree_id = int(q.user.student_info['menu']['degree'])
 
@@ -554,7 +524,7 @@ async def guest_program(q: Q):
 
 @on('#program')
 async def program(q: Q):
-    clear_cards(q) # will use in the individual functions
+    #clear_cards(q) # will use in the individual functions
 
     if q.user.role == 'admin':
         # admin program page
@@ -1159,8 +1129,8 @@ async def student_schedule(q: Q):
             start_term = q.user.student_info['first_term']
         )
         #add_card(q, 'd3plot', cards.render_d3plot(html_template, location='horizontal', width='80%'))
-        await cards.render_d3plot(q, html_template, location='horizontal', width='75%', height='400px')
-        await cards.render_schedule_menu(q, location='horizontal', width='20%')
+        await cards.render_d3plot(q, html_template, location='horizontal', width='85%', height='400px')
+        await cards.render_schedule_menu(q, location='horizontal')
         await cards.render_schedule_page_table(q, location='bottom_horizontal', width='100%')
 
 async def guest_schedule(q: Q):
@@ -1191,8 +1161,8 @@ async def schedule(q: Q):
         # guest schedule page
         await guest_schedule(q)
 
-    #if q.app.debug:
-    #    add_card(q, 'schedule_debug', await cards.return_debug_card(q))
+    if q.app.debug:
+        add_card(q, 'schedule_debug', await cards.return_debug_card(q))
         
     await q.page.save()
 

@@ -5,7 +5,7 @@ The purpose behind this project is to create a self-serve registration app that 
 
 1. it is written in Python so HTML, Javascript, etc. skills are not necessarily needed, 
 2. it is more stable in production environments than competing choices such as Streamlit (e.g., AT&T has hundreds of H2O Wave apps in production within their corporate environment),
-3. authorship in Python enables the use of many Python machine learning and AI libraries that are not directly available in D3, for instance.
+3. authorship in Python enables the use of many Python machine learning and AI libraries that are not directly available in javascript D3, for instance.
 
 ## Files
 
@@ -18,6 +18,109 @@ The files required by the Wave app include:
 - `class_d3.js`
 - `UMGC.db`
 
+## OAuth Instructions
+This is a step-by-step guide to setting up a Keycloak server with prepopulated users for developmental purposes. We will use Keycloak, an open-source Identity and Access Management solution, to run an OAuth2 service in a Docker container.
+
+### Step 1. Pull the Keycloak Docker Image:
+
+```
+docker pull quay.io/keycloak/keycloak:latest
+```
+
+### Step 2. Create a Docker Compose File:
+
+Create a file `docker-compose.yml` to configure the Keycloak server.
+
+```
+version: '3.8'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8080:8080"
+    command:
+      - start-dev
+```
+
+### Step 3. Run Keycloak:
+
+Start Keycloak using Docker Compose
+
+```
+docker-compose up -d
+```
+
+### Step 4. Configure Keycloak:
+
+Access the Keycloak admin console at http://localhost:8080. Login with the username `admin` and password `admin`.
+
+- Create a new realm (e.g., `UMGC`)
+- Create a new client within the realm (e.g., `catalog_app`)
+  - Set the `Client ID` to `catalog_app`.
+  - Set `Client Authentication` to `On` (this sets `Access Type` to `confidential`).
+  - Set `Valid Redirect URIs` to the Wave app's address: `http://localhost:10101/catalog/`
+### Step 5. Export the Realm Configuration
+
+To prepopulate Keycloak with users, export the realm configuration and then modify it to include the users.
+
+Export the realm from the Keycloak admin console (Realm Settings > Export > Full Export).
+Save the exported JSON file (e.g., `test_realm.json`).
+
+- Create new users for your demo, each with the password `12345`.
+  - `admin` with role `admin`
+  - `coach` with role `coach`
+  - `johndoe` with role `student`
+  - `janedoe` with role `student`
+  - `jimdoe` with role `student`
+  - `sgtdoe` with role `student`
+
+```
+{
+  "realm": "myrealm",
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "12345",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "coach",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "12345",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "student",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "12345",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
+
+```
+  
+  
 
 ## Appendix
 
