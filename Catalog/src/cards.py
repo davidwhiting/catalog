@@ -106,21 +106,21 @@ def return_header_card(q, box='1 1 7 1'):
     '''
     flex = q.app.flex
     guest_tab_items = [
-        ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#home',     label='Home'),
         ui.tab(name='#program',  label='Program'),
         ui.tab(name='#course',   label='Course'),
         ui.tab(name='#schedule', label='Schedule'),
     ]
     student_tab_items = [
-        ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#home',     label='Home'),
         ui.tab(name='#program',  label='Program'),
         ui.tab(name='#course',   label='Course'),
         ui.tab(name='#schedule', label='Schedule'),
     ]
     coach_tab_items = [
-        ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#admin',    label='Coach'),
         ui.tab(name='#home',     label='Home'),
         ui.tab(name='#program',  label='Program'),
@@ -128,7 +128,7 @@ def return_header_card(q, box='1 1 7 1'):
         ui.tab(name='#schedule', label='Schedule'),
     ]
     admin_tab_items = [
-        ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#admin',    label='Admin'),
         ui.tab(name='#home',     label='Home'),
         ui.tab(name='#program',  label='Program'),
@@ -138,19 +138,19 @@ def return_header_card(q, box='1 1 7 1'):
 
     if q.user.role == 'admin':
         tab_items = admin_tab_items
-        textbox_label = 'Admin Name'
+        textbox_label = 'Name'
         textbox_value = q.user.name
     elif q.user.role == 'coach':
         tab_items = coach_tab_items
-        textbox_label = 'Coach Name'
+        textbox_label = 'Name'
         textbox_value = q.user.name
     elif q.user.role == 'student':
         tab_items = student_tab_items
-        textbox_label = 'Student Name'
+        textbox_label = 'Name'
         textbox_value = q.user.name
     else:
         tab_items = guest_tab_items
-        textbox_label = 'Guest'
+        textbox_label = 'Name'
         textbox_value = ' '
 
     older_tab_items = [
@@ -196,7 +196,7 @@ def return_header_card(q, box='1 1 7 1'):
     '''
     flex = q.app.flex
     admin_tab_items = [
-        ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='[Login]'),
         #ui.tab(name='#admin',    label='Admin'),
         ui.tab(name='#home',     label='Admin Home'),
         ui.tab(name='#program',  label='Choose Program'),
@@ -204,7 +204,7 @@ def return_header_card(q, box='1 1 7 1'):
         ui.tab(name='#schedule', label='Set Schedule'),
     ]
     coach_tab_items = [
-        ui.tab(name='#login',    label='Login'),
+        ui.tab(name='#login',    label='[Login]'),
         #ui.tab(name='#admin',    label='Admin'),
         ui.tab(name='#home',     label='Coach Home'),
         ui.tab(name='#program',  label='Choose Program'),
@@ -213,7 +213,7 @@ def return_header_card(q, box='1 1 7 1'):
     ]
 
     student_tab_items = [
-        ui.tab(name='#login',    label='Student'),
+        ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#home',     label='Home'),
         ui.tab(name='#program',  label='Program'),
         ui.tab(name='#course',   label='Courses'),
@@ -223,19 +223,19 @@ def return_header_card(q, box='1 1 7 1'):
 
     if q.user.role == 'admin':
         tab_items = admin_tab_items
-        textbox_label = 'Admin Name'
+        textbox_label = 'Name'
         textbox_value = q.user.name
     elif q.user.role == 'coach':
         tab_items = coach_tab_items
-        textbox_label = 'Coach Name'
+        textbox_label = 'Name'
         textbox_value = q.user.name
     elif q.user.role == 'student':
         tab_items = student_tab_items
-        textbox_label = 'Student Name'
+        textbox_label = 'Name'
         textbox_value = q.user.name
     else:
         tab_items = student_tab_items
-        textbox_label = 'Student Name'
+        textbox_label = 'Name'
         textbox_value = ' '
 
     older_tab_items = [
@@ -425,11 +425,12 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
     ## tmp fix for demo
     choicesdict = [
         #{'name': 1, 'label': 'Admin (admin role)'},
-        {'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
+        #{'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
         {'name': 5, 'label': 'New Student'},
-        #{'name': 0, 'label': 'New Student'},
-        {'name': 3, 'label': 'John Doe (full-time student with program selected)'},
-        #{'name': 4, 'label': 'Jane Doe (part-time transfer student with program selected)'},
+        {'name': 6, 'label': 'New Student (information entered)'},
+        {'name': 7, 'label': 'New Student (program selected)'},
+        {'name': 3, 'label': 'John Doe (schedule created)'},
+        {'name': 4, 'label': 'Jane Doe (transfer student with program selected)'},
         #{'name': 6, 'label': 'Tom Doe (military student, no program selected)'},
     ]
 
