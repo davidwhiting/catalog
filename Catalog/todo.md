@@ -1,6 +1,6 @@
 # To Do Items
 
-## I. Website
+## I. Website (UI)
 
 ### 1. Pages
 
@@ -107,5 +107,32 @@
 -  Update courses for 2024-2025 catalog
    + refactor new table for same course in multiple catalogs
 
-## IV. Documentation
+## IV. Backend
 
+- Matt & Michael
+
+### a) Live Data Feeds
+
+1. data feed 1
+2. data feed 2
+3. data feed 3
+
+vs.
+
+data feed 1 -> full integration
+
+### b) API End Points
+
+### c) Algorithms
+
+#### 1. Requirements
+
+- List out requirements (2023-2024 Catalog)
+
+#### 2. Optimization (AI)
+
+- Development / Adoption / Staging
+- Intermediate optimization
+- Firefly 
+
+## V. Documentation
