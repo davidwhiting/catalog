@@ -423,14 +423,15 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
     #choicesdict=await utils.get_choices(timedConnection, query)
 
     ## tmp fix for demo
+    ## need to update 'populate_sample_users_and_students.py'
     choicesdict = [
         #{'name': 1, 'label': 'Admin (admin role)'},
         #{'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
-        {'name': 5, 'label': 'New Student'},
-        {'name': 6, 'label': 'New Student (information entered)'},
-        {'name': 7, 'label': 'New Student (program selected)'},
+        {'name': 5, 'label': 'John Doe (New Student)'},
+        {'name': 6, 'label': 'John Doe (personal information entered)'},
+        {'name': 7, 'label': 'John Doe (program selected)'},
         {'name': 3, 'label': 'John Doe (schedule created)'},
-        {'name': 4, 'label': 'Jane Doe (transfer student with program selected)'},
+        {'name': 4, 'label': 'John Doe (transfer student with program selected)'},
         #{'name': 6, 'label': 'Tom Doe (military student, no program selected)'},
     ]
 
@@ -736,9 +737,7 @@ def task2(q):
 '''
     task_2a_caption = f'''
 ### Option 1: Explore Programs on your own. 
-The Program tab above will take you to the program exploration page
-
-### Option 2 (Coming soon): Let AI suggest programs for you
+The **Program** tab above will take you to the program exploration page
 '''
     add_card(q, 'task2a', 
         card = ui.wide_info_card(
@@ -976,16 +975,23 @@ async def render_skills_assessment_card(q, box='1 1 2 2', location='horizontal',
     flex = q.app.flex
     if flex:
         box=ui.box(location, width=width)
-    yale_url = 'https://your.yale.edu/work-yale/learn-and-grow/career-development/career-assessment-tools'
-    caption=f'Take a **Skills Assessment** to find programs that best fit your **skills**. *UMGC CareerQuest* '
+    old_caption = f'Take a **Skills Assessment** to find programs that best fit your **skills**. *UMGC CareerQuest* '
+    new_caption = f'''
+### Option 2: Let AI suggest programs
+
+- Take a **Skills Assessment** and find programs that best fit your Skills
+- Take an **Interests Assessment** and find programs that best fit your Interests
+- If you have transfer credits, find programs that let you graduate the soonest
+'''
     card = ui.wide_info_card(
         box=box,
         name='SkillsAssessment',
         icon='AccountActivity',
-        title='Let AI suggest Programs based on your Skills',
-        caption=caption
+        title='Select a UMGC Program',
+        caption=new_caption
     )
     add_card(q, cardname, card)
+
 
 async def render_interest_assessment_card(q, box='1 1 2 2', location='horizontal', 
                                         width='400px', cardname='interest_assessments'):

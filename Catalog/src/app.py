@@ -316,8 +316,8 @@ async def home2(q: Q):
     clear_cards(q)
 
     #add_card(q, 'ai_enablement', return_ai_enablement_card(location='horizontal'))
-    await cards.render_interest_assessment_card(q, location='horizontal', width='33%')
-    await cards.render_personality_assessment_card(q, location='horizontal', width='33%')
+    #await cards.render_interest_assessment_card(q, location='horizontal', width='33%')
+    #await cards.render_personality_assessment_card(q, location='horizontal', width='33%')
 
     cards.task2(q)
     await cards.render_skills_assessment_card(q, location='top_horizontal', width='33%')
@@ -496,7 +496,6 @@ async def next_demographic_2(q):
     logging.info('Redirecting to the #home/2 page')
     q.page['meta'].redirect = '#home/2'
     await q.page.save()
-
 
 
 #########################################################

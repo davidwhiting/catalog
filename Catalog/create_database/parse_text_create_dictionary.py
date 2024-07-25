@@ -554,46 +554,35 @@ import sqlite3
 conn = sqlite3.connect('UMGC.db')
 c = conn.cursor()
 
-# Create catalog table referenced by courses table
-catalog = [
-    { 'id':  1, 'version': '2023-2024' }
-]
-c.execute('''
-    CREATE TABLE catalog (
-        id INTEGER PRIMARY KEY,
-        version TEXT
-    )
-''')
-c.executemany('INSERT INTO catalog VALUES (:id, :version)', catalog)
-
-###############################################################
-# Create courses table
+## Create courses table
 
 c.execute('''
     CREATE TABLE courses (
         id INTEGER PRIMARY KEY,  
-        name TEXT,
-        title TEXT,
-        credits TEXT,
-        description TEXT,
-        prerequisites TEXT,
-        recommended TEXT,
-        warnings TEXT,
-        substitutions TEXT,
-        pre TEXT,
-        pre_credits TEXT,
-        pre_notes TEXT,
-        catalog_id INTEGER,
-        FOREIGN KEY(catalog_id) REFERENCES catalog(id)
+        course TEXT DEFAULT '',
+        title TEXT DEFAULT '',
+        credits TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        prerequisites TEXT DEFAULT '',
+        recommended TEXT DEFAULT '',
+        warnings TEXT DEFAULT '',
+        substitutions TEXT DEFAULT '',
+        pre TEXT DEFAULT '',
+        pre_credits TEXT DEFAULT '',
+        pre_notes TEXT DEFAULT '',
+        corequisites TEXT DEFAULT ''
     )
 ''')
+c.execute('''          
+    CREATE INDEX idx_courses_course ON courses(course);
+''')
 
-catalog_integer = 1
+# populate courses table from dictionary
 for class_name, class_info in classes.items():
     c.execute('''
-        INSERT INTO courses ('name','title','credits','description','prerequisites','recommended',
-              'warnings','substitutions','pre','pre_credits','pre_notes','catalog_id')
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', 
+        INSERT INTO courses ('course','title','credits','description','prerequisites','recommended',
+              'warnings','substitutions','pre','pre_credits','pre_notes')
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', 
         (
             class_info['name'],
             class_info['title'],
@@ -605,9 +594,82 @@ for class_name, class_info in classes.items():
             class_info['substitutions'],
             class_info['pre'],
             class_info['pre_credits'],
-            class_info['pre_notes'],
-            catalog_integer
+            class_info['pre_notes']
     ))
+
+## Need to add corequisites here !!!!
+
+### Create catalogs table
+catalogs = [
+    { 'id': 21, 'version': '2021-2022' },
+    { 'id': 22, 'version': '2022-2023' },
+    { 'id': 23, 'version': '2023-2024' },
+    { 'id': 24, 'version': '2024-2025' },
+]
+c.execute('''
+    CREATE TABLE catalogs (
+        id INTEGER PRIMARY KEY,
+        version TEXT
+    )
+''')
+c.executemany('INSERT INTO catalogs VALUES (:id, :version)', catalogs)
+
+## Create courses_catalog_mapping table 
+##   (accounting for multiple catalogs ... note: most courses won't change much from
+##    one year to the next. The academic process for adding or changing courses is 
+##    tedious enough that catalogs will remain largely consistent from year to year)
+
+c.execute('''
+    CREATE TABLE course_catalog_mapping (
+        id INTEGER PRIMARY KEY,  
+        course_id INTEGER,
+        catalog_id INTEGER,
+        FOREIGN KEY (course_id) REFERENCES courses(id),
+        FOREIGN KEY (catalog_id) REFERENCES catalogs(catalog_id),
+        UNIQUE (course_id, catalog_id)
+    )
+''')
+
+# create indexes for query efficiency (on view)
+c.execute('''
+    CREATE INDEX idx_course_catalog_mapping_both ON course_catalog_mapping(catalog_id, course_id);
+''')
+
+# populate with initial 2023-2024 catalog
+c.execute('''
+    INSERT INTO course_catalog_mapping (course_id, catalog_id)
+        SELECT id, 23 FROM courses
+        ORDER BY id
+''')
+
+###############################################################
+# create view
+
+c.execute('''
+    CREATE VIEW courses_view AS
+        SELECT 
+            c.id,
+            c.course,
+            c.title,
+            c.credits,
+            c.description,
+            c.prerequisites,
+            c.recommended,
+            c.warnings,
+            c.substitutions,
+            c.pre,
+            c.pre_credits,
+            c.pre_notes,
+            c.corequisites,
+            d.catalog_id
+    FROM courses c
+    INNER JOIN course_catalog_mapping d 
+        ON c.id = d.course_id
+''')
+
+## In sqlite3, use the
+##   EXPLAIN QUERY PLAN
+## command to verify that queries are using the indexes as expected.
 
 conn.commit()
 conn.close()

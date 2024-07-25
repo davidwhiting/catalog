@@ -1,17 +1,18 @@
 from h2o_wave import Q, ui
-from typing import Optional, List
 
-import logging
-import warnings
-import sqlite3
+from typing import Any, Optional, Dict, List
+
 import asyncio
-import time
-import pandas as pd
+import logging
 import numpy as np
+import pandas as pd
+import sqlite3
+import time
+import warnings
 
 #import sys
 #import traceback
-#from h2o_wave import Q, ui, graphics as g
+
 import templates
 
 ######################################################################
@@ -242,7 +243,6 @@ async def get_catalog_program_sequence(q):
     df = await get_query_df(timedConnection, query, params=(program_id,))
     return df
 
-
 async def get_choices(timedConnection, query, params=(), disabled=None, enabled=None):
     '''
     Return choices for dropdown menus and other ui elements.
@@ -359,7 +359,6 @@ async def populate_summarize_ge(q):
                                 (ge['res']['3b'] is not None) + 
                                 (ge['res']['3c'] is not None))))
 
-
 async def get_choices_old(timedConnection, query, params=(), disabled=None):
     '''
     Return choices for dropdown menus and other ui elements
@@ -443,23 +442,6 @@ from typing import Any, List, Dict, Optional
 import pandas as pd
 
 class TimedSQLiteConnection:
-    '''
-    This class creates an SQLite connection that will disconnect after 
-    'timeout' amount of inactivity. This is a lightweight way to manage 
-    multiple sqlite connections without using a connection pool. It prepares
-    for multiple users in Wave connecting to the same SQLite database.
-
-    Methods include 
-      - execute: executing commands (like create table), nothing returned
-      - fetchone and fetchall use corresponding sqlite3 methods
-      - fetchdict returns query results as a dictionary
-      - fetchdf returns a Pandas DataFrame
-
-    Notes: 
-    (1) The async/await syntax here may not be needed yet, it defaults
-        to synchronous. It is harmless and anticipates future improvements.
-    '''
-
     def __init__(self, db_path: str, row_factory: bool = True, timeout: int = 1800):
         self.db_path = db_path
         self.timeout = timeout
@@ -497,15 +479,19 @@ class TimedSQLiteConnection:
             await self._update_activity_time()
 
             if fetch_method == 'one':
-                return cursor.fetchone()
+                result = cursor.fetchone()
+                return result if result else None
             elif fetch_method == 'all':
-                return cursor.fetchall()
+                result = cursor.fetchall()
+                return result if result else None
             elif fetch_method == 'dict':
                 column_names = [description[0] for description in cursor.description]
                 rows = cursor.fetchall()
-                return [dict(zip(column_names, row)) for row in rows]
+                result = [dict(zip(column_names, row)) for row in rows]
+                return result if result else None
             elif fetch_method == 'df':
-                return pd.read_sql_query(query, self.connection, params=params)
+                df = pd.read_sql_query(query, self.connection, params=params)
+                return df if not df.empty else None
             else:
                 self.connection.commit()
         except sqlite3.Error as e:
@@ -516,19 +502,19 @@ class TimedSQLiteConnection:
         """Execute a query without returning results."""
         await self._execute_query(query, params)
 
-    async def fetchone(self, query: str, params: tuple = ()):
+    async def fetchone(self, query: str, params: tuple = ()) -> Optional[Any]:
         """Execute a query and fetch one result."""
         return await self._execute_query(query, params, fetch_method='one')
 
-    async def fetchall(self, query: str, params: tuple = ()):
+    async def fetchall(self, query: str, params: tuple = ()) -> Optional[List[Any]]:
         """Execute a query and fetch all results."""
         return await self._execute_query(query, params, fetch_method='all')
 
-    async def fetchdict(self, query: str, params: tuple = ()):
+    async def fetchdict(self, query: str, params: tuple = ()) -> Optional[List[Dict[str, Any]]]:
         """Execute a query and fetch results as a list of dictionaries."""
         return await self._execute_query(query, params, fetch_method='dict')
 
-    async def fetchdf(self, query: str, params: tuple = ()):
+    async def fetchdf(self, query: str, params: tuple = ()) -> Optional[pd.DataFrame]:
         """Execute a query and fetch results as a pandas DataFrame."""
         return await self._execute_query(query, params, fetch_method='df')
 
@@ -538,6 +524,7 @@ class TimedSQLiteConnection:
             self.connection.close()
             self.connection = None
 
+## remove this old version after testing the version above
 class TimedSQLiteConnectionOld:
     '''
     This class creates an SQLite connection that will disconnect after 
@@ -632,7 +619,7 @@ class TimedSQLiteConnectionOld:
             self.connection.close()
             self.connection = None
 
-async def get_query(timedConnection, query, params=()):
+async def get_query_old(timedConnection, query, params=()):
     '''
     This query uses the TimedSQLiteConnection class to return all rows
 
@@ -649,7 +636,7 @@ async def get_query(timedConnection, query, params=()):
     else:
         return rows
 
-async def get_query_one(timedConnection, query, params=()):
+async def get_query_one_old(timedConnection, query, params=()):
     '''
     This query uses the TimedSQLiteConnection class to return a row
 
@@ -666,7 +653,7 @@ async def get_query_one(timedConnection, query, params=()):
     else:
         return row
 
-async def get_query_dict(timedConnection, query, params=()):
+async def get_query_dict_old(timedConnection, query, params=()):
     '''
     This query uses the TimedSQLiteConnection class to return a 
     dictionary of all rows
@@ -684,7 +671,7 @@ async def get_query_dict(timedConnection, query, params=()):
     else:
         return result
 
-async def get_query_course_dict(timedConnection, query, params=()):
+async def get_query_course_dict_old(timedConnection, query, params=()):
     '''
     This query uses the TimedSQLiteConnection class to return a 
     dictionary of all rows indexed by course
@@ -716,7 +703,7 @@ async def get_query_course_dict(timedConnection, query, params=()):
         warnings.warn(f"An error occurred: {e}", category=Warning)
         return None
 
-async def get_query_df(timedConnection, query, params=()):
+async def get_query_df_old(timedConnection, query, params=()):
     '''
     This query uses the TimedSQLiteConnection class to return a dataframe
 
@@ -736,6 +723,62 @@ async def get_query_df(timedConnection, query, params=()):
         return None
     else:
         return df
+
+async def _base_query(timedConnection, query_method: str, query: str, params: tuple = (), **kwargs) -> Optional[Any]:
+    """
+    Base function to handle queries and error logging.
+    
+    :param timedConnection: TimedSQLiteConnection instance
+    :param query_method: String indicating which query method to use
+    :param query: SQL query string
+    :param params: Query parameters
+    :param kwargs: Additional keyword arguments for specific query methods
+    :return: Query result or None if query fails
+    """
+    try:
+        method = getattr(timedConnection, f"fetch{query_method}")
+        result = await method(query, params, **kwargs)
+        
+        if result is None or (isinstance(result, (list, dict)) and not result) or (isinstance(result, pd.DataFrame) and result.empty):
+            warning_message = f"Query returned no results: {query} with params {params}"
+            warnings.warn(warning_message, category=Warning)
+            logging.warning(warning_message)
+            return None
+        
+        return result
+    except Exception as e:
+        error_message = f"An error occurred during query execution: {e}"
+        warnings.warn(error_message, category=Warning)
+        logging.error(error_message)
+        return None
+
+async def get_query(timedConnection, query: str, params: tuple = ()) -> Optional[List[Any]]:
+    """Get all rows from a query."""
+    return await _base_query(timedConnection, "all", query, params)
+
+async def get_query_one(timedConnection, query: str, params: tuple = ()) -> Optional[Any]:
+    """Get a single row from a query."""
+    return await _base_query(timedConnection, "one", query, params)
+
+async def get_query_dict(timedConnection, query: str, params: tuple = ()) -> Optional[List[Dict[str, Any]]]:
+    """Get all rows from a query as a list of dictionaries."""
+    return await _base_query(timedConnection, "dict", query, params)
+
+async def get_query_course_dict(timedConnection, query: str, params: tuple = ()) -> Optional[Dict[str, Dict[str, Any]]]:
+    """Get all rows from a query as a dictionary indexed by course."""
+    result = await get_query_dict(timedConnection, query, params)
+    if result is None:
+        return None
+    
+    try:
+        return {record['course']: record for record in result}
+    except KeyError:
+        warnings.warn("'course' is not an element of the dictionary", category=Warning)
+        return None
+
+async def get_query_df(timedConnection, query: str, params: tuple = ()) -> Optional[pd.DataFrame]:
+    """Get query results as a pandas DataFrame."""
+    return await _base_query(timedConnection, "df", query, params)
 
 ######################################################################
 #####################  QUERIES & FUNCTIONS  ##########################
@@ -1302,9 +1345,33 @@ def prepare_d3_data(df, start_term='SPRING 2024'):
     return df, headers
 
 
-def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=18, 
-                     summer=False, sessions=[1,3], as_df=True):
-    '''
+from typing import List, Dict, Union
+from dataclasses import dataclass
+from collections import defaultdict
+import pandas as pd
+
+@dataclass
+class ScheduleEntry:
+    id: int
+    term: str
+    session: int
+    year: int
+    max_courses: int
+    max_credits: int
+    previous: int
+
+def generate_periods(
+        start_term: str = 'SPRING 2024',
+        years: int = 8,
+        max_courses: int = 3,
+        max_credits: int = 18,
+        summer: bool = False,
+        sessions: List[int] = [1, 3],
+        as_df: bool = True
+    ) -> Union[pd.DataFrame, List[Dict]]:
+    """
+    Generate a periods structure containing information about terms and sessions.
+
     A periods structure is a list of dictionaries (or a Pandas dataframe) containing information about terms and sessions,
     into which we will place classes when scheduling.
 
@@ -1325,113 +1392,99 @@ def generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credi
     
     Note: We create all terms a student could potentially attend and set max_courses=0 and max_credits=0 for periods they
     are not attending.
-    '''
-    
-    # List terms
-    terms = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
+    """
 
-    # Define the number of sessions for each term
-    sessions_per_term = {
-        'WINTER': 3,
-        'SPRING': 3,
-        'SUMMER': 2,
-        'FALL': 3
-    }
+    TERMS = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
+    SESSIONS_PER_TERM = {'WINTER': 3, 'SPRING': 3, 'SUMMER': 2, 'FALL': 3}
 
-    # Split the start term into the term and the year (ensure we uppercase term)
     start_term, start_year = start_term.upper().split()
-
-    # Convert the start year to an integer
     start_year = int(start_year)
 
-    # Initialize the schedule and the id
     schedule = []
     id = 1
 
-    # Loop over the next 'years' years
+    max_values = defaultdict(lambda: (0, 0))
+    max_values.update({
+        ('SUMMER', True): (max_courses, 2 * (max_credits // 3)),
+        ('WINTER', True): (max_courses, max_credits),
+        ('SPRING', True): (max_courses, max_credits),
+        ('FALL', True): (max_courses, max_credits)
+    })
+
     for year in range(start_year, start_year + years):
-        # Loop over each term
-        for term in terms:
-            # If the year is the start year and the term is before the start term, skip it
-            if year == start_year and terms.index(term) < terms.index(start_term):
+        for term_index, term in enumerate(TERMS):
+            if year == start_year and term_index < TERMS.index(start_term):
                 continue
-            # Loop over each session
-            for session in range(1, sessions_per_term[term] + 1):
-                # Set max_courses=0 and max_credits=0 if (term='SUMMER' and summer==False)
-                if term=='SUMMER': 
-                    if not summer:
-                        max_courses_value = 0
-                        max_credits_value = 0
-                    else:
-                        max_courses_value = max_courses
-                        # only 2 sessions in summer, adjust max_credits accordingly
-                        max_credits_value = 2*int(np.floor(max_credits/3))
+            
+            for session in range(1, SESSIONS_PER_TERM[term] + 1):
+                is_valid_session = session in sessions if term != 'SUMMER' else True
+                max_courses_value, max_credits_value = max_values[(term, is_valid_session and (summer or term != 'SUMMER'))]
                 
-                # Set max_courses=0 and max_credits=0 if session not in sessions
-                else:
-                    if session not in sessions:
-                        max_courses_value = 0
-                        max_credits_value = 0
-                    else: # spring, fall, winter
-                        max_courses_value = max_courses
-                        max_credits_value = max_credits
-                       
-                # Calculate previous value
-                # 
                 previous = 1 if session == 1 else 2
- 
-                # Add the entry to the schedule
-                schedule.append({
-                    'id': id,
-                    'term': term,
-                    'session': session,
-                    'year': year,
-                    'max_courses': max_courses_value,
-                    'max_credits': max_credits_value,
-                    'previous': previous
-                })
-                # Increment the id
+
+                schedule.append(ScheduleEntry(
+                    id=id,
+                    term=term,
+                    session=session,
+                    year=year,
+                    max_courses=max_courses_value,
+                    max_credits=max_credits_value,
+                    previous=previous
+                ))
                 id += 1
-    # either return as a dataframe or as a list of dictionaries
+
     if as_df:
-        return pd.DataFrame(schedule)
+        return pd.DataFrame([vars(entry) for entry in schedule])
     else:
-        return schedule
+        return [vars(entry) for entry in schedule]
 
-def update_periods(periods, condition, update_values):
-    '''
-    Update the 'periods' structure. Will return a DataFrame if a DataFrame is input,
-    otherwise will return a list of dictionaries.
+from typing import Union, List, Dict, Any
+import pandas as pd
 
-    periods: a list of dictionaries or a DataFrame with periods information returned from 'generate_periods'
+def update_periods(
+        periods: Union[pd.DataFrame, List[Dict[str, Any]]],
+        condition: str,
+        update_values: Dict[str, Any]
+    ) -> Union[pd.DataFrame, List[Dict[str, Any]]]:
+    """
+    Update the 'periods' structure based on a condition.
 
-    This will be used in the menu of the schedule page to update people's schedules
+    Args:
+        periods (Union[pd.DataFrame, List[Dict[str, Any]]]): A DataFrame or list of dictionaries with periods information.
+        condition (str): A string condition to be evaluated.
+        update_values (Dict[str, Any]): A dictionary of column names and values to update.
 
-    Example usage
-    # Update max_courses for SPRING 2024 to 0
-    update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
-    '''
+    Returns:
+        Union[pd.DataFrame, List[Dict[str, Any]]]: Updated periods structure in the same format as the input.
 
+    Example:
+        # Update max_courses for SPRING 2024 to 0
+        update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
+    """
     # Check whether input periods is a DataFrame
-    if isinstance(periods, pd.DataFrame):
-        return_as_list = False
-    else:
+    is_dataframe = isinstance(periods, pd.DataFrame)
+    
+    if not is_dataframe:
         periods = pd.DataFrame(periods)
-        return_as_list = True
     
-    # Apply conditions
-    mask = periods.eval(condition)
+    try:
+        # Apply conditions
+        mask = periods.eval(condition)
+        
+        # Update values
+        for key, value in update_values.items():
+            if key not in periods.columns:
+                raise ValueError(f"Column '{key}' not found in periods.")
+            periods.loc[mask, key] = value
     
-    # Update values
-    for key, value in update_values.items():
-        periods.loc[mask, key] = value
-
-    # Convert DataFrame back to a list of dictionaries
-    if return_as_list:
+    except Exception as e:
+        raise ValueError(f"Error updating periods: {str(e)}")
+    
+    # Return in the original format
+    if not is_dataframe:
         return periods.to_dict(orient='records')
     else:
         return periods
-
 
 async def update_prerequisites(timedConnection, prereq_name):
     '''
@@ -1483,8 +1536,9 @@ def insert_prerequisite(df, i, name):
         # Check if the inserted prerequisite has its own prerequisites
         insert_prerequisite(df, i+1, pre_dict['name'])
 
-### A Third Approach
 
+### A Third Approach
+### This is old but has some good code in it
 def prep_course_list(df):
     '''
     This function takes a DataFrame as input and returns a modified DataFrame where the courses are 
