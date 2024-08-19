@@ -310,7 +310,6 @@ async def home1(q: Q):
 
     await q.page.save()
 
-
 @on('#home/2')
 async def home2(q: Q):
     clear_cards(q)
@@ -460,9 +459,6 @@ async def register_submit(q):
     q.page['registration'].items = [
         #ui.text_xl('Welcome to the UMGC Registration Assistant'),
         ui.text_xl(f'Thank you, {q.user.guest_info["firstname"]}! You are now registered.'),
-        #ui.text(f'First Name: {q.user.guest_info["firstname"]}'),
-        #ui.text(f'Last Name: {q.user.guest_info["lastname"]}'),
-        #ui.text(f'Full Name: {q.user.guest_info["fullname"]}'),
     ]
 
     await q.page.save()

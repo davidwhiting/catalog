@@ -428,10 +428,10 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
         #{'name': 1, 'label': 'Admin (admin role)'},
         #{'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
         {'name': 5, 'label': 'John Doe (New Student)'},
-        {'name': 6, 'label': 'John Doe (personal information entered)'},
-        {'name': 7, 'label': 'John Doe (program selected)'},
-        {'name': 3, 'label': 'John Doe (schedule created)'},
-        {'name': 4, 'label': 'John Doe (transfer student with program selected)'},
+        {'name': 6, 'label': 'John Doe (After entering personal information)'},
+        {'name': 7, 'label': 'John Doe (After selecting program)'},
+        {'name': 3, 'label': 'John Doe (After creating schedule)'},
+        {'name': 4, 'label': 'Jim Doe (transfer student with program selected)'},
         #{'name': 6, 'label': 'Tom Doe (military student, no program selected)'},
     ]
 
@@ -991,7 +991,6 @@ async def render_skills_assessment_card(q, box='1 1 2 2', location='horizontal',
         caption=new_caption
     )
     add_card(q, cardname, card)
-
 
 async def render_interest_assessment_card(q, box='1 1 2 2', location='horizontal', 
                                         width='400px', cardname='interest_assessments'):

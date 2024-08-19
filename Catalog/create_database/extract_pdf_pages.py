@@ -17,5 +17,7 @@ def extract_pages(input_pdf, output_pdf, start_page, end_page):
     with open(output_pdf, 'wb') as output_file:
         writer.write(output_file)
 
+    print(input_pdf + ' extracted to ' + output_pdf)
+
 # Call the function
 extract_pages('2023-2024-catalog.pdf', 'tmp_2023-2024-catalog-courses.pdf', 201, 326)

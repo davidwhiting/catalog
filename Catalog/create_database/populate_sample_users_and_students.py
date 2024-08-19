@@ -23,26 +23,42 @@ users = [
         "username": "johndoe", 
         "firstname": "John", 
         "lastname": "Doe",
-        "notes": "Example new undergrad student, major selected"
+        "notes": "Example undergrad student, major selected, schedule created"
     },
     { 
         "id": 4, 
         "role_id": 3, 
-        "username": "janedoe", 
-        "firstname": "Jane", 
+        "username": "jimdoe", 
+        "firstname": "Jim", 
         "lastname": "Doe",
         "notes": "Example transfer undergrad student, major selected and transfer credits applied"
     },
     { 
         "id": 5, 
         "role_id": 3, 
-        "username": "jimdoe", 
-        "firstname": "Jim", 
+        "username": "johndoe5", 
+        "firstname": "John", 
         "lastname": "Doe",
         "notes": "Example undergrad student, new to UMGC and no major selected" 
     },
     { 
         "id": 6, 
+        "role_id": 3, 
+        "username": "johndoe6", 
+        "firstname": "John", 
+        "lastname": "Doe",
+        "notes": "Example undergrad student, personal information entered" 
+    },
+    { 
+        "id": 7, 
+        "role_id": 3, 
+        "username": "johndoe7", 
+        "firstname": "John", 
+        "lastname": "Doe",
+        "notes": "Example undergrad student, program selected" 
+    },
+    { 
+        "id": 9, 
         "role_id": 3, 
         "username": "sgtdoe", 
         "firstname": "Sgt", 
