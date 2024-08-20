@@ -105,13 +105,13 @@ def return_header_card(q, box='1 1 7 1'):
     Create separate tabs for different roles: guest, student, coach, admin
     '''
     flex = q.app.flex
-    guest_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
+    #guest_tab_items = [
+    #    ui.tab(name='#login',    label='[Login]'),
+    #    ui.tab(name='#home',     label='Home'),
+    #    ui.tab(name='#program',  label='Program'),
+    #    ui.tab(name='#course',   label='Course'),
+    #    ui.tab(name='#schedule', label='Schedule'),
+    #]
     student_tab_items = [
         ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#home',     label='Home'),
@@ -144,14 +144,11 @@ def return_header_card(q, box='1 1 7 1'):
         tab_items = coach_tab_items
         textbox_label = 'Name'
         textbox_value = q.user.name
-    elif q.user.role == 'student':
+    else: 
+        # q.user.role == 'student'
         tab_items = student_tab_items
         textbox_label = 'Name'
         textbox_value = q.user.name
-    else:
-        tab_items = guest_tab_items
-        textbox_label = 'Name'
-        textbox_value = ' '
 
     older_tab_items = [
         ui.tab(name='#home', label='Home'),
@@ -182,7 +179,6 @@ def return_header_card(q, box='1 1 7 1'):
                 name='textbox_default', 
                 label=textbox_label,
                 value=textbox_value, 
-                disabled=True
             )
         ]
     )
@@ -229,14 +225,11 @@ def return_header_card(q, box='1 1 7 1'):
         tab_items = coach_tab_items
         textbox_label = 'Name'
         textbox_value = q.user.name
-    elif q.user.role == 'student':
+    else:
+        #q.user.role == 'student'
         tab_items = student_tab_items
         textbox_label = 'Name'
         textbox_value = q.user.name
-    else:
-        tab_items = student_tab_items
-        textbox_label = 'Name'
-        textbox_value = ' '
 
     older_tab_items = [
         ui.tab(name='#home', label='Home'),

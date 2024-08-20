@@ -19,7 +19,8 @@ app_stage = [
     { 'id': 1, 'stage': 'new' },
     { 'id': 2, 'stage': 'personalized' },
     { 'id': 3, 'stage': 'program chosen' },
-    { 'id': 4, 'stage': 'schedule created' }
+    { 'id': 4, 'stage': 'classes selected' },
+    { 'id': 5, 'stage': 'schedule created' }
 ]
 
 drop_table('app_stage', c)
