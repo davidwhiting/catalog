@@ -1,11 +1,11 @@
-######################################################################
-#################  COURSE SCHEDULING FUNCTIONS  ######################
-######################################################################
-
-from typing import Union, List, Dict, Any
+from typing import Union, List, Dict, Any, Optional
 from dataclasses import dataclass
 from collections import defaultdict
 import pandas as pd
+
+# Module-level constants
+DEFAULT_TERMS = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
+DEFAULT_SESSIONS_PER_TERM = {'WINTER': 3, 'SPRING': 3, 'SUMMER': 2, 'FALL': 3}
 
 @dataclass
 class ScheduleEntry:
@@ -24,8 +24,10 @@ def generate_periods(
         max_credits: int = 18,
         summer: bool = False,
         sessions: List[int] = [1, 3],
-        as_df: bool = True
-    ) -> Union[pd.DataFrame, List[Dict]]:
+        as_df: bool = True,
+        terms: Optional[List[str]] = None,
+        sessions_per_term: Optional[Dict[str, int]] = None
+    ) -> Union[pd.DataFrame, List[Dict[str, Any]]]:
     """
     Generate a periods structure containing information about terms and sessions.
 
@@ -33,29 +35,45 @@ def generate_periods(
     into which we will place classes when scheduling.
 
     Parameters:
+    - start_term (str): First term classes are to be scheduled into.
+    - years (int): Number of years to create periods for (this can be larger than needed).
+    - max_courses (int): Maximum number of courses per session.
+    - max_credits (int): Maximum number of credits per term.
+    - summer (bool): Whether attending summer (as default).
+    - sessions (List[int]): Which sessions (1-3) to schedule classes in (excluding summer term, which has only sessions 1 & 2).
+    - as_df (bool): Return results as Pandas dataframe, otherwise return as list of dictionaries.
+    - terms (Optional[List[str]]): Custom list of terms to use instead of the default.
+    - sessions_per_term (Optional[Dict[str, int]]): Custom dictionary of sessions per term to use instead of the default.
 
-    - start_term: first term classes are to be scheduled into
-    - years: number of years to create periods for (this can be larger than needed)
-    - max_courses: maximum number of courses per session
-    - max_credits: maximum number of credits per term
-    - summer: whether attending summer (as default)
-    - sessions: which sessions (1-3) to schedule classes in (excluding summer term, which has only sessions 1 & 2)
-    - as_df: return results as Pandas dataframe, otherwise return as list of dictionaries
+    Returns:
+    Union[pd.DataFrame, List[Dict[str, Any]]]: Periods structure as specified by as_df parameter.
 
-    Output includes 'previous', a value used to determine placement of prerequisites. Because Sessions 1 & 2 and 
-    Sessions 2 & 3 overlap, a Session 2 class cannot have a Session 1 prerequisite, it's previous value is 2 (two
-    time-slots previous). Similarly, Session 3 cannot have a Session 2 prerequisite, it's previous value is also 2.
-    For all others, the 'previous' value is 1.
-    
-    Note: We create all terms a student could potentially attend and set max_courses=0 and max_credits=0 for periods they
+    Raises:
+    ValueError: If input parameters are invalid.
+
+    Note:
+    We create all terms a student could potentially attend and set max_courses=0 and max_credits=0 for periods they
     are not attending.
     """
+    # Input validation
+    if years <= 0:
+        raise ValueError('Years must be a positive integer.')
+    if max_courses < 0 or max_credits < 0:
+        raise ValueError('Max courses and max credits must be non-negative.')
+    if not all(1 <= s <= 3 for s in sessions):
+        raise ValueError('Sessions must be between 1 and 3.')
 
-    TERMS = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
-    SESSIONS_PER_TERM = {'WINTER': 3, 'SPRING': 3, 'SUMMER': 2, 'FALL': 3}
+    TERMS = terms or DEFAULT_TERMS
+    SESSIONS_PER_TERM = sessions_per_term or DEFAULT_SESSIONS_PER_TERM
 
-    start_term, start_year = start_term.upper().split()
-    start_year = int(start_year)
+    try:
+        start_term, start_year = start_term.upper().split()
+        start_year = int(start_year)
+    except ValueError:
+        raise ValueError('Invalid start_term format. Expected "TERM YEAR", e.g., "SPRING 2024".')
+
+    if start_term not in TERMS:
+        raise ValueError(f'Invalid start term. Must be one of {TERMS}.')
 
     schedule = []
     id = 1
@@ -104,38 +122,36 @@ def update_periods(
     Update the 'periods' structure based on a condition.
 
     Args:
-        periods (Union[pd.DataFrame, List[Dict[str, Any]]]): A DataFrame or list of dictionaries with periods information.
-        condition (str): A string condition to be evaluated.
-        update_values (Dict[str, Any]): A dictionary of column names and values to update.
+    - periods (Union[pd.DataFrame, List[Dict[str, Any]]]): A DataFrame or list of dictionaries with periods information.
+    - condition (str): A string condition to be evaluated.
+    - update_values (Dict[str, Any]): A dictionary of column names and values to update.
 
     Returns:
-        Union[pd.DataFrame, List[Dict[str, Any]]]: Updated periods structure in the same format as the input.
+    Union[pd.DataFrame, List[Dict[str, Any]]]: Updated periods structure in the same format as the input.
+
+    Raises:
+    ValueError: If the condition is invalid or if specified columns don't exist.
 
     Example:
-        # Update max_courses for SPRING 2024 to 0
-        update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
+    # Update max_courses for SPRING 2024 to 0
+    update_periods(periods, "term == 'SPRING' and year == 2024", {"max_courses": 0})
     """
-    # Check whether input periods is a DataFrame
     is_dataframe = isinstance(periods, pd.DataFrame)
     
     if not is_dataframe:
         periods = pd.DataFrame(periods)
     
     try:
-        # Apply conditions
         mask = periods.eval(condition)
         
-        # Update values
         for key, value in update_values.items():
             if key not in periods.columns:
                 raise ValueError(f"Column '{key}' not found in periods.")
             periods.loc[mask, key] = value
     
+    except pd.errors.UndefinedVariableError as e:
+        raise ValueError(f"Invalid condition: {str(e)}")
     except Exception as e:
         raise ValueError(f"Error updating periods: {str(e)}")
     
-    # Return in the original format
-    if not is_dataframe:
-        return periods.to_dict(orient='records')
-    else:
-        return periods
+    return periods if is_dataframe else periods.to_dict(orient='records')
