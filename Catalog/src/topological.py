@@ -25,355 +25,8 @@ def process_locked_courses(locked_courses, schedule_slots):
                 raise ValueError(f"Term '{term}' not found in schedule_slots")
     return processed_locked_courses
 
-def schedule_courses_old_2(prerequisites, course_credits, schedule_slots, locked_courses, corequisites):
-    # Process locked courses
-    processed_locked_courses = process_locked_courses(locked_courses, schedule_slots)
-
-    # Create a graph of prerequisites
-    graph = defaultdict(set)
-    all_courses = set()
-    for course, prereqs in prerequisites.items():
-        graph[course] = set(prereqs)
-        all_courses.add(course)
-        all_courses.update(prereqs)
-
-    # Create a dictionary for corequisites
-    coreq_dict = {}
-    for item in corequisites:
-        course = item['course']
-        coreq_dict[course] = set(item['coreq'])
-        for coreq in item['coreq']:
-            coreq_dict[coreq] = set([course])
-
-    # Perform topological sort
-    ts = TopologicalSorter(graph)
-    sorted_courses = list(ts.static_order())
-
-    # Initialize terms based on schedule_slots
-    terms = [[] for _ in range(len(schedule_slots))]
-    course_to_term = {}
-
-    # Pre-assign locked courses
-    for course, term in processed_locked_courses.items():
-        terms[term].append(course)
-        course_to_term[course] = term
-        # Reduce available slots and credits for the term
-        schedule_slots[term]['slots'] -= 1
-        schedule_slots[term]['credits'] -= course_credits.get(course, 0)
-
-    def find_earliest_available_term(course, start_term=0):
-        if course in processed_locked_courses:
-            return processed_locked_courses[course]
-        if not graph[course]:  # No prerequisites
-            return start_term
-        prereq_terms = [course_to_term[prereq] for prereq in graph[course] if prereq in course_to_term]
-        return max(max(prereq_terms) + 1, start_term) if prereq_terms else start_term
-
-    def can_schedule_in_term(course, term):
-        term_info = schedule_slots[term]
-        current_courses = len(terms[term])
-        current_credits = sum(course_credits.get(c, 0) for c in terms[term])
-        course_credits_with_coreqs = course_credits.get(course, 0) + sum(course_credits.get(c, 0) for c in coreq_dict.get(course, []))
-        
-        return (current_courses + 1 + len(coreq_dict.get(course, [])) <= term_info['slots'] and 
-                current_credits + course_credits_with_coreqs <= term_info['credits'])
-
-    # Schedule non-locked courses
-    for course in sorted_courses:
-        if course in processed_locked_courses or course in course_to_term:
-            continue  # Skip courses that are already scheduled
-
-        scheduled = False
-        earliest_term = find_earliest_available_term(course)
-        
-        for term in range(earliest_term, len(terms)):
-            if can_schedule_in_term(course, term):
-                terms[term].append(course)
-                course_to_term[course] = term
-                # Schedule corequisites
-                for coreq in coreq_dict.get(course, []):
-                    if coreq not in course_to_term:
-                        terms[term].append(coreq)
-                        course_to_term[coreq] = term
-                scheduled = True
-                break
-        
-        if not scheduled:
-            # Add a new term with default values
-            new_term_index = len(terms)
-            new_term_info = {
-                'slots': 5,
-                'credits': 15,
-                'term': f'Additional Term {new_term_index + 1}'
-            }
-            schedule_slots.append(new_term_info)
-            terms.append([course])
-            course_to_term[course] = new_term_index
-            # Schedule corequisites in the new term
-            for coreq in coreq_dict.get(course, []):
-                if coreq not in course_to_term:
-                    terms[new_term_index].append(coreq)
-                    course_to_term[coreq] = new_term_index
-
-    # Fill remaining slots with electives
-    elective_counter = 1
-    for term in range(len(terms)):
-        term_info = schedule_slots[term]
-        while (len(terms[term]) < term_info['slots'] and 
-               sum(course_credits.get(c, 0) for c in terms[term]) + 3 <= term_info['credits']):
-            elective = f"ELECTIVE {elective_counter}"
-            terms[term].append(elective)
-            elective_counter += 1
-
-    return terms
-
-def schedule_courses_old_1(prerequisites, course_credits, schedule_slots, locked_courses, corequisites):
-    # Process locked courses
-    processed_locked_courses = process_locked_courses(locked_courses, schedule_slots)
-
-    # Create a graph of prerequisites
-    graph = defaultdict(set)
-    all_courses = set()
-    for course, prereqs in prerequisites.items():
-        graph[course] = set(prereqs)
-        all_courses.add(course)
-        all_courses.update(prereqs)
-
-    # Create a dictionary for corequisites
-    coreq_dict = {}
-    for item in corequisites:
-        course = item['course']
-        coreq_dict[course] = set(item['coreq'])
-        for coreq in item['coreq']:
-            coreq_dict[coreq] = set([course])
-
-    # Perform topological sort
-    ts = TopologicalSorter(graph)
-    sorted_courses = list(ts.static_order())
-
-    # Initialize terms based on schedule_slots
-    terms = [[] for _ in range(len(schedule_slots))]
-    course_to_term = {}
-
-    # Pre-assign locked courses
-    for course, term in processed_locked_courses.items():
-        terms[term].append(course)
-        course_to_term[course] = term
-        # Reduce available slots and credits for the term
-        schedule_slots[term]['slots'] -= 1
-        schedule_slots[term]['credits'] -= course_credits.get(course, 0)
-
-    def find_earliest_available_term(course, start_term=0):
-        if course in processed_locked_courses:
-            return processed_locked_courses[course]
-        if not graph[course]:  # No prerequisites
-            return start_term
-        prereq_terms = [course_to_term[prereq] for prereq in graph[course] if prereq in course_to_term]
-        return max(max(prereq_terms) + 1, start_term) if prereq_terms else start_term
-
-    def can_schedule_in_term(course, term):
-        term_info = schedule_slots[term]
-        current_courses = len(terms[term])
-        current_credits = sum(course_credits.get(c, 0) for c in terms[term])
-        course_credits_with_coreqs = course_credits.get(course, 0) + sum(course_credits.get(c, 0) for c in coreq_dict.get(course, []))
-        
-        return (current_courses + 1 + len(coreq_dict.get(course, [])) <= term_info['slots'] and 
-                current_credits + course_credits_with_coreqs <= term_info['credits'])
-    
-    def add_new_term():
-        new_term_index = len(terms)
-        new_term_info = {
-            'slots': 5,
-            'credits': 15,
-            'term': f'Additional Term {new_term_index + 1}'
-        }
-        schedule_slots.append(new_term_info)
-        terms.append([])
-        
-        # Move "last" term courses to the new term
-        last_term_courses = [course for course, term in processed_locked_courses.items() if term == len(terms) - 2]
-        for course in last_term_courses:
-            terms[new_term_index - 1].remove(course)
-            terms[new_term_index].append(course)
-            course_to_term[course] = new_term_index
-            processed_locked_courses[course] = new_term_index
-        
-        return new_term_index
-
-    # Schedule non-locked courses
-    for course in sorted_courses:
-        if course in processed_locked_courses or course in course_to_term:
-            continue  # Skip courses that are already scheduled
-
-        scheduled = False
-        earliest_term = find_earliest_available_term(course)
-        
-        for term in range(earliest_term, len(terms)):
-            if can_schedule_in_term(course, term):
-                terms[term].append(course)
-                course_to_term[course] = term
-                # Schedule corequisites
-                for coreq in coreq_dict.get(course, []):
-                    if coreq not in course_to_term:
-                        terms[term].append(coreq)
-                        course_to_term[coreq] = term
-                scheduled = True
-                break
-        
-        if not scheduled:
-            # Add a new term and try to schedule in the new term
-            new_term_index = add_new_term()
-            if can_schedule_in_term(course, new_term_index):
-                terms[new_term_index].append(course)
-                course_to_term[course] = new_term_index
-                # Schedule corequisites in the new term
-                for coreq in coreq_dict.get(course, []):
-                    if coreq not in course_to_term:
-                        terms[new_term_index].append(coreq)
-                        course_to_term[coreq] = new_term_index
-            else:
-                raise ValueError(f"Unable to schedule course {course} even after adding a new term.")
-
-    # Fill remaining slots with electives
-    elective_counter = 1
-    for term in range(len(terms)):
-        term_info = schedule_slots[term]
-        while (len(terms[term]) < term_info['slots'] and 
-               sum(course_credits.get(c, 0) for c in terms[term]) + 3 <= term_info['credits']):
-            elective = f"ELECTIVE {elective_counter}"
-            terms[term].append(elective)
-            elective_counter += 1
-
-    return terms
-
-def schedule_courses(prerequisites, course_credits, schedule_slots, locked_courses, corequisites):
-    # Process locked courses (courses that are locked to specific terms, first, last, etc.)
-    processed_locked_courses = process_locked_courses(locked_courses, schedule_slots)
-
-    graph = defaultdict(set)
-    all_courses = set()
-    for course, prereqs in prerequisites.items():
-        graph[course] = set(prereqs)
-        all_courses.add(course)
-        all_courses.update(prereqs)
-
-    # Identify courses that are not prerequisites for any other course
-    not_prerequisite = all_courses - set(course for prereqs in graph.values() for course in prereqs)
-
-    # Create a dictionary for corequisites
-    coreq_dict = {}
-    for item in corequisites:
-        course = item['course']
-        coreq_dict[course] = set(item['coreq'])
-        for coreq in item['coreq']:
-            if coreq in coreq_dict:
-                coreq_dict[coreq].add(course)
-            else:
-                coreq_dict[coreq] = set([course])
-
-    ts = TopologicalSorter(graph)
-    sorted_courses = list(ts.static_order())
-
-    terms = [[] for _ in range(len(schedule_slots))]
-    course_to_term = {}
-
-    def credits_required(course):
-        return course_credits.get(course, 0) + sum(course_credits.get(c, 0) for c in coreq_dict.get(course, []))
-
-    def can_fit_in_term(term, courses):
-        term_info = schedule_slots[term]
-        current_courses = len(terms[term])
-        current_credits = sum(course_credits.get(c, 0) for c in terms[term])
-        additional_courses = sum(1 for c in courses if c not in terms[term])
-        additional_credits = sum(course_credits.get(c, 0) for c in courses if c not in terms[term])
-        
-        return (current_courses + additional_courses <= term_info['slots'] and 
-                current_credits + additional_credits <= term_info['credits'])
-
-    def move_course_forward(course, from_term):
-        for to_term in range(from_term + 1, len(terms)):
-            if can_fit_in_term(to_term, [course]):
-                terms[from_term].remove(course)
-                terms[to_term].append(course)
-                course_to_term[course] = to_term
-                return True
-        return False
-
-    def make_room_in_term(term, needed_slots, needed_credits):
-        courses_to_move = []
-        for course in terms[term]:
-            if course in not_prerequisite and course not in processed_locked_courses:
-                courses_to_move.append(course)
-                needed_slots -= 1
-                needed_credits -= course_credits.get(course, 0)
-                if needed_slots <= 0 and needed_credits <= 0:
-                    break
-
-        if needed_slots > 0 or needed_credits > 0:
-            # If we couldn't find enough non-prerequisite courses, try moving any unlocked course
-            for course in terms[term]:
-                if course not in processed_locked_courses and course not in courses_to_move:
-                    courses_to_move.append(course)
-                    needed_slots -= 1
-                    needed_credits -= course_credits.get(course, 0)
-                    if needed_slots <= 0 and needed_credits <= 0:
-                        break
-
-        for course in courses_to_move:
-            if not move_course_forward(course, term):
-                return False
-        return True
-
-    # Schedule locked courses and their corequisites
-    for course, term in processed_locked_courses.items():
-        courses_to_schedule = [course] + list(coreq_dict.get(course, []))
-        if not can_fit_in_term(term, courses_to_schedule):
-            needed_slots = len(courses_to_schedule) - (schedule_slots[term]['slots'] - len(terms[term]))
-            needed_credits = sum(course_credits.get(c, 0) for c in courses_to_schedule) - (schedule_slots[term]['credits'] - sum(course_credits.get(c, 0) for c in terms[term]))
-            if not make_room_in_term(term, needed_slots, needed_credits):
-                raise ValueError(f"Unable to make room for locked course {course} and its corequisites in term {term}")
-        
-        for c in courses_to_schedule:
-            if c not in terms[term]:
-                terms[term].append(c)
-                course_to_term[c] = term
-
-    # Schedule remaining courses
-    for course in sorted_courses:
-        if course in course_to_term:
-            continue
-
-        courses_to_schedule = [course] + list(coreq_dict.get(course, []))
-        scheduled = False
-        for term in range(len(terms)):
-            if can_fit_in_term(term, courses_to_schedule):
-                for c in courses_to_schedule:
-                    if c not in course_to_term:
-                        terms[term].append(c)
-                        course_to_term[c] = term
-                scheduled = True
-                break
-        
-        if not scheduled:
-            raise ValueError(f"Unable to schedule course {course} and its corequisites")
-
-    # Fill remaining slots with electives
-    elective_counter = 1
-    for term in range(len(terms)):
-        term_info = schedule_slots[term]
-        while (len(terms[term]) < term_info['slots'] and 
-               sum(course_credits.get(c, 0) for c in terms[term]) + 3 <= term_info['credits']):
-            elective = f"ELECTIVE {elective_counter}"
-            terms[term].append(elective)
-            elective_counter += 1
-
-    return terms
 
 # Example usage remains the same as before
-
-import pandas as pd
-from graphlib import TopologicalSorter
-from collections import defaultdict
 
 def create_schedule_dataframe(courses, prerequisites, course_credits, corequisites, locked_courses):
     data = []
@@ -406,42 +59,204 @@ def schedule_courses_new(schedule_df, schedule_slots):
 
     return schedule_df
 
+
+### Example usage
+##courses = ['MATH 100', 'MATH 200', 'PHYS 100', 'PHYS 200', 'CHEM 100', 'CHEM 200', 'CHEM 201', 'BIO 300', 'COMP 300', 'LIBS 100', 'CAPS 421']
+##prerequisites = {
+##    'MATH 200': ['MATH 100'],
+##    'PHYS 200': ['MATH 100', 'PHYS 100'],
+##    'CHEM 200': ['CHEM 100'],
+##    'BIO 300': ['CHEM 200'],
+##    'COMP 300': ['MATH 200', 'PHYS 200']
+##}
+##course_credits = {
+##    'MATH 100': 3, 'MATH 200': 3, 'PHYS 100': 4, 'PHYS 200': 4,
+##    'CHEM 100': 4, 'CHEM 200': 3, 'CHEM 201': 2, 'BIO 300': 3,
+##    'COMP 300': 4, 'LIBS 100': 1, 'CAPS 421': 3
+##}
+##corequisites = {
+##    'CHEM 200': ['CHEM 201']
+##}
+##locked_courses = {
+##    'LIBS 100': 'first',
+##    'CAPS 421': 'last',
+##    'CHEM 200': 'Fall 2026'
+##}
+##
+##schedule_slots = [
+##    {'slots': 4, 'credits': 12, 'term': 'Fall 2025'},
+##    {'slots': 3, 'credits': 10, 'term': 'Spring 2026'},
+##    {'slots': 0, 'credits': 0, 'term': 'Summer 2026'},  # Internship
+##    {'slots': 5, 'credits': 16, 'term': 'Fall 2026'},
+##    {'slots': 4, 'credits': 13, 'term': 'Spring 2027'}
+##]
+##
+### Create initial schedule DataFrame
+##schedule_df = create_schedule_dataframe(courses, prerequisites, course_credits, corequisites, locked_courses)
+##
+### Schedule courses
+##scheduled_df = schedule_courses(schedule_df, schedule_slots)
+##
+### Display the resulting schedule
+##print(scheduled_df)
+
+##
+## There is one more type of prerequisite that we need to account for. Some courses are required within the first x number of credits, for instance, Writing 112 (WRTG 112) is required within the first 24 credits. A few are required by 'Within the first 6 credits', those we can easily translate into 'lock in first term', but within the first 24 or within the first 30 credits are a little more difficult. Let's call the variable 'prereq_credits' with 'prereq_credits=24' means within the first 24 credits. How can we account for this in our scheduling code? (Note: these may be GE courses, not just required courses)
+
+
+import pandas as pd
+from graphlib import TopologicalSorter
+import sqlite3
+
+def get_major_requirements(major_name):
+    # TODO: Implement SQLite query to get major requirements
+    # This is a placeholder that you can replace with actual database query later
+    conn = sqlite3.connect('university_database.db')
+    cursor = conn.cursor()
+    # Example query (you'll need to adjust this based on your actual database schema)
+    cursor.execute("""
+        SELECT courses, required_ge, required_electives
+        FROM major_requirements
+        WHERE major_name = ?
+    """, (major_name,))
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result:
+        return {
+            'name': major_name,
+            'courses': result[0].split(','),
+            'required_ge': result[1].split(','),
+            'required_electives': result[2].split(',')
+        }
+    else:
+        raise ValueError(f"Major {major_name} not found in database")
+
+def categorize_courses(courses_df, major_courses, required_ge, required_electives):
+    def categorize(course):
+        if course in major_courses:
+            return 'Major'
+        elif course in required_ge:
+            return 'Required GE'
+        elif course in required_electives:
+            return 'Required Elective'
+        else:
+            return 'Elective'
+    
+    courses_df['category'] = courses_df['course'].apply(categorize)
+    return courses_df
+
+def determine_course_level(course_name):
+    try:
+        return int(course_name.split()[1][0]) * 100
+    except:
+        return 0  # Default level if unable to determine
+
+def earliest_year_for_course(course_level, course_category):
+    if course_category in ['Major', 'Required GE', 'Required Elective']:
+        return (course_level // 100) - 1
+    else:
+        return 0  # Electives can be taken any year
+
+def group_courses_by_prereq_chain(df):
+    # Group courses into chains of prerequisites
+    chains = {}
+    for _, course in df.iterrows():
+        if course['prerequisites']:
+            key = tuple(sorted(course['prerequisites'].split(',')))
+            if key in chains:
+                chains[key].append(course['course'])
+            else:
+                chains[key] = [course['course']]
+        else:
+            chains[('no_prereqs',)] = chains.get(('no_prereqs','), []) + [course['course']]
+    return chains
+
+def schedule_required_courses(df, schedule_slots):
+    required_df = df[df['category'].isin(['Major', 'Required GE', 'Required Elective'])]
+    chains = group_courses_by_prereq_chain(required_df)
+    
+    scheduled_courses = []
+    for chain_key, courses in chains.items():
+        if chain_key == ('no_prereqs',):
+            scheduled_courses.extend(courses)
+        else:
+            ts = TopologicalSorter({course: df.loc[df['course'] == course, 'prerequisites'].iloc[0].split(',') 
+                                    for course in courses if df.loc[df['course'] == course, 'prerequisites'].iloc[0]})
+            scheduled_courses.extend(list(ts.static_order()))
+    
+    # Assign courses to terms based on level and available slots
+    for course in scheduled_courses:
+        course_data = df.loc[df['course'] == course].iloc[0]
+        earliest_year = earliest_year_for_course(course_data['level'], course_data['category'])
+        for term in range(earliest_year * 3, len(schedule_slots)):  # 3 terms per year
+            if len(schedule_slots[term]['courses']) < schedule_slots[term]['slots']:
+                schedule_slots[term]['courses'].append(course)
+                df.loc[df['course'] == course, 'scheduled_term'] = term
+                break
+    
+    return df
+
+def schedule_electives(df, schedule_slots, total_credits_required):
+    scheduled_credits = df['credits'].sum()
+    elective_counter = 1
+    
+    for term in range(len(schedule_slots)):
+        while len(schedule_slots[term]['courses']) < schedule_slots[term]['slots'] and scheduled_credits < total_credits_required:
+            elective = f'ELECTIVE {elective_counter}'
+            schedule_slots[term]['courses'].append(elective)
+            new_row = pd.DataFrame({
+                'course': [elective],
+                'credits': [3],
+                'prerequisites': [''],
+                'corequisites': [''],
+                'category': ['Elective'],
+                'level': [0],
+                'scheduled_term': [term]
+            })
+            df = pd.concat([df, new_row], ignore_index=True)
+            scheduled_credits += 3
+            elective_counter += 1
+    
+    return df
+
+def build_schedule(courses_df, major_name, total_credits_required, schedule_slots):
+    # Get major requirements
+    major = get_major_requirements(major_name)
+    
+    # Categorize courses
+    courses_df = categorize_courses(courses_df, major['courses'], major['required_ge'], major['required_electives'])
+    
+    # Add level to courses
+    courses_df['level'] = courses_df['course'].apply(determine_course_level)
+    
+    # Schedule required courses
+    schedule_df = schedule_required_courses(courses_df, schedule_slots)
+    
+    # Schedule electives
+    final_schedule_df = schedule_electives(schedule_df, schedule_slots, total_credits_required)
+    
+    return final_schedule_df
+
 # Example usage
-courses = ['MATH 100', 'MATH 200', 'PHYS 100', 'PHYS 200', 'CHEM 100', 'CHEM 200', 'CHEM 201', 'BIO 300', 'COMP 300', 'LIBS 100', 'CAPS 421']
-prerequisites = {
-    'MATH 200': ['MATH 100'],
-    'PHYS 200': ['MATH 100', 'PHYS 100'],
-    'CHEM 200': ['CHEM 100'],
-    'BIO 300': ['CHEM 200'],
-    'COMP 300': ['MATH 200', 'PHYS 200']
-}
-course_credits = {
-    'MATH 100': 3, 'MATH 200': 3, 'PHYS 100': 4, 'PHYS 200': 4,
-    'CHEM 100': 4, 'CHEM 200': 3, 'CHEM 201': 2, 'BIO 300': 3,
-    'COMP 300': 4, 'LIBS 100': 1, 'CAPS 421': 3
-}
-corequisites = {
-    'CHEM 200': ['CHEM 201']
-}
-locked_courses = {
-    'LIBS 100': 'first',
-    'CAPS 421': 'last',
-    'CHEM 200': 'Fall 2026'
-}
+courses_df = pd.DataFrame({
+    'course': ['CHEM 101', 'CHEM 102', 'MATH 101', 'PHYS 101', 'ENGL 201', 'FILM 250'],
+    'credits': [4, 4, 3, 4, 3, 3],
+    'prerequisites': ['', 'CHEM 101', '', '', '', ''],
+    'corequisites': ['', '', '', '', '', '']
+})
 
 schedule_slots = [
-    {'slots': 4, 'credits': 12, 'term': 'Fall 2025'},
-    {'slots': 3, 'credits': 10, 'term': 'Spring 2026'},
-    {'slots': 0, 'credits': 0, 'term': 'Summer 2026'},  # Internship
-    {'slots': 5, 'credits': 16, 'term': 'Fall 2026'},
-    {'slots': 4, 'credits': 13, 'term': 'Spring 2027'}
+    {'term': 'Fall 2025', 'slots': 4, 'courses': []},
+    {'term': 'Spring 2026', 'slots': 4, 'courses': []},
+    {'term': 'Fall 2026', 'slots': 4, 'courses': []},
+    {'term': 'Spring 2027', 'slots': 4, 'courses': []},
+    {'term': 'Fall 2027', 'slots': 4, 'courses': []},
+    {'term': 'Spring 2028', 'slots': 4, 'courses': []}
 ]
 
-# Create initial schedule DataFrame
-schedule_df = create_schedule_dataframe(courses, prerequisites, course_credits, corequisites, locked_courses)
+final_schedule = build_schedule(courses_df, 'Chemistry', 120, schedule_slots)
 
-# Schedule courses
-scheduled_df = schedule_courses(schedule_df, schedule_slots)
-
-# Display the resulting schedule
-print(scheduled_df)
+# Display the final schedule
+for term in schedule_slots:
+    print(f"{term['term']}: {', '.join(term['courses'])}")
