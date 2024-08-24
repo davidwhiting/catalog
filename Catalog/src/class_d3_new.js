@@ -103,8 +103,8 @@ function render(data) {
   // End of Nested Functions
 
   zoomable.selectAll(".movable").remove();
-  const maxTerm = d3.max(data, d => d.period);
-  for (let j = 0; j <= maxTerm; j++) {
+  const maxPeriod = d3.max(data, d => d.period);
+  for (let j = 0; j <= maxPeriod; j++) {
     drawColumn(j, data);
   }
 }
