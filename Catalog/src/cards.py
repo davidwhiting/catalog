@@ -101,16 +101,10 @@ def return_header_card(q, box='1 1 7 1'):
     '''
     flex: Use the old flex layout system rather than the grid system
           (flex was not working correctly, can debug later)
-    Create separate tabs for different roles: guest, student, coach, admin
+    Create separate tabs for different roles: student, coach, admin
     '''
     flex = q.app.flex
-    #guest_tab_items = [
-    #    ui.tab(name='#login',    label='[Login]'),
-    #    ui.tab(name='#home',     label='Home'),
-    #    ui.tab(name='#program',  label='Program'),
-    #    ui.tab(name='#course',   label='Course'),
-    #    ui.tab(name='#schedule', label='Schedule'),
-    #]
+
     student_tab_items = [
         ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#home',     label='Home'),
@@ -406,6 +400,7 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
     if flex:
         box = location
 
+    ## Debug This
     #query = '''
     #    SELECT a.id AS name, 
     #        trim(a.firstname || ' ' || a.lastname || ' (' || b.role || ')') AS label
@@ -419,12 +414,13 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
     choicesdict = [
         #{'name': 1, 'label': 'Admin (admin role)'},
         #{'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
-        {'name': 5, 'label': 'John Doe (New Student)'},
-        {'name': 6, 'label': 'John Doe (After entering personal information)'},
-        {'name': 7, 'label': 'John Doe (After selecting program)'},
-        {'name': 3, 'label': 'John Doe (After creating schedule)'},
-        {'name': 4, 'label': 'Jim Doe (transfer student with program selected)'},
-        #{'name': 6, 'label': 'Tom Doe (military student, no program selected)'},
+        {'name': 3, 'label': 'John Doe (New Student)'},
+        {'name': 4, 'label': 'John Doe (After entering personal information)'},
+        {'name': 5, 'label': 'John Doe (After selecting program)'},
+        {'name': 6, 'label': 'John Doe (After selecting courses)'},
+        {'name': 7, 'label': 'John Doe (After creating schedule)'},
+        {'name': 8, 'label': 'Jane Doe (Transfer student with program selected)'},
+        #{'name': 9, 'label': 'Tom Doe (military student, no program selected)'},
     ]
 
     choices = [ui.choice(str(row['name']), row['label']) for row in choicesdict]

@@ -50,6 +50,9 @@ step4:
 step5:
 	$(PYTHON) populate_sample_users_and_students.py
 
+copy:
+	cp $(DB_FILE) ../src/
+
 # Clean up intermediate and output files
 clean:
 	rm -f $(DB_FILE) $(TMP_TXT_FILE) $(TMP_PDF_FILE)

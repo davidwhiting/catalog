@@ -1,3 +1,7 @@
+######################################################################
+#################  COURSE SCHEDULING FUNCTIONS  ######################
+######################################################################
+
 from typing import Union, List, Dict, Any, Optional
 from dataclasses import dataclass
 from collections import defaultdict
@@ -5,6 +9,7 @@ import pandas as pd
 
 # Module-level constants
 DEFAULT_TERMS = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
+# Sessions are UMGC-specific
 DEFAULT_SESSIONS_PER_TERM = {'WINTER': 3, 'SPRING': 3, 'SUMMER': 2, 'FALL': 3}
 
 @dataclass

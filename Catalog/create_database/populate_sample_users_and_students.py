@@ -92,7 +92,7 @@ student_info = [
         "financial_aid": None,
         "app_stage_id": 1, 
         "program_id": None, 
-        "student_profile_id": 1,
+        "student_profile_id": None,
         "notes": "John Doe, app stage 1 (new student)"
     },
     { 
@@ -289,6 +289,21 @@ c.executemany('''
     INSERT INTO student_progress (user_id, program_id, seq, course, credits, course_type_id, completed, term, session, locked)
         VALUES (:user_id, :program_id, :seq, :course, :credits, :course_type_id, :completed, :term, :session, :locked)
     ''', student_progress)
+
+# copy user 7 to user 6 (same user, this is a temporary hack for the demo)
+
+c.execute('''
+    INSERT INTO student_progress (
+        program_id, seq, course, credits, course_type_id, completed, term, session, locked, user_id
+    )
+    SELECT 
+        program_id, seq, course, credits, course_type_id, completed, term, session, locked, 6
+    FROM 
+        student_progress
+    WHERE 
+        user_id = 7;
+''')
+
 conn.commit()
 
 # Close the connection

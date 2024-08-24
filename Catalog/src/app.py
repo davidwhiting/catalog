@@ -94,13 +94,12 @@ async def initialize_user(q: Q):
     q.user.initialized = True
     q.user.conn = utils.TimedSQLiteConnection('UMGC.db')
 
-    ## Until logged in, user is a guest
-    #q.user.role = 'guest'
+    ## Assuming that users log in through SSO. All access to this app is by registered users.
     #q.user.logged_in = False 
 
     await utils.reset_student_info_data(q)
 
-    q.user.user_id = 5
+    q.user.user_id = 3
     q.user.role == 'student'
     await utils.populate_student_info(q, q.user.user_id)
     q.user.student_info_populated = True
@@ -259,7 +258,6 @@ async def home(q: Q):
     card_height = '400px'
 
     # this depends on student stage:
-
 
     #cards.render_home_cards(q)
 
