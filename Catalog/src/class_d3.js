@@ -48,7 +48,7 @@ function render(data) {
       const item = filteredData[j];
       if (item) {
         anyItem = true;
-        const fullname = `${item.name} (${item.credits})`;
+        const fullname = `${item.course} (${item.credits})`;
         drawRectangle(bin[period]+offset, row[j], fullname, item.color, item.textcolor);
       }
     }
@@ -57,7 +57,7 @@ function render(data) {
     }
   };
 
-  const drawRectangle = (x, y, name, color, textcolor, description='') => {
+  const drawRectangle = (x, y, course, color, textcolor, description='') => {
     const g = zoomable.append("g");
     g.append("rect")
       .attr("x", x)
@@ -69,7 +69,7 @@ function render(data) {
     g.append("text")
       .attr("x", x + textOffsetX)
       .attr("y", y + textOffsetY)
-      .text(name)
+      .text(course)
       .attr("fill", textcolor)
       .style("font-size", "12px")
       .style("font-family", "Arial")
@@ -79,7 +79,7 @@ function render(data) {
       .text(description);
   };
 
-  const drawHeader = (x, y, name, color, textcolor, description='') => {
+  const drawHeader = (x, y, course, color, textcolor, description='') => {
     const g = zoomable.append("g");
     g.append("rect")
       .attr("x", x - sessionOffset)
@@ -91,7 +91,7 @@ function render(data) {
     g.append("text")
       .attr("x", x - sessionOffset + 2*textOffsetX)
       .attr("y", y + textOffsetY)
-      .text(name)
+      .text(course)
       .attr("fill", textcolor)
       .style("font-size", "14px")
       .style("font-family", "Arial")

@@ -1,25 +1,16 @@
-    const screenWidth = 800;
-    const boxWidth = 110;
-    const boxHeight = 40;
-    const textOffsetX = 10; 
-    const textOffsetY = 25;
-    const sessionOffset = 60;
-    const headerRow = 20;
+const screenWidth = 800;
+const boxWidth = 110;
+const boxHeight = 40;
+const textOffsetX = 10; 
+const textOffsetY = 25;
+const sessionOffset = 60;
+const headerRow = 20;
 
-    // Define x coordinates for rectangles
-    var bin = [10];
-    // if sessions, then 2.25*boxWidth else boxWidth
-    for (let k=0; k <=30; k++) {
-        bin.push(bin[k] + 20 + 2.25*boxWidth);
-    }
+// Define x coordinates for rectangles
     
-    // Define y coordinates for rectangles
-    const yGap = 4;
-    const boxSpace = boxHeight + yGap;
-    var row = [80];
-    for (let k=0; k <=10; k++) {
-        row.push(row[k] + boxSpace);
-    }
+// Define y coordinates for rectangles
+const yGap = 4;
+const boxSpace = boxHeight + yGap;
 
     var semesterData = [];
     const seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL'];

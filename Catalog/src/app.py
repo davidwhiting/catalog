@@ -3,17 +3,9 @@ from typing import Optional, List
 import logging
 import os
 #from msal import ConfidentialClientApplication
-import requests
 import pandas as pd
 import numpy as np
 
-#import random
-#import sqlite3
-
-#import delete_me as delete
-
-# 'templates' contains static html, markdown, and javascript D3 code
-import templates
 # cards contains static cards and python functions that render cards (render_... functions)
 import cards
 # 'utils' contains all other python functions
@@ -101,7 +93,7 @@ async def initialize_user(q: Q):
 
     q.user.user_id = 3
     q.user.role == 'student'
-    await utils.populate_student_info(q, q.user.user_id)
+    await utils.populate_q_student_info(q, q.user.conn, q.user.user_id)
     q.user.student_info_populated = True
 
     # Note: All user variables related to students will be saved in a dictionary
@@ -118,7 +110,6 @@ async def initialize_user(q: Q):
     #   - role in ('admin', 'coach') will start from new student or populate with saved
     #     student info using 'select student' dropdown menu (later will be lookup)
     #   - role == 'student' will start new or from saved student info from database
-    #   - role == 'guest' will always start new
 
     await q.page.save()
 
@@ -210,7 +201,7 @@ async def select_sample_user(q: Q):
         if q.user.role in ['coach', 'admin']:
             pass
         elif q.user.role == 'student':
-            await utils.populate_student_info(q, q.user.user_id)
+            await utils.populate_q_student_info(q, q.user.conn, q.user.user_id)
             q.user.student_info_populated = True
 
     else:
@@ -600,14 +591,14 @@ def dropdown_debug(q):
 @on()
 async def menu_degree(q: Q):
     logging.info('The value of menu_degree is ' + str(q.args.menu_degree))
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     q.user.student_info['menu']['degree'] = q.args.menu_degree
 
     # reset area_of_study if degree changes
     q.user.student_info['menu']['area_of_study'] = None
     q.page['dropdown'].menu_area.value = None
     # update area_of_study choices based on degree chosen
-    q.page['dropdown'].menu_area.choices = await get_choices(timedConnection, cards.area_query, 
+    q.page['dropdown'].menu_area.choices = await get_choices(timed_connection, cards.area_query, 
         params=(q.user.student_info['menu']['degree'],))
 
     # reset program if degree changes
@@ -633,7 +624,7 @@ async def menu_degree(q: Q):
 @on()
 async def menu_area(q: Q):
     logging.info('The value of area_of_study is ' + str(q.args.menu_area))
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     q.user.student_info['menu']['area_of_study'] = q.args.menu_area
 
     # reset program if area_of_study changes
@@ -643,7 +634,7 @@ async def menu_area(q: Q):
     q.page['dropdown'].menu_program.value = None
 
     # update program choices based on area_of_study chosen
-    q.page['dropdown'].menu_program.choices = await get_choices(timedConnection, cards.program_query, 
+    q.page['dropdown'].menu_program.choices = await get_choices(timed_connection, cards.program_query, 
         params=(q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']))
 
 #    if q.user.degree != '2':
@@ -660,15 +651,16 @@ async def menu_area(q: Q):
 @on()
 async def menu_program(q: Q):
     logging.info('The value of program is ' + str(q.args.menu_program))
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     q.user.student_info['menu']['program'] = q.args.menu_program
     q.user.student_info['program_id'] = q.user.student_info['menu']['program']
+    program_id = q.user.student_info['program_id']
 
-    row = await utils.get_program_title(timedConnection, q.user.student_info['program_id'])
+    row = await utils.get_program_title(timed_connection, program_id)
     if row:
         q.user.student_info['degree_program'] = row['title']
         q.user.student_info['degree_id'] = row['id']
-    q.user.student_data['required'] = await utils.get_required_program_courses(q)
+    q.user.student_data['required'] = await utils.get_required_program_courses(timed_connection, program_id)
 
     # need to also update q.user.student_info['degree_program']
     logging.info('This is menu_program(q): the value of program_id is ' + str(q.user.student_info['program_id']))
@@ -676,7 +668,7 @@ async def menu_program(q: Q):
     await cards.render_program(q)
     
     # # program_id an alias used throughout
-    #result = await get_program_title(timedConnection, q.user.student_info['program_id'])
+    #result = await get_program_title(timed_connection, q.user.student_info['program_id'])
     #q.user.student_info['degree_program'] = result['title']
     #
     ## have the size of this depend on the degree (?)
@@ -1150,6 +1142,7 @@ async def student_schedule(q: Q):
             df = q.user.student_data['schedule'], 
             start_term = q.user.student_info['first_term']
         )
+
         #add_card(q, 'd3plot', cards.render_d3plot(html_template, location='horizontal', width='80%'))
         await cards.render_d3plot(q, html_template, location='horizontal', width='75%', height='400px')
         await cards.render_schedule_menu(q, location='horizontal', width='20%')

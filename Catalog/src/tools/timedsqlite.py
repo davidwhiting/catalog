@@ -97,11 +97,11 @@ class TimedSQLiteConnection:
             self.connection.close()
             self.connection = None
 
-async def _base_query(timedConnection: TimedSQLiteConnection, query_method: str, query: str, params: tuple = (), **kwargs) -> Optional[Any]:
+async def _base_query(timed_connection: TimedSQLiteConnection, query_method: str, query: str, params: tuple = (), **kwargs) -> Optional[Any]:
     """
     Base function to handle queries and error logging.
     
-    :param timedConnection: TimedSQLiteConnection instance
+    :param timed_connection: TimedSQLiteConnection instance
     :param query_method: String indicating which query method to use
     :param query: SQL query string
     :param params: Query parameters
@@ -109,7 +109,7 @@ async def _base_query(timedConnection: TimedSQLiteConnection, query_method: str,
     :return: Query result or None if query fails
     """
     try:
-        method = getattr(timedConnection, f"fetch{query_method}")
+        method = getattr(timed_connection, f"fetch{query_method}")
         result = await method(query, params, **kwargs)
         
         if result is None or (isinstance(result, (list, dict)) and not result) or (isinstance(result, pd.DataFrame) and result.empty):
@@ -125,21 +125,21 @@ async def _base_query(timedConnection: TimedSQLiteConnection, query_method: str,
         logging.error(error_message)
         return None
 
-async def get_query(timedConnection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[List[Any]]:
+async def get_query(timed_connection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[List[Any]]:
     """Get all rows from a query."""
-    return await _base_query(timedConnection, "all", query, params)
+    return await _base_query(timed_connection, "all", query, params)
 
-async def get_query_one(timedConnection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[Any]:
+async def get_query_one(timed_connection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[Any]:
     """Get a single row from a query."""
-    return await _base_query(timedConnection, "one", query, params)
+    return await _base_query(timed_connection, "one", query, params)
 
-async def get_query_dict(timedConnection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[List[Dict[str, Any]]]:
+async def get_query_dict(timed_connection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[List[Dict[str, Any]]]:
     """Get all rows from a query as a list of dictionaries."""
-    return await _base_query(timedConnection, "dict", query, params)
+    return await _base_query(timed_connection, "dict", query, params)
 
-async def get_query_course_dict(timedConnection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[Dict[str, Dict[str, Any]]]:
+async def get_query_course_dict(timed_connection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[Dict[str, Dict[str, Any]]]:
     """Get all rows from a query as a dictionary indexed by course."""
-    result = await get_query_dict(timedConnection, query, params)
+    result = await get_query_dict(timed_connection, query, params)
     if result is None:
         return None
     
@@ -149,7 +149,7 @@ async def get_query_course_dict(timedConnection: TimedSQLiteConnection, query: s
         warnings.warn("'course' is not an element of the dictionary", category=Warning)
         return None
 
-async def get_query_df(timedConnection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[pd.DataFrame]:
+async def get_query_df(timed_connection: TimedSQLiteConnection, query: str, params: tuple = ()) -> Optional[pd.DataFrame]:
     """Get query results as a pandas DataFrame."""
-    return await _base_query(timedConnection, "df", query, params)
+    return await _base_query(timed_connection, "df", query, params)
 

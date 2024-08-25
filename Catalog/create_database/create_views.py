@@ -224,6 +224,8 @@ c.execute(create_view_query)
 conn.commit()
 
 # used by utils.get_student_progress_d3
+# used to be a.course as name, now sticking with course
+
 drop_view('student_progress_d3_view')
 create_view_query = '''
 	CREATE VIEW student_progress_d3_view AS
@@ -231,7 +233,7 @@ create_view_query = '''
         a.id,
         a.user_id,
         a.seq,
-        a.course as name,
+        a.course,
         COALESCE(b.title, '') AS title,
         a.credits, 
         LOWER(c.label) AS course_type,

@@ -395,7 +395,7 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
     '''
     Function to create a dropdown menu of sample users to demo the wave app
     '''
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     flex = q.app.flex
     if flex:
         box = location
@@ -407,7 +407,7 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
     #    FROM users a, roles b
     #    WHERE a.role_id = b.id
     #'''
-    #choicesdict=await utils.get_choices(timedConnection, query)
+    #choicesdict=await utils.get_choices(timed_connection, query)
 
     ## tmp fix for demo
     ## need to update 'populate_sample_users_and_students.py'
@@ -1041,7 +1041,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
     Create menus for selecting degree, area of study, and program
     '''
     flex = q.app.flex
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
 
     #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
     #area_query = '''
@@ -1071,7 +1071,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
                 (q.user.student_info['menu']['degree'] is not None) else q.args.menu_degree,
             trigger=True,
             width='230px',
-            choices=await utils.get_choices(timedConnection, degree_query)
+            choices=await utils.get_choices(timed_connection, degree_query)
         ),
         ui.dropdown(
             name='menu_area',
@@ -1083,7 +1083,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
             disabled=False,
             width='250px',
             choices=None if (q.user.student_info['menu']['degree'] is None) else \
-                await utils.get_choices(timedConnection, area_query, (q.user.student_info['menu']['degree'],))
+                await utils.get_choices(timed_connection, area_query, (q.user.student_info['menu']['degree'],))
         ),
         ui.dropdown(
             name='menu_program',
@@ -1095,7 +1095,7 @@ async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizonta
             width='300px',
             choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
                 await utils.get_choices(
-                    timedConnection, 
+                    timed_connection, 
                     program_query, 
                     (q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study'])
                 )
@@ -1141,7 +1141,7 @@ async def render_program_description(q, box='1 3 7 2', location='top_vertical', 
     :param location: page location to display
     '''
     flex = q.app.flex
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     title = q.user.student_info['degree_program'] # program name
 
     if flex:
@@ -1151,7 +1151,7 @@ async def render_program_description(q, box='1 3 7 2', location='top_vertical', 
         SELECT description, info, learn, certification
         FROM program_descriptions WHERE program_id = ?
     '''
-    row = await get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
+    row = await get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
     if row:
         # major = '\n##' + title + '\n\n'
         frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
@@ -1182,7 +1182,7 @@ async def render_program_dashboard(q, box=None, location='horizontal', width='10
     flex=False: box is required
     '''
     flex = q.app.flex
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     title = q.user.student_info['degree_program'] # program name
 
     if flex:
@@ -1191,7 +1191,7 @@ async def render_program_dashboard(q, box=None, location='horizontal', width='10
 
     # get program summary for bachelor's degrees
     query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    row = await get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
+    row = await get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
     if row:
         card = add_card(q, 'major_dashboard', ui.form_card(
             box=box,
@@ -1674,7 +1674,7 @@ async def render_ge_arts_card(q, menu_width='300px', box='1 11 3 3', location='g
     '''
     ge = q.user.student_info['ge']['arts']
     nopre = ge['nopre']
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
@@ -1693,7 +1693,7 @@ async def render_ge_arts_card(q, menu_width='300px', box='1 11 3 3', location='g
                 placeholder='(Select One)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (6,))
+                choices=await get_choices(timed_connection, ge_query, (6,))
             ),
             ui.dropdown(
                 name='ge_arts_2',
@@ -1704,7 +1704,7 @@ async def render_ge_arts_card(q, menu_width='300px', box='1 11 3 3', location='g
                 required=True,
                 width=menu_width,
                 # figure out how to omit choice selected in Course 1
-                choices=await get_choices(timedConnection, ge_query, (7,))
+                choices=await get_choices(timed_connection, ge_query, (7,))
             ),
         ]
     )
@@ -1717,7 +1717,7 @@ async def render_ge_beh_card(q, menu_width='300px', box='4 11 3 3', location='gr
     '''
     ge = q.user.student_info['ge']['beh']
     nopre = ge['nopre']
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
@@ -1738,8 +1738,8 @@ async def render_ge_beh_card(q, menu_width='300px', box='4 11 3 3', location='gr
                 placeholder='(Select One)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (12,))
-                #choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (11,))
+                choices=await get_choices(timed_connection, ge_query, (12,))
+                #choices=await get_choices(timed_connection, ge_query_nopre if nopre else ge_query, (11,))
             ),
             ui.dropdown(
                 name='ge_beh_2',
@@ -1750,8 +1750,8 @@ async def render_ge_beh_card(q, menu_width='300px', box='4 11 3 3', location='gr
                 placeholder='(Select One)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (13,))
-#                choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (11,))
+                choices=await get_choices(timed_connection, ge_query, (13,))
+#                choices=await get_choices(timed_connection, ge_query_nopre if nopre else ge_query, (11,))
             ),
         ]
     )
@@ -1762,7 +1762,7 @@ async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='gri
     '''
     Create the General Education - Science card
     '''
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     ge = q.user.student_info['ge']['bio']
     nopre = ge['nopre']
     flex = q.app.flex
@@ -1785,7 +1785,7 @@ async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='gri
                 placeholder='(Combined Lecture & Lab)',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (8,))
+                choices=await get_choices(timed_connection, ge_query, (8,))
             ),
             ui.dropdown(
                 name='ge_bio_1c',
@@ -1794,7 +1794,7 @@ async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='gri
                 trigger=True,
                 placeholder='or (Separate Lecture & Lab)',
                 width=menu_width,
-                choices=await utils.get_choices_disable_all(timedConnection, ge_pairs_query, ())
+                choices=await utils.get_choices_disable_all(timed_connection, ge_pairs_query, ())
             ),
             ui.dropdown(
                 name='ge_bio_1b',
@@ -1803,7 +1803,7 @@ async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='gri
                 trigger=True,
                 placeholder='or (Science Majors and Minors)',
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (9,))
+                choices=await get_choices(timed_connection, ge_query, (9,))
             ),
             #ui.separator(label='Select an additional science course:'),
             #nopre=True # check for easy classes by selecting those w/o prerequisites
@@ -1816,8 +1816,8 @@ async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='gri
                 placeholder='(Select One)',
                 required=True,
                 width=menu_width,
-#                choices=await get_choices(timedConnection, ge_query_nopre if nopre else ge_query, (10,))
-                choices=await get_choices(timedConnection, ge_query, (11,))
+#                choices=await get_choices(timed_connection, ge_query_nopre if nopre else ge_query, (10,))
+                choices=await get_choices(timed_connection, ge_query, (11,))
             ),
         ]
     )
@@ -1828,7 +1828,7 @@ async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='gr
     '''
     Create the General Education - Communications card
     '''
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     ge = q.user.student_info['ge']['comm']
     nopre = ge['nopre']
     flex = q.app.flex
@@ -1847,7 +1847,7 @@ async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='gr
                 value=ge['1'] if (ge['1'] is not None) else q.args.ge_comm_1,
                 trigger=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (1,))
+                choices=await get_choices(timed_connection, ge_query, (1,))
             ),
             ui.dropdown(
                 name='ge_comm_2',
@@ -1856,7 +1856,7 @@ async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='gr
                 disabled=False,
                 trigger=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (2,))
+                choices=await get_choices(timed_connection, ge_query, (2,))
             ),
             ui.dropdown(
                 name='ge_comm_3',
@@ -1867,7 +1867,7 @@ async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='gr
                 popup='always',
                 required=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (3,))
+                choices=await get_choices(timed_connection, ge_query, (3,))
             ),
             ui.dropdown(
                 name='ge_comm_4',
@@ -1876,7 +1876,7 @@ async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='gr
                 value=ge['4'] if (ge['4'] is not None) else q.args.ge_comm_4,
                 trigger=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (4,))
+                choices=await get_choices(timed_connection, ge_query, (4,))
             ),
         ]
     )
@@ -1888,7 +1888,7 @@ async def render_ge_math_card(q, menu_width='300px', box='4 9 3 2', location='gr
     Create the General Education - Mathematics card
     '''
     ge = q.user.student_info['ge']['math']
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
@@ -1908,7 +1908,7 @@ async def render_ge_math_card(q, menu_width='300px', box='4 9 3 2', location='gr
                 trigger=True,
                 required=True,
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (5,))
+                choices=await get_choices(timed_connection, ge_query, (5,))
             ),
         ]
     )
@@ -1919,7 +1919,7 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
     '''
     Create the General Education - Research and Computing Literacy card
     '''
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     ge = q.user.student_info['ge']['res']
     nopre = ge['nopre']
     flex = q.app.flex
@@ -1944,7 +1944,7 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
                 placeholder='(Select One)',
                 popup='always',
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (14,))
+                choices=await get_choices(timed_connection, ge_query, (14,))
             ),
             ui.dropdown(
                 name='ge_res_2',
@@ -1953,7 +1953,7 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
                 trigger=True,
                 placeholder='(Select One)',
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_query, (15,))
+                choices=await get_choices(timed_connection, ge_query, (15,))
             ),
             ui.dropdown(
                 name='ge_res_3',
@@ -1963,7 +1963,7 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
                 required=True,
                 placeholder='(Select 3-credit Course)',
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_credits_query, (16,3))
+                choices=await get_choices(timed_connection, ge_credits_query, (16,3))
             ),
            ui.dropdown(
                 name='ge_res_3a',
@@ -1973,7 +1973,7 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
                 trigger=True,
                 placeholder='(Select 1-credit Course)',
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_credits_query, (16,1))
+                choices=await get_choices(timed_connection, ge_credits_query, (16,1))
             ),
             ui.dropdown(
                 name='ge_res_3b',
@@ -1982,7 +1982,7 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
                 trigger=True,
                 placeholder='and (Select 1-credit Course)',
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_credits_query, (16,1))
+                choices=await get_choices(timed_connection, ge_credits_query, (16,1))
             ),
             ui.dropdown(
                 name='ge_res_3c',
@@ -1991,7 +1991,7 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
                 trigger=True,
                 placeholder='and (Select 1-credit Course)',
                 width=menu_width,
-                choices=await get_choices(timedConnection, ge_credits_query, (16,1))
+                choices=await get_choices(timed_connection, ge_credits_query, (16,1))
             ),
         ]
     )

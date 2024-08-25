@@ -1,5 +1,4 @@
 from h2o_wave import Q, ui
-
 from typing import Any, Optional, Dict, List
 
 import asyncio
@@ -12,8 +11,6 @@ import warnings
 
 #import sys
 #import traceback
-
-import templates
 
 ######################################################################
 ####################  STANDARD WAVE CARDS  ###########################
@@ -43,195 +40,188 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 ##
 ## Retaining older version below
 
-from tools.init_old import initialize_student_info, initialize_student_data, \
-    initialize_ge, reset_program
-__all__ = ['initialize_student_info', 'initialize_student_data', 'initialize_ge', 'reset_program']
-
-############################################################
-####################  Populate Functions  ##################
-############################################################
-
-async def populate_student_info(q, user_id):
-    '''
-    Get information from student_info table and populate the q.user.student_info variables
-    and q.user.student_data dataframes
-    '''
-    timedConnection = q.user.conn
-    attributes = ['resident_status', 'app_stage_id', 'app_stage', 'student_profile', 'financial_aid', 
-        'transfer_credits', 'program_id']
-    query = '''
-    SELECT user_id, fullname AS name, resident_status, app_stage_id, app_stage, student_profile,
-        transfer_credits, financial_aid, program_id
-    FROM student_info_view WHERE user_id = ?
-    '''
-    row = await get_query_one(timedConnection, query, params=(user_id,))
-    if row:
-        q.user.student_info.update({name: row[name] for name in attributes})
-#                q.user.student_data['user_id'] = user_id
-
-        q.user.student_info['user_id'] = user_id
-        q.user.student_info['name'] = row['name']
-        q.user.student_data['user_id'] = user_id
-
-        if q.user.student_info['program_id'] is not None:
-            row = await get_program_title(timedConnection, q.user.student_info['program_id'])
-            if row:
-                q.user.student_info['degree_program'] = row['title']
-                q.user.student_info['degree_id'] = row['id']
-            q.user.student_data['required'] = await get_required_program_courses(q)
-
-        if q.user.student_info['app_stage_id'] == 4:
-            q.user.student_data['schedule'] = await get_student_progress_d3(q)
-    
-        if q.user.student_info['first_term'] is None:
-            q.user.student_info['first_term'] = q.app.default_first_term
-
-    # Recreate dropdown menus for students
-    # Need to do this only if dropdown menu status was not saved
-    # (We should save this status in the future)
-    if q.user.student_info['program_id'] is not None:
-        # recreate dropdown menu for program if empty
-        if q.user.student_info['menu']['program'] is None:
-            q.user.student_info['menu']['program'] = q.user.student_info['program_id']
-        # recreate dropdowns for degree and area_of_study if either is empty
-        if (q.user.student_info['menu']['degree'] is None) or (q.user.student_info['menu']['area_of_study'] is None):
-            query = '''
-                SELECT menu_degree_id, menu_area_id 
-                FROM menu_all_view
-                WHERE program_id = ?
-                LIMIT 1
-            '''
-            # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
-            row = await get_query_one(q.user.conn, query, params=(q.user.student_info['program_id'],))
-            if row:
-                q.user.student_info['menu']['degree'] = row['menu_degree_id']
-                q.user.student_info['menu']['area_of_study'] = row['menu_area_id']
-
-#######################################################
-####################  Get Functions  ##################
-#######################################################
-
-async def get_student_progress_d3(q):
-    timedConnection = q.user.conn
-    user_id = q.user.student_info['user_id']
-    query = 'SELECT * FROM student_progress_d3_view WHERE user_id = ?'
-    # note: 'course' is named 'name' in student_progress_d3_view 
-    df = await get_query_df(timedConnection, query, params=(user_id,))
-    return df
-
-async def get_required_program_courses(q):
-    timedConnection = q.user.conn
-    program_id = q.user.student_info['program_id']
-    query = '''
-        SELECT 
-            id,
-            course, 
-            course_type as type,
-            title,
-            credits,
-            pre,
-            pre_credits,
-            substitutions,
-            description
-        FROM program_requirements_view
-        WHERE program_id = ?
-    '''
-    df = await get_query_df(timedConnection, query, params=(program_id,))
-    return df
-
-async def get_catalog_program_sequence(q):
-    timedConnection = q.user.conn
-    query = 'SELECT * FROM catalog_program_sequence_view WHERE program_id = ?'
-    program_id = q.user.student_info['program_id']
-    df = await get_query_df(timedConnection, query, params=(program_id,))
-    return df
-
-async def get_choices(timedConnection, query, params=(), disabled=None, enabled=None):
-    '''
-    Return choices for dropdown menus and other ui elements.
-    
-    timedConnection: Database connection object
-    query: SQL query to fetch choices from the database
-    params: Parameters for the SQL query
-    disabled: Iterable of labels that should be disabled in the menu
-    enabled: Iterable of labels that should be enabled in the menu
-    
-    Either `disabled` or `enabled` should be provided, not both.
-    
-    Example:
-        disabled = {'Option A', 'Option B'}
-        enabled = {'Option C', 'Option D'}
-    '''
-
-    # Ensure both disabled and enabled are not provided at the same time
-    if (disabled is not None) and (enabled is not None):
-        raise ValueError("Only one of `disabled` or `enabled` should be provided, not both.")
-    
-    rows = await get_query(timedConnection, query, params)
-    
-    # Convert disabled and enabled to sets for efficient look-up
-    if disabled is not None:
-        if not isinstance(disabled, (list, tuple, set)):
-            raise ValueError("`disabled` should be a list, tuple, or set")
-        status_set = set(disabled)
-        disable = True
-    elif enabled is not None:
-        if not isinstance(enabled, (list, tuple, set)):
-            raise ValueError("`enabled` should be a list, tuple, or set")
-        status_set = set(enabled)
-        disable = False
-    else:
-        status_set = set()
-        disable = True
-
-    choices = [
-        ui.choice(
-            name=str(row['name']), 
-            label=row['label'], 
-            disabled=(disable if row['label'] in status_set else not disable)
-        ) 
-        for row in rows
+from tools.init_old import initialize_student_info, initialize_student_data, initialize_ge, reset_program
+__all__ = [
+    'initialize_student_info', 
+    'initialize_student_data', 
+    'initialize_ge', 
+    'reset_program'
     ]
-    return choices
 
-async def get_choices_disable_all(timedConnection, query, params=()):
-    '''
-    Return choices for dropdown menus and other ui elements
-    disabled: Needs to be formatted as
-        disabled = {'Social Science', 'English', 'General Studies'}
-        These items will be disabled in the menu so they cannot be chosen
-    '''
-    rows = await get_query(timedConnection, query, params)
+######################################################################
+####################  SQL-RELATED FUNCTIONS  #########################
 
-        # might have to add error checking here to make sure `disabled` is formatted correctly
-    choices = [ui.choice(
-        name = str(row['name']), 
-        label = row['label'], 
-        disabled = True 
-        ) for row in rows]
+# If problems, revert to 'from tools.timedsqlite_old' and debug
+from tools.timedsqlite import TimedSQLiteConnection, _base_query, get_query, get_query_one, get_query_dict, get_query_course_dict, get_query_df
+to_add = [
+    'TimedSQLiteConnection', 
+    '_base_query', 
+    'get_query', 
+    'get_query_one', 
+    'get_query_dict', 
+    'get_query_course_dict', 
+    'get_query_df'
+    ]
+__all__.extend(to_add)
 
-    return choices
+#########################################################
+####################  Get Functions  ####################
+#########################################################
 
-async def get_choices_with_disabled(timedConnection, query, params=()):
-    '''
-    Return choices for dropdown menus and other ui elements
-    This is a quick-and-dirty solution for something I can make more elegant
-    Used specifically with menu_program dropdown.
+from tools.done import get_student_progress_d3, get_catalog_program_sequence, get_required_program_courses, get_choices
+to_add = [
+    'get_student_progress_d3', 
+    'get_catalog_program_sequence', 
+    'get_required_program_courses',
+    'get_choices'
+]
+__all__.extend(to_add)
+####################
+#### DONE BELOW ####
+ 
+async def summarize_ge(student_info):
+    """
+    Summarize General Education (GE) to keep our dashboard updated.
+    If 'ge' doesn't exist in student_info, it creates it using create_ge function.
 
-    Not working for some reason
-    '''
-    rows = await get_query(timedConnection, query, params)
+    Args:
+        student_info: The student_info dictionary (most likely sourced from q.user)
 
-        # might have to add error checking here to make sure `disabled` is formatted correctly
-    choices = [ui.choice(
-        name = str(row['name']), 
-        label = row['label'], 
-        disabled = bool(row['disabled'])
-        ) for row in rows]
+    Raises:
+        Exception: If there's an error during the GE summarization process
+    """
+    try:
+        # Ensure ge exists in student_info
+        if 'ge' not in student_info:
+            student_info['ge'] = await create_ge()
 
-    return choices
+        ge = student_info['ge']
+        
+        # Initialize total and summary if they don't exist
+        if 'total' not in ge:
+            ge['total'] = {}
+        if 'summary' not in ge:
+            ge['summary'] = {}
+
+        total = ge['total']
+        summary = ge['summary']
+
+        # Define areas and their requirements
+        areas = {
+            'arts': {'total': 6, 'requirements': ['1', '2']},
+            'beh': {'total': 6, 'requirements': ['1', '2']},
+            'bio': {'total': 7, 'requirements': ['1a', '1b', '1c', '2']},
+            'comm': {'total': 12, 'requirements': ['1', '2', '3', '4']},
+            'math': {'total': 3, 'requirements': ['1']},
+            'res': {'total': 7, 'requirements': ['1', '2', '3', '3a', '3b', '3c']}
+        }
+
+        for area, info in areas.items():
+            total[area] = info['total']
+            if area == 'bio':
+                summary[area] = (
+                    (ge[area].get('1a') is not None or 
+                     ge[area].get('1b') is not None or 
+                     ge[area].get('1c') is not None)
+                ) * 4 + (ge[area].get('2') is not None) * 3
+            elif area == 'res':
+                summary[area] = (
+                    (ge[area].get('1') is not None) * 3 + 
+                    (ge[area].get('2') is not None) * 1 +
+                    (3 if (ge[area].get('3') is not None) else sum(
+                        ge[area].get(req) is not None for req in ['3a', '3b', '3c']
+                    ))
+                )
+            else:
+                summary[area] = sum(ge[area].get(req) is not None for req in info['requirements']) * (info['total'] // len(info['requirements']))
+
+        # Update q.user.student_info with the new calculations
+        student_info['ge']['total'] = total
+        student_info['ge']['summary'] = summary
+
+        return student_info
+
+    except Exception as e:
+        error_message = f"Error in summarize_ge: {str(e)}"
+        print(error_message)  # For logging purposes
+        # You might want to set an error flag or handle the exception in a way that fits your application
+        raise  # Re-raise the exception for now
+
+async def create_ge_stub(q):
+    """
+    Create and initialize the 'ge' dictionary in student_info.
+    This function should be implemented to set up the initial structure of 'ge'.
+    """
+    # TODO: Implement this function
+    # For now, return an empty dictionary with the expected structure
+    return {
+        'total': {},
+        'summary': {},
+        'arts': {'1': None, '2': None},
+        'beh': {'1': None, '2': None},
+        'bio': {'1a': None, '1b': None, '1c': None, '2': None},
+        'comm': {'1': None, '2': None, '3': None, '4': None},
+        'math': {'1': None},
+        'res': {'1': None, '2': None, '3': None, '3a': None, '3b': None, '3c': None}
+    }
+ 
+#### DONE ABOVE ####
+####################
 
 async def populate_summarize_ge(q):
+    '''
+    Summarize GE to keep our dashboard updated
+    '''
+    ge = q.user.student_info['ge']
+    total = ge['total']
+    summary = ge['summary']
+
+    area = 'arts'
+    total[area] = 6
+    summary[area] = ((ge[area]['1'] is not None) + (ge[area]['2'] is not None)) * 3
+
+    area = 'beh'
+    total[area] = 6
+    summary[area] = ((ge[area]['1'] is not None) + (ge[area]['2'] is not None)) * 3
+
+    area = 'bio'
+    total[area] = 7
+    summary[area] = (
+        (ge[area]['1a'] is not None) or 
+        (ge[area]['1b'] is not None) or 
+        (ge[area]['1c'] is not None)
+        ) * 4 + (ge[area]['2'] is not None) * 3
+
+    area = 'comm'
+    total[area] = 12
+    summary[area] = (
+        (ge[area]['1'] is not None) + 
+        (ge[area]['2'] is not None) + 
+        (ge[area]['3'] is not None) + 
+        (ge[area]['4'] is not None)
+        ) * 3
+
+    area = 'math'
+    total[area] = 3
+    summary[area] = (ge[area]['1'] is not None) * 3
+
+    area = 'res'
+    total[area] = 7
+    summary[area] = (
+        (ge[area]['1'] is not None) * 3 + 
+        (ge[area]['2'] is not None) * 1 +
+        (3 if (ge[area]['3'] is not None) else (
+            (ge[area]['3a'] is not None) + 
+            (ge[area]['3b'] is not None) + 
+            (ge[area]['3c'] is not None))
+        ))
+    
+    # not sure if this reassignment is needed
+    q.user.student_info['ge']['total'] = total
+    q.user.student_info['ge']['summary'] = summary
+
+
+async def populate_summarize_ge_old(q):
     '''
     Summarize GE to keep our dashboard updated
     '''
@@ -262,31 +252,30 @@ async def populate_summarize_ge(q):
                                 (ge['res']['3b'] is not None) + 
                                 (ge['res']['3c'] is not None))))
 
-async def get_choices_old(timedConnection, query, params=(), disabled=None):
-    '''
-    Return choices for dropdown menus and other ui elements
-    disabled: Needs to be formatted as
-        disabled = {'Social Science', 'English', 'General Studies'}
-        These items will be disabled in the menu so they cannot be chosen
-    '''
-    rows = await get_query(timedConnection, query, params)
+############################################################
+####################  Populate Functions  ##################
+############################################################
 
-    if disabled is None:
-        choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
-    else:
-        # might have to add error checking here to make sure `disabled` is formatted correctly
-        choices = [ui.choice(
-            name = str(row['name']), 
-            label = row['label'], 
-            disabled = (str(row['label']) in disabled)
-        ) for row in rows]
-
-    return choices
-# these functions return 
+from tools.populate import reverse_engineer_dropdown_menu, populate_student_info_dict, populate_student_data_dict, populate_q_student_info TimedSQLiteConnection, _base_query, get_query, get_query_one, get_query_dict, get_query_course_dict, get_query_df
+to_add = [ 
+    'reverse_engineer_dropdown_menu', 
+    'populate_student_info_dict', 
+    'populate_student_data_dict', 
+    'populate_q_student_info' 
+]
+__all__.extend(to_add)
 
 #######################################################
 #######  Set Functions (for setting variables)  #######
 #######################################################
+
+####################
+#### DONE BELOW ####
+
+
+
+#### DONE ABOVE ####
+####################
 
 async def reset_student_info_data(q):
     '''
@@ -305,7 +294,7 @@ async def set_user_vars_given_role(q):
     '''
     Get role given a user id and set q.user variables
     '''
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     query = '''
         SELECT 
 		    a.role_id,
@@ -317,35 +306,41 @@ async def set_user_vars_given_role(q):
 		WHERE 
 			a.role_id=b.id AND a.id = ?
     '''
-    row = await get_query_one(timedConnection, query, params=(q.user.user_id,))
+    row = await get_query_one(timed_connection, query, params=(q.user.user_id,))
     q.user.role_id = row['role_id']
     q.user.role = row['role']
     q.user.username = row['username']
     q.user.name = row['fullname']
 
-async def get_program_title(timedConnection, program_id):
-    query = '''
-        SELECT b.id, b.name || ' in ' || a.name as title
-        FROM programs a, degrees b 
-        WHERE a.id = ? AND a.degree_id = b.id 
-    '''
-    row = await get_query_one(timedConnection, query, params=(program_id,))
-    if row:
-        return row
-    else:
+####################
+#### DONE BELOW ####
+
+async def get_program_title(timed_connection, program_id):
+    """
+    Retrieve the program title for a given program ID.
+
+    Args:
+        timed_connection: Database connection object
+        program_id: ID of the program to query
+
+    Returns:
+        dict: Program information including 'id' and 'title', or None if not found
+    """
+    query = """
+        SELECT b.id, b.name || ' in ' || a.name AS title
+        FROM programs a
+        JOIN degrees b ON a.degree_id = b.id
+        WHERE a.id = ?
+    """
+    try:
+        row = await get_query_one(timed_connection, query, params=(program_id,))
+        return row if row else None
+    except Exception as e:
+        print(f"Error retrieving program title: {str(e)}")
         return None
 
-######################################################################
-####################  SQL-RELATED FUNCTIONS  #########################
-######################################################################
-
-# If problems, revert to 'from tools.timedsqlite_old' and debug
-
-from tools.timedsqlite import TimedSQLiteConnection, _base_query, get_query, \
-    get_query_one, get_query_dict, get_query_course_dict, get_query_df
-to_add = ['TimedSQLiteConnection', '_base_query', 'get_query', 'get_query_one', 
-          'get_query_dict', 'get_query_course_dict', 'get_query_df']
-__all__.extend(to_add)
+#### DONE ABOVE ####
+####################
 
 ######################################################################
 #####################  QUERIES & FUNCTIONS  ##########################
@@ -375,7 +370,7 @@ def course_description_dialog(q, course, which='schedule'):
     course: indicate what course it's for
     df: DataFrame that the table was created from
 
-    to do: course in the schedule df is called 'name'
+    to do: course in the schedule df is called 'name' (changing this now)
            course is called course in the required df
            should simplify by changing schedule df to course AFTER
            updating d3 javascript code, since it's expecting name
@@ -384,7 +379,7 @@ def course_description_dialog(q, course, which='schedule'):
         #df = q.user.student_data[which]
         if which == 'schedule':
             df = q.user.student_data['schedule']
-            description = df.loc[df['name'] == course, 'description'].iloc[0]
+            description = df.loc[df['course'] == course, 'description'].iloc[0]
    
         elif which == 'required':
             df = q.user.student_data['required']
@@ -540,7 +535,7 @@ def update_bio_df(df):
 
     return df
 
-async def build_program_course_list(program_df, timedConnection, ge_course_list):
+async def build_program_course_list(program_df, timed_connection, ge_course_list):
     '''
     Fix this up for use within wave, get_required_program_courses should be updated, etc.
     program_df: the result of get_required_program_courses
@@ -568,7 +563,7 @@ async def build_program_course_list(program_df, timedConnection, ge_course_list)
         '''
 
         # Step 3: Execute the query
-        result = await get_query_dict(timedConnection, query, params=required)
+        result = await get_query_dict(timed_connection, query, params=required)
 
         # Update the ge_ids for ARTS, BEH
         updated_data = update_ge_ids(result)
@@ -582,7 +577,7 @@ async def build_program_course_list(program_df, timedConnection, ge_course_list)
         return ge_course_list, elective_data
 
 # parallel the utils.get_required_program_courses code
-async def get_required_program_courses_no_q(timedConnection, student_info):
+async def get_required_program_courses_no_q(timed_connection, student_info):
     '''
     DELETE after testing. Use the get_required_program_courses code instead
     '''
@@ -601,19 +596,19 @@ async def get_required_program_courses_no_q(timedConnection, student_info):
         FROM program_requirements_view
         WHERE program_id = ?
     '''
-    df = await get_query_df(timedConnection, query, params=(program_id,))
+    df = await get_query_df(timed_connection, query, params=(program_id,))
     return df
 
-async def return_program_course_list_df_from_scratch(timedConnection, student_info):
+async def return_program_course_list_df_from_scratch(timed_connection, student_info):
     '''
     Function should be updated to work within wave (w/ q, etc.)
-    Note: (timedConnection, student_info) are both accessible w/in q, would be better to pass
+    Note: (timed_connection, student_info) are both accessible w/in q, would be better to pass
           program_id for clarity 
     '''
     # Build the Program course list
 
     # Task 1. Get the required classes from the program
-    required_df = await get_required_program_courses_no_q(timedConnection, student_info)
+    required_df = await get_required_program_courses_no_q(timed_connection, student_info)
 
     # Build the GE course list
     # Create a blank list of GE course requirements with all courses set to 'GENERAL'
@@ -622,13 +617,13 @@ async def return_program_course_list_df_from_scratch(timedConnection, student_in
             'ge_' || abbr || '_' || part AS course_slot 
         FROM general_education_requirements 
     '''
-    ge_course_list = await get_query_dict(timedConnection, query)
+    ge_course_list = await get_query_dict(timed_connection, query)
 
     # update with information from student_info['ge']
     ge_course_list = update_ge_list_from_student_info(ge_course_list, student_info)
 
     # Update the ge_course_list 
-    ge_course_list, elective_data = await build_program_course_list(required_df, timedConnection, ge_course_list)
+    ge_course_list, elective_data = await build_program_course_list(required_df, timed_connection, ge_course_list)
 
     # check on the elective_data as well (it should be empty)
 
@@ -689,7 +684,7 @@ async def return_program_course_list_df_from_scratch(timedConnection, student_in
     final_course_list = pd.concat([course_list_df, elective_df], ignore_index=True)# Build the Program course list
 
     # Task 1. Get the required classes from the program
-    required_df = await get_required_program_courses_no_q(timedConnection, student_info)
+    required_df = await get_required_program_courses_no_q(timed_connection, student_info)
 
     # Build the GE course list
     # Create a blank list of GE course requirements with all courses set to 'GENERAL'
@@ -698,13 +693,13 @@ async def return_program_course_list_df_from_scratch(timedConnection, student_in
             'ge_' || abbr || '_' || part AS course_slot 
         FROM general_education_requirements 
     '''
-    ge_course_list = await get_query_dict(timedConnection, query)
+    ge_course_list = await get_query_dict(timed_connection, query)
 
     # update with information from student_info['ge']
     ge_course_list = update_ge_list_from_student_info(ge_course_list, student_info)
 
     # Update the ge_course_list 
-    ge_course_list, elective_data = await build_program_course_list(required_df, timedConnection, ge_course_list)
+    ge_course_list, elective_data = await build_program_course_list(required_df, timed_connection, ge_course_list)
 
     # check on the elective_data as well (it should be empty)
 
@@ -774,225 +769,15 @@ from tools.schedule import ScheduleEntry, generate_periods, update_periods
 # debug tools.d3, not working yet, staying with tools.d3_old
 from tools.d3_old import create_html_template, prepare_d3_data
 
-to_add = ['ScheduleEntry', 'generate_periods', 'update_periods', 
-          'create_html_template', 'prepare_d3_data']
+to_add = ['ScheduleEntry', 
+          'generate_periods', 
+          'update_periods', 
+          'create_html_template', 
+          'prepare_d3_data'
+          ]
 __all__.extend(to_add)
 
-########################################################################
-#################  COURSE PREREQUISITE FUNCTIONS  ######################
-########################################################################
-
-async def update_prerequisites(timedConnection, prereq_name):
-    '''
-    Function to update prerequisites. 
-    '''
-    # Placeholder implementation
-    query = '''
-    SELECT course AS name, 'elective' as course_type, 'elective' as type, credits, title, 
-        0 as completed, 0 as term, 0 as session, 0 as locked, pre, pre_credits, 
-        substitutions, description
-    FROM courses
-    WHERE course = ?
-    ''' 
-    result = await get_query_dict(timedConnection, query, params=(prereq_name, ))
-    if result:
-        return result
-    else:
-        return None
-
-def parse_prerequisites(prereq_string):
-    '''
-    Parse the prerequisites string and return a list of prerequisite groups.
-    Each group contains lists of courses that satisfy the 'or' and 'and' patterns.
-    '''
-    import re
-    prereq_string = prereq_string.strip()
-    prereq_string = re.sub(r'\s+', ' ', prereq_string)
-    prereq_string = re.sub(r'\(', '', prereq_string)
-    prereq_string = re.sub(r'\)', '', prereq_string)
-    
-    and_groups = prereq_string.split('&')
-    prereq_groups = [group.split('|') for group in and_groups]
-    
-    # Strip whitespace from each course in the groups
-    prereq_groups = [[course.strip() for course in group] for group in prereq_groups]
-    
-    return prereq_groups
-
-### A second approach 
-
-def insert_prerequisite(df, i, name):
-    # Recursive function to insert prerequisites
-    pre_dict = update_prerequisites(name)
-    if pre_dict is not None:
-        # Shift rows down
-        df.loc[i+2:] = df.loc[i+1:-1].values
-        # Insert the prerequisite row
-        df.loc[i+1] = pre_dict
-        # Check if the inserted prerequisite has its own prerequisites
-        insert_prerequisite(df, i+1, pre_dict['name'])
-
-
-### A Third Approach
-### This is old but has some good code in it
-def prep_course_list(df):
-    '''
-    This function takes a DataFrame as input and returns a modified DataFrame where the courses are 
-    ordered based on their prerequisites. It handles both “or” and “and” conditions in prerequisites, 
-    as well as the ‘*’ and ‘+’ notations.
-
-    Please note that this function assumes that the update_prerequisites function returns a dictionary 
-    with keys that match the columns of your DataFrame. 
-    '''
-
-    import re
-
-    # Assuming df is the DataFrame and it has columns 'name', 'pre', 'met', and 'where'
-    for i, row in df.iterrows():
-        if pd.notna(row['pre']):
-            pre_courses = [pre.split('&') for pre in row['pre'].split('|')]  # Split prerequisites on '|' and '&'
-            met = False
-            for pre_group in pre_courses:
-                met_group = True
-                for pre_course in pre_group:
-                    pre_course = pre_course.strip()  # Remove leading/trailing whitespace
-                    if '*' in pre_course:
-                        pre_course = pre_course.replace('*', '')  # Remove '*' from the course name
-                    if '+' in pre_course:
-                        course_prefix, course_number = re.match(r'(\D+)(\d+)\+', pre_course).groups()
-                        pre_rows = df[(df['name'].str.startswith(course_prefix)) & (df['name'].str.slice(start=len(course_prefix)).astype(int) >= int(course_number))]
-                    else:
-                        pre_rows = df[df['name'] == pre_course]
-                    if not pre_rows.empty:
-                        if pre_rows.index[0] > i:
-                            # Move the prerequisite row to immediately precede the current row
-                            cols = df.columns.tolist()
-                            temp = df.loc[pre_rows.index[0], cols].tolist()
-                            df.loc[i+2:] = df.loc[i+1:-1].values  # Shift rows down
-                            df.loc[i+1] = temp  # Insert the prerequisite row
-                    else:
-                        # If the prerequisite is not found in the DataFrame, get it and insert it
-                        print(f'The prerequisite {pre_course} is not found, it should be inserted!')
-                        #insert_prerequisite(df, i, pre_course)
-                        met_group = False
-                        break  # Exit the loop as soon as one prerequisite is not met
-                if met_group:
-                    met = True
-                    break  # Exit the loop as soon as one group of prerequisites is met
-            df.at[i, 'met'] = met
-            df.at[i, 'where'] = i - 1  # The prerequisite should be the previous row
-    return df
-
-async def handle_prerequisites(timedConnection, course_df):
-    '''
-    Expand the course list to include necessary prerequisites.
-
-    Group_satisfied approach:
-
-    1. For each group of prerequisites associated with a course, we iterate over each individual 
-       prerequisite in the group.
-    2. For each prerequisite, we check if it's already present in courses_dict. If it is, then the 
-       group is considered satisfied, and we move on to the next group.
-    3. If the prerequisite is not present in courses_dict, we perform wildcard (*) and optional (+) 
-       matching to check if any existing courses match the pattern. If such a course is found, the 
-       group is considered satisfied.
-    4. If no existing courses satisfy any prerequisite in the group, we proceed to update and add the 
-       missing prerequisites to courses_dict and rows_to_append.
-
-       This approach ensures that we only update and add missing prerequisites if none of the prerequisites 
-       in a group are already satisfied by existing courses in courses_dict. If any prerequisite in the 
-       group is already satisfied, we skip updating and adding new prerequisites for that group.
-
-    Features:
-
-    1. Recursive Function: The recursive_add_prerequisites function takes a prerequisite name, checks 
-       if it's already in courses_dict, and if not, it retrieves its information using update_prerequisites.
-    2. Recursion: If the prerequisite has its own prerequisites, recursive_add_prerequisites is called 
-       recursively for each of them.
-    3. Updating courses_dict and rows_to_append: The function ensures that all necessary prerequisites are 
-       added to courses_dict and rows_to_append.
-    4. Processing Main Courses: The main loop processes each course with prerequisites, using the recursive 
-       function to ensure all prerequisites are included.
-    '''
-
-    async def recursive_add_prerequisites(prereq_name, courses_dict, rows_to_append):
-        '''
-        Recursively add prerequisites to the courses_dict and rows_to_append list.
-        '''
-        if prereq_name in courses_dict:
-            return courses_dict[prereq_name]
-
-        prereq_info = await update_prerequisites(timedConnection, prereq_name)
-        if prereq_info:
-            prerequisites = parse_prerequisites(prereq_info.get('pre', ''))
-            for prereq_group in prerequisites:
-                group_satisfied = False
-                for sub_prereq_name in prereq_group:
-                    sub_prereq_name = sub_prereq_name.strip()
-                    if sub_prereq_name in courses_dict:
-                        group_satisfied = True
-                        break
-                    elif sub_prereq_name.endswith('*'):
-                        base_name = sub_prereq_name.rstrip('*')
-                        if any(existing_course.startswith(base_name) for existing_course in courses_dict):
-                            group_satisfied = True
-                            break
-                    elif sub_prereq_name.endswith('+'):
-                        base_name = sub_prereq_name.rstrip('+')
-                        if any(existing_course.startswith(base_name) and existing_course > base_name for existing_course in courses_dict):
-                            group_satisfied = True
-                            break
-
-                if not group_satisfied:
-                    for sub_prereq_name in prereq_group:
-                        sub_prereq_name = sub_prereq_name.strip()
-                        await recursive_add_prerequisites(sub_prereq_name, courses_dict, rows_to_append)
-
-            courses_dict[prereq_name] = prereq_info
-            if prereq_info not in rows_to_append:
-                rows_to_append.append(prereq_info)
-        return prereq_info
-
-    # Filter out rows where 'name' is 'ELECTIVE', 'GENERAL', or an empty string, then set index and convert to dictionary
-    courses_dict = course_df[~course_df['name'].isin(['ELECTIVE', 'GENERAL', ''])].set_index('name').to_dict('index')
-    rows_to_append = []
-    
-    # Define filter condition for prerequisites
-    filter_condition = (course_df['pre'] != '') & (~course_df['pre'].isna())
-    
-    for idx, course in course_df[filter_condition].iterrows():
-        prerequisites = parse_prerequisites(course['pre'])
-        
-        for prereq_group in prerequisites:
-            # Check if any prerequisite in the group satisfies the condition
-            group_satisfied = False
-            for prereq_name in prereq_group:
-                prereq_name = prereq_name.strip()
-                if prereq_name in courses_dict:
-                    group_satisfied = True
-                    break
-                elif prereq_name.endswith('*'):
-                    base_name = prereq_name.rstrip('*')
-                    if any(existing_course.startswith(base_name) for existing_course in courses_dict):
-                        group_satisfied = True
-                        break
-                elif prereq_name.endswith('+'):
-                    base_name = prereq_name.rstrip('+')
-                    if any(existing_course.startswith(base_name) and existing_course > base_name for existing_course in courses_dict):
-                        group_satisfied = True
-                        break
-            
-            # If no prerequisite in the group is satisfied, update prerequisites
-            if not group_satisfied:
-                for prereq_name in prereq_group:
-                    prereq_name = prereq_name.strip()
-                    await recursive_add_prerequisites(prereq_name, courses_dict, rows_to_append)
-    
-    prereq_df = pd.DataFrame(rows_to_append)
-    updated_course_df = pd.concat([prereq_df, course_df]).drop_duplicates(subset='name').reset_index(drop=True)
-    return updated_course_df
-
-async def generate_schedule(timedConnection, course_df, periods_df):
+async def generate_schedule(timed_connection, course_df, periods_df):
     '''
     Generate a schedule that respects prerequisites and schedules courses into available periods.
     course_df: requires columns credits, name, session, term, year  !!! 'course' column needs to be renamed 'name' !!!
@@ -1003,7 +788,7 @@ async def generate_schedule(timedConnection, course_df, periods_df):
 
     ## Handle prerequisites and expand the course list
     ## broken, need to fix!!!
-    #course_df = await handle_prerequisites(timedConnection, course_df)
+    #course_df = await handle_prerequisites(timed_connection, course_df)
 
     # create a dictionary to store prerequisites for each course
 
@@ -1087,3 +872,9 @@ async def generate_schedule(timedConnection, course_df, periods_df):
             print(f"Unable to assign unlocked course '{course['name']}' to any period.")
 
     return pd.DataFrame(schedule)
+
+########################################################################
+#################  COURSE PREREQUISITE FUNCTIONS  ######################
+########################################################################
+
+from tools.prereq_old import update_prerequisites, parse_prerequisites, handle_prerequisites, insert_prerequisite
