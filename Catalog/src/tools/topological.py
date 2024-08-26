@@ -25,7 +25,6 @@ def process_locked_courses(locked_courses, schedule_slots):
                 raise ValueError(f"Term '{term}' not found in schedule_slots")
     return processed_locked_courses
 
-
 # Example usage remains the same as before
 
 def create_schedule_dataframe(courses, prerequisites, course_credits, corequisites, locked_courses):
@@ -58,7 +57,6 @@ def schedule_courses_new(schedule_df, schedule_slots):
         schedule_df.loc[schedule_df['course'] == course, 'scheduled_term'] = term
 
     return schedule_df
-
 
 ### Example usage
 ##courses = ['MATH 100', 'MATH 200', 'PHYS 100', 'PHYS 200', 'CHEM 100', 'CHEM 200', 'CHEM 201', 'BIO 300', 'COMP 300', 'LIBS 100', 'CAPS 421']

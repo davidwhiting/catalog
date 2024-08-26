@@ -606,7 +606,7 @@ async def menu_degree(q: Q):
 
     if q.user.student_info['menu']['degree'] == '2':
         # insert ge into student_info for bachelor's degree students
-        q.user.student_info['ge'] = utils.initialize_ge()
+        q.user.student_info['ge'] = await utils.initialize_ge()
         pass
     else:
         #clear_cards(q, ['dropdown']) # clear everything except dropdown menus

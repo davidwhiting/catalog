@@ -163,9 +163,6 @@ def create_html_template(df, start_term):
 def generate_header_data(start_semester, num_periods, data_df):
 
     # Constants
-    BOX_WIDTH = 120
-    BOX_HEIGHT = 40
-
     HEADER_WIDTH = 260
     SUMMER_HEADER_WIDTH = 190
     HEADER_OFFSET = 3
@@ -176,7 +173,6 @@ def generate_header_data(start_semester, num_periods, data_df):
     Y_GAP = 4
     Y_OFFSET = 10
     SESSION_OFFSET = 70
-    BOX_SPACE = BOX_HEIGHT + Y_GAP
     HEADER_ROW = 20    
 
     seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL']
@@ -297,6 +293,6 @@ def prepare_d3_data(df_input, start_term='SPRING 2024'):
     df['fontsize'] = '12px'
     df['printname'] = df['name'] + ' (' + df['credits'].astype(str) + ')'
     
-    df = df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 'fontsize', 'period', 'session', 'type', 'name', 'credits', 'description']]
+    df = df[['x', 'y', 'width', 'printname', 'color', 'textcolor', 'offset', 'fontsize', 'period', 'session', 'type', 'course', 'credits', 'description']]
 
     return df, headers

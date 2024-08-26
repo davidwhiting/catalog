@@ -1495,10 +1495,10 @@ async def render_course_page_table_use(q, box=None, location=None, width=None, h
     rows = [
         ui.table_row(
             #name=str(row['id']),
-            name=row['name'],
+            name=row['course'],
             cells=[
                 #str(row['seq']),
-                row['name'],
+                row['course'],
                 row['title'],
                 str(row['credits']),
                 row['course_type'].upper(),

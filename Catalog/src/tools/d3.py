@@ -114,14 +114,14 @@ def create_html_template(df, start_term):
     df_json = df_display.to_json(orient='records')
     headers_json = headers_display.to_json(orient='records')
 
-    html_template = html_code_minimal.format(
+    html_template = html_minimal_template.format(
         javascript=javascript_draw_only,
         headers=headers_json, 
         data=df_json)
     
     return html_template
 
-def prepare_d3_data_new(df, start_term='SPRING 2024'):
+def prepare_d3_data(df, start_term='SPRING 2024'):
     '''
     Prepare data for input into D3 figure
     '''
@@ -157,15 +157,15 @@ def prepare_d3_data_new(df, start_term='SPRING 2024'):
 
     # Generate semester data
     headers = _generate_semester_data(start_term)
-    headers['period'] = range(1, len(headers) + 1)
+    headers['term'] = range(1, len(headers) + 1)
     headers['x'] = 10 + (headers.index * (2.25 * BOX_WIDTH + 20))
     headers['y'] = HEADER_ROW
     headers['color'] = 'lightgray'
     headers['textcolor'] = 'black'
 
     # Prepare course data
-    df['x'] = 10 + ((df['period'] - 1) * (2.25 * BOX_WIDTH + 20)) + ((df['session'] - 1) * SESSION_OFFSET)
-    df['y'] = HEADER_ROW + BOX_HEIGHT + ((df.groupby('period').cumcount()) * BOX_SPACE)
+    df['x'] = 10 + ((df['term'] - 1) * (2.25 * BOX_WIDTH + 20)) + ((df['session'] - 1) * SESSION_OFFSET)
+    df['y'] = HEADER_ROW + BOX_HEIGHT + ((df.groupby('term').cumcount()) * BOX_SPACE)
     df[['color', 'textcolor']] = df.apply(_set_colors, axis=1)
     df['course'] = df['course'] + f' ({df["credits"]})'
 
@@ -174,8 +174,7 @@ def prepare_d3_data_new(df, start_term='SPRING 2024'):
     combined_data['description'] = combined_data.get('prerequisites', '')
 
     # Select and order final columns
-    final_columns = ['x', 'y', 'course', 'color', 'textcolor', 'period', 'credits', 'description']
+    final_columns = ['x', 'y', 'course', 'color', 'textcolor', 'term', 'credits', 'description']
     result = combined_data[final_columns].to_dict('records')
 
     return result
-
