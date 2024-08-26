@@ -606,15 +606,16 @@ def dropdown_debug(q):
 @on()
 async def menu_degree(q: Q):
     logging.info('The value of menu_degree is ' + str(q.args.menu_degree))
-    timedConnection = q.user.conn
-    q.user.student_info['menu']['degree'] = q.args.menu_degree
+    timed_connection = q.user.conn
+    menu_degree_val = q.args.menu_degree
+    q.user.student_info['menu']['degree'] = menu_degree_val
 
     # reset area_of_study if degree changes
     q.user.student_info['menu']['area_of_study'] = None
     q.page['dropdown'].menu_area.value = None
     # update area_of_study choices based on degree chosen
-    q.page['dropdown'].menu_area.choices = await get_choices(timedConnection, cards.area_query, 
-        params=(q.user.student_info['menu']['degree'],))
+    q.page['dropdown'].menu_area.choices = await get_choices(timed_connection, cards.area_query, 
+        params=(menu_degree_val,))
 
     # reset program if degree changes
     utils.reset_program(q)
@@ -639,7 +640,7 @@ async def menu_degree(q: Q):
 @on()
 async def menu_area(q: Q):
     logging.info('The value of area_of_study is ' + str(q.args.menu_area))
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     q.user.student_info['menu']['area_of_study'] = q.args.menu_area
 
     # reset program if area_of_study changes
@@ -649,7 +650,7 @@ async def menu_area(q: Q):
     q.page['dropdown'].menu_program.value = None
 
     # update program choices based on area_of_study chosen
-    q.page['dropdown'].menu_program.choices = await get_choices(timedConnection, cards.program_query, 
+    q.page['dropdown'].menu_program.choices = await get_choices(timed_connection, cards.program_query, 
         params=(q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']))
 
 #    if q.user.degree != '2':
@@ -666,11 +667,11 @@ async def menu_area(q: Q):
 @on()
 async def menu_program(q: Q):
     logging.info('The value of program is ' + str(q.args.menu_program))
-    timedConnection = q.user.conn
+    timed_connection = q.user.conn
     q.user.student_info['menu']['program'] = q.args.menu_program
     q.user.student_info['program_id'] = q.user.student_info['menu']['program']
 
-    row = await utils.get_program_title(timedConnection, q.user.student_info['program_id'])
+    row = await utils.get_program_title(timed_connection, q.user.student_info['program_id'])
     if row:
         q.user.student_info['degree_program'] = row['title']
         q.user.student_info['degree_id'] = row['id']
@@ -682,7 +683,7 @@ async def menu_program(q: Q):
     await cards.render_program(q)
     
     # # program_id an alias used throughout
-    #result = await get_program_title(timedConnection, q.user.student_info['program_id'])
+    #result = await get_program_title(timed_connection, q.user.student_info['program_id'])
     #q.user.student_info['degree_program'] = result['title']
     #
     ## have the size of this depend on the degree (?)

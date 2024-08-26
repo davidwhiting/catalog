@@ -1,46 +1,58 @@
+# Makefile for UMGC Wave App
+
+# Variables
+DOCKER_IMAGE_NAME := umgc-wave-app
+DOCKER_IMAGE_NAME_ARM := $(DOCKER_IMAGE_NAME)_arm
+PYTHON_VERSION := 3.10.12
+PORT := 10101
+HOST_PORT := 8000
+VENV_PATH := .venv  # Default virtual environment path
+
+# Phony targets
+.PHONY: default build build_amd build_arm build_all run run_amd run_arm copy_venv clone_venv
+
+# Default target
 default: run
 
-## Docker build commands
-
+# Docker build commands
 build_amd:
 	docker build --platform linux/amd64 \
-	--build-arg PLATFORM=amd64 \
-	--build-arg PYTHON_VERSION=3.10.12 \
-	-t umgc-wave-app:latest \
-	-f dockerfile .
+		--build-arg PLATFORM=amd64 \
+		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
+		-t $(DOCKER_IMAGE_NAME):latest \
+		-f dockerfile .
 
 build_arm:
 	docker build --platform linux/arm64 \
-	--build-arg PLATFORM=arm64 \
-	--build-arg PYTHON_VERSION=3.10.12 \
-	-t umgc-wave-app_arm:latest \
-	-f dockerfile .
+		--build-arg PLATFORM=arm64 \
+		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
+		-t $(DOCKER_IMAGE_NAME_ARM):latest \
+		-f dockerfile .
 
 build: build_amd
 
 build_all: build_amd build_arm
 
 # Docker run commands
-
 run_amd:
 	docker run --rm --name umgc_catalog \
-	-p 10101:10101 \
-	-p 8000:8000 \
-	-e PORT=10101 \
-	umgc-wave-app:latest
+		-p $(PORT):$(PORT) \
+		-p $(HOST_PORT):$(HOST_PORT) \
+		-e PORT=$(PORT) \
+		$(DOCKER_IMAGE_NAME):latest
 
 run_arm:
 	docker run --rm --name umgc_catalog_arm \
-	-p 10101:10101 \
-	-p 8000:8000 \
-	-e PORT=10101 \
-	umgc-wave-app_arm:latest
+		-p $(PORT):$(PORT) \
+		-p $(HOST_PORT):$(HOST_PORT) \
+		-e PORT=$(PORT) \
+		$(DOCKER_IMAGE_NAME_ARM):latest
 
 run: run_amd
 
-
+# Virtual environment management
 copy_venv:
-	.venv/bin/pip freeze > requirements.txt
+	$(VENV_PATH)/bin/pip freeze > requirements.txt
 
 clone_venv:
-	.venv/bin/pip install -r requirements.txt
+	$(VENV_PATH)/bin/pip install -r requirements.txt

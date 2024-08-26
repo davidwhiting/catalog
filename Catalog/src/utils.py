@@ -1,7 +1,6 @@
 ## _ZZ versions are newly rewritten but not all working
 ## will incrementally fix them and introduce the correct one
 
-
 from contextlib import asynccontextmanager
 from h2o_wave import Q, ui
 from typing import Any, Dict, Callable, List, Optional, Union
@@ -493,6 +492,7 @@ async def get_catalog_program_sequence_ZZ(timed_connection, program_id):
         print(f"Error retrieving catalog program sequence: {str(e)}")
         return None
 
+# was get_choices_ZZ
 async def get_choices_ZZ(timed_connection, query, params=(), disabled=None, enabled=None):
     """
     Return choices for dropdown menus and other UI elements.
@@ -704,7 +704,7 @@ async def get_catalog_program_sequence(q):
     df = await get_query_df(timedConnection, query, params=(program_id,))
     return df
 
-async def get_choices(timedConnection, query, params=(), disabled=None, enabled=None):
+async def get_choices_AA(timedConnection, query, params=(), disabled=None, enabled=None):
     '''
     Return choices for dropdown menus and other ui elements.
     
@@ -751,6 +751,12 @@ async def get_choices(timedConnection, query, params=(), disabled=None, enabled=
         for row in rows
     ]
     return choices
+
+async def get_choices(timed_connection, query, params=(), disabled=None, enabled=None):
+    result = await get_choices_AA(timed_connection, query, params, disabled, enabled)
+    #result = await get_choices_ZZ(timed_connection, query, params, disabled, enabled)
+    return result
+
 
 async def get_choices_disable_all(timedConnection, query, params=()):
     '''
