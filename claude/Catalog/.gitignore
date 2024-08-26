@@ -1,8 +1,0 @@
-.DS_Store
-.ipynb_checkpoints/
-node_modules/
-venv/
-.venv/
-__pycache__/
-package-lock.json
-package.json
