@@ -16,9 +16,14 @@ import numpy as np
 import templates
 # cards contains static cards and python functions that render cards (render_... functions)
 import cards
+
+# frontend contains functions for dealing with cards and the UI directly
+from frontend import add_card, clear_cards
+from backend import initialize_ge, initialize_student_info, initialize_student_data
+
 # 'utils' contains all other python functions
 import utils
-from utils import add_card, clear_cards, get_choices, get_choices_disable_all
+from utils import get_choices, get_choices_disable_all
 
 ##########################################
 #############  Update Notes ##############
@@ -622,7 +627,7 @@ async def menu_degree(q: Q):
 
     if q.user.student_info['menu']['degree'] == '2':
         # insert ge into student_info for bachelor's degree students
-        q.user.student_info['ge'] = utils.initialize_ge()
+        q.user.student_info['ge'] = initialize_ge()
         pass
     else:
         #clear_cards(q, ['dropdown']) # clear everything except dropdown menus
