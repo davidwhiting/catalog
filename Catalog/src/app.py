@@ -135,7 +135,7 @@ async def initialize_client(q: Q) -> None:
     q.page['meta'] = cards.return_meta_card()
     q.page['header'] = cards.return_header_card(q)
     #q.page['header'] = cards.return_login_header_card(q)
-    q.page['footer'] = cards.return_footer_card(q)
+    q.page['footer'] = cards.return_footer_card()
 
 #    if q.app.debug:
 #        q.page['debug'] = ui.markdown_card(box=ui.box('debugcards.return_debug_card(q)

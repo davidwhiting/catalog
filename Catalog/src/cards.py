@@ -135,100 +135,17 @@ def return_meta_card_ZZ(flex=True):
     )
     return card 
 
-def return_header_card_ZZ(q, box='1 1 7 1'):
+def return_header_card(q) -> ui.header_card:
     '''
-    flex: Use the old flex layout system rather than the grid system
-          (flex was not working correctly, can debug later)
-    Create separate tabs for different roles: student, coach, admin
+    Returns a header card with tabs for different roles: student, coach, admin
+    Called in app.py.
     '''
-    flex = q.app.flex
-
     student_tab_items = [
         ui.tab(name='#login',    label='[Login]'),
         ui.tab(name='#home',     label='Home'),
         ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
+        ui.tab(name='#course',   label='Courses'),
         ui.tab(name='#schedule', label='Schedule'),
-    ]
-    coach_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#admin',    label='Coach'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-    admin_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#admin',    label='Admin'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-
-    if q.user.role == 'admin':
-        tab_items = admin_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    elif q.user.role == 'coach':
-        tab_items = coach_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    else: 
-        # q.user.role == 'student'
-        tab_items = student_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-
-    older_tab_items = [
-        ui.tab(name='#home', label='Home'),
-        #ui.tab(name='#student', label='Student Info'),
-        ui.tab(name='#major', label='Program'), # 'Select Program'
-        ui.tab(name='#course', label='Course'), # 'Select Courses'
-        #ui.tab(name='#ge', label='GE'), 
-        #ui.tab(name='#electives', label='Electives'), # 'Select Courses'
-        ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
-        #ui.tab(name='#project', label='Status'), # 'Project Plan'
-    ]
-    if flex:
-        box='header'
-    card = ui.header_card(
-        box=box, 
-        title='UMGC', 
-        subtitle='Registration Assistant',
-        image=q.app.umgc_logo,
-        secondary_items=[
-            ui.tabs(
-                name='tabs', 
-                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
-                items=tab_items,
-            ),
-        ],
-        items=[
-            ui.textbox(
-                name='textbox_default', 
-                label=textbox_label,
-                value=textbox_value, 
-            )
-        ]
-    )
-    return card
-
-def return_header_card_ZZ(q, box='1 1 7 1'):
-    '''
-    flex: Use the old flex layout system rather than the grid system
-          (flex was not working correctly, can debug later)
-    Create separate tabs for different roles: guest, student, coach, admin
-    '''
-    flex = q.app.flex
-    admin_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        #ui.tab(name='#admin',    label='Admin'),
-        ui.tab(name='#home',     label='Admin Home'),
-        ui.tab(name='#program',  label='Choose Program'),
-        ui.tab(name='#course',   label='Select Courses'),
-        ui.tab(name='#schedule', label='Set Schedule'),
     ]
     coach_tab_items = [
         ui.tab(name='#login',    label='[Login]'),
@@ -238,15 +155,14 @@ def return_header_card_ZZ(q, box='1 1 7 1'):
         ui.tab(name='#course',   label='Select Courses'),
         ui.tab(name='#schedule', label='Set Schedule'),
     ]
-
-    student_tab_items = [
+    admin_tab_items = [
         ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Courses'),
-        ui.tab(name='#schedule', label='Schedule'),
+        #ui.tab(name='#admin',    label='Admin'),
+        ui.tab(name='#home',     label='Admin Home'),
+        ui.tab(name='#program',  label='Choose Program'),
+        ui.tab(name='#course',   label='Select Courses'),
+        ui.tab(name='#schedule', label='Set Schedule'),
     ]
-    guest_tab_items = student_tab_items
 
     if q.user.role == 'admin':
         tab_items = admin_tab_items
@@ -272,8 +188,7 @@ def return_header_card_ZZ(q, box='1 1 7 1'):
         ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
         #ui.tab(name='#project', label='Status'), # 'Project Plan'
     ]
-    if flex:
-        box='header'
+    box='header'
     card = ui.header_card(
         box=box, 
         title='UMGC', 
@@ -335,22 +250,6 @@ def return_login_header_card_ZZ(q, box='1 1 7 1'):
     )
     return card
 
-def return_footer_card_ZZ(box='1 10 7 1', flex=True):
-    '''
-    flex: Use the flex layout system rather than the grid system
-    '''
-
-    if flex:
-        box='footer'
-    card = ui.footer_card(
-        box=box,
-        caption='''
-Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
-This app is in pre-alpha stage. Feedback welcomed.
-        '''
-    )
-    return card
-
 def return_meta_card(flex=True):
     title='UMGC Wave App'
     theme_name='UMGC'
@@ -392,181 +291,6 @@ def return_meta_card(flex=True):
     )
     return card 
 
-def return_header_card(q, box='1 1 7 1'):
-    '''
-    flex: Use the old flex layout system rather than the grid system
-          (flex was not working correctly, can debug later)
-    Create separate tabs for different roles: guest, student, coach, admin
-    '''
-    flex = q.app.flex
-    guest_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-    student_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-    coach_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#admin',    label='Coach'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-    admin_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#admin',    label='Admin'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Course'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-
-    if q.user.role == 'admin':
-        tab_items = admin_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    elif q.user.role == 'coach':
-        tab_items = coach_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    elif q.user.role == 'student':
-        tab_items = student_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    else:
-        tab_items = guest_tab_items
-        textbox_label = 'Name'
-        textbox_value = ' '
-
-    older_tab_items = [
-        ui.tab(name='#home', label='Home'),
-        #ui.tab(name='#student', label='Student Info'),
-        ui.tab(name='#major', label='Program'), # 'Select Program'
-        ui.tab(name='#course', label='Course'), # 'Select Courses'
-        #ui.tab(name='#ge', label='GE'), 
-        #ui.tab(name='#electives', label='Electives'), # 'Select Courses'
-        ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
-        #ui.tab(name='#project', label='Status'), # 'Project Plan'
-    ]
-    if flex:
-        box='header'
-    card = ui.header_card(
-        box=box, 
-        title='UMGC', 
-        subtitle='Registration Assistant',
-        image=q.app.umgc_logo,
-        secondary_items=[
-            ui.tabs(
-                name='tabs', 
-                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
-                items=tab_items,
-            ),
-        ],
-        items=[
-            ui.textbox(
-                name='textbox_default', 
-                label=textbox_label,
-                value=textbox_value, 
-                disabled=True
-            )
-        ]
-    )
-    return card
-
-def return_header_card(q, box='1 1 7 1'):
-    '''
-    flex: Use the old flex layout system rather than the grid system
-          (flex was not working correctly, can debug later)
-    Create separate tabs for different roles: guest, student, coach, admin
-    '''
-    flex = q.app.flex
-    admin_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        #ui.tab(name='#admin',    label='Admin'),
-        ui.tab(name='#home',     label='Admin Home'),
-        ui.tab(name='#program',  label='Choose Program'),
-        ui.tab(name='#course',   label='Select Courses'),
-        ui.tab(name='#schedule', label='Set Schedule'),
-    ]
-    coach_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        #ui.tab(name='#admin',    label='Admin'),
-        ui.tab(name='#home',     label='Coach Home'),
-        ui.tab(name='#program',  label='Choose Program'),
-        ui.tab(name='#course',   label='Select Courses'),
-        ui.tab(name='#schedule', label='Set Schedule'),
-    ]
-
-    student_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Courses'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-    guest_tab_items = student_tab_items
-
-    if q.user.role == 'admin':
-        tab_items = admin_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    elif q.user.role == 'coach':
-        tab_items = coach_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    elif q.user.role == 'student':
-        tab_items = student_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    else:
-        tab_items = student_tab_items
-        textbox_label = 'Name'
-        textbox_value = ' '
-
-    older_tab_items = [
-        ui.tab(name='#home', label='Home'),
-        #ui.tab(name='#student', label='Student Info'),
-        ui.tab(name='#major', label='Program'), # 'Select Program'
-        ui.tab(name='#course', label='Course'), # 'Select Courses'
-        #ui.tab(name='#ge', label='GE'), 
-        #ui.tab(name='#electives', label='Electives'), # 'Select Courses'
-        ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
-        #ui.tab(name='#project', label='Status'), # 'Project Plan'
-    ]
-    if flex:
-        box='header'
-    card = ui.header_card(
-        box=box, 
-        title='UMGC', 
-        subtitle='Registration Assistant',
-        image=q.app.umgc_logo,
-        secondary_items=[
-            ui.tabs(
-                name='tabs', 
-                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
-                items=tab_items,
-            ),
-        ],
-        items=[
-            ui.textbox(
-                name='textbox_default', 
-                label=textbox_label,
-                value=textbox_value, 
-                disabled=True
-            )
-        ]
-    )
-    return card
-
 def return_login_header_card(q, box='1 1 7 1'):
     '''
     flex: Use the old flex layout system rather than the grid system
@@ -605,15 +329,13 @@ def return_login_header_card(q, box='1 1 7 1'):
     )
     return card
 
-def return_footer_card(box='1 10 7 1', flex=True):
+def return_footer_card() -> ui.footer_card:
     '''
-    flex: Use the flex layout system rather than the grid system
+    Footer card with caption for entire app.
+    Called in app.py.
     '''
-
-    if flex:
-        box='footer'
     card = ui.footer_card(
-        box=box,
+        box='footer',
         caption='''
 Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
 This app is in pre-alpha stage. Feedback welcomed.
@@ -624,7 +346,6 @@ This app is in pre-alpha stage. Feedback welcomed.
 #######################################################
 ####################  DEBUG CARDS  ####################
 #######################################################
-
 
 async def return_debug_card_ZZ(q, box='3 3 1 1', location='debug', width='100%', height='300px'):
     '''
@@ -732,16 +453,16 @@ async def return_debug_card(q, box='3 3 1 1', location='debug', width='100%', he
 ####################  LOGIN PAGE  #############################
 ###############################################################
 
-def return_login_welcome_card(q, location='top_vertical', width='100%', box='1 2 7 1'):
-    flex = q.app.flex
-    if flex:
-        box = ui.box(location, width=width)
+def return_login_welcome_card(location: str = 'top_vertical', width: str = '100%') -> ui.form_card:
+    """
+    Login welcome card
+    """
+    box = ui.box(location, width=width)
 
     card = ui.form_card(
         box=box,
         items=[
             ui.text_l('Select a user below to simulate their login.')
-            #ui.text('(The Home page will collect student information)')
         ]
     )
     return card
@@ -752,6 +473,69 @@ def render_login_welcome_card(q, location='top_vertical', width='100%', box='1 2
     add_card(q, cardname, card)
 
 async def return_user_login_dropdown(q, box=None, location='horizontal', menu_width='300px'):
+    '''
+    Function to create a dropdown menu of sample users to demo the wave app
+    '''
+    timed_connection = q.user.conn
+    flex = q.app.flex
+    if flex:
+        box = location
+
+    ## Debug This
+    #query = '''
+    #    SELECT a.id AS name, 
+    #        trim(a.firstname || ' ' || a.lastname || ' (' || b.role || ')') AS label
+    #    FROM users a, roles b
+    #    WHERE a.role_id = b.id
+    #'''
+    #choicesdict=await utils.get_choices(timed_connection, query)
+
+    ## tmp fix for demo
+    ## need to update 'populate_sample_users_and_students.py'
+    choicesdict = [
+        #{'name': 1, 'label': 'Admin (admin role)'},
+        #{'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
+        {'name': 3, 'label': 'John Doe (New Student)'},
+        {'name': 4, 'label': 'John Doe (After entering personal information)'},
+        {'name': 5, 'label': 'John Doe (After selecting program)'},
+        {'name': 6, 'label': 'John Doe (After selecting courses)'},
+        {'name': 7, 'label': 'John Doe (After creating schedule)'},
+        {'name': 8, 'label': 'Jane Doe (Transfer student with program selected)'},
+        #{'name': 9, 'label': 'Tom Doe (military student, no program selected)'},
+    ]
+
+    choices = [ui.choice(str(row['name']), row['label']) for row in choicesdict]
+
+    choicegroup = ui.choice_group(
+        name='choice_group', 
+        label='Pick one', 
+        required=True, 
+        choices=choices
+    )
+    button = ui.button(name='select_sample_user', label='Submit', primary=True)
+
+    #dropdown = ui.dropdown(
+    #    name='sample_user',
+    #    label='Sample User',
+    #    value=q.args.sample_user,
+    #    trigger=True,
+    #    placeholder='(Select)',
+    #    width=menu_width,
+    #    choices=choices
+    #)
+
+    card = ui.form_card(box=box,
+        items=[
+            ui.text_xl('Example users'),
+            choicegroup,
+            #dropdown, 
+            ui.separator(),
+            button
+        ]
+    ) 
+    return card
+
+async def return_user_login_dropdown_old(q, box=None, location='horizontal', menu_width='300px'):
     '''
     Function to create a dropdown menu of sample users to demo the wave app
     '''
@@ -839,68 +623,6 @@ def render_login_welcome_card_ZZ(q, location='top_vertical', width='100%', box='
     card = return_login_welcome_card(q, location, width, box)
     add_card(q, cardname, card)
 
-async def return_user_login_dropdown_ZZ(q, box=None, location='horizontal', menu_width='300px'):
-    '''
-    Function to create a dropdown menu of sample users to demo the wave app
-    '''
-    timed_connection = q.user.conn
-    flex = q.app.flex
-    if flex:
-        box = location
-
-    ## Debug This
-    #query = '''
-    #    SELECT a.id AS name, 
-    #        trim(a.firstname || ' ' || a.lastname || ' (' || b.role || ')') AS label
-    #    FROM users a, roles b
-    #    WHERE a.role_id = b.id
-    #'''
-    #choicesdict=await utils.get_choices(timed_connection, query)
-
-    ## tmp fix for demo
-    ## need to update 'populate_sample_users_and_students.py'
-    choicesdict = [
-        #{'name': 1, 'label': 'Admin (admin role)'},
-        #{'name': 2, 'label': 'Coach (coach role)', 'disabled': True},
-        {'name': 3, 'label': 'John Doe (New Student)'},
-        {'name': 4, 'label': 'John Doe (After entering personal information)'},
-        {'name': 5, 'label': 'John Doe (After selecting program)'},
-        {'name': 6, 'label': 'John Doe (After selecting courses)'},
-        {'name': 7, 'label': 'John Doe (After creating schedule)'},
-        {'name': 8, 'label': 'Jane Doe (Transfer student with program selected)'},
-        #{'name': 9, 'label': 'Tom Doe (military student, no program selected)'},
-    ]
-
-    choices = [ui.choice(str(row['name']), row['label']) for row in choicesdict]
-
-    choicegroup = ui.choice_group(
-        name='choice_group', 
-        label='Pick one', 
-        required=True, 
-        choices=choices
-    )
-    button = ui.button(name='select_sample_user', label='Submit', primary=True)
-
-    #dropdown = ui.dropdown(
-    #    name='sample_user',
-    #    label='Sample User',
-    #    value=q.args.sample_user,
-    #    trigger=True,
-    #    placeholder='(Select)',
-    #    width=menu_width,
-    #    choices=choices
-    #)
-
-    card = ui.form_card(box=box,
-        items=[
-            ui.text_xl('Example users'),
-            choicegroup,
-            #dropdown, 
-            ui.separator(),
-            button
-        ]
-    ) 
-    return card
 
 async def render_user_login_dropdown_ZZ(q, box=None, location='horizontal', menu_width='300px',
                                      cardname='login/demo_login'):
