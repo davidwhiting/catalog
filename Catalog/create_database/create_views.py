@@ -224,6 +224,8 @@ c.execute(create_view_query)
 conn.commit()
 
 # used by utils.get_student_progress_d3
+# need to change `a.course as name` to `a.course` after adjusting d3 viewing code to use course
+
 drop_view('student_progress_d3_view')
 create_view_query = '''
 	CREATE VIEW student_progress_d3_view AS
@@ -257,6 +259,55 @@ create_view_query = '''
 '''
 c.execute(create_view_query)
 conn.commit()
+
+# skill_category_skill_map_view used by { nothing yet }
+drop_view('skill_category_skill_map_view')
+create_view_query = '''
+    CREATE VIEW skill_category_skill_map_view AS
+        SELECT 
+            scsm.id, 
+            sk.id AS category_id, 
+            sk.name AS category,
+            scsm.skill AS skill_id, 
+            s.name AS skill 
+        FROM 
+            skill_category sk 
+        JOIN
+            skill_category_skill_map scsm 
+        ON 
+            scsm.skill_category = sk.id
+        JOIN 
+            Skills s 
+        ON 
+            scsm.skill = s.id
+        ORDER BY category_id, skill_id
+'''
+c.execute(create_view_query)
+conn.commit()
+
+# program_skill_score_view used by { nothing yet }
+drop_view('program_skill_score_view')
+create_view_query = '''
+    CREATE VIEW program_skill_score_view AS
+        SELECT 
+            p.id AS program_id,
+            p.name AS program, 
+        	s.id AS skill_id,
+        	s.name AS skill, 
+        	pss.score
+        FROM 
+            program_skill_score pss
+        JOIN 
+            programs p 
+        ON 
+            pss.program_id = p.id
+        JOIN 
+            Skills s 
+        ON s.id = pss.skill_id
+'''
+c.execute(create_view_query)
+conn.commit()
+
 
 # Close the connection
 conn.close()

@@ -19,8 +19,20 @@ app_stage = [
     { 'id': 1, 'stage': 'new' },
     { 'id': 2, 'stage': 'personalized' },
     { 'id': 3, 'stage': 'program chosen' },
-    { 'id': 4, 'stage': 'schedule created' }
+    { 'id': 4, 'stage': 'courses selected' },
+    { 'id': 5, 'stage': 'schedule created' }
 ]
+
+## Note: This used to be
+#
+# app_stage = [
+#     { 'id': 1, 'stage': 'new' },
+#     { 'id': 2, 'stage': 'personalized' },
+#     { 'id': 3, 'stage': 'program chosen' },
+#     { 'id': 4, 'stage': 'schedule created' }
+# ]
+#
+## which omitted the courses selected stage
 
 drop_table('app_stage', c)
 c.execute('''

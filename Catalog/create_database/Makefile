@@ -1,41 +1,46 @@
+# Makefile for UMGC Database Creation
+
+# Variables
+VENV_PATH := ../.venv  # Default virtual environment path
+#PYTHON := $(VENV_PATH)/bin/python
 PYTHON := ../.venv/bin/python
+PDF_FILE := 2023-2024-catalog.pdf
+DB_FILE := UMGC.db
+#TMP_PDF_FILE := tmp_$(PDF_FILE)
+TMP_PDF_FILE := tmp_2023-2024-catalog-courses.pdf
+TMP_TXT_FILE := tmp_pdf2txt.txt
+
+# Phony targets
+.PHONY: all old clean step0 step1 step2 step3 step4 step5
+
+# Default target
 default: all
 
-# Makefile for creating UMGC database with a sequence of python files
+# Steps
 
-# Split pdf file 2023-2024-catalog.pdf to tmp_2023-2024-catalog-courses.pdf
+# Split pdf file 2023-2024-catalog.pdf to 2023-2024-catalog-courses.pdf
 step0:
 	$(PYTHON) extract_pdf_pages.py
 
+# output is $(TMP_TXT_FILE)
 step1:
 	$(PYTHON) parse_catalog_pdf.py
 
-# output is tmp_pdf2txt.txt
-
 step2:
-	rm -f UMGC.db
+	@echo "Removing existing database file..."
+	rm -f $(DB_FILE)
 	$(PYTHON) parse_text_create_dictionary.py
-	rm tmp_pdf2txt.txt
-
+	rm $(TMP_TXT_FILE)
 # input is tmp_pdf2txt.txt
 # output is UMGC.db with catalog and courses tables
 # remove tmp file at the end 
 
-##################################################3
+# UMGC_base.db.bz2 contains catalog and course tables
+# with Skills tables. The steps012 replaces step0, step1,
+# step 2 in the original.
 
-## To Do items:
-#
-# create_program_courses to do:
-# 	- add Undergrad Minors
-#   - add Masters
-#   - add Ph.D.
-#   - add Grad Certificates
-#
-# create_program_descriptions to do:
-#   - add Associate
-#   - add Masters
-#   - add Ph.D.
-#   - add Grad Certificates
+steps012:
+	bzcat UMGC_base.db.bz2 > UMGC.db
 
 step3:
 	$(PYTHON) create_catalog_tables.py
@@ -49,12 +54,35 @@ step3:
 	$(PYTHON) create_ui_tables.py
 	$(PYTHON) create_student_progress_tables.py
 
-# Need to review and update my views in create_views.py
-
 step4:
 	$(PYTHON) create_views.py
 
 step5:
 	$(PYTHON) populate_sample_users_and_students.py
 
-all: step0 step1 step2 step3 step4 step5
+copy:
+	cp $(DB_FILE) ../src/
+
+# Clean up intermediate and output files
+clean:
+	rm -f $(DB_FILE) $(TMP_TXT_FILE) $(TMP_PDF_FILE)
+
+# Aggregate all steps
+old: step0 step1 step2 step3 step4 step5
+all: steps012 step3 step4 step5 
+
+###################################################3
+#
+### To Do items:
+##
+## create_program_courses to do:
+## 	- add Undergrad Minors
+##   - add Masters
+##   - add Ph.D.
+##   - add Grad Certificates
+##
+## create_program_descriptions to do:
+##   - add Associate
+##   - add Masters
+##   - add Ph.D.
+##   - add Grad Certificates
