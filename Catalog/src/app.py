@@ -3,7 +3,6 @@ from typing import Optional, List
 import logging
 import os
 #from msal import ConfidentialClientApplication
-import requests
 import pandas as pd
 import numpy as np
 
@@ -100,9 +99,12 @@ async def initialize_user(q: Q) -> None:
 
     await utils.reset_student_info_data(q)
 
-    q.user.user_id = 5
+    q.user.user_id = 3 # from ZZ updated that broke other things
+    #q.user.user_id = 5 
     q.user.role == 'student'
     await utils.populate_student_info(q, q.user.user_id)
+    ## from ZZ updates that broke things
+    #await utils.populate_q_student_info(q, q.user.conn, q.user.user_id)
     q.user.student_info_populated = True
 
     # Note: All user variables related to students will be saved in a dictionary
@@ -212,6 +214,7 @@ async def select_sample_user(q: Q):
             pass
         elif q.user.role == 'student':
             await utils.populate_student_info(q, q.user.user_id)
+            #await utils.populate_q_student_info(q, q.user.conn, q.user.user_id)
             q.user.student_info_populated = True
 
     else:
@@ -603,9 +606,9 @@ def dropdown_debug(q):
 
 @on()
 async def menu_degree(q: Q):
-    logging.info('The value of menu_degree is ' + str(q.args.menu_degree))
     timed_connection = q.user.conn
     menu_degree_val = q.args.menu_degree
+    logging.info('The value of menu_degree is ' + str(menu_degree_val))
     q.user.student_info['menu']['degree'] = menu_degree_val
 
     # reset area_of_study if degree changes
@@ -637,9 +640,10 @@ async def menu_degree(q: Q):
 
 @on()
 async def menu_area(q: Q):
-    logging.info('The value of area_of_study is ' + str(q.args.menu_area))
     timed_connection = q.user.conn
-    q.user.student_info['menu']['area_of_study'] = q.args.menu_area
+    menu_area_val = q.args.menu_area
+    logging.info('The value of area_of_study is ' + str(menu_area_val))
+    q.user.student_info['menu']['area_of_study'] = menu_area_val
 
     # reset program if area_of_study changes
     utils.reset_program(q)
@@ -649,7 +653,7 @@ async def menu_area(q: Q):
 
     # update program choices based on area_of_study chosen
     q.page['dropdown'].menu_program.choices = await get_choices(timed_connection, cards.program_query, 
-        params=(q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']))
+        params=(q.user.student_info['menu']['degree'], menu_area_val))
 
 #    if q.user.degree != '2':
 #        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
@@ -664,12 +668,13 @@ async def menu_area(q: Q):
 
 @on()
 async def menu_program(q: Q):
-    logging.info('The value of program is ' + str(q.args.menu_program))
     timed_connection = q.user.conn
-    q.user.student_info['menu']['program'] = q.args.menu_program
-    q.user.student_info['program_id'] = q.user.student_info['menu']['program']
+    menu_program_val = q.args.menu_program
+    logging.info('The value of program is ' + str(menu_program_val))
+    q.user.student_info['menu']['program'] = menu_program_val
+    q.user.student_info['program_id'] = menu_program_val
 
-    row = await utils.get_program_title(timed_connection, q.user.student_info['program_id'])
+    row = await utils.get_program_title(timed_connection, menu_program_val)
     if row:
         q.user.student_info['degree_program'] = row['title']
         q.user.student_info['degree_id'] = row['id']
