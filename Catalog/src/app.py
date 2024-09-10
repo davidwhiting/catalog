@@ -25,16 +25,6 @@ from backend import initialize_ge, initialize_student_info, initialize_student_d
 import utils
 from utils import get_choices, get_choices_disable_all
 
-##########################################
-#############  Update Notes ##############
-##########################################
-
-# This is a simplified version for demos
-# There is still a lot of work that needs to be done
-# Tasks:
-#   - 
-#
-
 ###############################################################################
 #############  Functions for on_startup() and on_shutdown() ###################
 ###############################################################################
@@ -51,7 +41,13 @@ async def on_shutdown():
 ####################  Initialize app, user, client Functions ##################
 ###############################################################################
 
-async def initialize_app(q: Q):
+#from qfunctions import initialize_app, initialize_user, initialize_client
+
+###############################################################################
+####################  Initialize app, user, client Functions ##################
+###############################################################################
+
+async def initialize_app(q: Q) -> None:
     """
     Initialize the app. Code here is run once at the app level.
     """
@@ -84,10 +80,9 @@ async def initialize_app(q: Q):
         'General Studies',
         'History'
     }
-
     await q.page.save()
 
-async def initialize_user(q: Q):
+async def initialize_user(q: Q) -> None:
     """
     Initialize the user.
 
@@ -128,7 +123,7 @@ async def initialize_user(q: Q):
 
     await q.page.save()
 
-async def initialize_client(q: Q):
+async def initialize_client(q: Q) -> None:
     """
     Initialize the client (once per connection)
     """
@@ -147,10 +142,10 @@ async def initialize_client(q: Q):
     if q.args['#'] is None:
         await home(q)
 
+
 ###############################################################################
 ##################  End initialize app, user, client Functions ################
 ###############################################################################
-
 
 ######################################################
 ####################  Login page  ####################
@@ -315,7 +310,6 @@ async def home1(q: Q):
 
     await q.page.save()
 
-
 @on('#home/2')
 async def home2(q: Q):
     clear_cards(q)
@@ -444,13 +438,12 @@ async def home3(q: Q):
     
     await q.page.save()
 
-
 #############################
 ## Events on the Home page ##
 #############################
 
 @on()
-async def register_submit(q):
+async def register_submit(q: Q) -> None:
     '''
     Respond to submission button on registration page 
     (from render_registration_card(q))
@@ -473,7 +466,7 @@ async def register_submit(q):
     await q.page.save()
 
 @on()
-async def next_demographic_1(q):
+async def next_demographic_1(q: Q) -> None:
     '''
     Respond to submission by clicking next on 'Tell us about yourself' card 1
     (from demographics1 function)
@@ -490,7 +483,7 @@ async def next_demographic_1(q):
     await q.page.save()
 
 @on()
-async def next_demographic_2(q):
+async def next_demographic_2(q: Q) -> None:
     '''
     Respond to submission by clicking next on 'Tell us about yourself' card 1
     (from demographics1 function)
@@ -507,13 +500,13 @@ async def next_demographic_2(q):
 ####################  Program pages  ####################
 #########################################################
 
-async def admin_program(q: Q):
+async def admin_program(q: Q) -> None:
     await student_program(q)
 
-async def coach_program(q: Q):
+async def coach_program(q: Q) -> None:
     await student_program(q)
 
-async def student_program(q: Q):
+async def student_program(q: Q) -> None:
 
     clear_cards(q)
     if q.user.student_info['menu']['degree']:
@@ -553,7 +546,7 @@ async def student_program(q: Q):
 #        pass
 
 
-async def guest_program(q: Q):
+async def guest_program(q: Q) -> None:
     await student_program(q)
 
 @on('#program')
