@@ -1,8 +1,3 @@
-from backend import initialize_ge, initialize_student_info, initialize_student_data
-
-## _ZZ versions are newly rewritten but not all working
-## will incrementally fix them and introduce the correct one
-
 from contextlib import asynccontextmanager
 from h2o_wave import Q, ui
 from typing import Any, Dict, Callable, List, Optional, Union
@@ -14,13 +9,19 @@ import sqlite3
 import time
 import warnings
 
+
+from backend import initialize_ge, initialize_student_info, initialize_student_data
+from backend import TimedSQLiteConnection, _base_query, get_query, get_query_one, \
+    get_query_dict, get_query_course_dict, get_query_df
+
+## _ZZ versions are newly rewritten but not all working
+## will incrementally fix them and introduce the correct one
+
+
 #import sys
 #import traceback
 
 import templates
-
-# temporary: will sort utils functions into frontend, backend, and utils files
-from backend import initialize_ge
 
 ############################################################
 ####################  POPULATE FUNCTIONS  ##################
@@ -315,64 +316,6 @@ async def get_catalog_program_sequence_ZZ(timed_connection, program_id):
         return None
 
 # was get_choices_ZZ
-async def get_choices_ZZ(timed_connection: sqlite3.Connection, query: str, params: tuple = (), disabled: Optional[Union[set, list, tuple]] = None, enabled: Optional[Union[set, list, tuple]] = None) -> list:
-    """
-    Return choices for dropdown menus and other UI elements.
-
-    Args:
-        timed_connection: Database connection object
-        query (str): SQL query to fetch choices from the database
-        params (tuple): Parameters for the SQL query (default: ())
-        disabled (set, list, tuple): Iterable of labels that should be disabled in the menu (default: None)
-        enabled (set, list, tuple): Iterable of labels that should be enabled in the menu (default: None)
-
-    Returns:
-        list: List of ui.choice objects for use in H2O Wave menus
-
-    Raises:
-        ValueError: If both disabled and enabled are provided, or if they are of incorrect type
-
-    Note:
-        Either disabled or enabled should be provided, not both.
-        If both disabled and enabled are None, then by default everything is enabled.
-
-    Example:
-        disabled = {'Social Science', 'English', 'General Studies'}
-        enabled = {'Social Science', 'English', 'General Studies'}
-    """
-    if disabled is not None and enabled is not None:
-        raise ValueError("Only one of `disabled` or `enabled` should be provided, not both.")
-
-    if disabled is not None:
-        if not isinstance(disabled, (list, tuple, set)):
-            raise ValueError("`disabled` should be a list, tuple, or set")
-        status_set = set(disabled)
-        disable_mode = True
-    elif enabled is not None:
-        if not isinstance(enabled, (list, tuple, set)):
-            raise ValueError("`enabled` should be a list, tuple, or set")
-        status_set = set(enabled)
-        disable_mode = False
-    else:
-        status_set = set()
-        disable_mode = False  # Changed to False to enable everything by default
-
-    try:
-        rows = await get_query(timed_connection, query, params)
-        
-        choices = [
-            ui.choice(
-                name=str(row['name']),
-                label=row['label'],
-                disabled=(disable_mode if row['label'] in status_set else not disable_mode)
-            )
-            for row in rows
-        ]
-        return choices
-
-    except Exception as e:
-        print(f"Error retrieving choices: {str(e)}")
-        return []  # Return an empty list if there's an error
 
 async def get_program_title_ZZ(timed_connection, program_id):
     """
@@ -526,59 +469,6 @@ async def get_catalog_program_sequence(q):
     df = await get_query_df(timedConnection, query, params=(program_id,))
     return df
 
-async def get_choices_AA(timedConnection, query, params=(), disabled=None, enabled=None):
-    '''
-    Return choices for dropdown menus and other ui elements.
-    
-    timedConnection: Database connection object
-    query: SQL query to fetch choices from the database
-    params: Parameters for the SQL query
-    disabled: Iterable of labels that should be disabled in the menu
-    enabled: Iterable of labels that should be enabled in the menu
-    
-    Either `disabled` or `enabled` should be provided, not both.
-    
-    Example:
-        disabled = {'Option A', 'Option B'}
-        enabled = {'Option C', 'Option D'}
-    '''
-
-    # Ensure both disabled and enabled are not provided at the same time
-    if (disabled is not None) and (enabled is not None):
-        raise ValueError("Only one of `disabled` or `enabled` should be provided, not both.")
-    
-    rows = await get_query(timedConnection, query, params)
-    
-    # Convert disabled and enabled to sets for efficient look-up
-    if disabled is not None:
-        if not isinstance(disabled, (list, tuple, set)):
-            raise ValueError("`disabled` should be a list, tuple, or set")
-        status_set = set(disabled)
-        disable = True
-    elif enabled is not None:
-        if not isinstance(enabled, (list, tuple, set)):
-            raise ValueError("`enabled` should be a list, tuple, or set")
-        status_set = set(enabled)
-        disable = False
-    else:
-        status_set = set()
-        disable = True
-
-    choices = [
-        ui.choice(
-            name=str(row['name']), 
-            label=row['label'], 
-            disabled=(disable if row['label'] in status_set else not disable)
-        ) 
-        for row in rows
-    ]
-    return choices
-
-async def get_choices(timed_connection, query, params=(), disabled=None, enabled=None):
-    result = await get_choices_AA(timed_connection, query, params, disabled, enabled)
-    #result = await get_choices_ZZ(timed_connection, query, params, disabled, enabled)
-    return result
-
 async def get_choices_disable_all(timedConnection, query, params=()):
     '''
     Return choices for dropdown menus and other ui elements
@@ -647,26 +537,6 @@ async def populate_summarize_ge(q):
                                 (ge['res']['3b'] is not None) + 
                                 (ge['res']['3c'] is not None))))
 
-async def get_choices_old(timedConnection, query, params=(), disabled=None):
-    '''
-    Return choices for dropdown menus and other ui elements
-    disabled: Needs to be formatted as
-        disabled = {'Social Science', 'English', 'General Studies'}
-        These items will be disabled in the menu so they cannot be chosen
-    '''
-    rows = await get_query(timedConnection, query, params)
-
-    if disabled is None:
-        choices = [ui.choice(name=str(row['name']), label=row['label']) for row in rows]
-    else:
-        # might have to add error checking here to make sure `disabled` is formatted correctly
-        choices = [ui.choice(
-            name = str(row['name']), 
-            label = row['label'], 
-            disabled = (str(row['label']) in disabled)
-        ) for row in rows]
-
-    return choices
 # these functions return 
 
 #######################################################
@@ -708,13 +578,22 @@ async def set_user_vars_given_role(q):
     q.user.username = row['username']
     q.user.name = row['fullname']
 
-async def get_program_title(timedConnection, program_id):
+async def get_program_title(timed_connection: TimedSQLiteConnection, program_id: int) -> Optional[str]:
+    '''
+    Get the program title for a given program id
+    '''
     query = '''
+        SELECT b.id, b.name || ' in ' || a.name as title
+        FROM programs a, degrees b 
+        WHERE a.id = ? AND a.degree_id = b.id 
+    '''
+    # When updatign the db, change from 'name' to 'degree'
+    new_query = '''
         SELECT b.id, b.degree || ' in ' || a.name as title
         FROM programs a, degrees b 
         WHERE a.id = ? AND a.degree_id = b.id 
     '''
-    row = await get_query_one(timedConnection, query, params=(program_id,))
+    row = await get_query_one(timed_connection, query, params=(program_id,))
     if row:
         return row
     else:
@@ -724,163 +603,6 @@ async def get_program_title(timedConnection, program_id):
 ####################  SQL-RELATED FUNCTIONS  #########################
 ######################################################################
 
-from timedsqliteconnection import TimedSQLiteConnection, _base_query, get_query, get_query_one, get_query_dict, get_query_course_dict, get_query_df
-
-import sqlite3
-import time
-from typing import Any, List, Dict, Optional
-import pandas as pd
-
-##################################################################################
-#######################  SQL-RELATED FUNCTIONS (REWRITTEN) #######################
-##################################################################################
-
-class TimedSQLiteConnection_ZZ:
-    '''
-    This class creates an SQLite connection that will disconnect after 
-    'timeout' amount of inactivity. This is a lightweight way to manage 
-    multiple sqlite connections without using a connection pool. It prepares
-    for multiple users in Wave connecting to the same SQLite database.
-
-    Methods include 
-      - execute: executing commands (like create table), nothing returned
-      - fetchone and fetchall use corresponding sqlite3 methods
-      - fetchdict returns query results as a dictionary
-      - fetchdf returns a Pandas DataFrame
-
-    '''
-    def __init__(self, db_path: str, row_factory: bool = True, timeout: int = 1800):
-        self.db_path = db_path
-        self.timeout = timeout
-        self.row_factory = row_factory
-        self.last_activity_time = time.time()
-        self.connection: Optional[sqlite3.Connection] = None
-        self._lock = asyncio.Lock()
-
-    @asynccontextmanager
-    async def _connection(self):
-        async with self._lock:
-            await self._check_and_close()
-            if self.connection is None:
-                self.connection = sqlite3.connect(self.db_path)
-                if self.row_factory:
-                    self.connection.row_factory = sqlite3.Row
-            try:
-                yield self.connection
-                await self._update_activity_time()
-            finally:
-                if self.connection:
-                    self.connection.commit()
-
-    async def _check_and_close(self):
-        if self.connection is not None:
-            current_time = time.time()
-            if current_time - self.last_activity_time >= self.timeout:
-                await self.close()
-
-    async def _update_activity_time(self):
-        self.last_activity_time = time.time()
-
-    async def _execute_query(self, query: str, params: tuple = (), fetch_method: Optional[Callable] = None):
-        async with self._connection() as conn:
-            try:
-                cursor = conn.cursor()
-                cursor.execute(query, params)
-                
-                if fetch_method:
-                    result = fetch_method(cursor)
-                    return result if result else None
-            except sqlite3.Error as e:
-                logging.error(f"SQLite error occurred: {e}")
-                raise
-
-    async def execute(self, query: str, params: tuple = ()):
-        """Execute a query without returning results."""
-        await self._execute_query(query, params)
-
-    async def fetchone(self, query: str, params: tuple = ()) -> Optional[Any]:
-        """Execute a query and fetch one result."""
-        return await self._execute_query(query, params, lambda cursor: cursor.fetchone())
-
-    async def fetchall(self, query: str, params: tuple = ()) -> Optional[List[Any]]:
-        """Execute a query and fetch all results."""
-        return await self._execute_query(query, params, lambda cursor: cursor.fetchall())
-
-    async def fetchdict(self, query: str, params: tuple = ()) -> Optional[List[Dict[str, Any]]]:
-        """Execute a query and fetch results as a list of dictionaries."""
-        def fetch_dict(cursor):
-            columns = [col[0] for col in cursor.description]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
-        return await self._execute_query(query, params, fetch_dict)
-
-    async def fetchdf(self, query: str, params: tuple = ()) -> Optional[pd.DataFrame]:
-        """Execute a query and fetch results as a pandas DataFrame."""
-        async with self._connection() as conn:
-            df = pd.read_sql_query(query, conn, params=params)
-            return df if not df.empty else None
-
-    async def close(self):
-        """Close the database connection."""
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
-
-async def _base_query_ZZ(timed_connection: TimedSQLiteConnection_ZZ, query_method: str, query: str, params: tuple = (), **kwargs) -> Optional[Any]:
-    """
-    Base function to handle queries and error logging.
-    
-    :param timed_connection: TimedSQLiteConnection instance
-    :param query_method: String indicating which query method to use
-    :param query: SQL query string
-    :param params: Query parameters
-    :param kwargs: Additional keyword arguments for specific query methods
-    :return: Query result or None if query fails
-    """
-    try:
-        method = getattr(timed_connection, f"fetch{query_method}")
-        result = await method(query, params, **kwargs)
-        
-        if result is None or (isinstance(result, (list, dict)) and not result) or (isinstance(result, pd.DataFrame) and result.empty):
-            warning_message = f"Query returned no results: {query} with params {params}"
-            warnings.warn(warning_message, category=Warning)
-            logging.warning(warning_message)
-            return None
-        
-        return result
-    except Exception as e:
-        error_message = f"An error occurred during query execution: {e}"
-        warnings.warn(error_message, category=Warning)
-        logging.error(error_message)
-        return None
-
-async def get_query_ZZ(timed_connection: TimedSQLiteConnection_ZZ, query: str, params: tuple = ()) -> Optional[List[Any]]:
-    """Get all rows from a query."""
-    return await _base_query(timed_connection, "all", query, params)
-
-async def get_query_one_ZZ(timed_connection: TimedSQLiteConnection_ZZ, query: str, params: tuple = ()) -> Optional[Any]:
-    """Get a single row from a query."""
-    return await _base_query(timed_connection, "one", query, params)
-
-async def get_query_dict_ZZ(timed_connection: TimedSQLiteConnection_ZZ, query: str, params: tuple = ()) -> Optional[List[Dict[str, Any]]]:
-    """Get all rows from a query as a list of dictionaries."""
-    return await _base_query(timed_connection, "dict", query, params)
-
-async def get_query_course_dict_ZZ(timed_connection: TimedSQLiteConnection_ZZ, query: str, params: tuple = ()) -> Optional[Dict[str, Dict[str, Any]]]:
-    """Get all rows from a query as a dictionary indexed by course."""
-    result = await get_query_dict(timed_connection, query, params)
-    if result is None:
-        return None
-    try:
-        return {record['course']: record for record in result}
-    except KeyError:
-        warnings.warn("'course' is not an element of the dictionary", category=Warning)
-        return None
-
-async def get_query_df_ZZ(timed_connection: TimedSQLiteConnection_ZZ, query: str, params: tuple = ()) -> Optional[pd.DataFrame]:
-    """Get query results as a pandas DataFrame."""
-    return await _base_query(timed_connection, "df", query, params)
-
-
 ######################################################################
 #####################  QUERIES & FUNCTIONS  ##########################
 ######################################################################
@@ -889,105 +611,31 @@ async def get_query_df_ZZ(timed_connection: TimedSQLiteConnection_ZZ, query: str
 #################  EVENT AND HANDLER FUNCTIONS  ######################
 ######################################################################
 
-def example_dialog(q):
-    q.page['meta'].dialog = ui.dialog(
-        title='Hello!',
-        name='my_dialog',
-        items=[
-            ui.text('Click the X button to close this dialog.'),
-        ],
-        # Enable a close button (displayed at the top-right of the dialog)
-        closable=True,
-        # Get notified when the dialog is dismissed.
-        events=['dismissed'],
-    )
+#def example_dialog(q):
+#    q.page['meta'].dialog = ui.dialog(
+#        title='Hello!',
+#        name='my_dialog',
+#        items=[
+#            ui.text('Click the X button to close this dialog.'),
+#        ],
+#        # Enable a close button (displayed at the top-right of the dialog)
+#        closable=True,
+#        # Get notified when the dialog is dismissed.
+#        events=['dismissed'],
+#    )
 
-def course_description_dialog(q, course, which='schedule'):
-    '''
-    Create a dialog for the course description for a table.
-    This will be used for multiple tables on multiple pages.
-    course: indicate what course it's for
-    df: DataFrame that the table was created from
-
-    to do: course in the schedule df is called 'name'
-           course is called course in the required df
-           should simplify by changing schedule df to course AFTER
-           updating d3 javascript code, since it's expecting name
-    '''
-    if which in ['required', 'schedule']:
-        #df = q.user.student_data[which]
-        if which == 'schedule':
-            df = q.user.student_data['schedule']
-            description = df.loc[df['name'] == course, 'description'].iloc[0]
-   
-        elif which == 'required':
-            df = q.user.student_data['required']
-            description = df.loc[df['course'] == course, 'description'].iloc[0]
-
-        #description = df.loc[df['course'] == course, 'description'].iloc[0]
-
-        q.page['meta'].dialog = ui.dialog(
-            name = which + '_description_dialog',
-            title = course + ' Course Description',
-            width = '480px',
-            items = [ui.text(description)],
-            # Enable a close button
-            closable = True,
-            # Get notified when the dialog is dismissed.
-            events = ['dismissed']
-        )
-    else:
-        pass
-
-def example_dialog_ZZ(q):
-    q.page['meta'].dialog = ui.dialog(
-        title='Hello!',
-        name='my_dialog',
-        items=[
-            ui.text('Click the X button to close this dialog.'),
-        ],
-        # Enable a close button (displayed at the top-right of the dialog)
-        closable=True,
-        # Get notified when the dialog is dismissed.
-        events=['dismissed'],
-    )
-
-def course_description_dialog_ZZ(q, course, which='schedule'):
-    '''
-    Create a dialog for the course description for a table.
-    This will be used for multiple tables on multiple pages.
-    course: indicate what course it's for
-    df: DataFrame that the table was created from
-
-    to do: course in the schedule df is called 'name' (changing this now)
-           course is called course in the required df
-           should simplify by changing schedule df to course AFTER
-           updating d3 javascript code, since it's expecting name
-    '''
-    if which in ['required', 'schedule']:
-        #df = q.user.student_data[which]
-        if which == 'schedule':
-            df = q.user.student_data['schedule']
-            description = df.loc[df['course'] == course, 'description'].iloc[0]
-   
-        elif which == 'required':
-            df = q.user.student_data['required']
-            description = df.loc[df['course'] == course, 'description'].iloc[0]
-
-        #description = df.loc[df['course'] == course, 'description'].iloc[0]
-
-        q.page['meta'].dialog = ui.dialog(
-            name = which + '_description_dialog',
-            title = course + ' Course Description',
-            width = '480px',
-            items = [ui.text(description)],
-            # Enable a close button
-            closable = True,
-            # Get notified when the dialog is dismissed.
-            events = ['dismissed']
-        )
-    else:
-        pass
+#def example_dialog_ZZ(q):
+#    q.page['meta'].dialog = ui.dialog(
+#        title='Hello!',
+#        name='my_dialog',
+#        items=[
+#            ui.text('Click the X button to close this dialog.'),
+#        ],
+#        # Enable a close button (displayed at the top-right of the dialog)
+#        closable=True,
+#        # Get notified when the dialog is dismissed.
+#        events=['dismissed'],
+#    )
 
 async def set_user_vars_given_role_ZZ(q):
     '''

@@ -2,58 +2,34 @@ from backend import test_functions, initialize_student_info_ZZ, initialize_ge, i
 
 test_functions(initialize_student_info_ZZ, initialize_student_info)
 
-def compare(dict1, dict2, key):
-    if dict1[key] is not dict2[key]:
-        print(f"'{key}' is different: {dict1[key]} is not {dict2[key]}")
-    else:
-        print(f"'{key}' is the same")
+d2 = backend.initialize_student_info()
 
-def compare_dictionaries(dict1, dict2):
-    def recursive_compare(d1, d2, path=""):
-        if not isinstance(d1, dict) or not isinstance(d2, dict):
-            compare(d1, d2, path)
-            return
+backend.compare_dictionaries(d1, d2)
 
-        all_keys = set(d1.keys()) | set(d2.keys())
-        
-        for key in all_keys:
-            new_path = f"{path}.{key}" if path else key
-            
-            if key not in d1:
-                print(f"'{new_path}' is missing in the first dictionary")
-            elif key not in d2:
-                print(f"'{new_path}' is missing in the second dictionary")
-            elif isinstance(d1[key], dict) and isinstance(d2[key], dict):
-                recursive_compare(d1[key], d2[key], new_path)
-            else:
-                compare(d1, d2, key)
+# Example usage:
+dict1 = {
+    'a': 1,
+    'b': {
+        'c': 2,
+        'd': {
+            'e': 3
+        }
+    },
+    'f': 4
+}
 
-    recursive_compare(dict1, dict2)
+dict2 = {
+    'a': 1,
+    'b': {
+        'c': 2,
+        'd': {
+            'e': 5
+        }
+    },
+    'g': 6
+}
 
-## Example usage:
-#dict1 = {
-#    'a': 1,
-#    'b': {
-#        'c': 2,
-#        'd': {
-#            'e': 3
-#        }
-#    },
-#    'f': 4
-#}
-#
-#dict2 = {
-#    'a': 1,
-#    'b': {
-#        'c': 2,
-#        'd': {
-#            'e': 5
-#        }
-#    },
-#    'g': 6
-#}
-#
-#compare_dictionaries(dict1, dict2)
+compare_dictionaries(dict1, dict2)
 
 f1 = initialize_student_info_ZZ()
 f2 = initialize_student_info()

@@ -9,7 +9,7 @@ import pandas as pd
 #import sqlite3
 #import time
 #import warnings
-
+import backend
 
 ######################################################################
 ####################  STANDARD WAVE CARDS  ###########################
@@ -34,119 +34,154 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
 ####################  Q FUNCTIONS  ####################
 #######################################################
 
+########################################################
+####################  MENU QUERIES  ####################
+########################################################
 
-def reset_program(q):
+### These queries are used in app.py for menus and  ###
+### render_dropdown_menus_horizontal                ###
+
+degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
+area_query = '''
+    SELECT DISTINCT menu_area_id AS name, area_name AS label
+    FROM menu_all_view 
+    WHERE menu_degree_id = ?
+'''
+program_query_old = '''
+    SELECT program_id AS name, program_name AS label
+    FROM menu_all_view 
+    WHERE menu_degree_id = ? AND menu_area_id = ?
+'''
+program_query = '''
+    SELECT program_id AS name, program_name AS label, disabled
+    FROM menu_all_view 
+    WHERE menu_degree_id = ? AND menu_area_id = ?
+'''
+
+##############################################################
+####################  PROGRAMS PAGE ##########################
+##############################################################
+
+async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width='300px'):
     '''
-    When program is changed, multiple variables need to be reset
+    Create menus for selecting degree, area of study, and program
     '''
-    q.user.student_info['menu']['program'] = None
-    q.user.student_info['program_id'] = None
-    q.user.student_info['degree_program'] = None
 
-    q.user.student_data['required'] = None
-    q.user.student_data['schedule'] = None
+    timed_connection = q.user.conn    
+    enabled_degree = {"Bachelor's", "Undergraduate Certificate"}
+    disabled_programs = q.app.disabled_program_menu_items
 
-    q.page['dropdown'].menu_program.value = None
-    q.page['dropdown'].menu_program.choices = None
+    # enforcing string because I've got a bug somewhere (passing an int instead of str)
+    dropdowns = ui.inline([
+        ui.dropdown(
+            name='menu_degree',
+            label='Degree',
+            value=str(q.user.student_info['menu']['degree']) if \
+                (q.user.student_info['menu']['degree'] is not None) else q.args.menu_degree,
+            trigger=True,
+            width='230px',
+            choices = await backend.get_choices(timed_connection, degree_query, enabled=enabled_degree)
+        ),
+        ui.dropdown(
+            name='menu_area',
+            label='Area of Study',
+            value=str(q.user.student_info['menu']['area_of_study']) if \
+                (str(q.user.student_info['menu']['area_of_study']) is not None) else \
+                str(q.args.menu_area),
+            trigger=True,
+            disabled=False,
+            width='250px',
+            choices=None if (q.user.student_info['menu']['degree'] is None) else \
+                await backend.get_choices(timed_connection, area_query, 
+                                          params=(q.user.student_info['menu']['degree'],))
+        ),
+        ui.dropdown(
+            name='menu_program',
+            label='Program',
+            value=str(q.user.student_info['menu']['program']) if \
+                (q.user.student_info['menu']['program'] is not None) else q.args.menu_program,
+            trigger=True,
+            disabled=False,
+            width='300px',
+            choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
+                await backend.get_choices(timed_connection, program_query, 
+                    params=(q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']),
+                    disabled=disabled_programs
+                )
+        )
+    ], justify='start', align='start')
+
+    command_button = ui.button(
+        name='command_button', 
+        label='Select', 
+        disabled=False,
+        commands=[
+            ui.command(name='program', label='Save Program'),
+            #ui.command(name='classes_menu', label='Classes', 
+            #    items=[
+            #        ui.command(name='add_ge', label='Add GE'),
+            #        ui.command(name='add_elective', label='Add Electives'),  
+            #]),
+            ui.command(name='add_ge', label='Add GE'),
+            ui.command(name='add_elective', label='Add Electives')  
+    ])
+
+    card = ui.form_card(
+        box = location,
+        items = [
+            #ui.text_xl('Browse Programs'),
+            ui.inline([
+                dropdowns, 
+                command_button
+            ],
+            justify='between', 
+            align='end')
+        ]
+    )
+        
+    add_card(q, 'dropdown', card)
+
+    ########################
+
+######################################################################
+#################  EVENT AND HANDLER FUNCTIONS  ######################
+######################################################################
 
 
-async def reset_student_info_data_ZZ(q):
+def course_description_dialog(q, course, which='schedule'):
     '''
-    All the steps needed to initialize q.user.student_info and q.user.student_data
-    and set multiple q.user parameters
+    Create a dialog for the course description for a table.
+    This will be used for multiple tables on multiple pages.
+    course: indicate what course it's for
+    df: DataFrame that the table was created from
 
-    Will be called at startup in initialize_user and when switching to a new student 
-    for admin and coaches
+    to do: course in the schedule df is called 'name'
+           course is called course in the required df
+           should simplify by changing schedule df to course AFTER
+           updating d3 javascript code, since it's expecting name
     '''
-    q.user.student_info = initialize_student_info()
-    q.user.student_info_populated = False # may be needed later 
-    q.user.student_data = initialize_student_data() # will have required, periods, schedule
+    if which in ['required', 'schedule']:
+        #df = q.user.student_data[which]
+        if which == 'schedule':
+            df = q.user.student_data['schedule']
+            description = df.loc[df['name'] == course, 'description'].iloc[0]
+   
+        elif which == 'required':
+            df = q.user.student_data['required']
+            description = df.loc[df['course'] == course, 'description'].iloc[0]
 
+        #description = df.loc[df['course'] == course, 'description'].iloc[0]
 
-async def populate_q_student_info_ZZ(q, timed_connection, user_id):
-    """
-    Populate q.user.student_info and q.user.student_data dictionaries with student information.
+        q.page['meta'].dialog = ui.dialog(
+            name = which + '_description_dialog',
+            title = course + ' Course Description',
+            width = '480px',
+            items = [ui.text(description)],
+            # Enable a close button
+            closable = True,
+            # Get notified when the dialog is dismissed.
+            events = ['dismissed']
+        )
+    else:
+        pass
 
-    This function retrieves student information from the database and populates the relevant
-    dictionaries in the q object. It's called by `app.initialize_user` and `app.select_sample_user`.
-
-    Args:
-        q: The q object containing application and user data
-        timed_connection: Database connection object (also stored in q)
-        user_id: The ID of the user to retrieve information for (also stored in q)
-
-    Note:
-        timed_connection and user_id are included as parameters for clarity, despite being stored in q.
-
-    Raises:
-        Exception: If there's an error during the data retrieval or population process
-    """
-    try:
-        student_info = await populate_student_info_dict(timed_connection, user_id)
-        student_data = await populate_student_data_dict(timed_connection, student_info)
-
-        q.user.student_info = student_info
-        q.user.student_data = student_data
-
-    except Exception as e:
-        error_message = f"Error populating student info for user {user_id}: {str(e)}"
-        print(error_message)  # For logging purposes
-        raise  # Re-raising the exception for now
-
-    q.user.info_populated = True  
-
-async def populate_student_info(q, user_id):
-    '''
-    Get information from student_info table and populate the q.user.student_info variables
-    and q.user.student_data dataframes
-    '''
-    timedConnection = q.user.conn
-    attributes = ['resident_status', 'app_stage_id', 'app_stage', 'student_profile', 'financial_aid', 
-        'transfer_credits', 'program_id']
-    query = '''
-    SELECT user_id, fullname AS name, resident_status, app_stage_id, app_stage, student_profile,
-        transfer_credits, financial_aid, program_id
-    FROM student_info_view WHERE user_id = ?
-    '''
-    row = await get_query_one(timedConnection, query, params=(user_id,))
-    if row:
-        q.user.student_info.update({name: row[name] for name in attributes})
-#                q.user.student_data['user_id'] = user_id
-
-        q.user.student_info['user_id'] = user_id
-        q.user.student_info['name'] = row['name']
-        q.user.student_data['user_id'] = user_id
-
-        if q.user.student_info['program_id'] is not None:
-            row = await get_program_title(timedConnection, q.user.student_info['program_id'])
-            if row:
-                q.user.student_info['degree_program'] = row['title']
-                q.user.student_info['degree_id'] = row['id']
-            q.user.student_data['required'] = await get_required_program_courses(q)
-
-        if q.user.student_info['app_stage_id'] == 4:
-            q.user.student_data['schedule'] = await get_student_progress_d3(q)
-    
-        if q.user.student_info['first_term'] is None:
-            q.user.student_info['first_term'] = q.app.default_first_term
-
-    # Recreate dropdown menus for students
-    # Need to do this only if dropdown menu status was not saved
-    # (We should save this status in the future)
-    if q.user.student_info['program_id'] is not None:
-        # recreate dropdown menu for program if empty
-        if q.user.student_info['menu']['program'] is None:
-            q.user.student_info['menu']['program'] = q.user.student_info['program_id']
-        # recreate dropdowns for degree and area_of_study if either is empty
-        if (q.user.student_info['menu']['degree'] is None) or (q.user.student_info['menu']['area_of_study'] is None):
-            query = '''
-                SELECT menu_degree_id, menu_area_id 
-                FROM menu_all_view
-                WHERE program_id = ?
-                LIMIT 1
-            '''
-            # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
-            row = await get_query_one(q.user.conn, query, params=(q.user.student_info['program_id'],))
-            if row:
-                q.user.student_info['menu']['degree'] = row['menu_degree_id']
-                q.user.student_info['menu']['area_of_study'] = row['menu_area_id']

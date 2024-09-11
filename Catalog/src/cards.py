@@ -1,13 +1,27 @@
-from h2o_wave import ui, copy_expando, expando_to_dict
-from typing import Optional, List
-import pandas as pd
+from h2o_wave import Q, ui, copy_expando, expando_to_dict
+from contextlib import asynccontextmanager
+from h2o_wave import Q, ui
+from typing import Any, Dict, Callable, List, Optional, Union
+import asyncio
+import logging
 import numpy as np
+import pandas as pd
+import sqlite3
+import time
+import warnings
+
+import backend
+from backend import get_choices 
+
+
+#from backend import initialize_ge, initialize_student_info, initialize_student_data
+from backend import TimedSQLiteConnection, _base_query, get_query, get_query_one, \
+    get_query_dict, get_query_course_dict, get_query_df
 
 from frontend import add_card, clear_cards
 
 import utils
-from utils import get_query, get_query_one, get_query_dict, get_query_df
-from utils import get_choices
+#from utils import get_query, get_query_one, get_query_dict, get_query_df
 #from utils import generate_periods, update_periods, generate_schedule, handle_prerequisites, \
 #    schedule_courses_old, update_courses, move_courses_forward
 #import sys
@@ -19,43 +33,9 @@ from utils import get_choices
 ##################  TEST FUNCTIONS TO BE DELETED  ####################
 ######################################################################
 
-
 ######################################################################
 ##################  DEFINITIONS AND QUERIES  #########################
 ######################################################################
-
-######################################################################
-##################  DEFINITIONS AND QUERIES  #########################
-######################################################################
-
-UMGC_tags_ZZ = [
-    ui.tag(label='ELECTIVE', color='#fdbf38', label_color='$black'),
-    ui.tag(label='REQUIRED', color='#a30606'),
-    ui.tag(label='MAJOR', color='#135f96'),
-#    ui.tag(label='GENERAL', color='#3c3c43'), # dark gray
-#    ui.tag(label='GENERAL', color='#787800'), # khaki   
-    ui.tag(label='GENERAL', color='#3b8132', label_color='$white'), # green   
-]
-
-### These queries are used in app.py for menus and  ###
-### render_dropdown_menus_horizontal                ###
-
-degree_query_ZZ = 'SELECT id AS name, name AS label FROM menu_degrees'
-area_query_ZZ = '''
-    SELECT DISTINCT menu_area_id AS name, area_name AS label
-    FROM menu_all_view 
-    WHERE menu_degree_id = ?
-'''
-program_query_old_ZZ = '''
-    SELECT program_id AS name, program_name AS label
-    FROM menu_all_view 
-    WHERE menu_degree_id = ? AND menu_area_id = ?
-'''
-program_query_ZZ = '''
-    SELECT program_id AS name, program_name AS label, disabled
-    FROM menu_all_view 
-    WHERE menu_degree_id = ? AND menu_area_id = ?
-'''
 
 UMGC_tags = [
     ui.tag(label='ELECTIVE', color='#fdbf38', label_color='$black'),
@@ -94,48 +74,7 @@ program_query = '''
 ####################  LAYOUT CARDS  ####################
 ########################################################
 
-def return_meta_card_ZZ(flex=True):
-    title='UMGC Wave App'
-    theme_name='UMGC'
-    content_zones = [
-        # Specify various zones and use the one that is currently needed. Empty zones are ignored.
-        # Usually will not need the top_ or bottom_ versions
-        ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
-        ui.zone('top_vertical'),
-        ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
-        ui.zone('vertical'),
-        ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center'),
-        ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
-        ui.zone('bottom_vertical'),
-        ui.zone('debug', direction=ui.ZoneDirection.ROW)
-    ]
-    UMGC_themes=[ui.theme( # UMGC red: '#a30606', UMGC yellow: '#fdbf38'
-        name='UMGC',
-        primary='#a30606', 
-        text='#000000',
-        card='#ffffff',
-        page='#e2e2e2', 
-    )]
-    UMGC_layouts=[ui.layout(
-        breakpoint='xs', 
-        #min_height='100vh', 
-        zones=[
-            # size='0' keeps zone from expanding
-            ui.zone('header', size='80px'), 
-            ui.zone('content', zones=content_zones, size='100%-80px'),
-            ui.zone('footer', size='0'),
-        ]
-    )]
-    card = ui.meta_card(
-        box = '',
-        themes = UMGC_themes,
-        theme = theme_name,
-        title = title,
-        layouts = UMGC_layouts if flex else None
-    )
-    return card 
-
-def return_header_card(q) -> ui.header_card:
+def return_header_card(q: Q) -> ui.header_card:
     '''
     Returns a header card with tabs for different roles: student, coach, admin
     Called in app.py.
@@ -212,23 +151,18 @@ def return_header_card(q) -> ui.header_card:
     )
     return card
 
-def return_login_header_card_ZZ(q, box='1 1 7 1'):
+def return_login_header_card(q: Q) -> ui.header_card:
     '''
-    flex: Use the old flex layout system rather than the grid system
-          (flex was not working correctly, can debug later)
-    Create separate tabs for different roles: guest, student, coach, admin
+    Create a header card with a login tab.
     '''
-    flex = q.app.flex
 
     login_tab_items = [
         ui.tab(name='#login',     label='Login'),
     ]
     tab_items = login_tab_items
 
-    if flex:
-        box='header'
     card = ui.header_card(
-        box=box, 
+        box='header', 
         title='UMGC', 
         subtitle='Registration Assistant',
         image=q.app.umgc_logo,
@@ -239,18 +173,27 @@ def return_login_header_card_ZZ(q, box='1 1 7 1'):
                 items=tab_items,
             ),
         ],
-        #items=[
-        #    ui.textbox(
-        #        name='textbox_default', 
-        #        label='',
-        #        value='',
-        #        disabled=True
-        #    )
-        #]
     )
     return card
 
-def return_meta_card(flex=True):
+def return_footer_card() -> ui.footer_card:
+    '''
+    Footer card with caption for entire app.
+    Called in app.py.
+    '''
+    card = ui.footer_card(
+        box='footer',
+        caption='''
+Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
+This app is in pre-alpha stage. Feedback welcomed.
+        '''
+    )
+    return card
+
+def return_meta_card() -> ui.meta_card:
+    '''
+    Meta card for the UMGC app.
+    '''
     title='UMGC Wave App'
     theme_name='UMGC'
     content_zones = [
@@ -287,61 +230,9 @@ def return_meta_card(flex=True):
         themes = UMGC_themes,
         theme = theme_name,
         title = title,
-        layouts = UMGC_layouts if flex else None
+        layouts = UMGC_layouts
     )
     return card 
-
-def return_login_header_card(q, box='1 1 7 1'):
-    '''
-    flex: Use the old flex layout system rather than the grid system
-          (flex was not working correctly, can debug later)
-    Create separate tabs for different roles: guest, student, coach, admin
-    '''
-    flex = q.app.flex
-
-    login_tab_items = [
-        ui.tab(name='#login',     label='Login'),
-    ]
-    tab_items = login_tab_items
-
-    if flex:
-        box='header'
-    card = ui.header_card(
-        box=box, 
-        title='UMGC', 
-        subtitle='Registration Assistant',
-        image=q.app.umgc_logo,
-        secondary_items=[
-            ui.tabs(
-                name='tabs', 
-                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
-                items=tab_items,
-            ),
-        ],
-        #items=[
-        #    ui.textbox(
-        #        name='textbox_default', 
-        #        label='',
-        #        value='',
-        #        disabled=True
-        #    )
-        #]
-    )
-    return card
-
-def return_footer_card() -> ui.footer_card:
-    '''
-    Footer card with caption for entire app.
-    Called in app.py.
-    '''
-    card = ui.footer_card(
-        box='footer',
-        caption='''
-Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
-This app is in pre-alpha stage. Feedback welcomed.
-        '''
-    )
-    return card
 
 #######################################################
 ####################  DEBUG CARDS  ####################
@@ -1886,7 +1777,7 @@ async def render_program_description_ZZ(q, box='1 3 7 2', location='top_vertical
         SELECT description, info, learn, certification
         FROM program_descriptions WHERE program_id = ?
     '''
-    row = await get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
     if row:
         # major = '\n##' + title + '\n\n'
         frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
@@ -1926,7 +1817,7 @@ async def render_program_dashboard_ZZ(q, box=None, location='horizontal', width=
 
     # get program summary for bachelor's degrees
     query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    row = await get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
     if row:
         card = add_card(q, 'major_dashboard', ui.form_card(
             box=box,
@@ -2148,104 +2039,6 @@ async def render_program_ZZ(q):
     await render_program_table(q, location='horizontal', width='90%')
     await render_program_dashboard(q, location='horizontal', width='150px')
 
-async def render_dropdown_menus_horizontal(q, box='1 2 7 1', location='horizontal', 
-                                           menu_width='300px'):
-    '''
-    Create menus for selecting degree, area of study, and program
-    '''
-    flex = q.app.flex
-    timedConnection = q.user.conn
-
-    #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
-    #area_query = '''
-    #    SELECT DISTINCT menu_area_id AS name, area_name AS label
-    #    FROM menu_all_view 
-    #    WHERE menu_degree_id = ?
-    #'''
-    #program_query_old = '''
-    #    SELECT program_id AS name, program_name AS label
-    #    FROM menu_all_view 
-    #    WHERE menu_degree_id = ? AND menu_area_id = ?
-    #'''
-    #program_query = '''
-    #    SELECT program_id AS name, program_name AS label, disabled
-    #    FROM menu_all_view 
-    #    WHERE menu_degree_id = ? AND menu_area_id = ?
-    #'''
-
-    current_disabled = q.app.disabled_program_menu_items
-    
-    # enforcing string because I've got a bug somewhere (passing an int instead of str)
-    dropdowns = ui.inline([
-        ui.dropdown(
-            name='menu_degree',
-            label='Degree',
-            value=str(q.user.student_info['menu']['degree']) if \
-                (q.user.student_info['menu']['degree'] is not None) else q.args.menu_degree,
-            trigger=True,
-            width='230px',
-            choices=await utils.get_choices(timedConnection, degree_query)
-        ),
-        ui.dropdown(
-            name='menu_area',
-            label='Area of Study',
-            value=str(q.user.student_info['menu']['area_of_study']) if \
-                (str(q.user.student_info['menu']['area_of_study']) is not None) else \
-                str(q.args.menu_area),
-            trigger=True,
-            disabled=False,
-            width='250px',
-            choices=None if (q.user.student_info['menu']['degree'] is None) else \
-                await utils.get_choices(timedConnection, area_query, (q.user.student_info['menu']['degree'],))
-        ),
-        ui.dropdown(
-            name='menu_program',
-            label='Program',
-            value=str(q.user.student_info['menu']['program']) if \
-                (q.user.student_info['menu']['program'] is not None) else q.args.menu_program,
-            trigger=True,
-            disabled=False,
-            width='300px',
-            choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
-                await utils.get_choices(
-                    timedConnection, 
-                    program_query, 
-                    (q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study'])
-                )
-        )
-    ], justify='start', align='start')
-
-    command_button = ui.button(
-        name='command_button', 
-        label='Select', 
-        disabled=False,
-        commands=[
-            ui.command(name='program', label='Save Program'),
-            #ui.command(name='classes_menu', label='Classes', 
-            #    items=[
-            #        ui.command(name='add_ge', label='Add GE'),
-            #        ui.command(name='add_elective', label='Add Electives'),  
-            #]),
-            ui.command(name='add_ge', label='Add GE'),
-            ui.command(name='add_elective', label='Add Electives')  
-    ])
-    if flex:
-        box = location
-    card = ui.form_card(box=box,
-        items=[
-            #ui.text_xl('Browse Programs'),
-            ui.inline([
-                dropdowns, 
-                command_button
-            ],
-            justify='between', 
-            align='end')
-        ]
-    )
-        
-    add_card(q, 'dropdown', card)
-
-    ########################
 
 async def render_program_description(q, box='1 3 7 2', location='top_vertical', width='100%', height='100px'):
     '''
@@ -2264,7 +2057,7 @@ async def render_program_description(q, box='1 3 7 2', location='top_vertical', 
         SELECT description, info, learn, certification
         FROM program_descriptions WHERE program_id = ?
     '''
-    row = await get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
     if row:
         # major = '\n##' + title + '\n\n'
         frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
@@ -2304,7 +2097,7 @@ async def render_program_dashboard(q, box=None, location='horizontal', width='10
 
     # get program summary for bachelor's degrees
     query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    row = await get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
     if row:
         card = add_card(q, 'major_dashboard', ui.form_card(
             box=box,
@@ -2999,7 +2792,6 @@ ge_pairs_query_ZZ = '''
     WHERE ge_id=10 AND credits=3
     ORDER BY course
 '''
-
 ge_query = '''
     SELECT course AS name, course || ': ' || title AS label 
     FROM ge_view 
@@ -3359,7 +3151,6 @@ async def render_ge_res_card_ZZ(q, menu_width='300px', box='1 3 3 4', location='
     )
     add_card(q, cardname, card)
 
-
 async def render_ge_arts_card(q, menu_width='300px', box='1 11 3 3', location='grid', 
                               cardname='ge_arts', width='300px'):
     '''
@@ -3710,7 +3501,6 @@ async def return_d3plot(q, html, box='1 2 5 6', location='horizontal',
         content=html
     )
     return card
-
 
 async def return_schedule_menu(q, box='6 2 2 5', location='vertical', width='300px'):
     '''
