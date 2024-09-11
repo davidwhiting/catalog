@@ -119,6 +119,9 @@ async def initialize_user(q: Q) -> None:
     #     student info using 'select student' dropdown menu (later will be lookup)
     #   - role == 'student' will start new or from saved student info from database
 
+    logging.info(f'Student Info: {q.user.student_info}')
+    logging.info(f'Student Data: {q.user.student_data}')
+
     await q.page.save()
 
 async def initialize_client(q: Q) -> None:
@@ -133,8 +136,8 @@ async def initialize_client(q: Q) -> None:
     #q.page['header'] = frontend.return_login_header_card(q)
     q.page['footer'] = frontend.return_footer_card()
 
-#    if q.app.debug:
-#        q.page['debug'] = ui.markdown_card(box=ui.box('debugcards.return_debug_card(q)
+    #if q.app.debug:
+    #    q.page['debug'] = ui.markdown_card(box=ui.box('debugcards.return_debug_card(q)
 
     await q.page.save()
     if q.args['#'] is None:
@@ -629,6 +632,24 @@ async def add_ge(q: Q):
     q.page['meta'].redirect = '#ge'
     await q.page.save()
 
+@on()
+async def add_elective(q: Q):
+    '''
+    Respond to the menu event 'Add Electives'
+    '''
+    logging.info(f'Redirecting to the Electives page')
+    await q.page.save()
+
+@on()
+async def select_program(q: Q):
+    '''
+    Respond to the menu event 'Select Program'
+    '''
+    logging.info(f'Will select the program and save to student_info')
+    await q.page.save()
+
+
+
 ########################################################
 ####################  Skills pages  ####################
 ########################################################
@@ -666,59 +687,63 @@ async def submit_skills_menu(q: Q):
     int_tuple = tuple(map(int, skills_tuple))
 
     query = f"""
-        SELECT program, sum(score) AS TotalScore 
-        FROM program_skill_score_view
-        WHERE skill_id IN {int_tuple}
-        GROUP BY program
+        SELECT b.id, a.program, sum(a.score) AS TotalScore 
+        FROM program_skill_score_view a, programs b
+
+        WHERE a.skill_id IN {int_tuple}
+            AND b.degree_id = 3
+            AND a.program = b.name 
+        GROUP BY a.program
         ORDER BY TotalScore DESC 
         LIMIT {result_limit}
     """
-
     results = await backend.get_query_dict(q.user.conn, query)
+    # save for reuse
+    q.user.student_data['skills'] = results
+    card = await frontend.return_skills_table(results)
 
-    columns = [
-        #ui.table_column(name='seq', label='Seq', data_type='number'),
-        ui.table_column(name='program', label='Program', searchable=False, min_width='250'),
-        ui.table_column(name='score', label='Score', searchable=False, min_width='100'), 
-        ui.table_column(name='menu', label='Menu', max_width='150',
-            cell_type=ui.menu_table_cell_type(name='commands', 
-                commands=[
-                    ui.command(name='explore_skills_program', label='Explore Program'),
-                    ui.command(name='select_skills_program', label='Select Program'),
-                ]
-        ))
-    ]
-    rows = [
-        ui.table_row(
-            #name=str(row['id']),
-            name=row['program'],
-            cells=[
-                #str(row['seq']),
-                row['program'],
-                #str(row['TotalScore']),
-                f"{row['TotalScore']:.3f}"
-            ]
-        ) for row in results
-    ]
-    add_card(q, 'program_table', ui.form_card(
-        box='horizontal',
-        items=[
-            #ui.inline(justify='between', align='center', items=[
-            #    ui.text(title, size=ui.TextSize.L),
-            #    ui.button(name='schedule_coursework', label='Schedule', 
-            #        #caption='Description', 
-            #        primary=True, disabled=False)
-            #]),
-            ui.table(
-                name='program_skills_table',
-                downloadable=False,
-                resettable=True,
-                groupable=False,
-                columns=columns,
-                rows=rows
-            )
-        ]
-    ))
+    add_card(q, 'skills_program_table', card)
+
+@on()
+async def program_skills_table(q: Q):
+    '''
+    Respond to events (clicking table link or double-clicking row)
+    in the table on Program page. This will display the course description
+    by default.
+
+    Notes:
+      - q.args.table_name is set to [row_name]
+      - the name of the table is 'program_table'
+      - the name of the row is name = row['name']    
+    '''
+    program_name = q.args.program_skills_table[0] 
+    #frontend.course_description_dialog(q, coursename, which='required')
+    logging.info('The value of program_name in program_skills_table is ' + program_name)
+    await q.page.save()
+
+@on()
+async def explore_skills_program(q: Q):
+    '''
+    Respond to the menu event 'Explore Program'
+    [Should be similar to what is found in #programs ]
+    '''
+    which_program = q.args.explore_skills_program
+    #frontend.course_description_dialog(q, coursename, which='required')
+    logging.info('The value of which_program in explore_skills_program is ' + str(which_program))
+    await q.page.save()
+
+@on()
+async def select_skills_program(q: Q):
+    '''
+    Respond to the menu event 'Select Program'
+    [Should be identical to what is found in #programs under Select]
+    '''
+    which_program = q.args.select_skills_program
+    #frontend.course_description_dialog(q, coursename, which='required')
+    logging.info(f'The value of which_program in select_skills_program is {which_program}')
+    await q.page.save()
+
+
 
 ########################################################
 ####################  Course pages  ####################

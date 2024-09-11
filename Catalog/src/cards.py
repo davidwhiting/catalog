@@ -1231,12 +1231,9 @@ def render_registration_card(q, location='top_horizontal', width='40%',
     add_card(q, cardname, card)
 
 def return_welcome_back_card(q, location='vertical', height='400px', width='100%', 
-                             box='1 3 3 3', title=''):
+                             title=''):
     student_info = q.user.student_info
-    flex = q.app.flex
-
-    if flex:
-        box = ui.box(location, height=height, width=width)
+    box = ui.box(location, height=height, width=width)
 
     content2 = f'''## Welcome back, {student_info['name']}.
 
@@ -1293,11 +1290,12 @@ def return_welcome_back_card(q, location='vertical', height='400px', width='100%
 - Select the **Schedule** tab to update your schedule.
 '''
     app_stage_id = int(q.user.student_info['app_stage_id'])
+
     if app_stage_id == 2:
         content = content2
     elif app_stage_id == 3:
         content = content3
-    elif app_stage_id == 4:
+    else:
         content = content4
 
     if content:

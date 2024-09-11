@@ -77,52 +77,15 @@ def return_header_card(q: Q) -> ui.header_card:
         ui.tab(name='#schedule',  label='Schedule')
     ]
 
-    #coach_tab_items = [
-    #    ui.tab(name='#login',    label='[Login]'),
-    #    #ui.tab(name='#admin',    label='Admin'),
-    #    ui.tab(name='#home',     label='Coach Home'),
-    #    ui.tab(name='#program',  label='Choose Program'),
-    #    ui.tab(name='#course',   label='Select Courses'),
-    #    ui.tab(name='#schedule', label='Set Schedule'),
-    #]
-    #admin_tab_items = [
-    #    ui.tab(name='#login',    label='[Login]'),
-    #    #ui.tab(name='#admin',    label='Admin'),
-    #    ui.tab(name='#home',     label='Admin Home'),
-    #    ui.tab(name='#program',  label='Choose Program'),
-    #    ui.tab(name='#course',   label='Select Courses'),
-    #    ui.tab(name='#schedule', label='Set Schedule'),
-    #]
-
-    #if q.user.role == 'admin':
-    #    tab_items = admin_tab_items
-    #    textbox_label = 'Name'
-    #    textbox_value = q.user.name
-    #elif q.user.role == 'coach':
-    #    tab_items = coach_tab_items
-    #    textbox_label = 'Name'
-    #    textbox_value = q.user.name
-    #else:
-    #    #q.user.role == 'student'
-    #    tab_items = student_tab_items
-    #    textbox_label = 'Name'
-    #    textbox_value = q.user.name
-
     q.user.role = 'student'
     tab_items = student_tab_items
     textbox_label = 'Name'
     #textbox_value = q.user.name
     textbox_value = "John Doe"
 
+    # Determine the current page
+    current_page = q.args['#'] if '#' in q.args else 'home'
 
-    older_tab_items = [
-        ui.tab(name='#home', label='Home'),
-        #ui.tab(name='#student', label='Student Info'),
-        ui.tab(name='#major', label='Program'), # 'Select Program'
-        ui.tab(name='#course', label='Course'), # 'Select Courses'
-       ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
-        #ui.tab(name='#project', label='Status'), # 'Project Plan'
-    ]
     box='header'
     card = ui.header_card(
         box=box, 
@@ -132,7 +95,8 @@ def return_header_card(q: Q) -> ui.header_card:
         secondary_items=[
             ui.tabs(
                 name='tabs', 
-                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
+                value=f'#{current_page}',
+                link=True, 
                 items=tab_items,
             ),
         ],
@@ -369,6 +333,56 @@ async def return_skills_menu(timed_connection, location='vertical', width='300px
             ui.button(name='submit_skills_menu', label='Submit', primary=True),
             ui.button(name='reset_skills_menu', label='Reset', primary=False),
             #])
+        ]
+    )
+    return card
+
+async def return_skills_table(results, location='horizontal'):
+    """
+    Return the skills table given input of results from get_query_dict
+    Called by submit_skills_menu
+    """
+    columns = [
+        #ui.table_column(name='seq', label='Seq', data_type='number'),
+        ui.table_column(name='program', label='Program', searchable=False, min_width='250'),
+        ui.table_column(name='score', label='Score', searchable=False, min_width='100'), 
+        ui.table_column(name='menu', label='Menu', max_width='150',
+            cell_type=ui.menu_table_cell_type(name='commands', 
+                commands=[
+                    ui.command(name='explore_skills_program', label='Explore Program'),
+                    ui.command(name='select_skills_program', label='Select Program'),
+                ]
+        ))
+    ]
+    rows = [
+        ui.table_row(
+            name=str(row['id']),
+            #name=row['program'],
+            cells=[
+                #str(row['seq']),
+                row['program'],
+                #str(row['TotalScore']),
+                f"{row['TotalScore']:.3f}"
+            ]
+        ) for row in results
+    ]
+    card = ui.form_card(
+        box=location,
+        items=[
+            #ui.inline(justify='between', align='center', items=[
+            #    ui.text(title, size=ui.TextSize.L),
+            #    ui.button(name='schedule_coursework', label='Schedule', 
+            #        #caption='Description', 
+            #        primary=True, disabled=False)
+            #]),
+            ui.table(
+                name='program_skills_table',
+                downloadable=False,
+                resettable=True,
+                groupable=False,
+                columns=columns,
+                rows=rows
+            )
         ]
     )
     return card
