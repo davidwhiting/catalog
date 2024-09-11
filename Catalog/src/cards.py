@@ -70,169 +70,6 @@ program_query = '''
 ####################  STANDARD WAVE CARDS  ###########################
 ######################################################################
 
-########################################################
-####################  LAYOUT CARDS  ####################
-########################################################
-
-def return_header_card(q: Q) -> ui.header_card:
-    '''
-    Returns a header card with tabs for different roles: student, coach, admin
-    Called in app.py.
-    '''
-    student_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        ui.tab(name='#home',     label='Home'),
-        ui.tab(name='#program',  label='Program'),
-        ui.tab(name='#course',   label='Courses'),
-        ui.tab(name='#schedule', label='Schedule'),
-    ]
-    coach_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        #ui.tab(name='#admin',    label='Admin'),
-        ui.tab(name='#home',     label='Coach Home'),
-        ui.tab(name='#program',  label='Choose Program'),
-        ui.tab(name='#course',   label='Select Courses'),
-        ui.tab(name='#schedule', label='Set Schedule'),
-    ]
-    admin_tab_items = [
-        ui.tab(name='#login',    label='[Login]'),
-        #ui.tab(name='#admin',    label='Admin'),
-        ui.tab(name='#home',     label='Admin Home'),
-        ui.tab(name='#program',  label='Choose Program'),
-        ui.tab(name='#course',   label='Select Courses'),
-        ui.tab(name='#schedule', label='Set Schedule'),
-    ]
-
-    if q.user.role == 'admin':
-        tab_items = admin_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    elif q.user.role == 'coach':
-        tab_items = coach_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-    else:
-        #q.user.role == 'student'
-        tab_items = student_tab_items
-        textbox_label = 'Name'
-        textbox_value = q.user.name
-
-    older_tab_items = [
-        ui.tab(name='#home', label='Home'),
-        #ui.tab(name='#student', label='Student Info'),
-        ui.tab(name='#major', label='Program'), # 'Select Program'
-        ui.tab(name='#course', label='Course'), # 'Select Courses'
-        #ui.tab(name='#ge', label='GE'), 
-        #ui.tab(name='#electives', label='Electives'), # 'Select Courses'
-        ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
-        #ui.tab(name='#project', label='Status'), # 'Project Plan'
-    ]
-    box='header'
-    card = ui.header_card(
-        box=box, 
-        title='UMGC', 
-        subtitle='Registration Assistant',
-        image=q.app.umgc_logo,
-        secondary_items=[
-            ui.tabs(
-                name='tabs', 
-                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
-                items=tab_items,
-            ),
-        ],
-        items=[
-            ui.textbox(
-                name='textbox_default', 
-                label=textbox_label,
-                value=textbox_value, 
-                disabled=True
-            )
-        ]
-    )
-    return card
-
-def return_login_header_card(q: Q) -> ui.header_card:
-    '''
-    Create a header card with a login tab.
-    '''
-
-    login_tab_items = [
-        ui.tab(name='#login',     label='Login'),
-    ]
-    tab_items = login_tab_items
-
-    card = ui.header_card(
-        box='header', 
-        title='UMGC', 
-        subtitle='Registration Assistant',
-        image=q.app.umgc_logo,
-        secondary_items=[
-            ui.tabs(
-                name='tabs', 
-                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
-                items=tab_items,
-            ),
-        ],
-    )
-    return card
-
-def return_footer_card() -> ui.footer_card:
-    '''
-    Footer card with caption for entire app.
-    Called in app.py.
-    '''
-    card = ui.footer_card(
-        box='footer',
-        caption='''
-Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
-This app is in pre-alpha stage. Feedback welcomed.
-        '''
-    )
-    return card
-
-def return_meta_card() -> ui.meta_card:
-    '''
-    Meta card for the UMGC app.
-    '''
-    title='UMGC Wave App'
-    theme_name='UMGC'
-    content_zones = [
-        # Specify various zones and use the one that is currently needed. Empty zones are ignored.
-        # Usually will not need the top_ or bottom_ versions
-        ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
-        ui.zone('top_vertical'),
-        ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
-        ui.zone('vertical'),
-        ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center'),
-        ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
-        ui.zone('bottom_vertical'),
-        ui.zone('debug', direction=ui.ZoneDirection.ROW)
-    ]
-    UMGC_themes=[ui.theme( # UMGC red: '#a30606', UMGC yellow: '#fdbf38'
-        name='UMGC',
-        primary='#a30606', 
-        text='#000000',
-        card='#ffffff',
-        page='#e2e2e2', 
-    )]
-    UMGC_layouts=[ui.layout(
-        breakpoint='xs', 
-        #min_height='100vh', 
-        zones=[
-            # size='0' keeps zone from expanding
-            ui.zone('header', size='80px'), 
-            ui.zone('content', zones=content_zones, size='100%-80px'),
-            ui.zone('footer', size='0'),
-        ]
-    )]
-    card = ui.meta_card(
-        box = '',
-        themes = UMGC_themes,
-        theme = theme_name,
-        title = title,
-        layouts = UMGC_layouts
-    )
-    return card 
 
 #######################################################
 ####################  DEBUG CARDS  ####################
@@ -1335,6 +1172,9 @@ def tasks_checked1(q):
             icon_color='#da1a32'
         )]),
     ]))
+
+
+
 
 def task2(q):
     '''
@@ -3502,12 +3342,11 @@ async def return_d3plot(q, html, box='1 2 5 6', location='horizontal',
     )
     return card
 
-async def return_schedule_menu(q, box='6 2 2 5', location='vertical', width='300px'):
+async def return_schedule_menu(q, location='vertical', width='300px'):
     '''
     Create menu for schedule page
     (retrieve defaults from DB or from q.user.student_info fields)
     '''
-    flex = q.app.flex
 
     Sessions = ['Session 1', 'Session 2', 'Session 3']
     default_attend_summer = True
@@ -3533,10 +3372,8 @@ async def return_schedule_menu(q, box='6 2 2 5', location='vertical', width='300
         default_max_credits = 13
         default_courses_per_session = 2
 
-    if flex:
-        box = ui.box(location, width=width)
     card = ui.form_card(
-        box=box,
+        box = ui.box(location, width=width),
         items=[
             ui.dropdown(
                 name='first_term',

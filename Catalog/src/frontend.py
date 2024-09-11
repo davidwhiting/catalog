@@ -57,6 +57,203 @@ program_query = '''
     FROM menu_all_view 
     WHERE menu_degree_id = ? AND menu_area_id = ?
 '''
+########################################################
+####################  LAYOUT CARDS  ####################
+########################################################
+
+def return_header_card(q: Q) -> ui.header_card:
+    '''
+    Returns a header card with tabs for different roles: student, coach, admin
+    Called in app.py.
+    '''
+    student_tab_items = [
+        ui.tab(name='#login',     label='[Login]'),
+        ui.tab(name='#home',      label='Home'),
+        ui.tab(name='#skills',    label='Skills'),
+        ui.tab(name='#program',   label='Program'),
+        ui.tab(name='#course',    label='Courses'),
+        ui.tab(name='#ge',        label='GE'), 
+        ui.tab(name='#electives', label='Electives'), # 'Select Courses'
+        ui.tab(name='#schedule',  label='Schedule')
+    ]
+
+    #coach_tab_items = [
+    #    ui.tab(name='#login',    label='[Login]'),
+    #    #ui.tab(name='#admin',    label='Admin'),
+    #    ui.tab(name='#home',     label='Coach Home'),
+    #    ui.tab(name='#program',  label='Choose Program'),
+    #    ui.tab(name='#course',   label='Select Courses'),
+    #    ui.tab(name='#schedule', label='Set Schedule'),
+    #]
+    #admin_tab_items = [
+    #    ui.tab(name='#login',    label='[Login]'),
+    #    #ui.tab(name='#admin',    label='Admin'),
+    #    ui.tab(name='#home',     label='Admin Home'),
+    #    ui.tab(name='#program',  label='Choose Program'),
+    #    ui.tab(name='#course',   label='Select Courses'),
+    #    ui.tab(name='#schedule', label='Set Schedule'),
+    #]
+
+    #if q.user.role == 'admin':
+    #    tab_items = admin_tab_items
+    #    textbox_label = 'Name'
+    #    textbox_value = q.user.name
+    #elif q.user.role == 'coach':
+    #    tab_items = coach_tab_items
+    #    textbox_label = 'Name'
+    #    textbox_value = q.user.name
+    #else:
+    #    #q.user.role == 'student'
+    #    tab_items = student_tab_items
+    #    textbox_label = 'Name'
+    #    textbox_value = q.user.name
+
+    q.user.role = 'student'
+    tab_items = student_tab_items
+    textbox_label = 'Name'
+    #textbox_value = q.user.name
+    textbox_value = "John Doe"
+
+
+    older_tab_items = [
+        ui.tab(name='#home', label='Home'),
+        #ui.tab(name='#student', label='Student Info'),
+        ui.tab(name='#major', label='Program'), # 'Select Program'
+        ui.tab(name='#course', label='Course'), # 'Select Courses'
+       ui.tab(name='#schedule', label='Schedule'), # 'Set Schedule'
+        #ui.tab(name='#project', label='Status'), # 'Project Plan'
+    ]
+    box='header'
+    card = ui.header_card(
+        box=box, 
+        title='UMGC', 
+        subtitle='Registration Assistant',
+        image=q.app.umgc_logo,
+        secondary_items=[
+            ui.tabs(
+                name='tabs', 
+                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
+                items=tab_items,
+            ),
+        ],
+        items=[
+            ui.textbox(
+                name='textbox_default', 
+                label=textbox_label,
+                value=textbox_value, 
+                disabled=True
+            )
+        ]
+    )
+    return card
+
+def return_login_header_card(q: Q) -> ui.header_card:
+    '''
+    Create a header card with a login tab.
+    '''
+
+    login_tab_items = [
+        ui.tab(name='#login',     label='Login'),
+    ]
+    tab_items = login_tab_items
+
+    card = ui.header_card(
+        box='header', 
+        title='UMGC', 
+        subtitle='Registration Assistant',
+        image=q.app.umgc_logo,
+        secondary_items=[
+            ui.tabs(
+                name='tabs', 
+                value=f'#{q.args["#"]}' if q.args['#'] else '#home', link=True, 
+                items=tab_items,
+            ),
+        ],
+    )
+    return card
+
+def return_footer_card() -> ui.footer_card:
+    '''
+    Footer card with caption for entire app.
+    Called in app.py.
+    '''
+    card = ui.footer_card(
+        box='footer',
+        caption='''
+Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai). 
+This app is in pre-alpha stage. Feedback welcomed.
+        '''
+    )
+    return card
+
+def return_meta_card() -> ui.meta_card:
+    '''
+    Meta card for the UMGC app.
+    '''
+    title='UMGC Wave App'
+    theme_name='UMGC'
+    content_zones = [
+        # Specify various zones and use the one that is currently needed. Empty zones are ignored.
+        # Usually will not need the top_ or bottom_ versions
+        ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
+        ui.zone('top_vertical'),
+        ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
+        ui.zone('vertical'),
+        ui.zone('grid', direction=ui.ZoneDirection.ROW, wrap='stretch', justify='center'),
+        ui.zone('bottom_horizontal', direction=ui.ZoneDirection.ROW),
+        ui.zone('bottom_vertical'),
+        ui.zone('debug', direction=ui.ZoneDirection.ROW)
+    ]
+    UMGC_themes=[ui.theme( # UMGC red: '#a30606', UMGC yellow: '#fdbf38'
+        name='UMGC',
+        primary='#a30606', 
+        text='#000000',
+        card='#ffffff',
+        page='#e2e2e2', 
+    )]
+    UMGC_layouts=[ui.layout(
+        breakpoint='xs', 
+        #min_height='100vh', 
+        zones=[
+            # size='0' keeps zone from expanding
+            ui.zone('header', size='80px'), 
+            ui.zone('content', zones=content_zones, size='100%-80px'),
+            ui.zone('footer', size='0'),
+        ]
+    )]
+    card = ui.meta_card(
+        box = '',
+        themes = UMGC_themes,
+        theme = theme_name,
+        title = title,
+        layouts = UMGC_layouts
+    )
+    return card 
+
+##########################################################
+####################  HOME PAGE ##########################
+##########################################################
+def create_program_selection_card(location='horizontal', width='60%'):
+    """
+    Create the program selection card
+    """
+    card = ui.form_card(
+        box=ui.box(location, width=width),
+        #name='program_selection',
+        #title='Select a UMGC Program',
+        #caption='Choose an option to explore UMGC programs',
+        #category='Program Selection',
+        #icon='Education',
+        items=[
+            ui.text_xl(content='**Select a UMGC Program**'),
+            ui.link(label='Option 1: Explore programs on your own', path='/#program'),
+            ui.link(label='Option 2: Select a program based on your skills', path='/#skills'),
+            ui.link(label='Option 3: Select a program based on your interests', disabled=True),
+            ui.link(label='Option 4: Select a program that finished your degree the quickest', disabled=True)
+        ]
+    )
+    return card
+
 
 ##############################################################
 ####################  PROGRAMS PAGE ##########################
@@ -80,7 +277,7 @@ async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width=
                 (q.user.student_info['menu']['degree'] is not None) else q.args.menu_degree,
             trigger=True,
             width='230px',
-            choices = await backend.get_choices(timed_connection, degree_query, enabled=enabled_degree)
+            choices = await backend.get_choices(timed_connection, degree_query, disabled=None, enabled=enabled_degree)
         ),
         ui.dropdown(
             name='menu_area',
@@ -142,6 +339,40 @@ async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width=
     add_card(q, 'dropdown', card)
 
     ########################
+
+############################################################
+####################  SKILLS PAGE ##########################
+############################################################
+
+async def return_skills_menu(timed_connection, location='vertical', width='300px', inline=False):
+    '''
+    Create skills choice menu
+    Will send the selected skills to the database query and return a list of courses
+
+    '''
+    #timed_connection = q.user.conn
+    skills_query = 'SELECT id AS name, name AS label, explanation AS tooltip FROM Skills'
+    choices = await backend.get_choices_new(timed_connection, skills_query, disabled={""}, tooltip=False)
+
+    card = ui.form_card(
+        box = ui.box(location, width=width),
+        items=[
+            #                ui.separator(),
+            ui.checklist(
+                name='skills_checklist',
+                label='Skills',
+                inline=inline,
+                choices = choices,
+            ),
+            #ui.number(name='result_limit', label='Number of results', min=5, max=15, step=1, value=7),
+            #ui.inline(items=[
+            ui.button(name='submit_skills_menu', label='Submit', primary=True),
+            ui.button(name='reset_skills_menu', label='Reset', primary=False),
+            #])
+        ]
+    )
+    return card
+
 
 ######################################################################
 #################  EVENT AND HANDLER FUNCTIONS  ######################
