@@ -277,7 +277,7 @@ async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width=
         label='Select', 
         disabled=False,
         commands=[
-            ui.command(name='program', label='Save Program'),
+            ui.command(name='select_program', label='Select Program'),
             #ui.command(name='classes_menu', label='Classes', 
             #    items=[
             #        ui.command(name='add_ge', label='Add GE'),
