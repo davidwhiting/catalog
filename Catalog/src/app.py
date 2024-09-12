@@ -1316,7 +1316,7 @@ async def show_dialog(q: Q):
 
 # mode='multicast' sync information across all tabs of a user
 # see https://wave.h2o.ai/docs/realtime
-@app('/skills', mode='multicast', on_startup=on_startup)
+@app('/', mode='multicast', on_startup=on_startup)
 async def serve(q: Q):
 
     # Initialize the app if not already
