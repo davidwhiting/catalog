@@ -18,10 +18,11 @@ def sidebar_card(q: Q) -> ui.NavCard:
         box='sidebar', 
         color='primary', 
         title='UMGC', 
-        subtitle="Catalog Assistant",
+        subtitle='Registration Assistant',
+        #current_page = q.args["#"] if q.args['#'] else 'page1',
         value=f'#{q.args["#"]}' if q.args['#'] else '#page1',
-        # replace image
-        image='https://wave.h2o.ai/img/h2o-logo.svg', 
+        #value=f'#{current_page}',
+        image=q.app.umgc_logo, 
         items=[
             ui.nav_group('Menu', items=[
                 ui.nav_item(name='#page1', label='Page 1'),
@@ -37,7 +38,11 @@ def sidebar_card(q: Q) -> ui.NavCard:
     )
 
 header_card = ui.header_card(
-    box='header', title='', subtitle='',
+    box='header', 
+    title='UMGC Registration Assistant', 
+    subtitle='',
+    #subtitle="Registration Assistant",
+    #title='', subtitle='',
     #secondary_items=[
     #    ui.textbox(name='search', icon='Search', width='400px', placeholder='Search...')],
     items=[
@@ -53,7 +58,6 @@ Software prototype built by David Whiting using [H2O Wave](https://wave.h2o.ai).
 This app is in pre-alpha stage. Feedback welcomed.
 '''
 )
-
 
 def return_meta_card() -> ui.MetaCard:
     '''
