@@ -165,10 +165,10 @@ async def initialize_client_update(q: Q) -> None:
     logging.info('Initializing client')
     q.client.initialized = True
     q.client.cards = set()
-    q.page['meta'] = frontend.return_meta_card()
-    q.page['header'] = frontend.return_header_card(q)
-    #q.page['header'] = frontend.return_login_header_card(q)
-    q.page['footer'] = frontend.return_footer_card()
+    q.page['meta'] = return_meta_card()
+    q.page['header'] = return_header_card(q)
+    #q.page['header'] = return_login_header_card(q)
+    q.page['footer'] = return_footer_card()
 
     #if q.app.debug:
     #    q.page['debug'] = ui.markdown_card(box=ui.box('debugcards.return_debug_card(q)
@@ -284,13 +284,11 @@ async def serve(q: Q) -> None:
     
     await q.page.save()
 
-
 ###########################################################
 ##################  End Serve functions  ##################
 ###########################################################
 
-
-async def show_error(q: Q, error: str):
+async def show_error(q: Q, error: str, page='debug') -> None:
     """
     Displays errors.
     """
@@ -300,7 +298,7 @@ async def show_error(q: Q, error: str):
     clear_cards(q)
 
     # Format and display the error
-    q.page['error'] = crash_report(q)
+    q.page[page] = crash_report(q)
 
     await q.page.save()
 
@@ -308,10 +306,9 @@ def crash_report(q: Q) -> ui.FormCard:
     """
     Card for capturing the stack trace and current application state, for error reporting.
     """
-    repo_url = 'https://github.com/your-repo-url'
-    issue_url = f'{repo_url}/issues/new?assignees=your-username&labels=bug&template=error-report.md&title=%5BERROR%5D'
 
-    def code_block(content): return '\n'.join(['```', *content, '```'])
+    def code_block(content): 
+        return '\n'.join(['```', *content, '```'])
 
     type_, value_, traceback_ = sys.exc_info()
     stack_trace = traceback.format_exception(type_, value_, traceback_)
@@ -335,22 +332,20 @@ def crash_report(q: Q) -> ui.FormCard:
     return ui.form_card(
         box='content',
         items=[
-            ui.stats(
-                items=[
-                    ui.stat(
-                        label='',
-                        value='Oops!',
-                        caption='Something went wrong',
-                        icon='Error'
-                    )
-                ],
-            ),
+            ui.stats(items=[
+                ui.stat(
+                    label='',
+                    value='Oops!',
+                    caption='Something went wrong',
+                    icon='Error'
+                )
+            ],),
             ui.separator(),
             ui.text_l(content='Apologies for the inconvenience!'),
             ui.buttons(items=[ui.button(name='reload', label='Reload', primary=True)]),
             ui.expander(name='report', label='Error Details', items=[
                 ui.text(
-                    f'To report this issue, <a href="{issue_url}" target="_blank">please open an issue</a> with the details below:'),
+                    f'To report this issue, please open an issue with the details below:'),
                 ui.text(content='\n'.join(dump)),
             ])
         ]
