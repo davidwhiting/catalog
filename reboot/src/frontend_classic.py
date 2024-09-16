@@ -19,24 +19,6 @@ import sys
 import cards
 import backend
 
-######################################################################
-####################  STANDARD WAVE CARDS  ###########################
-######################################################################
-
-# Use for page cards that should be removed when navigating away.
-# For pages that should be always present on screen use q.page[key] = ...
-def add_card(q: Q, name: str, card: any) -> None:
-    q.client.cards.add(name)
-    q.page[name] = card
-
-# Remove all the cards related to navigation.
-def clear_cards(q: Q, ignore: Optional[List[str]] = []) -> None:
-    if not q.client.cards:
-        return
-    for name in q.client.cards.copy():
-        if name not in ignore:
-            del q.page[name]
-            q.client.cards.remove(name)
 
 ###############################################################################
 ####################  Initialize app, user, client Functions ##################
@@ -78,44 +60,6 @@ async def initialize_app(q: Q) -> None:
     }
     await q.page.save()
 
-async def initialize_app_old(q: Q) -> None:
-    """
-    Initialize the app. Code here is run once at the app level.
-    """
-    logging.info('Initializing app')
-    q.app.initialized = True
-
-    # q.app.flex: use flexible layout rather than grid
-    # this won't be needed as we strip it away from functions
-    # flex is the default layout
-    q.app.flex = True 
-
-    # show debug info and cards
-    q.app.debug = True
- 
-    ## upload logo
-    q.app.umgc_logo, = await q.site.upload(['umgc-logo-white.png'])
-
-    # set global default first term
-    q.app.default_first_term = 'Spring 2024'
-
-    # SHORTCUT: Added these into the view directly, will fix this code later
-    # as we fix the logic for these, will remove from disabled
-
-    q.app.disabled_program_menu_items = {
-        'Applied Technology',
-        'Biotechnology',
-        'Cybersecurity Technology',
-        'East Asian Studies',
-        'English',
-        'General Studies',
-        'History',
-        'Laboratory Management',
-        'Nursing for Registered Nurses',
-        'Social Science',
-        'Web and Digital Design',        
-    }
-    await q.page.save()
 
 async def initialize_user(q: Q) -> None:
     """
@@ -217,17 +161,6 @@ async def initialize_client_old(q: Q) -> None:
 
     await q.page.save()
 
-###############################################################################
-#############  Functions for on_startup() and on_shutdown() ###################
-###############################################################################
-
-async def on_startup() -> None:
-    # Set up logging
-    logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
-
-async def on_shutdown() -> None:
-    # Create shutdown actions if needed
-    pass
 
 #######################################################
 ##################  Serve functions  ##################
@@ -351,37 +284,6 @@ def crash_report(q: Q) -> ui.FormCard:
         ]
     )
 
-async def page1(q: Q):
-    q.page['sidebar'].value = '#page1'
-    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-
-    for i in range(3):
-        add_card(q, f'info{i}', cards.page1_card1)
-    add_card(q, 'article', cards.page1_card4)
-
-async def page2(q: Q):
-    q.page['sidebar'].value = '#page2'
-    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    add_card(q, 'chart1', cards.page2_card1)
-    add_card(q, 'chart2', cards.page2_card2)
-    add_card(q, 'table', cards.page2_card3)
-
-async def page3(q: Q):
-    q.page['sidebar'].value = '#page3'
-    clear_cards(q)  # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-
-    for i in range(12):
-        add_card(q, f'item{i}', cards.page3_card1)
-
-async def page4(q: Q):
-    q.page['sidebar'].value = '#page4'
-    # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    # Since this page is interactive, we want to update its card
-    # instead of recreating it every time, so ignore 'form' card on drop.
-    clear_cards(q, ['form'])
-
-    # If first time on this page, create the card.
-    add_card(q, 'form', cards.page4_card1)
 
 async def page4_step2(q: Q):
     # Just update the existing card, do not recreate.

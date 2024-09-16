@@ -10,13 +10,16 @@ import sys
 ## backend should not call others
 ## This will prevent circular references
 
-from frontend.initialization import initialize_app, initialize_client
-from frontend.utils import clear_cards, handle_fallback, show_error
+from frontend.initialization import initialize_app_waveton, initialize_client_waveton, \
+    initialize_app, initialize_user, initialize_client
+from frontend.utils import clear_cards_waveton, handle_fallback
+from frontend.utils import show_error_waveton as show_error
+
 from frontend.cards import meta_card, header_card, footer_card, main_card, crash_report_card
 
 logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
 
-@app('/')
+@app('/', mode='multicast')
 async def serve(q: Q) -> None:
     try:
         if not q.app.initialized:
@@ -56,8 +59,12 @@ async def serve(q: Q) -> None:
         # This ensures that any changes to the page are saved, even if an error occurred
         await q.page.save()
 
+## should change these reload_client and initialize_client to reload_user and initialize_user
+
 @on('reload')
 async def reload_client(q: Q) -> None:
     logging.info('Reloading client')
-    clear_cards(q, ['main'])
+    clear_cards_waveton(q, ['main'])
     await initialize_client(q)
+
+from frontend.delete_me import page1, page2, page3, page4
