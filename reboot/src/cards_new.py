@@ -115,7 +115,7 @@ meta_card = return_meta_card()
 ################  ERROR CHECKING CARDS  ################
 ########################################################
 
-def crash_report(q: Q) -> ui.FormCard:
+def crash_report_edited(q: Q) -> ui.FormCard:
     """
     Card for capturing the stack trace and current application state, for error reporting.
     This function is called by the main serve() loop on uncaught exceptions.
