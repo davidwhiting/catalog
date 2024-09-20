@@ -324,10 +324,10 @@ import templates
 
 async def populate_student_info(q, user_id):
     '''
-    Get information from student_info table and populate the q.user.student_info variables
-    and q.user.student_data dataframes
+    Get information from student_info table and populate the q.client.student_info variables
+    and q.client.student_data dataframes
     '''
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     attributes = ['resident_status', 'app_stage_id', 'app_stage', 'student_profile', 'financial_aid', 
         'transfer_credits', 'program_id']
     query = '''
@@ -337,35 +337,35 @@ async def populate_student_info(q, user_id):
     '''
     row = await get_query_one(timed_connection, query, params=(user_id,))
     if row:
-        q.user.student_info.update({name: row[name] for name in attributes})
-#                q.user.student_data['user_id'] = user_id
+        q.client.student_info.update({name: row[name] for name in attributes})
+#                q.client.student_data['user_id'] = user_id
 
-        q.user.student_info['user_id'] = user_id
-        q.user.student_info['name'] = row['name']
-        q.user.student_data['user_id'] = user_id
+        q.client.student_info['user_id'] = user_id
+        q.client.student_info['name'] = row['name']
+        q.client.student_data['user_id'] = user_id
 
-        if q.user.student_info['program_id'] is not None:
-            row = await get_program_title(timed_connection, q.user.student_info['program_id'])
+        if q.client.student_info['program_id'] is not None:
+            row = await get_program_title(timed_connection, q.client.student_info['program_id'])
             if row:
-                q.user.student_info['degree_program'] = row['title']
-                q.user.student_info['degree_id'] = row['id']
-            q.user.student_data['required'] = await get_required_program_courses(q)
+                q.client.student_info['degree_program'] = row['title']
+                q.client.student_info['degree_id'] = row['id']
+            q.client.student_data['required'] = await get_required_program_courses(q)
 
-        if q.user.student_info['app_stage_id'] == 4:
-            q.user.student_data['schedule'] = await get_student_progress_d3(q)
+        if q.client.student_info['app_stage_id'] == 4:
+            q.client.student_data['schedule'] = await get_student_progress_d3(q)
     
-        if q.user.student_info['first_term'] is None:
-            q.user.student_info['first_term'] = q.app.default_first_term
+        if q.client.student_info['first_term'] is None:
+            q.client.student_info['first_term'] = q.app.default_first_term
 
     # Recreate dropdown menus for students
     # Need to do this only if dropdown menu status was not saved
     # (We should save this status in the future)
-    if q.user.student_info['program_id'] is not None:
+    if q.client.student_info['program_id'] is not None:
         # recreate dropdown menu for program if empty
-        if q.user.student_info['menu']['program'] is None:
-            q.user.student_info['menu']['program'] = q.user.student_info['program_id']
+        if q.client.student_info['menu']['program'] is None:
+            q.client.student_info['menu']['program'] = q.client.student_info['program_id']
         # recreate dropdowns for degree and area_of_study if either is empty
-        if (q.user.student_info['menu']['degree'] is None) or (q.user.student_info['menu']['area_of_study'] is None):
+        if (q.client.student_info['menu']['degree'] is None) or (q.client.student_info['menu']['area_of_study'] is None):
             query = '''
                 SELECT menu_degree_id, menu_area_id 
                 FROM menu_all_view
@@ -373,27 +373,27 @@ async def populate_student_info(q, user_id):
                 LIMIT 1
             '''
             # limit 1 because there is not a strict 1:1 correspondence between study areas and programs
-            row = await get_query_one(q.user.conn, query, params=(q.user.student_info['program_id'],))
+            row = await get_query_one(q.client.conn, query, params=(q.client.student_info['program_id'],))
             if row:
-                q.user.student_info['menu']['degree'] = row['menu_degree_id']
-                q.user.student_info['menu']['area_of_study'] = row['menu_area_id']
+                q.client.student_info['menu']['degree'] = row['menu_degree_id']
+                q.client.student_info['menu']['area_of_study'] = row['menu_area_id']
 
 
 async def reset_student_info_data_ZZ(q):
     '''
-    All the steps needed to initialize q.user.student_info and q.user.student_data
-    and set multiple q.user parameters
+    All the steps needed to initialize q.client.student_info and q.client.student_data
+    and set multiple q.client parameters
 
     Will be called at startup in initialize_user and when switching to a new student 
     for admin and coaches
     '''
-    q.user.student_info = initialize_student_info()
-    q.user.student_info_populated = False # may be needed later 
-    q.user.student_data = initialize_student_data() # will have required, periods, schedule
+    q.client.student_info = initialize_student_info()
+    q.client.student_info_populated = False # may be needed later 
+    q.client.student_data = initialize_student_data() # will have required, periods, schedule
 
 async def populate_q_student_info_ZZ(q, timed_connection, user_id):
     """
-    Populate q.user.student_info and q.user.student_data dictionaries with student information.
+    Populate q.client.student_info and q.client.student_data dictionaries with student information.
 
     This function retrieves student information from the database and populates the relevant
     dictionaries in the q object. It's called by `app.initialize_user` and `app.select_sample_user`.
@@ -413,27 +413,27 @@ async def populate_q_student_info_ZZ(q, timed_connection, user_id):
         student_info = await populate_student_info_dict(timed_connection, user_id)
         student_data = await populate_student_data_dict(timed_connection, student_info)
 
-        q.user.student_info = student_info
-        q.user.student_data = student_data
+        q.client.student_info = student_info
+        q.client.student_data = student_data
 
     except Exception as e:
         error_message = f"Error populating student info for user {user_id}: {str(e)}"
         print(error_message)  # For logging purposes
         raise  # Re-raising the exception for now
 
-    q.user.info_populated = True  
+    q.client.info_populated = True  
 
 
 def reset_program(q):
     '''
     When program is changed, multiple variables need to be reset
     '''
-    q.user.student_info['menu']['program'] = None
-    q.user.student_info['program_id'] = None
-    q.user.student_info['degree_program'] = None
+    q.client.student_info['menu']['program'] = None
+    q.client.student_info['program_id'] = None
+    q.client.student_info['degree_program'] = None
 
-    q.user.student_data['required'] = None
-    q.user.student_data['schedule'] = None
+    q.client.student_data['required'] = None
+    q.client.student_data['schedule'] = None
 
     q.page['dropdown'].menu_program.value = None
     q.page['dropdown'].menu_program.choices = None
@@ -593,16 +593,16 @@ async def get_choices_disable_all_ZZ(timed_connection, query, params=()):
     return choices
 
 async def get_student_progress_d3(q):
-    timedConnection = q.user.conn
-    user_id = q.user.student_info['user_id']
+    timedConnection = q.client.conn
+    user_id = q.client.student_info['user_id']
     query = 'SELECT * FROM student_progress_d3_view WHERE user_id = ?'
     # note: 'course' is named 'name' in student_progress_d3_view 
     df = await get_query_df(timedConnection, query, params=(user_id,))
     return df
 
 async def get_required_program_courses(q):
-    timedConnection = q.user.conn
-    program_id = q.user.student_info['program_id']
+    timedConnection = q.client.conn
+    program_id = q.client.student_info['program_id']
     query = '''
         SELECT 
             id,
@@ -621,9 +621,9 @@ async def get_required_program_courses(q):
     return df
 
 async def get_catalog_program_sequence(q):
-    timedConnection = q.user.conn
+    timedConnection = q.client.conn
     query = 'SELECT * FROM catalog_program_sequence_view WHERE program_id = ?'
-    program_id = q.user.student_info['program_id']
+    program_id = q.client.student_info['program_id']
     df = await get_query_df(timedConnection, query, params=(program_id,))
     return df
 
@@ -668,7 +668,7 @@ async def populate_summarize_ge(q):
     '''
     Summarize GE to keep our dashboard updated
     '''
-    ge = q.user.student_info['ge']
+    ge = q.client.student_info['ge']
 
     ge['total']['arts'] = 6
     ge['summary']['arts'] = ((ge['arts']['1'] is not None) + (ge['arts']['2'] is not None)) * 3
@@ -703,22 +703,22 @@ async def populate_summarize_ge(q):
 
 async def reset_student_info_data(q):
     '''
-    All the steps needed to initialize q.user.student_info and q.user.student_data
-    and set multiple q.user parameters
+    All the steps needed to initialize q.client.student_info and q.client.student_data
+    and set multiple q.client parameters
 
     Will be called at startup in initialize_user and when switching to a new student 
     for admin and coaches
     '''
-    q.user.student_info = initialize_student_info()
-    q.user.student_info['ge'] = initialize_ge() # only if undergraduate
-    q.user.student_info_populated = False # may be needed later 
-    q.user.student_data = initialize_student_data() # will have required, periods, schedule
+    q.client.student_info = initialize_student_info()
+    q.client.student_info['ge'] = initialize_ge() # only if undergraduate
+    q.client.student_info_populated = False # may be needed later 
+    q.client.student_data = initialize_student_data() # will have required, periods, schedule
 
 async def set_user_vars_given_role(q):
     '''
-    Get role given a user id and set q.user variables
+    Get role given a user id and set q.client variables
     '''
-    timedConnection = q.user.conn
+    timedConnection = q.client.conn
     query = '''
         SELECT 
 		    a.role_id,
@@ -730,11 +730,11 @@ async def set_user_vars_given_role(q):
 		WHERE 
 			a.role_id=b.id AND a.id = ?
     '''
-    row = await get_query_one(timedConnection, query, params=(q.user.user_id,))
-    q.user.role_id = row['role_id']
-    q.user.role = row['role']
-    q.user.username = row['username']
-    q.user.name = row['fullname']
+    row = await get_query_one(timedConnection, query, params=(q.client.user_id,))
+    q.client.role_id = row['role_id']
+    q.client.role = row['role']
+    q.client.username = row['username']
+    q.client.name = row['fullname']
 
 async def get_program_title(timed_connection: TimedSQLiteConnection, program_id: int) -> Optional[str]:
     '''
@@ -797,9 +797,9 @@ async def get_program_title(timed_connection: TimedSQLiteConnection, program_id:
 
 async def set_user_vars_given_role_ZZ(q):
     '''
-    Get role given a user id and set q.user variables
+    Get role given a user id and set q.client variables
     '''
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     query = '''
         SELECT 
 		    a.role_id,
@@ -811,11 +811,11 @@ async def set_user_vars_given_role_ZZ(q):
 		WHERE 
 			a.role_id=b.id AND a.id = ?
     '''
-    row = await get_query_one(timed_connection, query, params=(q.user.user_id,))
-    q.user.role_id = row['role_id']
-    q.user.role = row['role']
-    q.user.username = row['username']
-    q.user.name = row['fullname']
+    row = await get_query_one(timed_connection, query, params=(q.client.user_id,))
+    q.client.role_id = row['role_id']
+    q.client.role = row['role']
+    q.client.username = row['username']
+    q.client.name = row['fullname']
 
 
 ####################################################################
@@ -1664,7 +1664,7 @@ def update_periods_ZZ(
 
 def create_html_template(df, start_term):
     '''
-    Function that takes the q.user.student_data['schedule'] dataframe 
+    Function that takes the q.client.student_data['schedule'] dataframe 
     and converts it to the html_template to create the Javascript D3 figure
     '''
     # accept start_term both as 'spring2024' and 'Spring 2024'. Make sure to
@@ -2264,7 +2264,7 @@ async def summarize_ge_ZZ(student_info):
     If 'ge' doesn't exist in student_info, it creates it using create_ge function.
 
     Args:
-        student_info: The student_info dictionary (most likely sourced from q.user)
+        student_info: The student_info dictionary (most likely sourced from q.client)
 
     Raises:
         Exception: If there's an error during the GE summarization process
@@ -2885,10 +2885,10 @@ def return_header_card(q: Q) -> ui.header_card:
         ui.tab(name='#schedule',  label='Schedule')
     ]
 
-    q.user.role = 'student'
+    q.client.role = 'student'
     tab_items = student_tab_items
     textbox_label = 'Name'
-    #textbox_value = q.user.name
+    #textbox_value = q.client.name
     textbox_value = "John Doe"
 
     # Determine the current page
@@ -2992,7 +2992,7 @@ async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width=
     Create menus for selecting degree, area of study, and program
     '''
 
-    timed_connection = q.user.conn    
+    timed_connection = q.client.conn    
     enabled_degree = {"Bachelor's", "Undergraduate Certificate"}
     disabled_programs = q.app.disabled_program_menu_items
 
@@ -3001,8 +3001,8 @@ async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width=
         ui.dropdown(
             name='menu_degree',
             label='Degree',
-            value=str(q.user.student_info['menu']['degree']) if \
-                (q.user.student_info['menu']['degree'] is not None) else q.args.menu_degree,
+            value=str(q.client.student_info['menu']['degree']) if \
+                (q.client.student_info['menu']['degree'] is not None) else q.args.menu_degree,
             trigger=True,
             width='230px',
             choices = await backend.get_choices(timed_connection, degree_query, disabled=None, enabled=enabled_degree)
@@ -3010,27 +3010,27 @@ async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width=
         ui.dropdown(
             name='menu_area',
             label='Area of Study',
-            value=str(q.user.student_info['menu']['area_of_study']) if \
-                (str(q.user.student_info['menu']['area_of_study']) is not None) else \
+            value=str(q.client.student_info['menu']['area_of_study']) if \
+                (str(q.client.student_info['menu']['area_of_study']) is not None) else \
                 str(q.args.menu_area),
             trigger=True,
             disabled=False,
             width='250px',
-            choices=None if (q.user.student_info['menu']['degree'] is None) else \
+            choices=None if (q.client.student_info['menu']['degree'] is None) else \
                 await backend.get_choices(timed_connection, area_query, 
-                                          params=(q.user.student_info['menu']['degree'],))
+                                          params=(q.client.student_info['menu']['degree'],))
         ),
         ui.dropdown(
             name='menu_program',
             label='Program',
-            value=str(q.user.student_info['menu']['program']) if \
-                (q.user.student_info['menu']['program'] is not None) else q.args.menu_program,
+            value=str(q.client.student_info['menu']['program']) if \
+                (q.client.student_info['menu']['program'] is not None) else q.args.menu_program,
             trigger=True,
             disabled=False,
             width='300px',
-            choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
+            choices=None if (q.client.student_info['menu']['area_of_study'] is None) else \
                 await backend.get_choices(timed_connection, program_query, 
-                    params=(q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study']),
+                    params=(q.client.student_info['menu']['degree'], q.client.student_info['menu']['area_of_study']),
                     disabled=disabled_programs
                 )
         )
@@ -3078,7 +3078,7 @@ async def return_skills_menu(timed_connection, location='vertical', width='300px
     Will send the selected skills to the database query and return a list of courses
 
     '''
-    #timed_connection = q.user.conn
+    #timed_connection = q.client.conn
     skills_query = 'SELECT id AS name, name AS label, explanation AS tooltip FROM Skills'
     choices = await backend.get_choices_new(timed_connection, skills_query, disabled={""}, tooltip=False)
 
@@ -3170,13 +3170,13 @@ def course_description_dialog(q, course, which='schedule'):
            updating d3 javascript code, since it's expecting name
     '''
     if which in ['required', 'schedule']:
-        #df = q.user.student_data[which]
+        #df = q.client.student_data[which]
         if which == 'schedule':
-            df = q.user.student_data['schedule']
+            df = q.client.student_data['schedule']
             description = df.loc[df['name'] == course, 'description'].iloc[0]
    
         elif which == 'required':
-            df = q.user.student_data['required']
+            df = q.client.student_data['required']
             description = df.loc[df['course'] == course, 'description'].iloc[0]
 
         #description = df.loc[df['course'] == course, 'description'].iloc[0]
@@ -3227,17 +3227,17 @@ async def select_sample_user(q: Q):
     '''
     choice = q.args.choice_group
     logging.info('The selected user is: ' + choice)
-    q.user.user_id = int(choice)
+    q.client.user_id = int(choice)
     
     # initialize all student_info stuff
     await utils.reset_student_info_data(q)
-    q.user.student_info_populated = False
+    q.client.student_info_populated = False
 
     # Guest has user_id = 0
-    if q.user.user_id > 0:
-        q.user.logged_in = True
+    if q.client.user_id > 0:
+        q.client.logged_in = True
         # get role for logged in user
-        await utils.set_user_vars_given_role(q) # assigns q.user.role_id, q.user.username, q.user.name
+        await utils.set_user_vars_given_role(q) # assigns q.client.role_id, q.client.username, q.client.name
 
         # Admin path:
         #   - Can add users
@@ -3256,12 +3256,12 @@ async def select_sample_user(q: Q):
         # Guest path:
         #   - Can do everything a student can do except save their info to the database 
         #
-        if q.user.role in ['coach', 'admin']:
+        if q.client.role in ['coach', 'admin']:
             pass
-        elif q.user.role == 'student':
-            await utils.populate_student_info(q, q.user.user_id)
-            #await utils.populate_q_student_info(q, q.user.conn, q.user.user_id)
-            q.user.student_info_populated = True
+        elif q.client.role == 'student':
+            await utils.populate_student_info(q, q.client.user_id)
+            #await utils.populate_q_student_info(q, q.client.conn, q.client.user_id)
+            q.client.student_info_populated = True
 
     else:
         #await utils.reset_student_info_data(q) # already done?
@@ -3282,11 +3282,11 @@ async def select_sample_user(q: Q):
 ### q.client value:
 {q.client}
 
-### q.user.student_info values:
-{q.user.student_info}
+### q.client.student_info values:
+{q.client.student_info}
 
-### q.user values:
-{q.user}
+### q.client values:
+{q.client}
         '''
 
     # redirect to #home route
@@ -3304,13 +3304,13 @@ async def coach_skills(q: Q) -> None:
 
 async def student_skills(q: Q) -> None:
     clear_cards(q)
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     card = await return_skills_menu(timed_connection, location='vertical', width='300px')
     add_card(q, 'skill_card', card)
     await q.page.save()
 
-    #if q.user.student_info['menu']['degree']:
-    #    degree_id = int(q.user.student_info['menu']['degree'])
+    #if q.client.student_info['menu']['degree']:
+    #    degree_id = int(q.client.student_info['menu']['degree'])
 
     #add_card(q, 'explore_programs', ui.form_card(
     #    box=ui.box('top_vertical', width='100%'),
@@ -3323,28 +3323,28 @@ async def student_skills(q: Q) -> None:
 
 
     ## render program after getting the list of programs
-    #if q.user.student_info['program_id']:
+    #if q.client.student_info['program_id']:
     #    await cards.render_program(q)
 
 @on('#skills')
 async def skills(q: Q):
     clear_cards(q) # will use in the individual functions
 
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     card = await return_skills_menu(timed_connection, location='vertical', width='300px')
     add_card(q, 'skill_card', card)
 #    await q.page.save()
 
 
-#    if q.user.role == 'admin':
+#    if q.client.role == 'admin':
 #        # admin program page
 #        await admin_skills(q)
 #
-#    elif q.user.role == 'coach':
+#    elif q.client.role == 'coach':
 #        # coach program page
 #        await coach_skills(q)
 #        
-#    elif q.user.role == 'student':
+#    elif q.client.role == 'student':
 #        # student program page
 #        await student_skills(q)
 #        
@@ -3437,11 +3437,11 @@ async def return_debug_card_ZZ(q, box='3 3 1 1', location='debug', width='100%',
     '''
     Show q.client information in a card for debugging
     '''
-    expando_dict = expando_to_dict(q.user)
-    q_user_filtered = {k: v for k, v in expando_dict.items() if k not in ['student_info', 'student_data']}
+    expando_dict = expando_to_dict(q.client)
+    q_client_filtered = {k: v for k, v in expando_dict.items() if k not in ['student_info', 'student_data']}
 
-    #### q.user.student_data values:
-    #{q.user.student_data}
+    #### q.client.student_data values:
+    #{q.client.student_data}
     flex = q.app.flex
 
     if flex:
@@ -3457,21 +3457,21 @@ async def return_debug_card_ZZ(q, box='3 3 1 1', location='debug', width='100%',
 ### q.client value:
 {q.client}
 
-### q.user.student_info values:
-{q.user.student_info}
+### q.client.student_info values:
+{q.client.student_info}
 
-### q.user.student_data values:
+### q.client.student_data values:
 
 #### Required:
-{q.user.student_data['required']}
+{q.client.student_data['required']}
 
 #### Schedule:
-{q.user.student_data['schedule']}
+{q.client.student_data['schedule']}
 
-### remaining q.user values:
-{q_user_filtered}
+### remaining q.client values:
+{q_client_filtered}
 
-### q.user values
+### q.client values
 
 ### q.app values:
 {q.app}
@@ -3488,11 +3488,11 @@ async def return_debug_card(q, box='3 3 1 1', location='debug', width='100%', he
     '''
     Show q.client information in a card for debugging
     '''
-    expando_dict = expando_to_dict(q.user)
-    q_user_filtered = {k: v for k, v in expando_dict.items() if k not in ['student_info', 'student_data']}
+    expando_dict = expando_to_dict(q.client)
+    q_client_filtered = {k: v for k, v in expando_dict.items() if k not in ['student_info', 'student_data']}
 
-    #### q.user.student_data values:
-    #{q.user.student_data}
+    #### q.client.student_data values:
+    #{q.client.student_data}
     flex = q.app.flex
 
     if flex:
@@ -3508,21 +3508,21 @@ async def return_debug_card(q, box='3 3 1 1', location='debug', width='100%', he
 ### q.client value:
 {q.client}
 
-### q.user.student_info values:
-{q.user.student_info}
+### q.client.student_info values:
+{q.client.student_info}
 
-### q.user.student_data values:
+### q.client.student_data values:
 
 #### Required:
-{q.user.student_data['required']}
+{q.client.student_data['required']}
 
 #### Schedule:
-{q.user.student_data['schedule']}
+{q.client.student_data['schedule']}
 
-### remaining q.user values:
-{q_user_filtered}
+### remaining q.client values:
+{q_client_filtered}
 
-### q.user values
+### q.client values
 
 ### q.app values:
 {q.app}
@@ -3562,7 +3562,7 @@ async def return_user_login_dropdown(q, box=None, location='horizontal', menu_wi
     '''
     Function to create a dropdown menu of sample users to demo the wave app
     '''
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     flex = q.app.flex
     if flex:
         box = location
@@ -3625,7 +3625,7 @@ async def return_user_login_dropdown_old(q, box=None, location='horizontal', men
     '''
     Function to create a dropdown menu of sample users to demo the wave app
     '''
-    timedConnection = q.user.conn
+    timedConnection = q.client.conn
     flex = q.app.flex
     if flex:
         box = location
@@ -4022,7 +4022,7 @@ def render_registration_card_ZZ(q, location='top_horizontal', width='40%',
 
 def return_welcome_back_card_ZZ(q, location='vertical', height='400px', width='100%', 
                              box='1 3 3 3', title=''):
-    student_info = q.user.student_info
+    student_info = q.client.student_info
     flex = q.app.flex
 
     if flex:
@@ -4082,7 +4082,7 @@ def return_welcome_back_card_ZZ(q, location='vertical', height='400px', width='1
 - Select the **Courses** tab to add or change courses.
 - Select the **Schedule** tab to update your schedule.
 '''
-    app_stage_id = int(q.user.student_info['app_stage_id'])
+    app_stage_id = int(q.client.student_info['app_stage_id'])
     if app_stage_id == 2:
         content = content2
     elif app_stage_id == 3:
@@ -4102,7 +4102,7 @@ def return_welcome_back_card_ZZ(q, location='vertical', height='400px', width='1
 
 def render_welcome_back_card_ZZ(q, location='vertical', height='400px', width='100%', cardname='user_info',
                              box='1 3 3 3', title=''):
-    student_info = q.user.student_info
+    student_info = q.client.student_info
     flex = q.app.flex
 
     if flex:
@@ -4131,14 +4131,14 @@ def render_welcome_back_card_ZZ(q, location='vertical', height='400px', width='1
     card = ui.markdown_card(
         box=box,
         title=title,
-        content=content1 if int(q.user.student_info['app_stage_id']) else content4
+        content=content1 if int(q.client.student_info['app_stage_id']) else content4
     )
 
     add_card(q, cardname, card)
 
 def render_welcome_back_card_stage1_ZZ(q, location='vertical', height='400px', width='100%', cardname='user_info',
                              box='1 3 3 3', title=''):
-    student_info = q.user.student_info
+    student_info = q.client.student_info
     flex = q.app.flex
 
     if flex:
@@ -4590,7 +4590,7 @@ def render_registration_card(q, location='top_horizontal', width='40%',
 
 def return_welcome_back_card(q, location='vertical', height='400px', width='100%', 
                              title=''):
-    student_info = q.user.student_info
+    student_info = q.client.student_info
     box = ui.box(location, height=height, width=width)
 
     content2 = f'''## Welcome back, {student_info['name']}.
@@ -4647,7 +4647,7 @@ def return_welcome_back_card(q, location='vertical', height='400px', width='100%
 - Select the **Courses** tab to add or change courses.
 - Select the **Schedule** tab to update your schedule.
 '''
-    app_stage_id = int(q.user.student_info['app_stage_id'])
+    app_stage_id = int(q.client.student_info['app_stage_id'])
 
     if app_stage_id == 2:
         content = content2
@@ -4668,7 +4668,7 @@ def return_welcome_back_card(q, location='vertical', height='400px', width='100%
 
 def render_welcome_back_card(q, location='vertical', height='400px', width='100%', cardname='user_info',
                              box='1 3 3 3', title=''):
-    student_info = q.user.student_info
+    student_info = q.client.student_info
     flex = q.app.flex
 
     if flex:
@@ -4697,14 +4697,14 @@ def render_welcome_back_card(q, location='vertical', height='400px', width='100%
     card = ui.markdown_card(
         box=box,
         title=title,
-        content=content1 if int(q.user.student_info['app_stage_id']) else content4
+        content=content1 if int(q.client.student_info['app_stage_id']) else content4
     )
 
     add_card(q, cardname, card)
 
 def render_welcome_back_card_stage1(q, location='vertical', height='400px', width='100%', cardname='user_info',
                              box='1 3 3 3', title=''):
-    student_info = q.user.student_info
+    student_info = q.client.student_info
     flex = q.app.flex
 
     if flex:
@@ -4863,7 +4863,7 @@ async def render_dropdown_menus_horizontal_ZZ(q, box='1 2 7 1', location='horizo
     Create menus for selecting degree, area of study, and program
     '''
     flex = q.app.flex
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
 
     #degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
     #area_query = '''
@@ -4889,8 +4889,8 @@ async def render_dropdown_menus_horizontal_ZZ(q, box='1 2 7 1', location='horizo
         ui.dropdown(
             name='menu_degree',
             label='Degree',
-            value=str(q.user.student_info['menu']['degree']) if \
-                (q.user.student_info['menu']['degree'] is not None) else q.args.menu_degree,
+            value=str(q.client.student_info['menu']['degree']) if \
+                (q.client.student_info['menu']['degree'] is not None) else q.args.menu_degree,
             trigger=True,
             width='230px',
             choices=await utils.get_choices(timed_connection, degree_query)
@@ -4898,28 +4898,28 @@ async def render_dropdown_menus_horizontal_ZZ(q, box='1 2 7 1', location='horizo
         ui.dropdown(
             name='menu_area',
             label='Area of Study',
-            value=str(q.user.student_info['menu']['area_of_study']) if \
-                (str(q.user.student_info['menu']['area_of_study']) is not None) else \
+            value=str(q.client.student_info['menu']['area_of_study']) if \
+                (str(q.client.student_info['menu']['area_of_study']) is not None) else \
                 str(q.args.menu_area),
             trigger=True,
             disabled=False,
             width='250px',
-            choices=None if (q.user.student_info['menu']['degree'] is None) else \
-                await utils.get_choices(timed_connection, area_query, (q.user.student_info['menu']['degree'],))
+            choices=None if (q.client.student_info['menu']['degree'] is None) else \
+                await utils.get_choices(timed_connection, area_query, (q.client.student_info['menu']['degree'],))
         ),
         ui.dropdown(
             name='menu_program',
             label='Program',
-            value=str(q.user.student_info['menu']['program']) if \
-                (q.user.student_info['menu']['program'] is not None) else q.args.menu_program,
+            value=str(q.client.student_info['menu']['program']) if \
+                (q.client.student_info['menu']['program'] is not None) else q.args.menu_program,
             trigger=True,
             disabled=False,
             width='300px',
-            choices=None if (q.user.student_info['menu']['area_of_study'] is None) else \
+            choices=None if (q.client.student_info['menu']['area_of_study'] is None) else \
                 await utils.get_choices(
                     timed_connection, 
                     program_query, 
-                    (q.user.student_info['menu']['degree'], q.user.student_info['menu']['area_of_study'])
+                    (q.client.student_info['menu']['degree'], q.client.student_info['menu']['area_of_study'])
                 )
         )
     ], justify='start', align='start')
@@ -4963,8 +4963,8 @@ async def render_program_description_ZZ(q, box='1 3 7 2', location='top_vertical
     :param location: page location to display
     '''
     flex = q.app.flex
-    timed_connection = q.user.conn
-    title = q.user.student_info['degree_program'] # program name
+    timed_connection = q.client.conn
+    title = q.client.student_info['degree_program'] # program name
 
     if flex:
         box = ui.box(location, width=width, height=height)
@@ -4973,11 +4973,11 @@ async def render_program_description_ZZ(q, box='1 3 7 2', location='top_vertical
         SELECT description, info, learn, certification
         FROM program_descriptions WHERE program_id = ?
     '''
-    row = await backend.get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timed_connection, query, params=(q.client.student_info['program_id'],))
     if row:
         # major = '\n##' + title + '\n\n'
         frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
-        if int(q.user.student_info['program_id']) in (4, 24, 29):
+        if int(q.client.student_info['program_id']) in (4, 24, 29):
             content = row['info'] + '\n\n' + row['description']
         else:
             content = row['description'] + frontstuff + row['learn'] #+ '\n\n' + row['certification']
@@ -5004,16 +5004,16 @@ async def render_program_dashboard_ZZ(q, box=None, location='horizontal', width=
     flex=False: box is required
     '''
     flex = q.app.flex
-    timed_connection = q.user.conn
-    title = q.user.student_info['degree_program'] # program name
+    timed_connection = q.client.conn
+    title = q.client.student_info['degree_program'] # program name
 
     if flex:
         box = ui.box(location, width=width)
-    #if q.user.student_info['menu_degree'] == '2':
+    #if q.client.student_info['menu_degree'] == '2':
 
     # get program summary for bachelor's degrees
     query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    row = await backend.get_query_one(timed_connection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timed_connection, query, params=(q.client.student_info['program_id'],))
     if row:
         card = add_card(q, 'major_dashboard', ui.form_card(
             box=box,
@@ -5101,7 +5101,7 @@ async def render_program_table_ZZ(q, box='1 5 6 5', location='horizontal', width
     elective: Include Elective classes
     '''
     flex = q.app.flex
-    df = q.user.student_data['required']
+    df = q.client.student_data['required']
 
     async def _render_program_group(group_name, record_type, df, collapsed, check=True):
         '''
@@ -5206,7 +5206,7 @@ async def render_program_table_ZZ(q, box='1 5 6 5', location='horizontal', width
     if flex:
         box = ui.box(location, height=height, width=width)
 
-    #title = q.user.student_info['degree_program'] + ': Explore Required Courses'
+    #title = q.client.student_info['degree_program'] + ': Explore Required Courses'
     title = 'Explore Required Courses'
     card = add_card(q, 'program_table_card', ui.form_card(
         box=box,
@@ -5243,8 +5243,8 @@ async def render_program_description(q, box='1 3 7 2', location='top_vertical', 
     :param location: page location to display
     '''
     flex = q.app.flex
-    timedConnection = q.user.conn
-    title = q.user.student_info['degree_program'] # program name
+    timedConnection = q.client.conn
+    title = q.client.student_info['degree_program'] # program name
 
     if flex:
         box = ui.box(location, width=width, height=height)
@@ -5253,11 +5253,11 @@ async def render_program_description(q, box='1 3 7 2', location='top_vertical', 
         SELECT description, info, learn, certification
         FROM program_descriptions WHERE program_id = ?
     '''
-    row = await backend.get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timedConnection, query, params=(q.client.student_info['program_id'],))
     if row:
         # major = '\n##' + title + '\n\n'
         frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
-        if int(q.user.student_info['program_id']) in (4, 24, 29):
+        if int(q.client.student_info['program_id']) in (4, 24, 29):
             content = row['info'] + '\n\n' + row['description']
         else:
             content = row['description'] + frontstuff + row['learn'] #+ '\n\n' + row['certification']
@@ -5284,16 +5284,16 @@ async def render_program_dashboard(q, box=None, location='horizontal', width='10
     flex=False: box is required
     '''
     flex = q.app.flex
-    timedConnection = q.user.conn
-    title = q.user.student_info['degree_program'] # program name
+    timedConnection = q.client.conn
+    title = q.client.student_info['degree_program'] # program name
 
     if flex:
         box = ui.box(location, width=width)
-    #if q.user.student_info['menu_degree'] == '2':
+    #if q.client.student_info['menu_degree'] == '2':
 
     # get program summary for bachelor's degrees
     query = 'SELECT * FROM program_requirements WHERE program_id = ?'
-    row = await backend.get_query_one(timedConnection, query, params=(q.user.student_info['program_id'],))
+    row = await backend.get_query_one(timedConnection, query, params=(q.client.student_info['program_id'],))
     if row:
         card = add_card(q, 'major_dashboard', ui.form_card(
             box=box,
@@ -5381,7 +5381,7 @@ async def render_program_table(q, box='1 5 6 5', location='horizontal', width='9
     elective: Include Elective classes
     '''
     flex = q.app.flex
-    df = q.user.student_data['required']
+    df = q.client.student_data['required']
 
     async def _render_program_group(group_name, record_type, df, collapsed, check=True):
         '''
@@ -5486,7 +5486,7 @@ async def render_program_table(q, box='1 5 6 5', location='horizontal', width='9
     if flex:
         box = ui.box(location, height=height, width=width)
 
-    #title = q.user.student_info['degree_program'] + ': Explore Required Courses'
+    #title = q.client.student_info['degree_program'] + ': Explore Required Courses'
     title = 'Explore Required Courses'
     card = add_card(q, 'program_table_card', ui.form_card(
         box=box,
@@ -5522,7 +5522,7 @@ async def render_program(q):
 
 def render_courses_header_ZZ(q, box='1 2 7 1', location='horizontal'):
     flex = q.app.flex
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     if flex:
         box = ui.box(location)
     content=f'**Program Selected**: {degree_program}'
@@ -5545,7 +5545,7 @@ async def render_course_page_table_use_ZZ(q, box=None, location=None, width=None
     height:
     '''
     flex = q.app.flex
-    df = q.user.student_data['schedule']
+    df = q.client.student_data['schedule']
 
     def _get_commands(course, type):
         # for creating adaptive menus
@@ -5611,7 +5611,7 @@ async def render_course_page_table_use_ZZ(q, box=None, location=None, width=None
 
     if flex:
         box = ui.box(location, height=height, width=width)
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     title = f'**{degree_program}**: Courses'
     #title = 'Courses'
     card = add_card(q, 'course_table', ui.form_card(
@@ -5712,7 +5712,7 @@ async def render_course_page_table_ZZ(q, df, box=None, location=None, width=None
 
     if flex:
         box = ui.box(location, height=height, width=width)
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     title = f'**{degree_program}**: Courses'
     #title = 'Courses'
     card = add_card(q, 'course_table', ui.form_card(
@@ -5740,7 +5740,7 @@ async def render_course_page_table_ZZ(q, df, box=None, location=None, width=None
 
 def render_courses_header(q, box='1 2 7 1', location='horizontal'):
     flex = q.app.flex
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     if flex:
         box = ui.box(location)
     content=f'**Program Selected**: {degree_program}'
@@ -5763,7 +5763,7 @@ async def render_course_page_table_use(q, box=None, location=None, width=None, h
     height:
     '''
     flex = q.app.flex
-    df = q.user.student_data['schedule']
+    df = q.client.student_data['schedule']
 
     def _get_commands(course, type):
         # for creating adaptive menus
@@ -5829,7 +5829,7 @@ async def render_course_page_table_use(q, box=None, location=None, width=None, h
 
     if flex:
         box = ui.box(location, height=height, width=width)
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     title = f'**{degree_program}**: Courses'
     #title = 'Courses'
     card = add_card(q, 'course_table', ui.form_card(
@@ -5930,7 +5930,7 @@ async def render_course_page_table(q, df, box=None, location=None, width=None, h
 
     if flex:
         box = ui.box(location, height=height, width=width)
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     title = f'**{degree_program}**: Courses'
     #title = 'Courses'
     card = add_card(q, 'course_table', ui.form_card(
@@ -6022,9 +6022,9 @@ async def render_ge_arts_card_ZZ(q, menu_width='300px', box='1 11 3 3', location
     '''
     Create the General Education - Arts card
     '''
-    ge = q.user.student_info['ge']['arts']
+    ge = q.client.student_info['ge']['arts']
     nopre = ge['nopre']
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
@@ -6065,9 +6065,9 @@ async def render_ge_beh_card_ZZ(q, menu_width='300px', box='4 11 3 3', location=
     '''
     Create the General Education - Behavioral and Social Sciences card
     '''
-    ge = q.user.student_info['ge']['beh']
+    ge = q.client.student_info['ge']['beh']
     nopre = ge['nopre']
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
@@ -6112,8 +6112,8 @@ async def render_ge_bio_card_ZZ(q, menu_width='300px', box='1 7 3 4', location='
     '''
     Create the General Education - Science card
     '''
-    timed_connection = q.user.conn
-    ge = q.user.student_info['ge']['bio']
+    timed_connection = q.client.conn
+    ge = q.client.student_info['ge']['bio']
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
@@ -6178,8 +6178,8 @@ async def render_ge_comm_card_ZZ(q, menu_width='300px', box='1 3 3 4', location=
     '''
     Create the General Education - Communications card
     '''
-    timed_connection = q.user.conn
-    ge = q.user.student_info['ge']['comm']
+    timed_connection = q.client.conn
+    ge = q.client.student_info['ge']['comm']
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
@@ -6237,8 +6237,8 @@ async def render_ge_math_card_ZZ(q, menu_width='300px', box='4 9 3 2', location=
     '''
     Create the General Education - Mathematics card
     '''
-    ge = q.user.student_info['ge']['math']
-    timed_connection = q.user.conn
+    ge = q.client.student_info['ge']['math']
+    timed_connection = q.client.conn
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
@@ -6269,14 +6269,14 @@ async def render_ge_res_card_ZZ(q, menu_width='300px', box='1 3 3 4', location='
     '''
     Create the General Education - Research and Computing Literacy card
     '''
-    timed_connection = q.user.conn
-    ge = q.user.student_info['ge']['res']
+    timed_connection = q.client.conn
+    ge = q.client.student_info['ge']['res']
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
     # make some defaults based on area of program chosen:
-    if q.user.student_info['menu']['area_of_study'] == '1':
+    if q.client.student_info['menu']['area_of_study'] == '1':
         ge['1'] = 'PACE 111B'
     card = ui.form_card(
         box=box,
@@ -6352,9 +6352,9 @@ async def render_ge_arts_card(q, menu_width='300px', box='1 11 3 3', location='g
     '''
     Create the General Education - Arts card
     '''
-    ge = q.user.student_info['ge']['arts']
+    ge = q.client.student_info['ge']['arts']
     nopre = ge['nopre']
-    timedConnection = q.user.conn
+    timedConnection = q.client.conn
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
@@ -6395,9 +6395,9 @@ async def render_ge_beh_card(q, menu_width='300px', box='4 11 3 3', location='gr
     '''
     Create the General Education - Behavioral and Social Sciences card
     '''
-    ge = q.user.student_info['ge']['beh']
+    ge = q.client.student_info['ge']['beh']
     nopre = ge['nopre']
-    timedConnection = q.user.conn
+    timedConnection = q.client.conn
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
@@ -6442,8 +6442,8 @@ async def render_ge_bio_card(q, menu_width='300px', box='1 7 3 4', location='gri
     '''
     Create the General Education - Science card
     '''
-    timedConnection = q.user.conn
-    ge = q.user.student_info['ge']['bio']
+    timedConnection = q.client.conn
+    ge = q.client.student_info['ge']['bio']
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
@@ -6508,8 +6508,8 @@ async def render_ge_comm_card(q, menu_width='300px', box='1 3 3 4', location='gr
     '''
     Create the General Education - Communications card
     '''
-    timedConnection = q.user.conn
-    ge = q.user.student_info['ge']['comm']
+    timedConnection = q.client.conn
+    ge = q.client.student_info['ge']['comm']
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
@@ -6567,8 +6567,8 @@ async def render_ge_math_card(q, menu_width='300px', box='4 9 3 2', location='gr
     '''
     Create the General Education - Mathematics card
     '''
-    ge = q.user.student_info['ge']['math']
-    timedConnection = q.user.conn
+    ge = q.client.student_info['ge']['math']
+    timedConnection = q.client.conn
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
@@ -6599,14 +6599,14 @@ async def render_ge_res_card(q, menu_width='300px', box='1 3 3 4', location='gri
     '''
     Create the General Education - Research and Computing Literacy card
     '''
-    timedConnection = q.user.conn
-    ge = q.user.student_info['ge']['res']
+    timedConnection = q.client.conn
+    ge = q.client.student_info['ge']['res']
     nopre = ge['nopre']
     flex = q.app.flex
     if flex:
         box = ui.box(location, width=width)
     # make some defaults based on area of program chosen:
-    if q.user.student_info['menu']['area_of_study'] == '1':
+    if q.client.student_info['menu']['area_of_study'] == '1':
         ge['1'] = 'PACE 111B'
     card = ui.form_card(
         box=box,
@@ -6701,12 +6701,12 @@ async def return_d3plot(q, html, box='1 2 5 6', location='horizontal',
 async def return_schedule_menu(q, location='vertical', width='300px'):
     '''
     Create menu for schedule page
-    (retrieve defaults from DB or from q.user.student_info fields)
+    (retrieve defaults from DB or from q.client.student_info fields)
     '''
 
     Sessions = ['Session 1', 'Session 2', 'Session 3']
     default_attend_summer = True
-    student_profile = q.user.student_info['student_profile']
+    student_profile = q.client.student_info['student_profile']
     if student_profile == 'Full-time':
         ## full-time: 
         ##   - 14 week and 17 week terms: (min 12, max 18)
@@ -6734,7 +6734,7 @@ async def return_schedule_menu(q, location='vertical', width='300px'):
             ui.dropdown(
                 name='first_term',
                 label='First Term',
-                value=q.user.student_info['first_term'] if (q.user.student_info['first_term'] is not None) \
+                value=q.client.student_info['first_term'] if (q.client.student_info['first_term'] is not None) \
                     else q.args.first_term,
                 trigger=False,
                 width='150px',
@@ -6781,7 +6781,7 @@ async def render_schedule_page_table(q, box=None, location='horizontal', width='
     height:
     '''
     flex = q.app.flex
-    df = q.user.student_data['schedule']
+    df = q.client.student_data['schedule']
 
     def _get_commands(course, type):
         # for creating adaptive menus
@@ -6850,7 +6850,7 @@ async def render_schedule_page_table(q, box=None, location='horizontal', width='
         #box = ui.box(location, height=height, width=width)
         box = ui.box(location, width=width)
 
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     title = f'**{degree_program}**: Courses'
     #title = 'Courses'
     card = add_card(q, 'schedule_table', ui.form_card(
@@ -6886,7 +6886,7 @@ async def render_schedule_menu(q, box='6 2 2 5', location='horizontal', width='3
                                cardname='schedule/menu'):
     '''
     Create menu for schedule page
-    (retrieve defaults from DB or from q.user.student_info fields)
+    (retrieve defaults from DB or from q.client.student_info fields)
     '''
     card = await return_schedule_menu(q, box='6 2 2 5', location=location, width=width )
     add_card(q, cardname, card)
@@ -6911,13 +6911,13 @@ async def return_d3plot_ZZ(q, html, box='1 2 5 6', location='horizontal',
 async def return_schedule_menu_ZZ(q, box='6 2 2 5', location='vertical', width='300px'):
     '''
     Create menu for schedule page
-    (retrieve defaults from DB or from q.user.student_info fields)
+    (retrieve defaults from DB or from q.client.student_info fields)
     '''
     flex = q.app.flex
 
     Sessions = ['Session 1', 'Session 2', 'Session 3']
     default_attend_summer = True
-    student_profile = q.user.student_info['student_profile']
+    student_profile = q.client.student_info['student_profile']
     if student_profile == 'Full-time':
         ## full-time: 
         ##   - 14 week and 17 week terms: (min 12, max 18)
@@ -6947,7 +6947,7 @@ async def return_schedule_menu_ZZ(q, box='6 2 2 5', location='vertical', width='
             ui.dropdown(
                 name='first_term',
                 label='First Term',
-                value=q.user.student_info['first_term'] if (q.user.student_info['first_term'] is not None) \
+                value=q.client.student_info['first_term'] if (q.client.student_info['first_term'] is not None) \
                     else q.args.first_term,
                 trigger=False,
                 width='150px',
@@ -6994,7 +6994,7 @@ async def render_schedule_page_table_ZZ(q, box=None, location='horizontal', widt
     height:
     '''
     flex = q.app.flex
-    df = q.user.student_data['schedule']
+    df = q.client.student_data['schedule']
 
     def _get_commands(course, type):
         # for creating adaptive menus
@@ -7063,7 +7063,7 @@ async def render_schedule_page_table_ZZ(q, box=None, location='horizontal', widt
         #box = ui.box(location, height=height, width=width)
         box = ui.box(location, width=width)
 
-    degree_program = q.user.student_info['degree_program']
+    degree_program = q.client.student_info['degree_program']
     title = f'**{degree_program}**: Courses'
     #title = 'Courses'
     card = add_card(q, 'schedule_table', ui.form_card(
@@ -7098,7 +7098,7 @@ async def render_schedule_menu_ZZ(q, box='6 2 2 5', location='horizontal', width
                                cardname='schedule/menu'):
     '''
     Create menu for schedule page
-    (retrieve defaults from DB or from q.user.student_info fields)
+    (retrieve defaults from DB or from q.client.student_info fields)
     '''
     card = await return_schedule_menu(q, box='6 2 2 5', location=location, width=width )
     add_card(q, cardname, card)

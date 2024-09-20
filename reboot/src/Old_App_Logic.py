@@ -44,7 +44,7 @@ async def home(q: Q):
 
     # By definition, students are registered so we at least know their name
 
-    if int(q.user.student_info['app_stage_id']) == 1:
+    if int(q.client.student_info['app_stage_id']) == 1:
         card = cards.return_task1_card(location='top_horizontal', width='350px')
         add_card(q, 'home/task1', card=card)
 
@@ -54,14 +54,14 @@ async def home(q: Q):
         card = cards.return_tasks_card(checked=0, location='top_horizontal', width='350px', height='400px')
         add_card(q, 'home/tasks', card)
 
-    elif int(q.user.student_info['app_stage_id']) == 2:
+    elif int(q.client.student_info['app_stage_id']) == 2:
         card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
         add_card(q, 'home/welcome_back', card=card)
 
         card = cards.return_tasks_card(checked=1, location='top_horizontal', width='350px', height='400px')
         add_card(q, 'home/tasks', card)
 
-    elif int(q.user.student_info['app_stage_id']) == 3:
+    elif int(q.client.student_info['app_stage_id']) == 3:
         card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
         add_card(q, 'home/welcome_back', card=card)
 
@@ -266,8 +266,8 @@ async def coach_program(q: Q) -> None:
 async def student_program(q: Q) -> None:
 
     clear_cards(q)
-    if q.user.student_info['menu']['degree']:
-        degree_id = int(q.user.student_info['menu']['degree'])
+    if q.client.student_info['menu']['degree']:
+        degree_id = int(q.client.student_info['menu']['degree'])
 
     add_card(q, 'explore_programs', ui.form_card(
         box=ui.box('top_vertical', width='100%'),
@@ -278,7 +278,7 @@ async def student_program(q: Q) -> None:
     ))    
     await frontend.render_dropdown_menus_horizontal(q, location='top_vertical', menu_width='300px')
 
-    if q.user.student_info['program_id']:
+    if q.client.student_info['program_id']:
         await cards.render_program(q)
 
 #    if menu_degree == 1:
@@ -308,15 +308,15 @@ async def program(q: Q):
     await student_program(q)
 
 ## simplify for now
-#    if q.user.role == 'admin':
+#    if q.client.role == 'admin':
 #        # admin program page
 #        await admin_program(q)
 #
-#    elif q.user.role == 'coach':
+#    elif q.client.role == 'coach':
 #        # coach program page
 #        await coach_program(q)
 #        
-#    elif q.user.role == 'student':
+#    elif q.client.role == 'student':
 #        # student program page
 #        await student_program(q)
 #        
@@ -344,11 +344,11 @@ def dropdown_debug(q):
 ### q.client value:
 {q.client}
 
-### q.user.student_info values:
-{q.user.student_info}
+### q.client.student_info values:
+{q.client.student_info}
 
-### q.user values:
-{q.user}
+### q.client values:
+{q.client}
 '''
     return content
 
@@ -358,13 +358,13 @@ def dropdown_debug(q):
 
 @on()
 async def menu_degree(q: Q):
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     menu_degree_val = q.args.menu_degree
     logging.info('The value of menu_degree is ' + str(menu_degree_val))
-    q.user.student_info['menu']['degree'] = menu_degree_val
+    q.client.student_info['menu']['degree'] = menu_degree_val
 
     # reset area_of_study if degree changes
-    q.user.student_info['menu']['area_of_study'] = None
+    q.client.student_info['menu']['area_of_study'] = None
     q.page['dropdown'].menu_area.value = None
     # update area_of_study choices based on degree chosen
     ## Note: without disabled this is disabling everything. This is a quick hack.
@@ -377,15 +377,15 @@ async def menu_degree(q: Q):
     # reset program if degree changes
     utils.reset_program(q)
 
-    if q.user.student_info['menu']['degree'] == '2':
+    if q.client.student_info['menu']['degree'] == '2':
         # insert ge into student_info for bachelor's degree students
-        q.user.student_info['ge'] = backend.initialize_ge()
+        q.client.student_info['ge'] = backend.initialize_ge()
         pass
     else:
         #clear_cards(q, ['dropdown']) # clear everything except dropdown menus
         # remove ge from non-bachelor's degree students
-        if 'ge' in q.user.student_info:
-            del q.user.student_info['ge']
+        if 'ge' in q.client.student_info:
+            del q.client.student_info['ge']
 
     q.page['program.debug'].content = dropdown_debug(q)
     await q.page.save()
@@ -397,25 +397,25 @@ async def menu_degree(q: Q):
 @on()
 async def menu_area(q: Q):
     disabled_programs = q.app.disabled_program_menu_items
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     menu_area_val = q.args.menu_area
     logging.info('The value of area_of_study is ' + str(menu_area_val))
-    q.user.student_info['menu']['area_of_study'] = menu_area_val
+    q.client.student_info['menu']['area_of_study'] = menu_area_val
 
     # reset program if area_of_study changes
     utils.reset_program(q)
 
-    q.user.student_info['menu']['program'] = None
+    q.client.student_info['menu']['program'] = None
     q.page['dropdown'].menu_program.value = None
 
     # update program choices based on area_of_study chosen
     q.page['dropdown'].menu_program.choices = \
         await backend.get_choices(timed_connection, cards.program_query, 
-            params=(q.user.student_info['menu']['degree'], menu_area_val),
+            params=(q.client.student_info['menu']['degree'], menu_area_val),
             disabled=disabled_programs
         )
 
-#    if q.user.degree != '2':
+#    if q.client.degree != '2':
 #        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
 #        del q.client.program_df
 
@@ -428,29 +428,29 @@ async def menu_area(q: Q):
 
 @on()
 async def menu_program(q: Q):
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     menu_program_val = q.args.menu_program
     logging.info('The value of program is ' + str(menu_program_val))
-    q.user.student_info['menu']['program'] = menu_program_val
-    q.user.student_info['program_id'] = menu_program_val
+    q.client.student_info['menu']['program'] = menu_program_val
+    q.client.student_info['program_id'] = menu_program_val
 
     row = await utils.get_program_title(timed_connection, menu_program_val)
     if row:
-        q.user.student_info['degree_program'] = row['title']
-        q.user.student_info['degree_id'] = row['id']
-    q.user.student_data['required'] = await utils.get_required_program_courses(q)
+        q.client.student_info['degree_program'] = row['title']
+        q.client.student_info['degree_id'] = row['id']
+    q.client.student_data['required'] = await utils.get_required_program_courses(q)
 
-    # need to also update q.user.student_info['degree_program']
-    logging.info('This is menu_program(q): the value of program_id is ' + str(q.user.student_info['program_id']))
+    # need to also update q.client.student_info['degree_program']
+    logging.info('This is menu_program(q): the value of program_id is ' + str(q.client.student_info['program_id']))
 
     await cards.render_program(q)
     
     # # program_id an alias used throughout
-    #result = await get_program_title(timed_connection, q.user.student_info['program_id'])
-    #q.user.student_info['degree_program'] = result['title']
+    #result = await get_program_title(timed_connection, q.client.student_info['program_id'])
+    #q.client.student_info['degree_program'] = result['title']
     #
     ## have the size of this depend on the degree (?)
-    #if q.user.student_info['menu']['degree'] == '2':
+    #if q.client.student_info['menu']['degree'] == '2':
     #    await cards.render_program(q)
     ##else:
     #    # Insert a blank card with a message - "has to be completed"
@@ -539,7 +539,7 @@ async def select_program(q: Q):
 async def skills(q: Q):
     clear_cards(q) # will use in the individual functions
 
-    timed_connection = q.user.conn
+    timed_connection = q.client.conn
     card = await frontend.return_skills_menu(timed_connection, location='horizontal', width='300px')
     add_card(q, 'skill_card', card)
 
@@ -578,9 +578,9 @@ async def submit_skills_menu(q: Q):
         ORDER BY TotalScore DESC 
         LIMIT {result_limit}
     """
-    results = await backend.get_query_dict(q.user.conn, query)
+    results = await backend.get_query_dict(q.client.conn, query)
     # save for reuse
-    q.user.student_data['skills'] = results
+    q.client.student_data['skills'] = results
     card = await frontend.return_skills_table(results)
 
     add_card(q, 'skills_program_table', card)
@@ -635,7 +635,7 @@ async def coach_course(q: Q):
     await student_course(q)
 
 async def student_course(q: Q):
-    if q.user.student_data['schedule'] is not None:
+    if q.client.student_data['schedule'] is not None:
         add_card(q, 'courses_instructions', ui.form_card(
             box='top_horizontal',
             items=[
@@ -650,15 +650,15 @@ async def student_course(q: Q):
 async def course(q: Q):
     clear_cards(q)
 
-    if q.user.role == 'admin':
+    if q.client.role == 'admin':
         # admin course page
         await admin_course(q)
 
-    elif q.user.role == 'coach':
+    elif q.client.role == 'coach':
         # coach course page
         await coach_course(q)
         
-    elif q.user.role == 'student':
+    elif q.client.role == 'student':
         # student course page
         await student_course(q)
         
@@ -705,15 +705,15 @@ async def student_ge(q: Q):
 async def ge(q: Q):
     clear_cards(q)
 
-    if q.user.role == 'admin':
+    if q.client.role == 'admin':
         # admin ge page
         await admin_ge(q)
 
-    elif q.user.role == 'coach':
+    elif q.client.role == 'coach':
         # coach ge page
         await coach_ge(q)
         
-    elif q.user.role == 'student':
+    elif q.client.role == 'student':
         # student ge page
         await student_ge(q)
         
@@ -731,14 +731,14 @@ async def ge(q: Q):
 
 def ge_debug_content(q):
     result = f'''
-### q.user.student_info['ge'] values:
+### q.client.student_info['ge'] values:
 
-- Arts: {q.user.student_info['ge']['arts']}
-- Beh: {q.user.student_info['ge']['beh']}
-- Bio: {q.user.student_info['ge']['bio']}
-- Comm: {q.user.student_info['ge']['comm']}
-- Math: {q.user.student_info['ge']['math']}
-- Res: {q.user.student_info['ge']['res']}
+- Arts: {q.client.student_info['ge']['arts']}
+- Beh: {q.client.student_info['ge']['beh']}
+- Bio: {q.client.student_info['ge']['bio']}
+- Comm: {q.client.student_info['ge']['comm']}
+- Math: {q.client.student_info['ge']['math']}
+- Res: {q.client.student_info['ge']['res']}
 
 ### q.args values:
 {q.args}
@@ -752,7 +752,7 @@ def ge_debug_content(q):
 { q.page['ge_bio'].items['ge_bio_1a'].value }
 
 #### Whole GE
-{q.user.student_info['ge']}
+{q.client.student_info['ge']}
 
 ### q.client value:
 {q.client}
@@ -773,18 +773,18 @@ def ge_debug_content(q):
 @on()
 async def ge_arts_check(q: Q):
     # set nopre = True
-    q.user.student_info['ge']['arts']['nopre'] = True
+    q.client.student_info['ge']['arts']['nopre'] = True
     await q.page.save()
 
 @on()
 async def ge_arts_1(q: Q):
-    q.user.student_info['ge']['arts']['1'] = q.args.ge_arts_1
+    q.client.student_info['ge']['arts']['1'] = q.args.ge_arts_1
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_arts_2(q: Q):
-    q.user.student_info['ge']['arts']['2'] = q.args.ge_arts_2
+    q.client.student_info['ge']['arts']['2'] = q.args.ge_arts_2
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
@@ -795,18 +795,18 @@ async def ge_arts_2(q: Q):
 @on()
 async def ge_beh_check(q: Q):
     # set nopre = True
-    q.user.student_info['ge']['beh']['nopre'] = True
+    q.client.student_info['ge']['beh']['nopre'] = True
     await q.page.save()
 
 @on()
 async def ge_beh_1(q: Q):
-    q.user.student_info['ge']['beh']['1'] = q.args.ge_beh_1
+    q.client.student_info['ge']['beh']['1'] = q.args.ge_beh_1
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_beh_2(q: Q):
-    q.user.student_info['ge']['beh']['2'] = q.args.ge_beh_2
+    q.client.student_info['ge']['beh']['2'] = q.args.ge_beh_2
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
@@ -817,7 +817,7 @@ async def ge_beh_2(q: Q):
 @on()
 async def ge_bio_check(q: Q):
     # set nopre = True
-    q.user.student_info['ge']['bio']['nopre'] = True
+    q.client.student_info['ge']['bio']['nopre'] = True
     await q.page.save()
 
 async def handle_dropdown_change(q, changed_dropdown):
@@ -829,14 +829,14 @@ async def handle_dropdown_change(q, changed_dropdown):
     dropdowns.remove(changed_dropdown)
 
     selected = changed_dropdown.split('_')[2]
-    q.user.student_info['ge']['bio'][selected] = q.args[changed_dropdown]
+    q.client.student_info['ge']['bio'][selected] = q.args[changed_dropdown]
 
     for dropdown in dropdowns:
         # reset menu options to default
         q.page['ge_req4'].items[dropdown].value = None
-        # clear q.user.student_info['ge']['bio'][which]
+        # clear q.client.student_info['ge']['bio'][which]
         which = dropdown.split('_')[2]
-        q.user.student_info['ge']['bio'][which] = None
+        q.client.student_info['ge']['bio'][which] = None
 
     await q.page.save()
 
@@ -847,9 +847,9 @@ async def ge_bio_1a(q: Q):
 #    q.page['ge_debug'].content = ge_debug_content
 #    await q.page.save()
 
-    q.user.student_info['ge']['bio']['1a'] = q.args.ge_bio_1a
-    q.user.student_info['ge']['bio']['1b'] = None
-    q.user.student_info['ge']['bio']['1c'] = None
+    q.client.student_info['ge']['bio']['1a'] = q.args.ge_bio_1a
+    q.client.student_info['ge']['bio']['1b'] = None
+    q.client.student_info['ge']['bio']['1c'] = None
     # reset dropdown menu items?
     #q.page['ge_bio'].
 
@@ -865,9 +865,9 @@ async def ge_bio_1b(q: Q):
 ##    q.page['ge_debug'].content = ge_debug_content
 ##    await q.page.save()
 #   
-    q.user.student_info['ge']['bio']['1a'] = None
-    q.user.student_info['ge']['bio']['1b'] = q.args.ge_bio_1b
-    q.user.student_info['ge']['bio']['1c'] = None
+    q.client.student_info['ge']['bio']['1a'] = None
+    q.client.student_info['ge']['bio']['1b'] = q.args.ge_bio_1b
+    q.client.student_info['ge']['bio']['1c'] = None
 ##    # reset dropdown menu items?
 
     q.page['ge_debug'].content = ge_debug_content(q)
@@ -880,9 +880,9 @@ async def ge_bio_1c(q: Q):
 #    q.page['ge_debug'].content = ge_debug_content
 #    await q.page.save()
 
-    q.user.student_info['ge']['bio']['1a'] = None
-    q.user.student_info['ge']['bio']['1b'] = None
-    q.user.student_info['ge']['bio']['1c'] = q.args.ge_bio_1c
+    q.client.student_info['ge']['bio']['1a'] = None
+    q.client.student_info['ge']['bio']['1b'] = None
+    q.client.student_info['ge']['bio']['1c'] = q.args.ge_bio_1c
 #    # reset dropdown menu items?
 
     q.page['ge_debug'].content = ge_debug_content
@@ -890,7 +890,7 @@ async def ge_bio_1c(q: Q):
 
 @on()
 async def ge_bio_2(q: Q):
-    q.user.student_info['ge']['bio']['2'] = q.args.ge_bio_2
+    q.client.student_info['ge']['bio']['2'] = q.args.ge_bio_2
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
@@ -902,33 +902,33 @@ async def ge_bio_2(q: Q):
 @on()
 async def ge_comm_check(q: Q):
     # set nopre = True
-    q.user.student_info['ge']['comm']['nopre'] = True
+    q.client.student_info['ge']['comm']['nopre'] = True
     await q.page.save()
 
 @on()
 async def ge_comm_1(q: Q):
-    q.user.student_info['ge']['comm']['1'] = q.args.ge_comm_1
+    q.client.student_info['ge']['comm']['1'] = q.args.ge_comm_1
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_comm_2(q: Q):
-    q.user.student_info['ge']['comm']['2'] = q.args.ge_comm_2
+    q.client.student_info['ge']['comm']['2'] = q.args.ge_comm_2
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_comm_3(q: Q):
-    q.user.student_info['ge']['comm']['3'] = q.args.ge_comm_3
+    q.client.student_info['ge']['comm']['3'] = q.args.ge_comm_3
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_comm_4(q: Q):
-    q.user.student_info['ge']['comm']['4'] = q.args.ge_comm_4
+    q.client.student_info['ge']['comm']['4'] = q.args.ge_comm_4
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
@@ -940,12 +940,12 @@ async def ge_comm_4(q: Q):
 @on()
 async def ge_math_check(q: Q):
     # set nopre = True
-    q.user.student_info['ge']['math']['nopre'] = True
+    q.client.student_info['ge']['math']['nopre'] = True
     await q.page.save()
 
 @on()
 async def ge_math_1(q: Q):
-    q.user.student_info['ge']['math']['1'] = q.args.ge_math_1
+    q.client.student_info['ge']['math']['1'] = q.args.ge_math_1
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
@@ -957,47 +957,47 @@ async def ge_math_1(q: Q):
 @on()
 async def ge_res_check(q: Q):
     # set nopre = True
-    q.user.student_info['ge']['res']['nopre'] = True
+    q.client.student_info['ge']['res']['nopre'] = True
     await q.page.save()
 
 @on()
 async def ge_res_1(q: Q):
-    q.user.student_info['ge']['res']['1'] = q.args.ge_res_1
+    q.client.student_info['ge']['res']['1'] = q.args.ge_res_1
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_res_2(q: Q):
-    q.user.student_info['ge']['res']['2'] = q.args.ge_res_2
+    q.client.student_info['ge']['res']['2'] = q.args.ge_res_2
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_res_3(q: Q):
-    q.user.student_info['ge']['res']['3'] = q.args.ge_res_3
+    q.client.student_info['ge']['res']['3'] = q.args.ge_res_3
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_res_3a(q: Q):
-    q.user.student_info['ge']['res']['3a'] = q.args.ge_res_3a
+    q.client.student_info['ge']['res']['3a'] = q.args.ge_res_3a
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_res_3b(q: Q):
-    q.user.student_info['ge']['res']['3b'] = q.args.ge_res_3b
+    q.client.student_info['ge']['res']['3b'] = q.args.ge_res_3b
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
 
 @on()
 async def ge_res_3c(q: Q):
-    q.user.student_info['ge']['res']['3c'] = q.args.ge_res_3c
+    q.client.student_info['ge']['res']['3c'] = q.args.ge_res_3c
     # reset dropdown menu items?
     q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
@@ -1013,14 +1013,14 @@ async def coach_schedule(q: Q):
     await student_schedule(q)
 
 async def student_schedule(q: Q):
-    if q.user.student_data['schedule'] is not None:
+    if q.client.student_data['schedule'] is not None:
         # need to check whether all terms and sessions are all 0,
         # meaning a schedule template was created but no classes
         # were actually scheduled
 
         html_template = utils.create_html_template(
-            df = q.user.student_data['schedule'], 
-            start_term = q.user.student_info['first_term']
+            df = q.client.student_data['schedule'], 
+            start_term = q.client.student_info['first_term']
         )
         #add_card(q, 'd3plot', cards.render_d3plot(html_template, location='horizontal', width='80%'))
         await cards.render_d3plot(q, html_template, location='horizontal', width='75%', height='400px')
@@ -1033,18 +1033,18 @@ async def schedule(q: Q):
 
     # first term is required for all scheduling
     # this should create the default for the pulldown 'First Term' menu
-    if q.user.student_info['first_term'] is None:
-        q.user.student_info['first_term'] = q.app.default_first_term
+    if q.client.student_info['first_term'] is None:
+        q.client.student_info['first_term'] = q.app.default_first_term
 
-    if q.user.role == 'admin':
+    if q.client.role == 'admin':
         # admin schedule page
         await admin_schedule(q)
 
-    elif q.user.role == 'coach':
+    elif q.client.role == 'coach':
         # coach schedule page
         await coach_schedule(q)
         
-    elif q.user.role == 'student':
+    elif q.client.role == 'student':
         # student schedule page
         await student_schedule(q)
         
@@ -1078,9 +1078,9 @@ async def submit_schedule_menu(q: Q):
     schedule_menu['max_courses'] = q.args.courses_per_session
     schedule_menu['max_credits'] = q.args.max_credits
     schedule_menu['attend_summer'] = q.args.attend_summer
-    q.user.student_info['schedule_menu'] = schedule_menu
+    q.client.student_info['schedule_menu'] = schedule_menu
 
-    q.user.student_data['periods'] = utils.generate_periods(
+    q.client.student_data['periods'] = utils.generate_periods(
             start_term=schedule_menu['first_term'],
             max_courses=schedule_menu['max_courses'],
             max_credits=schedule_menu['max_credits'],
@@ -1100,22 +1100,22 @@ async def submit_schedule_menu(q: Q):
 ### q.client value:
 {q.client}
 
-### q.user.student_info values:
-{q.user.student_info}
+### q.client.student_info values:
+{q.client.student_info}
 
-### q.user.student_info['schedule_menu'] values:
-{q.user.student_info['schedule_menu']}
+### q.client.student_info['schedule_menu'] values:
+{q.client.student_info['schedule_menu']}
 
-### q.user.student_data values:
+### q.client.student_data values:
 
 #### Required:
-{q.user.student_data['required']}
+{q.client.student_data['required']}
 
 #### Periods:
-{q.user.student_data['periods']}
+{q.client.student_data['periods']}
 
 #### Schedule:
-{q.user.student_data['schedule']}
+{q.client.student_data['schedule']}
     '''
     await q.page.save()
 

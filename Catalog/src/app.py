@@ -50,6 +50,8 @@ async def initialize_app(q: Q) -> None:
     logging.info('Initializing app')
     q.app.initialized = True
 
+    q.app.version = 'catalog_0.9'
+
     # q.app.flex: use flexible layout rather than grid
     # this won't be needed as we strip it away from functions
     # flex is the default layout
@@ -1316,7 +1318,7 @@ async def show_dialog(q: Q):
 
 # mode='multicast' sync information across all tabs of a user
 # see https://wave.h2o.ai/docs/realtime
-@app('/', mode='multicast', on_startup=on_startup)
+@app('/new', mode='multicast', on_startup=on_startup)
 async def serve(q: Q):
 
     # Initialize the app if not already
@@ -1331,8 +1333,14 @@ async def serve(q: Q):
     if not q.client.initialized:
         await initialize_client(q)
 
+    if q.app.version != 'catalog_0.9':
+        # This request is not for this version app
+        # During development, to run multiple wave versions of the same app
+        return
+
     # Handle routing.
     await run_on(q)
+
     await q.page.save()
 
 

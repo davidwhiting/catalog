@@ -8,8 +8,8 @@ import numpy as np
 import sys
 import traceback
 
-import frontend
-from frontend import add_card, clear_cards, show_error, crash_report
+import frontend_classic as frontend
+from frontend_classic import add_card, clear_cards, show_error, crash_report
 
 import backend
 
@@ -44,12 +44,3 @@ async def page4_step3(q: Q):
 @on()
 async def reload(q: Q): 
     await frontend.reload(q)
-
-@app('/', mode='multicast', on_startup=frontend.on_startup, on_shutdown=frontend.on_shutdown)
-async def serve(q: Q):
-    """
-    Main entry point. All queries pass through this function.
-    """
-    await frontend.serve(q)
-    # When things are updated, switch serve functions
-    #await frontend.serve(q)

@@ -70,36 +70,36 @@ async def initialize_user(q: Q) -> None:
     - Intend to have multiple users connecting simultaneously
     """
     logging.info('Initializing user')
-    q.user.initialized = True
-    q.user.conn = backend.TimedSQLiteConnection('UMGC.db')
+    q.client.initialized = True
+    q.client.conn = backend.TimedSQLiteConnection('UMGC.db')
 
     ## await utils.reset_student_info_data(q)
     ## 
-    ## q.user.user_id = 3 # new student... shortcut
-    ## #q.user.user_id = 7 # student with schedule created
-    ## q.user.role == 'student'
-    ## await utils.populate_student_info(q, q.user.user_id)
+    ## q.client.user_id = 3 # new student... shortcut
+    ## #q.client.user_id = 7 # student with schedule created
+    ## q.client.role == 'student'
+    ## await utils.populate_student_info(q, q.client.user_id)
     ## ## from ZZ updates that broke things
-    ## #await utils.populate_q_student_info(q, q.user.conn, q.user.user_id)
-    ## q.user.student_info_populated = True
+    ## #await utils.populate_q_student_info(q, q.client.conn, q.client.user_id)
+    ## q.client.student_info_populated = True
     ## 
     ## # Note: All user variables related to students will be saved in a dictionary
-    ## # q.user.student_info
+    ## # q.client.student_info
     ## #
     ## # This will allow us to keep track of student information whether the role is admin/coach 
-    ## # (where we can easily switch students by deleting q.user.student_info and starting over), or
-    ## # student roles (with single instance of q.user.student_info).
+    ## # (where we can easily switch students by deleting q.client.student_info and starting over), or
+    ## # student roles (with single instance of q.client.student_info).
     ## #
-    ## # For example, if q.user.user_id=2 is a coach working on a student with user_id=3, then we
-    ## # populate q.user.student_info['user_id']=3 with that student's information.
+    ## # For example, if q.client.user_id=2 is a coach working on a student with user_id=3, then we
+    ## # populate q.client.student_info['user_id']=3 with that student's information.
     ## #
-    ## # Student information stored in q.user.student_info
+    ## # Student information stored in q.client.student_info
     ## #   - role in ('admin', 'coach') will start from new student or populate with saved
     ## #     student info using 'select student' dropdown menu (later will be lookup)
     ## #   - role == 'student' will start new or from saved student info from database
     ## 
-    ## logging.info(f'Student Info: {q.user.student_info}')
-    ## logging.info(f'Student Data: {q.user.student_data}')
+    ## logging.info(f'Student Info: {q.client.student_info}')
+    ## logging.info(f'Student Data: {q.client.student_data}')
     await q.page.save()
 
 async def initialize_client_update(q: Q) -> None:
@@ -166,56 +166,6 @@ async def initialize_client_old(q: Q) -> None:
 ##################  Serve functions  ##################
 #######################################################
 
-async def serve_template(q: Q) -> None:
-    """
-    Main entry point. All queries pass through this function.
-    """
-    try:
-        # Initialize the app if not already
-        if not q.app.initialized:
-            q.app.initialized = True
-            logging.info('Initializing app')
-            # Add app-level initialization logic here (loading datasets, database connections, etc.)
-
-        # Initialize the client (browser tab) if not already
-        if not q.client.initialized:
-            await initialize_client_old(q)
-
-        # Handle page navigation and other events
-        await run_on(q)
-
-    except Exception as error:
-        await show_error(q, error=str(error))
-
-    await q.page.save()
-
-async def serve(q: Q) -> None:
-    """
-    Main entry point. All queries pass through this function.
-    """
-    try:
-        # Initialize the app if not already
-        if not q.app.initialized:
-            await initialize_app(q)
-            logging.info('Initializing app')
-
-        # Initialize the user if not already
-        if not q.user.initialized:
-            await initialize_user(q)
-            logging.info('Initializing user')
-
-        # Initialize the client if not already
-        if not q.client.initialized:
-            await initialize_client(q)
-            logging.info('Initializing client')
-
-        # Handle routing and events
-        await run_on(q)
-
-    except Exception as error:
-        await show_error(q, error=str(error))
-    
-    await q.page.save()
 
 ###########################################################
 ##################  End Serve functions  ##################

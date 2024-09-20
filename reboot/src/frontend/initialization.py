@@ -20,10 +20,13 @@ async def initialize_app(q: Q) -> None:
     q.app.debug = True
  
     ## upload logo
-    q.app.umgc_logo, = await q.site.upload(['umgc-logo-white.png'])
+    q.app.umgc_logo, = await q.site.upload(['frontend/umgc-logo-white.png'])
 
     # set global default first term
     q.app.default_first_term = 'Spring 2024'
+
+    # from waveton... include here or in q.user.cards or q.client.cards?
+    q.app.cards = ['main'] # move to q.user.cards?
 
     # SHORTCUT: Added these into the view directly, will fix this code later
     # as we fix the logic for these, will remove from disabled
@@ -42,11 +45,6 @@ async def initialize_app(q: Q) -> None:
         'Web and Digital Design',        
     }
     await q.page.save()
-
-async def initialize_app_waveton(q: Q) -> None:
-    logging.info('Initializing app')
-    q.app.cards = ['main'] # move to q.user.cards?
-    q.app.initialized = True
 
 async def initialize_client_waveton(q: Q) -> None:
     logging.info('Initializing client')

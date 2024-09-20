@@ -1,4 +1,5 @@
 # app.py
+import frontend.runon
 from h2o_wave import Q, main, app, run_on, on, ui
 from typing import List
 import logging
@@ -10,61 +11,55 @@ import sys
 ## backend should not call others
 ## This will prevent circular references
 
-from frontend.initialization import initialize_app_waveton, initialize_client_waveton, \
-    initialize_app, initialize_user, initialize_client
-from frontend.utils import clear_cards_waveton, handle_fallback
+from frontend.initialization import initialize_app, initialize_client_waveton
+#initialize_user, 
+#initialize_client
+import frontend
+from frontend.utils import clear_cards_waveton, handle_fallback, on_startup, on_shutdown
 from frontend.utils import show_error_waveton as show_error
 
 from frontend.cards import meta_card, header_card, footer_card, main_card, crash_report_card
 
 logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
 
-@app('/', mode='multicast')
+@app('/', on_startup=on_startup, on_shutdown=on_shutdown)
 async def serve(q: Q) -> None:
-    try:
-        if not q.app.initialized:
-            await initialize_app(q)
-        if not q.client.initialized:
-            await initialize_client(q)
-        elif await run_on(q):
-            pass
+    """
+    Main entry point. All queries pass through this function.
+    """
+    await frontend.runon.serve(q)
 
-        # This condition should never execute unless there is a bug in our code
-        # Adding this condition here helps us identify those cases (instead of seeing a blank page in the browser)
-        else:
-            await handle_fallback(q)
 
-    except NameError as e:
-        error_msg = f"NameError: {str(e)}. This usually means a variable or function is being used before it's defined."
-        logging.error(error_msg)
-        await show_error(q, error_msg)
-
-    except ImportError as e:
-        error_msg = f"ImportError: {str(e)}. This usually means a required module is missing."
-        logging.error(error_msg)
-        await show_error(q, error_msg)
-
-    except SyntaxError as e:
-        error_msg = f"SyntaxError: {str(e)}. This usually means there's a syntax error in the code."
-        logging.error(error_msg)
-        await show_error(q, error_msg)
-
-    except Exception as e:
-        error_type = type(e).__name__
-        error_msg = f"An unexpected {error_type} occurred: {str(e)}"
-        logging.error(error_msg)
-        await show_error(q, error_msg)
-
-    finally:
-        # This ensures that any changes to the page are saved, even if an error occurred
-        await q.page.save()
-
-## should change these reload_client and initialize_client to reload_user and initialize_user
-
+# fix this to be reload from error
 @on('reload')
-async def reload_client(q: Q) -> None:
+async def reload_waveton(q: Q) -> None:
     logging.info('Reloading client')
     clear_cards_waveton(q, ['main'])
-    await initialize_client(q)
+    await initialize_client_waveton(q)
 
 from frontend.delete_me import page1, page2, page3, page4
+
+@on('#page1')
+async def page1(q: Q):
+    await page1(q)
+
+@on('#page2')
+async def page2(q: Q):
+    await page2(q)
+
+@on('#page3')
+async def page3(q: Q):
+    await page3(q)
+
+@on('#page4')
+@on('page4_reset')
+async def page4(q: Q):
+    await page4(q)
+
+#@on()
+#async def page4_step2(q: Q):
+#    await frontend.page4_step2(q)
+#
+#@on()
+#async def page4_step3(q: Q):
+#    await frontend.page4_step3(q)
