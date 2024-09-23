@@ -16,6 +16,7 @@ from typing import Any, Dict, Callable, List, Optional, Union
 def initialize_ge() -> dict:
     """
     Initialize General Education tracking for undergraduate students.
+    Called by initialize_student_info
     """
     ge = {
         'arts': {'1': None, '2': None, 'nopre': False},

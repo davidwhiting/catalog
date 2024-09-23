@@ -27,9 +27,6 @@ def sidebar_card(q: Q, home: str = '#page1') -> ui.NavCard:
         items=[
             ui.nav_group('Menu', items=[
                 ui.nav_item(name='#page1', label='Page 1'),
-                ui.nav_item(name='#page2', label='Page 2'),
-                ui.nav_item(name='#page3', label='Page 3'),
-                ui.nav_item(name='#page4', label='Page 4'),
                 ui.nav_item(name='#home', label='Home'),
                 ui.nav_item(name='#program', label='Program'),
                 ui.nav_item(name='#courses', label='Courses'),
@@ -111,3 +108,70 @@ def return_meta_card() -> ui.MetaCard:
     return card 
 
 meta_card = return_meta_card()
+
+#################################################################
+####################  CARDS FOR BUG HANDLING ####################
+#################################################################
+
+from frontend.constants import APP_NAME as app_name
+from frontend.constants import REPO_URL as repo_url
+from frontend.constants import ISSUE_URL as issue_url
+
+# A fallback card for handling bugs
+fallback_card = ui.form_card(
+    box='fallback',
+    items=[ui.text('Uh-oh, something went wrong!')]
+)
+
+def crash_report_card(q: Q) -> ui.FormCard:
+    """
+    Card for capturing the stack trace and current application state, for error reporting.
+    This function is called by the main serve() loop on uncaught exceptions.
+    """
+
+    def code_block(content): 
+        return '\n'.join(['```', *content, '```'])
+
+    type_, value_, traceback_ = sys.exc_info()
+    stack_trace = traceback.format_exception(type_, value_, traceback_)
+
+    dump = [
+        '### Stack Trace',
+        code_block(stack_trace),
+    ]
+
+    states = [
+        ('q.app', q.app),
+        ('q.user', q.user),
+        ('q.client', q.client),
+        ('q.events', q.events),
+        ('q.args', q.args)
+    ]
+    for name, source in states:
+        dump.append(f'### {name}')
+        dump.append(code_block([f'{k}: {v}' for k, v in expando_to_dict(source).items()]))
+
+    return ui.form_card(
+        box='error',
+        items=[
+            ui.stats(
+                items=[
+                    ui.stat(
+                        label='',
+                        value='Oops!',
+                        caption='Something went wrong',
+                        icon='Error'
+                    )
+                ],
+            ),
+            ui.separator(),
+            ui.text_l(content='Apologies for the inconvenience!'),
+            ui.buttons(items=[ui.button(name='reload', label='Reload', primary=True)]),
+            ui.expander(name='report', label='Error Details', items=[
+                ui.text(
+                    f'To report this issue, <a href="{issue_url}" target="_blank">please open an issue</a> with the details below:'),
+                ui.text_l(content=f'Report Issue in App: **{app_name}**'),
+                ui.text(content='\n'.join(dump)),
+            ])
+        ]
+    )
