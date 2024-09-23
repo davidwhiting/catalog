@@ -1,6 +1,8 @@
 from h2o_wave import main, app, Q, ui, on, run_on, data
 from typing import Optional, List
 
+#from frontend.utils import add_card, clear_cards
+# circular reference, copy functions below
 
 # Use for page cards that should be removed when navigating away.
 # For pages that should be always present on screen use q.page[key] = ...
@@ -18,7 +20,6 @@ def clear_cards(q, ignore: Optional[List[str]] = []) -> None:
         if name not in ignore:
             del q.page[name]
             q.client.cards.remove(name)
-
 
 async def page1(q: Q):
     q.page['sidebar'].value = '#page1'
