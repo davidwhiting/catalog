@@ -1,5 +1,13 @@
 from h2o_wave import main, app, Q, ui, on, run_on, data
-from typing import Any, Dict, Callable, List, Optional, Union
+from typing import (
+    Any, 
+    Dict, 
+    Callable, 
+    List, 
+    Optional, 
+    Union
+)
+
 import logging
 import os
 #from msal import ConfidentialClientApplication
@@ -32,62 +40,7 @@ import utils
 ####################  Home page  #####################
 ######################################################
 
-@on('#home')
-async def home(q: Q):
-    clear_cards(q)
-    card_height = '400px'
 
-    # this depends on student stage:
-
-
-    #cards.render_home_cards(q)
-
-    # By definition, students are registered so we at least know their name
-
-    if int(q.client.student_info['app_stage_id']) == 1:
-        card = cards.return_task1_card(location='top_horizontal', width='350px')
-        add_card(q, 'home/task1', card=card)
-
-        card = cards.return_demographics_card1(location='top_horizontal', width='400px')
-        add_card(q, 'home/demographics1', card)
-
-        card = cards.return_tasks_card(checked=0, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    elif int(q.client.student_info['app_stage_id']) == 2:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=1, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    elif int(q.client.student_info['app_stage_id']) == 3:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=2, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    else:
-        card = cards.return_welcome_back_card(q, location='top_horizontal', height='400px', width='750px')
-        add_card(q, 'home/welcome_back', card=card)
-
-        card = cards.return_tasks_card(checked=4, location='top_horizontal', width='350px', height='400px')
-        add_card(q, 'home/tasks', card)
-
-    await q.page.save()
-
-@on('#home/1')
-async def home1(q: Q):
-    clear_cards(q)
-
-    card = cards.return_task1_card(location='top_horizontal', width='350px')
-    add_card(q, 'home/task1', card=card)
-
-    cards.demographics2(q)
-    cards.tasks_unchecked(q)
-
-    await q.page.save()
 
 @on('#home/2')
 async def home2(q: Q):
@@ -311,11 +264,10 @@ async def program(q: Q):
 #    if q.client.role == 'admin':
 #        # admin program page
 #        await admin_program(q)
-#
 #    elif q.client.role == 'coach':
 #        # coach program page
 #        await coach_program(q)
-#        
+     
 #    elif q.client.role == 'student':
 #        # student program page
 #        await student_program(q)
@@ -389,6 +341,7 @@ async def menu_degree(q: Q):
 
     q.page['program.debug'].content = dropdown_debug(q)
     await q.page.save()
+
 
 ##############################################
 ## For "Area of Study" dropdown menu events ##
@@ -474,62 +427,6 @@ async def menu_program(q: Q):
 ###############################
 ###  Program Table actions  ###
 ###############################
-
-@on()
-async def program_table(q: Q):
-    '''
-    Respond to events (clicking Course link or double-clicking row)
-    in the table on Program page. This will display the course description
-    by default.
-
-    Notes:
-      - q.args.table_name is set to [row_name]
-      - the name of the table is 'program_table'
-      - the name of the row is name = row['name']    
-    '''
-    coursename = q.args.program_table[0] 
-    frontend.course_description_dialog(q, coursename, which='required')
-    logging.info('The value of coursename in program_table is ' + coursename)
-    await q.page.save()
-
-@on()
-async def view_program_description(q: Q):
-    '''
-    Respond to the menu event 'Course Description'
-    (Calls same function as program_table above)
-    '''
-    coursename = q.args.view_program_description
-    frontend.course_description_dialog(q, coursename, which='required')
-    logging.info('The value of coursename in view_program_description is ' + str(coursename))
-    await q.page.save()
-
-@on()
-async def add_ge(q: Q):
-    '''
-    Respond to the menu event 'Add GE'
-    (redirect to GE page)
-    '''
-    logging.info('Redirecting to the GE page')
-    q.page['meta'].redirect = '#ge'
-    await q.page.save()
-
-@on()
-async def add_elective(q: Q):
-    '''
-    Respond to the menu event 'Add Electives'
-    '''
-    logging.info(f'Redirecting to the Electives page')
-    await q.page.save()
-
-@on()
-async def select_program(q: Q):
-    '''
-    Respond to the menu event 'Select Program'
-    '''
-    logging.info(f'Will select the program and save to student_info')
-    await q.page.save()
-
-
 
 ########################################################
 ####################  Skills pages  ####################

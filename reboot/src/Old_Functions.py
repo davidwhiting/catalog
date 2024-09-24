@@ -7,6 +7,40 @@ import warnings
 import functools
 
 
+import sys
+import traceback
+
+import templates
+
+
+from h2o_wave import Q, ui, copy_expando, expando_to_dict
+from contextlib import asynccontextmanager
+from h2o_wave import Q, ui
+from typing import Any, Dict, Callable, List, Optional, Union
+import asyncio
+import logging
+import numpy as np
+import pandas as pd
+import sqlite3
+import time
+import warnings
+import backend
+from backend import get_choices 
+
+from contextlib import asynccontextmanager
+from h2o_wave import Q, ui
+from typing import Any, Dict, Callable, List, Optional, Union
+import asyncio
+import logging
+import numpy as np
+import pandas as pd
+import sqlite3
+import time
+import warnings
+
+
+from backend import initialize_ge, initialize_student_info, initialize_student_data
+from backend import TimedSQLiteConnection, _base_query, get_query, get_query_one, get_query_dict, get_query_course_dict, get_query_df
 
 
 #########################################################
@@ -157,47 +191,6 @@ async def get_choices(timed_connection: TimedSQLiteConnection, query: str, param
 ####################  POPULATE FUNCTIONS  ####################
 ##############################################################
 
-async def reverse_engineer_dropdown_menu(timed_connection, program_id):
-    """
-    Recreate dropdown menus for students based on their program ID.
-    This function is used when the dropdown menu status was not saved and needs to be reconstructed.
-
-    Args:
-        timed_connection: Asynchronous database connection object
-        program_id (int): The ID of the student's program
-
-    Returns:
-        dict: A dictionary containing the menu selections for program, degree, and area of study
-
-    Note:
-        There isn't a strict 1:1 correspondence between study areas and programs,
-        so we limit the query to 1 result.
-    """
-    menu = {
-        'program': None,
-        'degree': None,
-        'area_of_study': None
-    }
-
-    if program_id is not None:
-        menu['program'] = program_id
-        query = """
-            SELECT menu_degree_id, menu_area_id 
-            FROM menu_all_view
-            WHERE program_id = ?
-            LIMIT 1
-        """
-
-        try:
-            row = await get_query_one(timed_connection, query, params=(program_id,))
-            if row:
-                menu['degree'] = row['menu_degree_id']
-                menu['area_of_study'] = row['menu_area_id']
-        except Exception as e:
-            print(f"Error retrieving menu data: {str(e)}")
-            # Depending on your error handling strategy, you might want to re-raise the exception
-
-    return menu
 
 async def populate_student_info_dict(timed_connection: TimedSQLiteConnection, user_id: int, 
                                      default_first_term: str = 'Spring 2024') -> dict:
@@ -293,30 +286,11 @@ async def populate_student_data_dict(timed_connection, student_info) -> dict:
         # Depending on your error handling strategy, you might want to re-raise the exception
 
     return student_data
-from contextlib import asynccontextmanager
-from h2o_wave import Q, ui
-from typing import Any, Dict, Callable, List, Optional, Union
-import asyncio
-import logging
-import numpy as np
-import pandas as pd
-import sqlite3
-import time
-import warnings
 
-
-from backend import initialize_ge, initialize_student_info, initialize_student_data
-from backend import TimedSQLiteConnection, _base_query, get_query, get_query_one, \
-    get_query_dict, get_query_course_dict, get_query_df
 
 ## _ZZ versions are newly rewritten but not all working
 ## will incrementally fix them and introduce the correct one
 
-
-#import sys
-#import traceback
-
-import templates
 
 ############################################################
 ####################  POPULATE FUNCTIONS  ##################
@@ -378,7 +352,6 @@ async def populate_student_info(q, user_id):
                 q.client.student_info['menu']['degree'] = row['menu_degree_id']
                 q.client.student_info['menu']['area_of_study'] = row['menu_area_id']
 
-
 async def reset_student_info_data_ZZ(q):
     '''
     All the steps needed to initialize q.client.student_info and q.client.student_data
@@ -422,7 +395,6 @@ async def populate_q_student_info_ZZ(q, timed_connection, user_id):
         raise  # Re-raising the exception for now
 
     q.client.info_populated = True  
-
 
 def reset_program(q):
     '''
@@ -475,104 +447,6 @@ async def get_catalog_program_sequence_ZZ(timed_connection, program_id):
 
 # was get_choices_ZZ
 
-async def get_program_title_ZZ(timed_connection, program_id):
-    """
-    Retrieve the program title for a given program ID.
-
-    Args:
-        timed_connection: Database connection object
-        program_id: ID of the program to query
-
-    Returns:
-        dict: Program information including 'id' and 'title', or None if not found
-    """
-    query = """
-        SELECT b.id, b.name || ' in ' || a.name AS title
-        FROM programs a
-        JOIN degrees b ON a.degree_id = b.id
-        WHERE a.id = ?
-    """
-    try:
-        row = await get_query_one(timed_connection, query, params=(program_id,))
-        return row if row else None
-    except Exception as e:
-        print(f"Error retrieving program title: {str(e)}")
-        return None
-
-async def get_required_program_courses_ZZ(timed_connection, program_id):
-    """
-    Retrieve the required courses for a given program.
-
-    This function is called by `app.menu_program` and `populate_q_student_info`.
-    It fetches course information from the program_requirements_view for a specific program.
-
-    Args:
-        timed_connection: Asynchronous database connection object
-        program_id (int): The ID of the program to query
-
-    Returns:
-        pandas.DataFrame: A DataFrame containing the required courses for the program,
-                          or None if no courses are found or an error occurs.
-
-    Raises:
-        Exception: If there's an error during the database query or DataFrame creation.
-    """
-    query = """
-        SELECT 
-            id,
-            course, 
-            course_type AS type,
-            title,
-            credits,
-            pre,
-            pre_credits,
-            substitutions,
-            description
-        FROM program_requirements_view
-        WHERE program_id = ?
-    """
-    
-    try:
-        df = await get_query_df(timed_connection, query, params=(program_id,))
-        return df if not df.empty else None
-    except Exception as e:
-        print(f"Error retrieving required program courses: {str(e)}")
-        return None
-
-async def get_student_progress_d3_ZZ(timed_connection, user_id):
-    """
-    Retrieve student progress data for D3 visualization.
-
-    This function fetches all columns from the student_progress_d3_view
-    for a specific user. It's called by `populate_q_student_info`.
-
-    Note: The 'name' column in the old version has been replaced with 'course'.
-    Downstream D3 figure implementations may need to be updated accordingly.
-
-    Args:
-        timed_connection: Asynchronous database connection object
-        user_id (int): The ID of the student to query
-
-    Returns:
-        pandas.DataFrame: A DataFrame containing the student's progress data,
-                          or None if no data is found or an error occurs.
-
-    Raises:
-        Exception: If there's an error during the database query or DataFrame creation.
-    """
-    query = """
-        SELECT *
-        FROM student_progress_d3_view
-        WHERE user_id = ?
-    """
-    
-    try:
-        df = await get_query_df(timed_connection, query, params=(user_id,))
-        return df if not df.empty else None
-    except Exception as e:
-        print(f"Error retrieving student progress data: {str(e)}")
-        return None
-
 async def get_choices_disable_all_ZZ(timed_connection, query, params=()):
     '''
     Return choices for dropdown menus and other ui elements
@@ -600,7 +474,7 @@ async def get_student_progress_d3(q):
     df = await get_query_df(timedConnection, query, params=(user_id,))
     return df
 
-async def get_required_program_courses(q):
+async def get_required_program_courses_old(q):
     timedConnection = q.client.conn
     program_id = q.client.student_info['program_id']
     query = '''
@@ -995,27 +869,6 @@ async def build_program_course_list(program_df, timedConnection, ge_course_list)
         return ge_course_list, elective_data
 
 # parallel the utils.get_required_program_courses code
-async def get_required_program_courses_no_q(timedConnection, student_info):
-    '''
-    DELETE after testing. Use the get_required_program_courses code instead
-    '''
-    program_id = student_info['program_id']
-    query = '''
-        SELECT 
-            id,
-            course, 
-            course_type as type,
-            title,
-            credits,
-            pre,
-            pre_credits,
-            substitutions,
-            description
-        FROM program_requirements_view
-        WHERE program_id = ?
-    '''
-    df = await get_query_df(timedConnection, query, params=(program_id,))
-    return df
 
 async def return_program_course_list_df_from_scratch(timedConnection, student_info):
     '''
@@ -1026,7 +879,7 @@ async def return_program_course_list_df_from_scratch(timedConnection, student_in
     # Build the Program course list
 
     # Task 1. Get the required classes from the program
-    required_df = await get_required_program_courses_no_q(timedConnection, student_info)
+    required_df = await get_required_program_courses(timedConnection, student_info)
 
     # Build the GE course list
     # Create a blank list of GE course requirements with all courses set to 'GENERAL'
@@ -1218,190 +1071,6 @@ async def build_program_course_list_ZZ(program_df, timed_connection, ge_course_l
         ge_course_list = update_ge_course_list_from_program(ge_course_list, ge_data)
 
         return ge_course_list, elective_data
-
-# parallel the utils.get_required_program_courses code
-async def get_required_program_courses_no_q_ZZ(timed_connection, student_info):
-    '''
-    DELETE after testing. Use the get_required_program_courses code instead
-    '''
-    program_id = student_info['program_id']
-    query = '''
-        SELECT 
-            id,
-            course, 
-            course_type as type,
-            title,
-            credits,
-            pre,
-            pre_credits,
-            substitutions,
-            description
-        FROM program_requirements_view
-        WHERE program_id = ?
-    '''
-    df = await get_query_df(timed_connection, query, params=(program_id,))
-    return df
-
-async def return_program_course_list_df_from_scratch_ZZ(timed_connection, student_info):
-    '''
-    Function should be updated to work within wave (w/ q, etc.)
-    Note: (timed_connection, student_info) are both accessible w/in q, would be better to pass
-          program_id for clarity 
-    '''
-    # Build the Program course list
-
-    # Task 1. Get the required classes from the program
-    required_df = await get_required_program_courses_no_q(timed_connection, student_info)
-
-    # Build the GE course list
-    # Create a blank list of GE course requirements with all courses set to 'GENERAL'
-    query = '''
-        SELECT id AS ge_id, 'GENERAL' AS course, requirement, abbr, part, credits, 
-            'ge_' || abbr || '_' || part AS course_slot 
-        FROM general_education_requirements 
-    '''
-    ge_course_list = await get_query_dict(timed_connection, query)
-
-    # update with information from student_info['ge']
-    ge_course_list = update_ge_list_from_student_info(ge_course_list, student_info)
-
-    # Update the ge_course_list 
-    ge_course_list, elective_data = await build_program_course_list(required_df, timed_connection, ge_course_list)
-
-    # check on the elective_data as well (it should be empty)
-
-    # Process ge_course_list_df
-    ge_course_list_df = pd.DataFrame(ge_course_list)
-    ge_course_list_df = update_bio_df(ge_course_list_df)
-    ge_course_list_df['type'] = 'General'
-    ge_course_list_df = ge_course_list_df.rename(columns={'course_slot': 'ge'})
-
-    # required_course_list_df is where we keep all of our courses for now
-    required_course_list_df = required_df[['course', 'type', 'credits']].copy()
-
-    # Merge GE information onto any 'Required,General' rows )
-    merged_df = pd.merge(ge_course_list_df[['course', 'ge']], required_course_list_df, 
-                         on='course', how='right')
-
-    # remove from the GE list those already in the Program list
-    remove_list = merged_df[merged_df['type']=='Required,General'][['ge']]
-    if len(remove_list) > 0:
-        remove_list_values = remove_list['ge'].values.tolist()
-        mask = ~ge_course_list_df['ge'].isin(remove_list_values)
-        ge_course_list_df = ge_course_list_df[mask][['course', 'ge', 'type', 'credits']]
-    else:
-        ge_course_list_df = ge_course_list_df[['course', 'ge', 'type', 'credits']]
-
-    # concatenate lists to join all 'General' to course list
-    # this will work either way
-    course_list_df = pd.concat([merged_df, ge_course_list_df], ignore_index=True)
-    course_list_df['credits'] = pd.to_numeric(course_list_df['credits'])
-
-    course_list_df['ge'] = course_list_df['ge'].fillna('')
-    course_list_df
-    # Add Electives to our course_list_df:
-
-    elective_credits = 120 - course_list_df['credits'].sum()
-
-    # Calculate number of electives to add 
-    # (standard pattern is one 1-credit class and the rest 3-credit classes)
-    # (1-credit class is often a capstone seminar)
-    # We will calculate them instead. 
-
-    remaining_elective_credit = elective_credits % 3
-    r = int(remaining_elective_credit)
-    number_of_electives = (elective_credits - remaining_elective_credit)/3
-    n = int(number_of_electives)
-
-    # create a DataFrame with the desired rows
-    data = {
-        'course': ['ELECTIVE'] * (n+1),
-        'ge': [''] * (n+1),
-        'type': ['Elective'] * (n+1),
-        'credits': [3] * n + [r]
-    }
-    elective_df = pd.DataFrame(data)
-
-    # Add electives to final dataframe
-
-    final_course_list = pd.concat([course_list_df, elective_df], ignore_index=True)# Build the Program course list
-
-    # Task 1. Get the required classes from the program
-    required_df = await get_required_program_courses_no_q(timed_connection, student_info)
-
-    # Build the GE course list
-    # Create a blank list of GE course requirements with all courses set to 'GENERAL'
-    query = '''
-        SELECT id AS ge_id, 'GENERAL' AS course, requirement, abbr, part, credits, 
-            'ge_' || abbr || '_' || part AS course_slot 
-        FROM general_education_requirements 
-    '''
-    ge_course_list = await get_query_dict(timed_connection, query)
-
-    # update with information from student_info['ge']
-    ge_course_list = update_ge_list_from_student_info(ge_course_list, student_info)
-
-    # Update the ge_course_list 
-    ge_course_list, elective_data = await build_program_course_list(required_df, timed_connection, ge_course_list)
-
-    # check on the elective_data as well (it should be empty)
-
-    # Process ge_course_list_df
-    ge_course_list_df = pd.DataFrame(ge_course_list)
-    ge_course_list_df = update_bio_df(ge_course_list_df)
-    ge_course_list_df['type'] = 'General'
-    ge_course_list_df = ge_course_list_df.rename(columns={'course_slot': 'ge'})
-
-    # required_course_list_df is where we keep all of our courses for now
-    required_course_list_df = required_df[['course', 'type', 'credits']].copy()
-
-    # Merge GE information onto any 'Required,General' rows )
-    merged_df = pd.merge(ge_course_list_df[['course', 'ge']], required_course_list_df, 
-                         on='course', how='right')
-
-    # remove from the GE list those already in the Program list
-    remove_list = merged_df[merged_df['type']=='Required,General'][['ge']]
-    if len(remove_list) > 0:
-        remove_list_values = remove_list['ge'].values.tolist()
-        mask = ~ge_course_list_df['ge'].isin(remove_list_values)
-        ge_course_list_df = ge_course_list_df[mask][['course', 'ge', 'type', 'credits']]
-    else:
-        ge_course_list_df = ge_course_list_df[['course', 'ge', 'type', 'credits']]
-
-    # concatenate lists to join all 'General' to course list
-    # this will work either way
-    course_list_df = pd.concat([merged_df, ge_course_list_df], ignore_index=True)
-    course_list_df['credits'] = pd.to_numeric(course_list_df['credits'])
-
-    course_list_df['ge'] = course_list_df['ge'].fillna('')
-    course_list_df
-    # Add Electives to our course_list_df:
-
-    elective_credits = 120 - course_list_df['credits'].sum()
-
-    # Calculate number of electives to add 
-    # (standard pattern is one 1-credit class and the rest 3-credit classes)
-    # (1-credit class is often a capstone seminar)
-    # We will calculate them instead. 
-
-    remaining_elective_credit = elective_credits % 3
-    r = int(remaining_elective_credit)
-    number_of_electives = (elective_credits - remaining_elective_credit)/3
-    n = int(number_of_electives)
-
-    # create a DataFrame with the desired rows
-    data = {
-        'course': ['ELECTIVE'] * (n+1),
-        'ge': [''] * (n+1),
-        'type': ['Elective'] * (n+1),
-        'credits': [3] * n + [r]
-    }
-    elective_df = pd.DataFrame(data)
-
-    # Add electives to final dataframe
-
-    final_course_list = pd.concat([course_list_df, elective_df], ignore_index=True)
-    return final_course_list
 
 async def generate_schedule_ZZ(timed_connection, course_df, periods_df):
     '''
@@ -3156,45 +2825,6 @@ async def return_skills_table(results, location='horizontal'):
 #################  EVENT AND HANDLER FUNCTIONS  ######################
 ######################################################################
 
-
-def course_description_dialog(q, course, which='schedule'):
-    '''
-    Create a dialog for the course description for a table.
-    This will be used for multiple tables on multiple pages.
-    course: indicate what course it's for
-    df: DataFrame that the table was created from
-
-    to do: course in the schedule df is called 'name'
-           course is called course in the required df
-           should simplify by changing schedule df to course AFTER
-           updating d3 javascript code, since it's expecting name
-    '''
-    if which in ['required', 'schedule']:
-        #df = q.client.student_data[which]
-        if which == 'schedule':
-            df = q.client.student_data['schedule']
-            description = df.loc[df['name'] == course, 'description'].iloc[0]
-   
-        elif which == 'required':
-            df = q.client.student_data['required']
-            description = df.loc[df['course'] == course, 'description'].iloc[0]
-
-        #description = df.loc[df['course'] == course, 'description'].iloc[0]
-
-        q.page['meta'].dialog = ui.dialog(
-            name = which + '_description_dialog',
-            title = course + ' Course Description',
-            width = '480px',
-            items = [ui.text(description)],
-            # Enable a close button
-            closable = True,
-            # Get notified when the dialog is dismissed.
-            events = ['dismissed']
-        )
-    else:
-        pass
-
-
 ######################################################
 ####################  Login page  ####################
 ######################################################
@@ -3356,28 +2986,12 @@ async def skills(q: Q):
 #        add_card(q, 'skills_debug', await cards.return_debug_card(q))
 
     await q.page.save()
-from h2o_wave import Q, ui, copy_expando, expando_to_dict
-from contextlib import asynccontextmanager
-from h2o_wave import Q, ui
-from typing import Any, Dict, Callable, List, Optional, Union
-import asyncio
-import logging
-import numpy as np
-import pandas as pd
-import sqlite3
-import time
-import warnings
-
-import backend
-from backend import get_choices 
 
 
 #from backend import initialize_ge, initialize_student_info, initialize_student_data
 from backend import TimedSQLiteConnection, _base_query, get_query, get_query_one, \
     get_query_dict, get_query_course_dict, get_query_df
-
 from frontend import add_card, clear_cards
-
 import utils
 #from utils import get_query, get_query_one, get_query_dict, get_query_df
 #from utils import generate_periods, update_periods, generate_schedule, handle_prerequisites, \
@@ -3433,7 +3047,7 @@ program_query = '''
 ####################  DEBUG CARDS  ####################
 #######################################################
 
-async def return_debug_card_ZZ(q, box='3 3 1 1', location='debug', width='100%', height='300px'):
+async def return_debug_card(q, location='debug', width='100%', height='300px'):
     '''
     Show q.client information in a card for debugging
     '''
@@ -3484,56 +3098,6 @@ async def return_debug_card_ZZ(q, box='3 3 1 1', location='debug', width='100%',
     )
     return card
 
-async def return_debug_card(q, box='3 3 1 1', location='debug', width='100%', height='300px'):
-    '''
-    Show q.client information in a card for debugging
-    '''
-    expando_dict = expando_to_dict(q.client)
-    q_client_filtered = {k: v for k, v in expando_dict.items() if k not in ['student_info', 'student_data']}
-
-    #### q.client.student_data values:
-    #{q.client.student_data}
-    flex = q.app.flex
-
-    if flex:
-        box = ui.box(location, width=width, height=height)
-
-    content = f'''
-### q.args values:
-{q.args}
-
-### q.events values:
-{q.events}
-
-### q.client value:
-{q.client}
-
-### q.client.student_info values:
-{q.client.student_info}
-
-### q.client.student_data values:
-
-#### Required:
-{q.client.student_data['required']}
-
-#### Schedule:
-{q.client.student_data['schedule']}
-
-### remaining q.client values:
-{q_client_filtered}
-
-### q.client values
-
-### q.app values:
-{q.app}
-
-    '''
-    card = ui.markdown_card(
-        box,
-        title='Debug Information', 
-        content=content 
-    )
-    return card
 
 ###############################################################
 ####################  LOGIN PAGE  #############################
@@ -3722,25 +3286,6 @@ async def render_user_login_dropdown_ZZ(q, box=None, location='horizontal', menu
 ####################  HOME PAGE  #############################
 ##############################################################
 
-def return_task1_card_ZZ(location='top_horizontal', width='350px'):
-    '''
-    Task 1 Card repeated on home page and home/1, home/2, etc.
-    '''
-    task_1_caption = f'''
-### Enter selected information 
-- Residency status
-- Attendance type
-- Financial aid
-- Transfer credits
-'''
-    card = ui.wide_info_card(
-        box=ui.box(location, width=width),
-        name='task1',
-        icon='AccountActivity',
-        title='Task 1',
-        caption=task_1_caption
-    )
-    return card
 
 def render_task1_card_ZZ(q, location='top_horizontal', width='350px'):
     '''
@@ -3748,139 +3293,6 @@ def render_task1_card_ZZ(q, location='top_horizontal', width='350px'):
     '''
     card = return_task1_card(location=location, width=width)
     add_card(q, 'home/task1', card=card)
-
-def return_demographics_card1_ZZ(card_height = '400px', location='top_horizontal', width='400px'):
-    '''
-    Demographics card for home page
-    '''
-    resident_choices = [
-        ui.choice('A', 'In-State'),
-        ui.choice('B', 'Out-of-State'),
-        ui.choice('C', 'Military'),
-    ]
-    attendance_choices = [
-        ui.choice('A', 'Full Time'),
-        ui.choice('B', 'Part Time'),
-        ui.choice('C', 'Evening only'),
-    ]
-    card = ui.form_card(
-        box=ui.box(location, width=width),
-        items=[
-            ui.text_xl('Tell us about yourself'),
-            ui.text('This information will help us build a course schedule'),
-            ui.inline(items=[
-                #ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
-                #ui.text_xl(''),
-                ui.choice_group(name='attendance', label='I will be attending', choices=attendance_choices, required=True),
-            ]),
-            ui.separator(name='my_separator', width='100%', visible=True),
-            ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
-            ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
-            #ui.separator(),
-            #ui.text('(Other appropriate questions here...)'),
-            #ui.separator(),
-            ui.button(name='next_demographic_1', label='Next', primary=True),
-        ]
-    )
-    return card
-
-def render_demographics_card1_ZZ(q, card_height = '400px', location='top_horizontal', width='400px'):
-    '''
-    Demographics card for home page
-    '''
-    card = return_demographics_card1(location=location, width=width)
-    add_card(q, 'home/demographics1', card)
-
-def return_demographics_card2_ZZ(location='top_horizontal', width='400px'):
-    '''
-
-    '''
-    resident_choices = [
-        ui.choice('A', 'In-State'),
-        ui.choice('B', 'Out-of-State'),
-        ui.choice('C', 'Military'),
-    ]
-    card = ui.form_card(
-        box=ui.box(location, width=width),
-        items=[
-            ui.text_xl('Tell us more about yourself:'),
-            ui.text('This information will help us estimate your tuition costs'),
-            ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
-            ui.separator(label='', name='my_separator2', width='100%', visible=True),
-            ui.button(name='next_demographic_2', label='Next', primary=True),
-        ]
-    )
-    return card
-
-def demographics2_ZZ(q):
-    '''
-
-    '''
-    resident_choices = [
-        ui.choice('A', 'In-State'),
-        ui.choice('B', 'Out-of-State'),
-        ui.choice('C', 'Military'),
-    ]
-    add_card(q, 'demographics2', 
-        ui.form_card(
-            box=ui.box('top_horizontal', width='400px'),
-            items=[
-                ui.text_xl('Tell us more about yourself:'),
-                ui.text('This information will help us estimate your tuition costs'),
-                ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
-                ui.separator(label='', name='my_separator2', width='100%', visible=True),
-                ui.button(name='next_demographic_2', label='Next', primary=True),
-            ]
-        )
-    )
-
-def return_tasks_card_ZZ(checked=0, location='top_horizontal', width='350px', height='400px'):
-    '''
-    Return tasks optionally checked off
-    '''
-    icons = ['Checkbox', 'Checkbox', 'Checkbox', 'Checkbox']
-    checked_icon = 'CheckboxComposite'
-    # checked needs to be a value between 0 and 4
-    if checked > 0:
-        for i in range(checked):
-            icons[i] = checked_icon
-
-    card = ui.form_card(
-        box=ui.box(location, width=width, height=height),
-        items=[
-            #ui.text(title + ': Credits', size=ui.TextSize.L),
-            ui.text('Task Tracker', size=ui.TextSize.L),
-            ui.stats(items=[ui.stat(
-                label=' ',
-                value='1. Information',
-                caption='Tell us about yourself',
-                icon=icons[0],
-                icon_color='#135f96'
-            )]),
-            ui.stats(items=[ui.stat(
-                label=' ',
-                value='2. Select Program',
-                caption='Decide what you want to study',
-                icon=icons[1],
-                icon_color='#a30606'
-            )]),
-            ui.stats(items=[ui.stat(
-                label=' ',
-                value='3. Add Courses',
-                caption='Add GE and Electives',
-                icon=icons[2],
-                #icon_color='#787800'
-                icon_color='#3c3c43'
-            )]),
-            ui.stats(items=[ui.stat(
-                label=' ',
-                value='4. Create Schedule',
-                caption='Optimize your schedule',
-                icon=icons[3],
-                icon_color='#da1a32'
-            )]),
-        ])
-    return card
 
 def tasks_unchecked_ZZ(q):
     '''
@@ -4312,68 +3724,6 @@ def render_task1_card(q, location='top_horizontal', width='350px'):
     card = return_task1_card(location=location, width=width)
     add_card(q, 'home/task1', card=card)
 
-def return_demographics_card1(card_height = '400px', location='top_horizontal', width='400px'):
-    '''
-    Demographics card for home page
-    '''
-    resident_choices = [
-        ui.choice('A', 'In-State'),
-        ui.choice('B', 'Out-of-State'),
-        ui.choice('C', 'Military'),
-    ]
-    attendance_choices = [
-        ui.choice('A', 'Full Time'),
-        ui.choice('B', 'Part Time'),
-        ui.choice('C', 'Evening only'),
-    ]
-    card = ui.form_card(
-        box=ui.box(location, width=width),
-        items=[
-            ui.text_xl('Tell us about yourself'),
-            ui.text('This information will help us build a course schedule'),
-            ui.inline(items=[
-                #ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
-                #ui.text_xl(''),
-                ui.choice_group(name='attendance', label='I will be attending', choices=attendance_choices, required=True),
-            ]),
-            ui.separator(name='my_separator', width='100%', visible=True),
-            ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
-            ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
-            #ui.separator(),
-            #ui.text('(Other appropriate questions here...)'),
-            #ui.separator(),
-            ui.button(name='next_demographic_1', label='Next', primary=True),
-        ]
-    )
-    return card
-
-def render_demographics_card1(q, card_height = '400px', location='top_horizontal', width='400px'):
-    '''
-    Demographics card for home page
-    '''
-    card = return_demographics_card1(location=location, width=width)
-    add_card(q, 'home/demographics1', card)
-
-def return_demographics_card2(location='top_horizontal', width='400px'):
-    '''
-
-    '''
-    resident_choices = [
-        ui.choice('A', 'In-State'),
-        ui.choice('B', 'Out-of-State'),
-        ui.choice('C', 'Military'),
-    ]
-    card = ui.form_card(
-        box=ui.box(location, width=width),
-        items=[
-            ui.text_xl('Tell us more about yourself:'),
-            ui.text('This information will help us estimate your tuition costs'),
-            ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
-            ui.separator(label='', name='my_separator2', width='100%', visible=True),
-            ui.button(name='next_demographic_2', label='Next', primary=True),
-        ]
-    )
-    return card
 
 
 def demographics2(q):

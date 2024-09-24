@@ -1,18 +1,28 @@
-from h2o_wave import main, app, Q, ui, on, run_on, data
+from h2o_wave import (
+    app,
+    data,
+    main,
+    on,
+    Q,
+    run_on,
+    ui
+)
 from typing import Optional, List
 import logging
 
 import backend.connection
+import backend.student
 import frontend.pages as pages
 import frontend.cards as cards
 
 #################################################################
-#############  on_startup() and on_shutdown() ###################
+#############  ON_STARTUP() AND ON_SHUTDOWN() ###################
 #################################################################
 
 async def on_startup() -> None:
     # Set up logging
-    logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', 
+                        level=logging.INFO)
 
 async def on_shutdown() -> None:
     # Create shutdown actions if needed
@@ -71,35 +81,6 @@ async def initialize_user(q: Q) -> None:
     logging.info('Initializing user')
     q.user.initialized = True
 
-    q.client.conn = backend.connection.TimedSQLiteConnection('UMGC.db')
-
-    ## await utils.reset_student_info_data(q)
-    ## 
-    ## q.client.user_id = 3 # new student... shortcut
-    ## #q.client.user_id = 7 # student with schedule created
-    ## q.client.role == 'student'
-    ## await utils.populate_student_info(q, q.client.user_id)
-    ## ## from ZZ updates that broke things
-    ## #await utils.populate_q_student_info(q, q.client.conn, q.client.user_id)
-    ## q.client.student_info_populated = True
-    ## 
-    ## # Note: All user variables related to students will be saved in a dictionary
-    ## # q.client.student_info
-    ## #
-    ## # This will allow us to keep track of student information whether the role is admin/coach 
-    ## # (where we can easily switch students by deleting q.client.student_info and starting over), or
-    ## # student roles (with single instance of q.client.student_info).
-    ## #
-    ## # For example, if q.client.user_id=2 is a coach working on a student with user_id=3, then we
-    ## # populate q.client.student_info['user_id']=3 with that student's information.
-    ## #
-    ## # Student information stored in q.client.student_info
-    ## #   - role in ('admin', 'coach') will start from new student or populate with saved
-    ## #     student info using 'select student' dropdown menu (later will be lookup)
-    ## #   - role == 'student' will start new or from saved student info from database
-    ## 
-    ## logging.info(f'Student Info: {q.client.student_info}')
-    ## logging.info(f'Student Data: {q.client.student_data}')
     await q.page.save()
 
 async def initialize_client(q: Q) -> None:
@@ -107,19 +88,61 @@ async def initialize_client(q: Q) -> None:
     Initialize the client (once per connection)
     """
     logging.info('Initializing client')
-    home = '#page1'
+    home = '#home'
     # Mark as initialized at the client (browser tab) level
     q.client.initialized = True
-    q.client.cards = set()
 
+    #### Move q.client to q.user if using multicast and sso
+    #### (do this in production)
+    conn = backend.connection.TimedSQLiteConnection('UMGC.db')
+    q.client.conn = conn
+    logging.info(f'sqlite connection: {q.client.conn}')
+
+    # reset student
+    client = backend.student.reset_student()
+    q.client.student_info = client['student_info']
+    logging.info(f'q.client.student_info debug: {q.client.student_info}')
+
+    q.client.student_data = client['student_data']
+    logging.info(f'q.client.student_data debug: {q.client.student_data}')
+
+    q.client.role = 'student' # other option is admin/coach
+
+    # Note: All user variables related to students will be saved in a dictionary
+    # q.client.student_info
+    #
+    # This will allow us to keep track of student information whether the role is admin/coach 
+    # (where we can easily switch students by deleting q.client.student_info and starting over), or
+    # student roles (with single instance of q.client.student_info).
+    #
+    # For example, if q.client.user_id=2 is a coach working on a student with user_id=3, then we
+    # populate q.client.student_info['user_id']=3 with that student's information.
+    #
+    # Student information stored in q.client.student_info
+    #   - role in ('admin', 'coach') will start from new student or populate with saved
+    #     student info using 'select student' dropdown menu (later will be lookup)
+    #   - role == 'student' will start new or from saved student info from database
+
+    student_user_id = 3 # new student... shortcut
+    student_user_id = 7 # student with schedule created
+    q.client.student_info = await backend.student.populate_student_info_dict(conn, student_user_id)
+
+    logging.info(f'q.client debug: {q.client}')
+
+    q.client.cards = set()
     q.page['meta'] = cards.meta_card
     q.page['sidebar'] = cards.sidebar_card(q, home=home)
     q.page['header'] = cards.header_card
     q.page['footer'] = cards.footer_card
+    logging.info(f"set q.page['footer']")
+    logging.info(f"{q.args}")
 
-    # If no active hash present, render page1.
+    # If no active hash present, render home.
     if q.args['#'] is None:
-        await pages.page1(q)
+        logging.info(f"q.args['#'] is None")
+        await pages.home(q)
+    else:
+        logging.info(f"q.args['#'] is not None")
 
     await q.page.save()
 
@@ -145,6 +168,7 @@ async def serve_v2(q: Q) -> None:
         if not q.client.initialized:
             await initialize_client(q)
 
+        logging.info('Made it through the initialize_client')
         # Handle routing.
         await run_on(q)
 

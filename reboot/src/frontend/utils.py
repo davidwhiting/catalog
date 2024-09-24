@@ -2,25 +2,9 @@ from h2o_wave import main, app, Q, ui, on, run_on, data
 from typing import Optional, List
 import logging
 
-#import delete_me_new as dmn
-#import frontend.pages as pages
-#import frontend.cards as cards
-
-#################################################################
-#############  on_startup() and on_shutdown() ###################
-#################################################################
-
-async def on_startup() -> None:
-    # Set up logging
-    logging.basicConfig(format='%(levelname)s:\t[%(asctime)s]\t%(message)s', level=logging.INFO)
-
-async def on_shutdown() -> None:
-    # Create shutdown actions if needed
-    pass
-
-######################################################################
-####################  STANDARD WAVE CARDS  ###########################
-######################################################################
+########################################################################
+####################  STANDARD WAVE CARD FUNCTIONS  ####################
+########################################################################
 
 # Use for page cards that should be removed when navigating away.
 # For pages that should be always present on screen use q.page[key] = ...
@@ -37,7 +21,6 @@ def clear_cards(q: Q, ignore: Optional[List[str]] = []) -> None:
         if name not in ignore:
             del q.page[name]
             q.client.cards.remove(name)
-
 
 ################################################################
 ##################  ERROR CHECKING FUNCTIONS  ##################
