@@ -68,8 +68,8 @@ async def home(q: Q):
     card = cards.return_tasks_card(checked=0, location='horizontal', width='350px', height=card_height)
     add_card(q, 'home/tasks', card)
 
-    logging.info(f"Home: q.client is {q.client}")
-    logging.info(f"Home: q.user is {q.user}")
+    #logging.info(f"Home: q.client is {q.client}")
+    #logging.info(f"Home: q.user is {q.user}")
     #logging.info(f"Home: q.app is {q.app}")
 
     #q.page['debug'] = cards.return_debug_card(q)
@@ -142,7 +142,7 @@ async def next_demographic_1(q: Q) -> None:
         ui.choice('3', 'Military'),
     ]
     logging.info('Updating home page')
-    #q.page['meta'].redirect = '#home/1'
+
     q.page['demographics'].items = [
         ui.text_xl('Tell us more about yourself:'),
         ui.text('This information will help us estimate your tuition costs'),
@@ -239,6 +239,8 @@ async def program(q: Q):
     Called by @on('#program')
     '''
     clear_cards(q) # will use in the individual functions
+    q.page['sidebar'].value = '#program'
+
 
     ### Could replace all of the below with student_program for now
     #if q.client.role:
@@ -426,6 +428,8 @@ async def add_ge(q: Q):
     '''
     logging.info('Redirecting to the GE page')
     q.page['meta'].redirect = '#ge'
+    q.page['sidebar'].value = '#ge'
+
     await q.page.save()
 
 async def add_elective(q: Q):
@@ -433,6 +437,9 @@ async def add_elective(q: Q):
     Respond to the menu event 'Add Electives'
     '''
     logging.info(f'Redirecting to the Electives page')
+    q.page['meta'].redirect = '#electives'
+    q.page['sidebar'].value = '#electives'
+
     await q.page.save()
 
 async def select_program(q: Q):
@@ -440,6 +447,97 @@ async def select_program(q: Q):
     Respond to the menu event 'Select Program'
     '''
     logging.info(f'Will select the program and save to student_info')
+    await q.page.save()
+
+#######################################################
+####################  SKILLS PAGE  ####################
+#######################################################
+
+async def skills(q: Q):
+    clear_cards(q) # will use in the individual functions
+
+    conn = q.client.conn
+    card = await cards.return_skills_menu_card(conn, location='horizontal', width='300px')
+    add_card(q, 'skill_card', card)
+    await q.page.save()
+
+##########################################################
+####################  SKILLS ACTIONS  ####################
+##########################################################
+
+async def submit_skills_menu(q: Q):
+    """
+    Respond to Submit button on Skills menu
+    """
+    conn = q.client.conn
+    selected_skills = q.args.skills_checklist
+    q.client.skills = {}
+    q.client.skills['selected'] = selected_skills
+
+    result_limit = 15
+    #result_limit = int(q.args.result_limit)
+
+    if not selected_skills:
+        # throw an error, not sure that this works
+        q.page['skills_results'] = ui.form_card(box='content', items=[ui.message_bar('No skills selected', type='warning')])
+        return
+
+    # Convert selected skills to a tuple for SQL query
+    skills_tuple = tuple(selected_skills)
+    int_tuple = tuple(map(int, skills_tuple))
+
+    query = f"""
+        SELECT b.id, a.program, sum(a.score) AS TotalScore 
+        FROM program_skill_score_view a, programs b
+
+        WHERE a.skill_id IN {int_tuple}
+            AND b.degree_id = 3
+            AND a.program = b.name 
+        GROUP BY a.program
+        ORDER BY TotalScore DESC 
+        LIMIT {result_limit}
+    """
+    results = await conn.query_dict(query)
+
+    # save for reuse
+    q.client.student_data['skills'] = results
+    card = await cards.return_skills_table(results)
+    add_card(q, 'skills_program_table', card)
+
+async def program_skills_table(q: Q):
+    '''
+    Respond to events (clicking table link or double-clicking row)
+    in the table on Program page. This will display the course description
+    by default.
+
+    Notes:
+      - q.args.table_name is set to [row_name]
+      - the name of the table is 'program_table'
+      - the name of the row is name = row['name']    
+    '''
+    program_name = q.args.program_skills_table[0] 
+    #frontend.course_description_dialog(q, coursename, which='required')
+    logging.info(f'The value of program_name in program_skills_table is {program_name}')
+    await q.page.save()
+
+async def explore_skills_program(q: Q):
+    '''
+    Respond to the menu event 'Explore Program'
+    [Should be similar to what is found in #programs ]
+    '''
+    which_program = q.args.explore_skills_program
+    #frontend.course_description_dialog(q, coursename, which='required')
+    logging.info('The value of which_program in explore_skills_program is ' + str(which_program))
+    await q.page.save()
+
+async def select_skills_program(q: Q):
+    '''
+    Respond to the menu event 'Select Program'
+    [Should be identical to what is found in #programs under Select]
+    '''
+    which_program = q.args.select_skills_program
+    #frontend.course_description_dialog(q, coursename, which='required')
+    logging.info(f'The value of which_program in select_skills_program is {which_program}')
     await q.page.save()
 
 ########################################################
@@ -450,11 +548,329 @@ async def select_program(q: Q):
 ####################  COURSES ACTIONS  ####################
 ###########################################################
 
+###################################################
+####################  GE PAGE  ####################
+###################################################
 
+async def student_ge(q: Q):
+    clear_cards(q)
+
+    add_card(q, 'welcome_ge', ui.form_card(
+        box=ui.box('horizontal', width='100%'),
+        items=[
+            ui.text_xl('Select your General Education courses here.'),
+            #ui.text('We will guide you through this experience.')
+            ui.inline([
+                ui.text('Click here to display courses without prerequisites:', size=ui.TextSize.L),
+                ui.checkbox(name='ge_all_nopre', label='')
+            ], align='start'),
+        ]
+    ))
+    menu_width = '300px'
+    location = 'grid'
+    width = '330px'
+    await cards.render_ge_comm_card(q, cardname='ge_comm', location=location, width=width)
+    await cards.render_ge_res_card(q, cardname='ge_res', location=location, width=width)
+    await cards.render_ge_bio_card(q, cardname='ge_bio', location=location, width=width)
+    await cards.render_ge_math_card(q, cardname='ge_math', location=location, width=width)
+    await cards.render_ge_arts_card(q, cardname='ge_arts', location=location, width=width)
+    await cards.render_ge_beh_card(q, cardname='ge_beh', location=location, width=width)
+
+async def admin_ge(q: Q):
+    await student_ge(q)
+
+async def ge(q: Q):
+    clear_cards(q)
+
+    if q.client.role == 'admin':
+        # admin ge page
+        await admin_ge(q)
+
+    elif q.client.role == 'coach':
+        # coach ge page
+        await admin_ge(q)
+        
+    elif q.client.role == 'student':
+        # student ge page
+        await student_ge(q)
+        
+    else:
+        await student_ge(q)
+        
+    #if q.app.debug:
+    #    add_card(q, 'ge_debug', await cards.return_debug_card(q))
+
+    await q.page.save()
+
+######################################################
+####################  GE ACTIONS  ####################
+######################################################
+
+#############
+## GE Arts ##  
+#############
+
+async def ge_arts_check(q: Q):
+    # set nopre = True
+    q.client.student_info['ge']['arts']['nopre'] = True
+    await q.page.save()
+
+async def ge_arts_1(q: Q):
+    q.client.student_info['ge']['arts']['1'] = q.args.ge_arts_1
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_arts_2(q: Q):
+    q.client.student_info['ge']['arts']['2'] = q.args.ge_arts_2
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+############
+## GE Beh ##
+############
+
+async def ge_beh_check(q: Q):
+    # set nopre = True
+    q.client.student_info['ge']['beh']['nopre'] = True
+    await q.page.save()
+
+async def ge_beh_1(q: Q):
+    q.client.student_info['ge']['beh']['1'] = q.args.ge_beh_1
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_beh_2(q: Q):
+    q.client.student_info['ge']['beh']['2'] = q.args.ge_beh_2
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+############
+## GE Bio ##
+############
+
+async def ge_bio_check(q: Q):
+    # set nopre = True
+    q.client.student_info['ge']['bio']['nopre'] = True
+    await q.page.save()
+
+async def handle_dropdown_change(q, changed_dropdown):
+    '''
+    When one of three menus is selected, clear the others and reset 
+    to defaults
+    '''
+    dropdowns=['ge_bio_1a', 'ge_bio_1b', 'ge_bio_1c']
+    dropdowns.remove(changed_dropdown)
+
+    selected = changed_dropdown.split('_')[2]
+    q.client.student_info['ge']['bio'][selected] = q.args[changed_dropdown]
+
+    for dropdown in dropdowns:
+        # reset menu options to default
+        q.page['ge_req4'].items[dropdown].value = None
+        # clear q.client.student_info['ge']['bio'][which]
+        which = dropdown.split('_')[2]
+        q.client.student_info['ge']['bio'][which] = None
+
+    await q.page.save()
+
+async def ge_bio_1a(q: Q):
+    logging.info('The value of ge_bio_1a = ' + q.args.ge_bio_1a)
+#    await handle_dropdown_change(q, 'ge_bio_1a')
+#    q.page['ge_debug'].content = ge_debug_content
+#    await q.page.save()
+
+    q.client.student_info['ge']['bio']['1a'] = q.args.ge_bio_1a
+    q.client.student_info['ge']['bio']['1b'] = None
+    q.client.student_info['ge']['bio']['1c'] = None
+    # reset dropdown menu items?
+    #q.page['ge_bio'].
+
+    #q.page['ge_debug'].content = ge_debug_content(q)
+
+    await q.page.save()
+
+async def ge_bio_1b(q: Q):
+    logging.info('The value of ge_bio_1b = ' + q.args.ge_bio_1b)
+##    await handle_dropdown_change(q, 'ge_bio_1b')
+##    q.page['ge_debug'].content = ge_debug_content
+##    await q.page.save()
+#   
+    q.client.student_info['ge']['bio']['1a'] = None
+    q.client.student_info['ge']['bio']['1b'] = q.args.ge_bio_1b
+    q.client.student_info['ge']['bio']['1c'] = None
+##    # reset dropdown menu items?
+
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_bio_1c(q: Q):
+    logging.info('The value of ge_bio_1c = ' + q.args.ge_bio_1c)
+#    await handle_dropdown_change(q, 'ge_bio_1b')
+#    q.page['ge_debug'].content = ge_debug_content
+#    await q.page.save()
+
+    q.client.student_info['ge']['bio']['1a'] = None
+    q.client.student_info['ge']['bio']['1b'] = None
+    q.client.student_info['ge']['bio']['1c'] = q.args.ge_bio_1c
+#    # reset dropdown menu items?
+
+    #q.page['ge_debug'].content = ge_debug_content
+    await q.page.save()
+
+async def ge_bio_2(q: Q):
+    q.client.student_info['ge']['bio']['2'] = q.args.ge_bio_2
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+#############
+## GE Comm ##  These all work !!!
+#############
+
+async def ge_comm_check(q: Q):
+    # set nopre = True
+    q.client.student_info['ge']['comm']['nopre'] = True
+    await q.page.save()
+
+async def ge_comm_1(q: Q):
+    q.client.student_info['ge']['comm']['1'] = q.args.ge_comm_1
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_comm_2(q: Q):
+    q.client.student_info['ge']['comm']['2'] = q.args.ge_comm_2
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_comm_3(q: Q):
+    q.client.student_info['ge']['comm']['3'] = q.args.ge_comm_3
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_comm_4(q: Q):
+    q.client.student_info['ge']['comm']['4'] = q.args.ge_comm_4
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+#############
+## GE Math ##  This works! 
+#############
+
+async def ge_math_check(q: Q):
+    # set nopre = True
+    q.client.student_info['ge']['math']['nopre'] = True
+    await q.page.save()
+
+async def ge_math_1(q: Q):
+    q.client.student_info['ge']['math']['1'] = q.args.ge_math_1
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+############
+## GE Res ##
+############
+
+async def ge_res_check(q: Q):
+    # set nopre = True
+    q.client.student_info['ge']['res']['nopre'] = True
+    await q.page.save()
+
+async def ge_res_1(q: Q):
+    q.client.student_info['ge']['res']['1'] = q.args.ge_res_1
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_res_2(q: Q):
+    q.client.student_info['ge']['res']['2'] = q.args.ge_res_2
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_res_3(q: Q):
+    q.client.student_info['ge']['res']['3'] = q.args.ge_res_3
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_res_3a(q: Q):
+    q.client.student_info['ge']['res']['3a'] = q.args.ge_res_3a
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_res_3b(q: Q):
+    q.client.student_info['ge']['res']['3b'] = q.args.ge_res_3b
+    # reset dropdown menu items?
+    #q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
+
+async def ge_res_3c(q: Q):
+    q.client.student_info['ge']['res']['3c'] = q.args.ge_res_3c
+    pass
+    # reset dropdown menu items?
+    # q.page['ge_debug'].content = ge_debug_content(q)
+    await q.page.save()
 
 #########################################################
 ####################  SCHEDULE PAGE  ####################
 #########################################################
+
+async def student_schedule(q: Q):
+    if q.client.student_data['schedule'] is not None:
+        # need to check whether all terms and sessions are all 0,
+        # meaning a schedule template was created but no classes
+        # were actually scheduled
+
+        #html_template = cards.create_html_template_13(
+        #    df = q.user.student_data['schedule'], 
+        #    start_term = q.user.student_info['first_term']
+        #)
+
+        #html_template = cards.create_html_template(
+        #    df = q.client.student_data['schedule'], 
+        #    start_term = q.client.student_info['first_term']
+        #)
+        ##add_card(q, 'd3plot', cards.render_d3plot(html_template, location='horizontal', width='80%'))
+        #await cards.render_d3plot(q, html_template, location='horizontal', width='75%', height='400px')
+        await cards.render_schedule_menu(q, location='horizontal', width='20%')
+        #await cards.render_schedule_page_table(q, location='bottom_horizontal', width='100%')
+
+async def admin_schedule(q: Q):
+    await student_schedule(q)
+
+async def schedule(q: Q):
+    clear_cards(q)
+    q.page['sidebar'].value = '#schedule'
+
+    student_info = q.client.student_info
+    # first term is required for all scheduling
+    # this should create the default for the pulldown 'First Term' menu
+    if student_info['first_term'] is None:
+        student_info['first_term'] = q.app.default_first_term
+
+    if q.client.role == 'admin':
+        # admin schedule page
+        await admin_schedule(q)
+
+    elif q.client.role == 'coach':
+        # coach schedule page
+        await admin_schedule(q)
+        
+    elif q.client.role == 'student':
+        # student schedule page
+        await student_schedule(q)
+        
+    else:
+        await student_schedule(q)
+        #pass
+        
+    await q.page.save()
 
 ############################################################
 ####################  SCHEDULE ACTIONS  ####################
@@ -462,51 +878,3 @@ async def select_program(q: Q):
 
 #### OLD PAGES BELOW
 #### USE AS EXAMPLES
-
-async def page4(q: Q):
-    q.page['sidebar'].value = '#page4'
-    # When routing, drop all the cards except of the main ones (header, sidebar, meta).
-    # Since this page is interactive, we want to update its card
-    # instead of recreating it every time, so ignore 'form' card on drop.
-    clear_cards(q, ['form'])
-
-    # If first time on this page, create the card.
-    add_card(q, 'form', ui.form_card(box='vertical', items=[
-        ui.stepper(name='stepper', items=[
-            ui.step(label='Step 1'),
-            ui.step(label='Step 2'),
-            ui.step(label='Step 3'),
-        ]),
-        ui.textbox(name='textbox1', label='Textbox 1'),
-        ui.buttons(justify='end', items=[
-            ui.button(name='page4_step2', label='Next', primary=True),
-        ]),
-    ]))
-
-async def page4_step2(q: Q):
-    # Just update the existing card, do not recreate.
-    q.page['form'].items = [
-        ui.stepper(name='stepper', items=[
-            ui.step(label='Step 1', done=True),
-            ui.step(label='Step 2'),
-            ui.step(label='Step 3'),
-        ]),
-        ui.textbox(name='textbox2', label='Textbox 2'),
-        ui.buttons(justify='end', items=[
-            ui.button(name='page4_step3', label='Next', primary=True),
-        ])
-    ]
-
-async def page4_step3(q: Q):
-    # Just update the existing card, do not recreate.
-    q.page['form'].items = [
-        ui.stepper(name='stepper', items=[
-            ui.step(label='Step 1', done=True),
-            ui.step(label='Step 2', done=True),
-            ui.step(label='Step 3'),
-        ]),
-        ui.textbox(name='textbox3', label='Textbox 3'),
-        ui.buttons(justify='end', items=[
-            ui.button(name='page4_reset', label='Finish', primary=True),
-        ])
-    ]

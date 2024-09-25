@@ -21,3 +21,36 @@ program_query = '''
     FROM menu_all_view 
     WHERE menu_degree_id = ? AND menu_area_id = ?
 '''
+
+######################################################
+####################  GE QUERIES  ####################
+######################################################
+
+ge_query = '''
+    SELECT course AS name, course || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=? 
+    ORDER BY course
+'''
+ge_query_nopre = '''
+    SELECT course AS name, course || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=? 
+        AND pre='' 
+        AND pre_credits=''
+    ORDER BY course
+'''
+ge_credits_query = '''
+    SELECT course AS name, course || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=? AND credits=? 
+    ORDER BY course
+'''
+ge_pairs_query = '''
+    SELECT 
+        course AS name, 
+        course || ' & ' || substr(note, 27, 3) || ': ' || title AS label 
+    FROM ge_view 
+    WHERE ge_id=10 AND credits=3
+    ORDER BY course
+'''
