@@ -2,6 +2,8 @@ from h2o_wave import main, app, Q, ui, on, run_on, data
 from typing import Optional, List
 import logging
 
+from backend.queries import degree_query, area_query, program_query, program_query_old 
+from backend.student import get_choices, initialize_ge, get_program_title, get_required_program_courses
 from frontend.utils import add_card, clear_cards
 import frontend.cards as cards
 
@@ -174,6 +176,216 @@ async def next_demographic_2(q: Q) -> None:
 #########################################################
 ####################  PROGRAMS PAGE  ####################
 #########################################################
+
+async def student_program(q: Q) -> None:
+    '''
+    Program page menu for students 
+    (will also make a admin/coach version)
+    '''
+    clear_cards(q)
+    location = 'top_vertical'
+    student_info = q.client.student_info
+    logging.info(f'Starting student_program')
+
+    # I'm not sure why I need this
+    if student_info['menu']['degree']:
+        logging.info(f"student_info['menu']['degree']: {student_info['menu']['degree']}")
+        #degree_id = int(student_info['menu']['degree'])
+
+    add_card(q, 'explore_programs', ui.form_card(
+        box=ui.box(location, width='100%'),
+        items=[
+            ui.text('**EXPLORE PROGRAMS** using the menus below. Click **Select > Save Program** to select your program.'),
+            #ui.text('Explore Majors. Click **Select > Save Program** to select your program.'),
+        ]
+    ))
+    await cards.render_dropdown_menus_horizontal(q, location=location, menu_width='300px')
+
+    # Display program description, courses, and summary if program_id is defined
+    if student_info['program_id']:
+        logging.info(f"student_info['program_id']: {student_info['program_id']}")
+        await cards.render_program_cards(q)
+
+    await q.page.save()
+
+#    if menu_degree == 1:
+#        # Associate's Degree
+#        clear_cards(['explore_programs', 'dropdown']) # clear all but the 
+#        #await cards.render_program_description(q, location='top_vertical', height='250px', width='100%')
+#        pass
+#
+#    elif menu_degree == 2: 
+#        # Bachelor's Degree
+#        clear_cards(['explore_programs', 'dropdown']) # clear all but the 
+#        await cards.render_program_description(q, location='top_vertical', height='250px', width='100%')
+#        await cards.render_program_table(q, location='horizontal', width='90%')
+#        await cards.render_program_dashboard(q, location='horizontal', width='150px')
+#
+#    elif menu_degree == 5: 
+#        # Undergraduate Certificate
+#        pass
+#
+#    else:
+#        # Graduate Certificate
+#        pass
+
+# defaults to student_program for now
+async def admin_program(q: Q) -> None:
+    await student_program(q)
+
+async def program(q: Q):
+    '''
+    The main function for the Program page
+    Called by @on('#program')
+    '''
+    clear_cards(q) # will use in the individual functions
+
+    ### Could replace all of the below with student_program for now
+    #if q.client.role:
+    #    if q.client.role == 'admin':
+    #        # admin program page
+    #        await admin_program(q)
+    #    elif q.client.role == 'coach':
+    #        # coach program page
+    #        await admin_program(q)
+    #    else:
+    #        # student program page
+    #        await student_program(q)
+    #else:
+    #    # if role not defined
+    #    # for now, default to student_program
+    #    await student_program(q)
+
+    await student_program(q)
+
+    await q.page.save()
+
+###############################################################
+####################  PROGRAM MENU EVENTS  ####################
+###############################################################
+
+def reset_program(q: Q) -> None:
+    '''
+    When program is changed, multiple variables need to be reset
+    '''
+    q.client.student_info['menu']['program'] = None
+    q.client.student_info['program_id'] = None
+    q.client.student_info['degree_program'] = None
+
+    q.client.student_data['required'] = None
+    #q.client.student_data['periods'] = None
+    q.client.student_data['schedule'] = None
+
+    q.page['dropdown'].menu_program.value = None
+    q.page['dropdown'].menu_program.choices = None
+
+#######################################
+## For "Degree" dropdown menu events ##
+#######################################
+
+async def menu_degree(q: Q):
+    '''
+    '''
+    conn = q.client.conn
+    student_info = q.client.student_info
+    menu_degree_val = q.args.menu_degree
+    logging.info('The value of menu_degree is ' + str(menu_degree_val))
+    student_info['menu']['degree'] = menu_degree_val
+
+    # reset area_of_study if degree changes
+    student_info['menu']['area_of_study'] = None
+    q.page['dropdown'].menu_area.value = None
+    # update area_of_study choices based on degree chosen
+    ## Note: without disabled this is disabling everything. This is a quick hack.
+    q.page['dropdown'].menu_area.choices = \
+        await get_choices(conn, area_query, params=(menu_degree_val,), disabled={""})
+
+    # reset program if degree changes
+    reset_program(q)
+
+    #if student_info['menu']['degree'] == '2':
+    #    # insert ge into student_info for bachelor's degree students if it does not already exist
+    #    if not student_info['ge']:
+    #        student_info['ge'] = initialize_ge()
+    #else:
+    #    #clear_cards(q, ['dropdown']) # clear everything except dropdown menus
+    #    # remove ge from non-bachelor's degree students
+    #    if student_info['ge']:
+    #        del student_info['ge']
+
+    #q.page['program.debug'].content = dropdown_debug(q)
+    await q.page.save()
+
+##############################################
+## For "Area of Study" dropdown menu events ##
+##############################################
+
+async def menu_area(q: Q):
+    '''
+    '''
+    disabled_programs = q.app.disabled_program_menu_items
+    conn = q.client.conn
+    student_info = q.client.student_info
+    menu_area_val = q.args.menu_area
+    logging.info('The value of area_of_study is ' + str(menu_area_val))
+    student_info['menu']['area_of_study'] = menu_area_val
+
+    # reset program if area_of_study changes
+    reset_program(q)
+
+    student_info['menu']['program'] = None
+    q.page['dropdown'].menu_program.value = None
+
+    # update program choices based on area_of_study chosen
+    q.page['dropdown'].menu_program.choices = \
+        await get_choices(conn, program_query, params=(student_info['menu']['degree'], menu_area_val),
+            disabled=disabled_programs
+        )
+
+    # when new area of study is selected, remove description, courses, and summary
+    # when new degree is selected, remove description, courses, and summary
+
+#    clear_cards(q, ['dropdown'])
+#    if q.client.degree != '2':
+#        clear_cards(q,['major_recommendations', 'dropdown']) # clear possible BA/BS cards
+#        del q.client.program_df
+
+#    q.page['debug_info'] = cards.return_debug_card(q, box='1 10 7 4') # update debug card
+    await q.page.save()
+
+########################################
+## For "Program" dropdown menu events ##
+########################################
+
+async def menu_program(q: Q):
+    conn = q.client.conn
+    student_info = q.client.student_info
+    menu_program_val = q.args.menu_program
+    logging.info('The value of program is ' + str(menu_program_val))
+    student_info['menu']['program'] = menu_program_val
+    student_info['program_id'] = menu_program_val
+
+    row = await get_program_title(conn, menu_program_val)
+    if row:
+        student_info['degree_program'] = row['title']
+        student_info['degree_id'] = row['id']
+
+    q.client.student_data['required'] = await get_required_program_courses(conn, menu_program_val)
+
+    # need to also update q.client.student_info['degree_program']
+    logging.info(f"This is menu_program(q): the value of program_id is {student_info['program_id']}")
+
+    await cards.render_program_cards(q)
+    
+    # # program_id an alias used throughout
+
+
+#    else:
+#        clear_cards(q,['major_recommendations', 'dropdown'])
+#        if hasattr(q.client, 'program_df'):
+#            del q.client.program_df
+
+    await q.page.save()
 
 
 

@@ -1,12 +1,4 @@
-from h2o_wave import (
-    app,
-    data,
-    main,
-    on,
-    Q,
-    run_on,
-    ui
-)
+from h2o_wave import app, data, main, on, Q, run_on, ui
 from typing import Optional, List
 import logging
 
@@ -125,9 +117,11 @@ async def initialize_client(q: Q) -> None:
 
     student_user_id = 3 # new student... shortcut
     student_user_id = 7 # student with schedule created
-    q.client.student_info = await backend.student.populate_student_info_dict(conn, student_user_id)
 
-    logging.info(f'q.client debug: {q.client}')
+    # populate q.client.student_info and q.client.student_data
+    await backend.student.populate_student_info_data(q, student_user_id)
+
+    #logging.info(f'q.client debug: {q.client}')
 
     q.client.cards = set()
     q.page['meta'] = cards.meta_card

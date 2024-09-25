@@ -52,6 +52,27 @@ async def next_demographic_2(q: Q):
 ####################  PROGRAM EVENTS  ####################
 ##########################################################
 
+@on('#program')
+async def program(q: Q):
+    await pages.program(q)
+
+##############################
+###  Program Menu actions  ###
+##############################
+
+@on()
+async def menu_degree(q: Q):
+    await pages.menu_degree(q)
+
+@on()
+async def menu_area(q: Q):
+    await pages.menu_area(q)
+
+@on()
+async def menu_program(q: Q):
+    await pages.menu_program(q)
+
+
 ###############################
 ###  Program Table actions  ###
 ###############################
@@ -75,6 +96,20 @@ async def add_elective(q: Q):
 @on()
 async def select_program(q: Q):
     await pages.select_program(q)
+
+############################
+## Dismiss dialog actions ##
+############################
+
+#@on('my_dialog.dismissed')
+@on('schedule_table.dismissed')
+@on('schedule_description_dialog.dismissed')
+@on('program_table.dismissed')
+@on('required_description_dialog.dismissed')
+async def dismiss_dialog(q: Q):
+    logging.info('Dismissing dialog')
+    q.page['meta'].dialog = None
+    await q.page.save()
 
 #######################################################
 ####################  MAIN SERVER  ####################

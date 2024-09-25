@@ -25,7 +25,6 @@ class TimedSQLiteConnection:
       - fetchdf returns a Pandas DataFrame
 
     '''
-
     def __init__(self, db_path: str, row_factory: bool = True, timeout: int = 1800):
         self.db_path = db_path
         self.timeout = timeout

@@ -42,255 +42,13 @@ import warnings
 from backend import initialize_ge, initialize_student_info, initialize_student_data
 from backend import TimedSQLiteConnection, _base_query, get_query, get_query_one, get_query_dict, get_query_course_dict, get_query_df
 
-
 #########################################################
 ####################  GET FUNCTIONS  ####################
 #########################################################
 
-async def get_choices_new(timed_connection: TimedSQLiteConnection, query: str, params: tuple = (), 
-                      disabled: Optional[Union[set, list, tuple]] = None, 
-                      enabled: Optional[Union[set, list, tuple]] = None,
-                      tooltip: bool = False):
-    """
-    Return choices for dropdown menus and other UI elements.
-
-    Args:
-        timed_connection: Database connection object
-        query (str): SQL query to fetch choices from the database
-        params (tuple): Parameters for the SQL query (default: ())
-        disabled (set, list, tuple): Iterable of labels that should be disabled in the menu (default: None)
-        enabled (set, list, tuple): Iterable of labels that should be enabled in the menu (default: None)
-        tooltip (bool): If True, return choices with tooltips (default: False)
-
-    Returns:
-        list: List of ui.choice objects for use in H2O Wave menus
-
-    Raises:
-        ValueError: If both disabled and enabled are provided, or if they are of incorrect type
-
-    Note:
-        Either disabled or enabled should be provided, not both.
-        If both disabled and enabled are None, then by default everything is enabled.
-        Queries need to return 'name', 'label', and 'tooltip' as the named values.
-        For tooltips, use '... AS tooltip' in your SQL query.
-
-    Example:
-        disabled = {'Social Science', 'English', 'General Studies'}
-        enabled = {'Social Science', 'English', 'General Studies'}
-        query = "SELECT id AS name, name AS label, explanation AS tooltip FROM Skills"
-    """
-    if disabled is not None and enabled is not None:
-        raise ValueError("Only one of `disabled` or `enabled` should be provided, not both.")
-
-    if disabled is not None:
-        if not isinstance(disabled, (list, tuple, set)):
-            raise ValueError("`disabled` should be a list, tuple, or set")
-        status_set = set(disabled)
-        disable_mode = True
-    elif enabled is not None:
-        if not isinstance(enabled, (list, tuple, set)):
-            raise ValueError("`enabled` should be a list, tuple, or set")
-        status_set = set(enabled)
-        disable_mode = False
-    else:
-        status_set = set()
-        disable_mode = False  # Changed to False to enable everything by default
-
-    try:
-        rows = await get_query(timed_connection, query, params)
-        
-        if tooltip:
-            choices = [
-                ui.choice(
-                    name=str(row['name']),
-                    label=row['label'],
-                    tooltip=row['tooltip'] if row['tooltip'] else '',
-                    disabled=(disable_mode if row['label'] in status_set else not disable_mode)
-                )
-                for row in rows
-            ]
-        else:
-            choices = [
-                ui.choice(
-                    name=str(row['name']),
-                    label=row['label'],
-                    disabled=(disable_mode if row['label'] in status_set else not disable_mode)
-                )
-                for row in rows
-            ]
-        return choices
-
-    except Exception as e:
-        print(f"Error retrieving choices: {str(e)}")
-        return []  # Return an empty list if there's an error
-
-
-## quick hack: diabled={""} (need to fix the entire thing)
-async def get_choices(timed_connection: TimedSQLiteConnection, query: str, params: tuple = (), 
-                      disabled: Optional[Union[set, list, tuple]] = {""}, 
-                      enabled: Optional[Union[set, list, tuple]] = None):
-    """
-    Return choices for dropdown menus and other UI elements.
-
-    Args:
-        timed_connection: Database connection object
-        query (str): SQL query to fetch choices from the database
-        params (tuple): Parameters for the SQL query (default: ())
-        disabled (set, list, tuple): Iterable of labels that should be disabled in the menu (default: None)
-        enabled (set, list, tuple): Iterable of labels that should be enabled in the menu (default: None)
-
-    Returns:
-        list: List of ui.choice objects for use in H2O Wave menus
-
-    Raises:
-        ValueError: If both disabled and enabled are provided, or if they are of incorrect type
-
-    Note:
-        Either disabled or enabled should be provided, not both.
-        If both disabled and enabled are None, then by default everything is enabled.
-
-    Example:
-        disabled = {'Social Science', 'English', 'General Studies'}
-        enabled = {'Social Science', 'English', 'General Studies'}
-    """
-    if disabled is not None and enabled is not None:
-        raise ValueError("Only one of `disabled` or `enabled` should be provided, not both.")
-
-    if disabled is not None:
-        if not isinstance(disabled, (list, tuple, set)):
-            raise ValueError("`disabled` should be a list, tuple, or set")
-        status_set = set(disabled)
-        disable_mode = True
-    elif enabled is not None:
-        if not isinstance(enabled, (list, tuple, set)):
-            raise ValueError("`enabled` should be a list, tuple, or set")
-        status_set = set(enabled)
-        disable_mode = False
-    else:
-        status_set = set()
-        disable_mode = False  # Changed to False to enable everything by default
-
-    try:
-        rows = await get_query(timed_connection, query, params)
-        
-        choices = [
-            ui.choice(
-                name=str(row['name']),
-                label=row['label'],
-                disabled=(disable_mode if row['label'] in status_set else not disable_mode)
-            )
-            for row in rows
-        ]
-        return choices
-
-    except Exception as e:
-        print(f"Error retrieving choices: {str(e)}")
-        return []  # Return an empty list if there's an error
-
 ##############################################################
 ####################  POPULATE FUNCTIONS  ####################
 ##############################################################
-
-
-async def populate_student_info_dict(timed_connection: TimedSQLiteConnection, user_id: int, 
-                                     default_first_term: str = 'Spring 2024') -> dict:
-    """
-    Get information from student_info table and populate the student_info dictionary.
-
-    Args:
-        timed_connection: Database connection object
-        user_id: User ID to query
-        default_first_term: Default term to use if not present in database (default: 'Spring 2024')
-
-    Returns:
-        dict: Student information dictionary
-    """
-    query = """
-    SELECT user_id, fullname AS name, resident_status, app_stage_id, app_stage, student_profile,
-           transfer_credits, financial_aid, program_id
-    FROM student_info_view
-    WHERE user_id = ?
-    """
-    
-    try:
-        result = await get_query_dict(timed_connection, query, params=(user_id,))
-        if not result:
-            raise ValueError(f"No student found with user_id: {user_id}")
-        
-        student_info = result[0]
-        
-        if student_info.get('program_id'):
-            program_id = student_info['program_id']
-            program_info = await get_program_title(timed_connection, program_id)
-            if program_info:
-                student_info['degree_program'] = program_info['title']
-                student_info['degree_id'] = program_info['id']
-
-            student_info['menu'] = await reverse_engineer_dropdown_menu(timed_connection, program_id)
-
-        # Note: first_term will also be selected on the Schedule page
-        student_info.setdefault('first_term', default_first_term)
-        
-        return student_info
-    
-    except Exception as e:
-        # Log the error or handle it as appropriate for your application
-        print(f"Error populating student info: {str(e)}")
-        raise
-
-async def populate_student_data_dict(timed_connection, student_info) -> dict:
-    """
-    Populate the student_data dictionary with user ID, required courses, and schedule.
-
-    Args:
-        timed_connection: Database connection object
-        student_info (dict): Dictionary containing student information from populate_student_info_dict
-
-    Returns:
-        dict: Student data dictionary containing:
-            - user_id: The student's user ID
-            - required: List of required program courses (if program_id is available)
-            - schedule: Student's course schedule (if app_stage_id is 4)
-
-    Note:
-        The function uses asyncio.gather() to run async operations concurrently.
-    """
-    student_data = {
-        'user_id': student_info.get('user_id'),
-        'required': None,
-        'schedule': None
-    }
-
-    program_id = student_info.get('program_id')
-    app_stage_id = student_info.get('app_stage_id')
-
-    async def _get_required_courses():
-        if program_id is not None:
-            return await get_required_program_courses(timed_connection, program_id)
-        return None
-
-    async def _get_schedule():
-        if app_stage_id == 4:
-            return await get_student_progress_d3(timed_connection, student_data['user_id'])
-        return None
-
-    try:
-        required, schedule = await asyncio.gather(
-            _get_required_courses(),
-            _get_schedule()
-        )
-        student_data['required'] = required
-        student_data['schedule'] = schedule
-    except Exception as e:
-        print(f"Error populating student record: {str(e)}")
-        # Depending on your error handling strategy, you might want to re-raise the exception
-
-    return student_data
-
-
-## _ZZ versions are newly rewritten but not all working
-## will incrementally fix them and introduce the correct one
-
 
 ############################################################
 ####################  POPULATE FUNCTIONS  ##################
@@ -364,51 +122,8 @@ async def reset_student_info_data_ZZ(q):
     q.client.student_info_populated = False # may be needed later 
     q.client.student_data = initialize_student_data() # will have required, periods, schedule
 
-async def populate_q_student_info_ZZ(q, timed_connection, user_id):
-    """
-    Populate q.client.student_info and q.client.student_data dictionaries with student information.
 
-    This function retrieves student information from the database and populates the relevant
-    dictionaries in the q object. It's called by `app.initialize_user` and `app.select_sample_user`.
 
-    Args:
-        q: The q object containing application and user data
-        timed_connection: Database connection object (also stored in q)
-        user_id: The ID of the user to retrieve information for (also stored in q)
-
-    Note:
-        timed_connection and user_id are included as parameters for clarity, despite being stored in q.
-
-    Raises:
-        Exception: If there's an error during the data retrieval or population process
-    """
-    try:
-        student_info = await populate_student_info_dict(timed_connection, user_id)
-        student_data = await populate_student_data_dict(timed_connection, student_info)
-
-        q.client.student_info = student_info
-        q.client.student_data = student_data
-
-    except Exception as e:
-        error_message = f"Error populating student info for user {user_id}: {str(e)}"
-        print(error_message)  # For logging purposes
-        raise  # Re-raising the exception for now
-
-    q.client.info_populated = True  
-
-def reset_program(q):
-    '''
-    When program is changed, multiple variables need to be reset
-    '''
-    q.client.student_info['menu']['program'] = None
-    q.client.student_info['program_id'] = None
-    q.client.student_info['degree_program'] = None
-
-    q.client.student_data['required'] = None
-    q.client.student_data['schedule'] = None
-
-    q.page['dropdown'].menu_program.value = None
-    q.page['dropdown'].menu_program.choices = None
 
 #########################################################
 ####################  GET FUNCTIONS  ####################
@@ -2518,22 +2233,7 @@ import backend
 ### These queries are used in app.py for menus and  ###
 ### render_dropdown_menus_horizontal                ###
 
-degree_query = 'SELECT id AS name, name AS label FROM menu_degrees'
-area_query = '''
-    SELECT DISTINCT menu_area_id AS name, area_name AS label
-    FROM menu_all_view 
-    WHERE menu_degree_id = ?
-'''
-program_query_old = '''
-    SELECT program_id AS name, program_name AS label
-    FROM menu_all_view 
-    WHERE menu_degree_id = ? AND menu_area_id = ?
-'''
-program_query = '''
-    SELECT program_id AS name, program_name AS label, disabled
-    FROM menu_all_view 
-    WHERE menu_degree_id = ? AND menu_area_id = ?
-'''
+
 ########################################################
 ####################  LAYOUT CARDS  ####################
 ########################################################
@@ -2656,86 +2356,6 @@ def create_program_selection_card(location='horizontal', width='60%'):
 ####################  PROGRAMS PAGE ##########################
 ##############################################################
 
-async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width='300px'):
-    '''
-    Create menus for selecting degree, area of study, and program
-    '''
-
-    timed_connection = q.client.conn    
-    enabled_degree = {"Bachelor's", "Undergraduate Certificate"}
-    disabled_programs = q.app.disabled_program_menu_items
-
-    # enforcing string because I've got a bug somewhere (passing an int instead of str)
-    dropdowns = ui.inline([
-        ui.dropdown(
-            name='menu_degree',
-            label='Degree',
-            value=str(q.client.student_info['menu']['degree']) if \
-                (q.client.student_info['menu']['degree'] is not None) else q.args.menu_degree,
-            trigger=True,
-            width='230px',
-            choices = await backend.get_choices(timed_connection, degree_query, disabled=None, enabled=enabled_degree)
-        ),
-        ui.dropdown(
-            name='menu_area',
-            label='Area of Study',
-            value=str(q.client.student_info['menu']['area_of_study']) if \
-                (str(q.client.student_info['menu']['area_of_study']) is not None) else \
-                str(q.args.menu_area),
-            trigger=True,
-            disabled=False,
-            width='250px',
-            choices=None if (q.client.student_info['menu']['degree'] is None) else \
-                await backend.get_choices(timed_connection, area_query, 
-                                          params=(q.client.student_info['menu']['degree'],))
-        ),
-        ui.dropdown(
-            name='menu_program',
-            label='Program',
-            value=str(q.client.student_info['menu']['program']) if \
-                (q.client.student_info['menu']['program'] is not None) else q.args.menu_program,
-            trigger=True,
-            disabled=False,
-            width='300px',
-            choices=None if (q.client.student_info['menu']['area_of_study'] is None) else \
-                await backend.get_choices(timed_connection, program_query, 
-                    params=(q.client.student_info['menu']['degree'], q.client.student_info['menu']['area_of_study']),
-                    disabled=disabled_programs
-                )
-        )
-    ], justify='start', align='start')
-
-    command_button = ui.button(
-        name='command_button', 
-        label='Select', 
-        disabled=False,
-        commands=[
-            ui.command(name='select_program', label='Select Program'),
-            #ui.command(name='classes_menu', label='Classes', 
-            #    items=[
-            #        ui.command(name='add_ge', label='Add GE'),
-            #        ui.command(name='add_elective', label='Add Electives'),  
-            #]),
-            ui.command(name='add_ge', label='Add GE'),
-            ui.command(name='add_elective', label='Add Electives')  
-    ])
-
-    card = ui.form_card(
-        box = location,
-        items = [
-            #ui.text_xl('Browse Programs'),
-            ui.inline([
-                dropdowns, 
-                command_button
-            ],
-            justify='between', 
-            align='end')
-        ]
-    )
-        
-    add_card(q, 'dropdown', card)
-
-    ########################
 
 ############################################################
 ####################  SKILLS PAGE ##########################
@@ -3009,14 +2629,7 @@ import utils
 ##################  DEFINITIONS AND QUERIES  #########################
 ######################################################################
 
-UMGC_tags = [
-    ui.tag(label='ELECTIVE', color='#fdbf38', label_color='$black'),
-    ui.tag(label='REQUIRED', color='#a30606'),
-    ui.tag(label='MAJOR', color='#135f96'),
-#    ui.tag(label='GENERAL', color='#3c3c43'), # dark gray
-#    ui.tag(label='GENERAL', color='#787800'), # khaki   
-    ui.tag(label='GENERAL', color='#3b8132', label_color='$white'), # green   
-]
+
 
 ### These queries are used in app.py for menus and  ###
 ### render_dropdown_menus_horizontal                ###
@@ -4306,45 +3919,6 @@ async def render_dropdown_menus_horizontal_ZZ(q, box='1 2 7 1', location='horizo
 
     ########################
 
-async def render_program_description_ZZ(q, box='1 3 7 2', location='top_vertical', width='100%', height='100px'):
-    '''
-    Renders the program description in an article card
-    :param q: instance of Q for wave query
-    :param location: page location to display
-    '''
-    flex = q.app.flex
-    timed_connection = q.client.conn
-    title = q.client.student_info['degree_program'] # program name
-
-    if flex:
-        box = ui.box(location, width=width, height=height)
-
-    query = '''
-        SELECT description, info, learn, certification
-        FROM program_descriptions WHERE program_id = ?
-    '''
-    row = await backend.get_query_one(timed_connection, query, params=(q.client.student_info['program_id'],))
-    if row:
-        # major = '\n##' + title + '\n\n'
-        frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
-        if int(q.client.student_info['program_id']) in (4, 24, 29):
-            content = row['info'] + '\n\n' + row['description']
-        else:
-            content = row['description'] + frontstuff + row['learn'] #+ '\n\n' + row['certification']
-
-        card = add_card(q, 'program_description', ui.markdown_card(
-            box=box, 
-            title=title,
-            content=content
-        ))
-        #card = add_card(q, 'program_description', ui.article_card(
-        #    box=box, 
-        #    title=title,
-        ##    content=row['description'] + row['']
-        #    content=content
-        #))
-        return card
-
 async def render_program_dashboard_ZZ(q, box=None, location='horizontal', width='100px'):
     '''
     Renders the dashboard with explored majors
@@ -4580,50 +4154,6 @@ async def render_program_table_ZZ(q, box='1 5 6 5', location='horizontal', width
     ))
     return card
 
-async def render_program_ZZ(q):
-    await render_program_description(q, location='top_vertical', height='250px', width='100%')
-    await render_program_table(q, location='horizontal', width='90%')
-    await render_program_dashboard(q, location='horizontal', width='150px')
-
-
-async def render_program_description(q, box='1 3 7 2', location='top_vertical', width='100%', height='100px'):
-    '''
-    Renders the program description in an article card
-    :param q: instance of Q for wave query
-    :param location: page location to display
-    '''
-    flex = q.app.flex
-    timedConnection = q.client.conn
-    title = q.client.student_info['degree_program'] # program name
-
-    if flex:
-        box = ui.box(location, width=width, height=height)
-
-    query = '''
-        SELECT description, info, learn, certification
-        FROM program_descriptions WHERE program_id = ?
-    '''
-    row = await backend.get_query_one(timedConnection, query, params=(q.client.student_info['program_id'],))
-    if row:
-        # major = '\n##' + title + '\n\n'
-        frontstuff = "\n\n#### What You'll Learn\nThrough your coursework, you will learn how to\n"
-        if int(q.client.student_info['program_id']) in (4, 24, 29):
-            content = row['info'] + '\n\n' + row['description']
-        else:
-            content = row['description'] + frontstuff + row['learn'] #+ '\n\n' + row['certification']
-
-        card = add_card(q, 'program_description', ui.markdown_card(
-            box=box, 
-            title=title,
-            content=content
-        ))
-        #card = add_card(q, 'program_description', ui.article_card(
-        #    box=box, 
-        #    title=title,
-        ##    content=row['description'] + row['']
-        #    content=content
-        #))
-        return card
 
 async def render_program_dashboard(q, box=None, location='horizontal', width='100px'):
     '''
@@ -4633,12 +4163,11 @@ async def render_program_dashboard(q, box=None, location='horizontal', width='10
     flex=True: location is required
     flex=False: box is required
     '''
-    flex = q.app.flex
-    timedConnection = q.client.conn
-    title = q.client.student_info['degree_program'] # program name
+    conn = q.client.conn
+    student_info = q.client.student_info
+    title = student_info['degree_program'] # program name
 
-    if flex:
-        box = ui.box(location, width=width)
+    box = ui.box(location, width=width)
     #if q.client.student_info['menu_degree'] == '2':
 
     # get program summary for bachelor's degrees
@@ -4705,160 +4234,8 @@ async def render_program_dashboard(q, box=None, location='horizontal', width='10
             ])
         )
         return card
-        #else: '#3c3c43' 
-        #    pass
-        #    # send a warning
 
-UMGC_tags = [
-    ui.tag(label='ELECTIVE', color='#fdbf38', label_color='$black'),
-    ui.tag(label='REQUIRED', color='#a30606'),
-    ui.tag(label='MAJOR', color='#135f96'),
-#    ui.tag(label='GENERAL', color='#3c3c43'), # dark gray
-#    ui.tag(label='GENERAL', color='#787800'), # khaki   
-    ui.tag(label='GENERAL', color='#3b8132', label_color='$white'), # green   
-]
 
-async def render_program_table(q, box='1 5 6 5', location='horizontal', width='90%', 
-                               height='500px', check=True, ge=False, elective=False):
-    '''
-    q:
-    df:
-    location:
-    cardname:
-    width:
-    height:
-    ge: Include GE classes
-    elective: Include Elective classes
-    '''
-    flex = q.app.flex
-    df = q.client.student_data['required']
-
-    async def _render_program_group(group_name, record_type, df, collapsed, check=True):
-        '''
-        group_name: 
-        record_type: 
-        df: course (Pandas) dataframe
-        collapsed:
-        check: If True, only return card if # rows > 0
-            e.g., we will always return 'MAJOR' but not necessarily 'REQUIRED'
-        '''
-        # card will be returned if 
-        # (1) check == False
-        # (2) check == True and sum(rows) > 0
-        no_rows = ((df['type'].str.upper() == record_type).sum() == 0)
-
-        if check and no_rows: #(check and not_blank) or (not check):
-            return ''
-        else:
-            return ui.table_group(group_name, [
-                ui.table_row(
-                    #name=str(row['id']),
-                    name=row['course'],
-                    cells=[
-                        row['course'],
-                        row['title'],
-                        str(row['credits']),
-                        row['type'].upper(),
-                    ]
-                ) for _, row in df.iterrows() if row['type'].upper() == record_type
-            ], collapsed=collapsed)
-
-    # Create groups with logic
-    groups = []
-    result = await _render_program_group(
-        'Required Major Core Courses',
-        'MAJOR',
-        df, collapsed=False, check=False
-    )
-    if result != '':
-        groups.append(result)
-        
-    result = await _render_program_group(
-        'Required Related Courses/General Education',
-        'REQUIRED,GENERAL',
-        df, collapsed=True, check=check
-    )
-    if result != '':
-        groups.append(result)
-    
-    result = await _render_program_group(
-        'Required Related Courses/Electives',
-        'REQUIRED,ELECTIVE',
-        df, collapsed=True, check=check
-    )
-    if result != '':
-        groups.append(result)
-
-    if ge:
-        result = await _render_program_group(
-            'General Education',
-            'GENERAL',
-            df, collapsed=True, check=False
-        )
-        if result != '':
-            groups.append(result)
-        
-    if elective:
-        result = await _render_program_group(
-            'Electives',
-            'ELECTIVE',
-            df, collapsed=True, check=False
-        )
-        if result != '':
-            groups.append(result)
-
-    columns = [
-        # ui.table_column(name='seq', label='Seq', data_type='number'),
-        ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
-        ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300',
-                        cell_overflow='wrap'),
-        ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
-                        align='center'),
-        ui.table_column(
-            name='tag',
-            label='Type',
-            min_width='190',
-            filterable=True,
-            cell_type=ui.tag_table_cell_type(
-                name='tags',
-                tags=UMGC_tags
-            )
-        ),
-        ui.table_column(name='menu', label='Menu', max_width='150',
-            cell_type=ui.menu_table_cell_type(name='commands', 
-                commands=[
-                    ui.command(name='view_program_description', label='Course Description'),
-                    #ui.command(name='prerequisites', label='Show Prerequisites'),
-                ]
-        ))
-    ]
-
-    if flex:
-        box = ui.box(location, height=height, width=width)
-
-    #title = q.client.student_info['degree_program'] + ': Explore Required Courses'
-    title = 'Explore Required Courses'
-    card = add_card(q, 'program_table_card', ui.form_card(
-        box=box,
-        items=[
-            ui.inline(justify='between', align='center', items=[
-                ui.text(title, size=ui.TextSize.L),
-                ui.button(name='describe_program', label='About', 
-                    #caption='Description', 
-                    primary=True, disabled=True)
-            ]),
-            ui.table(
-                name='program_table',
-                downloadable=False,
-                resettable=False,
-                groupable=False,
-                height=height,
-                columns=columns,
-                groups=groups
-            )
-        ]
-    ))
-    return card
 
 async def render_program(q):
     await render_program_description(q, location='top_vertical', height='250px', width='100%')

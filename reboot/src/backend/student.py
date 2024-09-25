@@ -122,7 +122,6 @@ def reset_student():
 ####################  POPULATE FUNCTIONS  ####################
 ##############################################################
 
-
 ## all of the menu functions other than retrieving information from the database should be in frontend
 ## the reverse engineer should really be in frontend instead of backend
 
@@ -215,7 +214,7 @@ async def populate_student_info_dict(conn: TimedSQLiteConnection, user_id: int,
         print(f"Error populating student info: {str(e)}")
         raise
 
-async def populate_student_data_dict(conn, student_info) -> dict:
+async def populate_student_data_dict(conn: TimedSQLiteConnection, student_info: dict) -> dict:
     """
     Populate the student_data dictionary with user ID, required courses, and schedule.
 
@@ -245,12 +244,14 @@ async def populate_student_data_dict(conn, student_info) -> dict:
     async def _get_required_courses():
         if program_id is not None:
             return await get_required_program_courses(conn, program_id)
-        return None
+        else:
+            return None
 
     async def _get_schedule():
-        if app_stage_id == 4:
+        if app_stage_id == 5:
             return await get_student_progress_d3(conn, student_data['user_id'])
-        return None
+        else:
+            return None
 
     try:
         required, schedule = await asyncio.gather(
@@ -266,9 +267,105 @@ async def populate_student_data_dict(conn, student_info) -> dict:
 
     return student_data
 
+async def populate_student_info_data(q: Q, user_id: int) -> None:
+    """
+    Populate q.client.student_info and q.client.student_data dictionaries with student information.
+
+    This function retrieves student information from the database and populates the relevant
+    dictionaries in the q object. It's called by `app.initialize_user` and `app.select_sample_user`.
+
+    Args:
+        q: The q object containing application and user data
+        user_id: The ID of the user to retrieve information for (also stored in q)
+
+    Note:
+        timed_connection and user_id are included as parameters for clarity, despite being stored in q.
+
+    Raises:
+        Exception: If there's an error during the data retrieval or population process
+    """
+    try:
+        conn = q.client.conn
+
+        student_info = await populate_student_info_dict(conn, user_id)
+        student_data = await populate_student_data_dict(conn, student_info)
+
+        q.client.student_info = student_info
+        q.client.student_data = student_data
+
+    except Exception as e:
+        error_message = f"Error populating student info for user {user_id}: {str(e)}"
+        print(error_message)  # For logging purposes
+        raise  # Re-raising the exception for now
+
+    q.client.info_populated = True  
+
+
 #########################################################
 ####################  GET FUNCTIONS  ####################
 #########################################################
+
+async def get_choices(conn: TimedSQLiteConnection, query: str, params: tuple = (), 
+                      disabled: Optional[Union[set, list, tuple]] = {""}, 
+                      enabled: Optional[Union[set, list, tuple]] = None):
+    """
+    Return choices for dropdown menus and other UI elements.
+    # quick hack: diabled={""} to make this work when both are none (need to fix the entire thing)
+    
+    Args:
+        conn: Asynchronous database connection object
+        query (str): SQL query to fetch choices from the database
+        params (tuple): Parameters for the SQL query (default: ())
+        disabled (set, list, tuple): Iterable of labels that should be disabled in the menu (default: None)
+        enabled (set, list, tuple): Iterable of labels that should be enabled in the menu (default: None)
+
+    Returns:
+        list: List of ui.choice objects for use in H2O Wave menus
+
+    Raises:
+        ValueError: If both disabled and enabled are provided, or if they are of incorrect type
+
+    Note:
+        Either disabled or enabled should be provided, not both.
+        If both disabled and enabled are None, then by default everything is enabled.
+
+    Example:
+        disabled = {'Social Science', 'English', 'General Studies'}
+        enabled = {'Social Science', 'English', 'General Studies'}
+    """
+    if disabled is not None and enabled is not None:
+        raise ValueError("Only one of `disabled` or `enabled` should be provided, not both.")
+
+    if disabled is not None:
+        if not isinstance(disabled, (list, tuple, set)):
+            raise ValueError("`disabled` should be a list, tuple, or set")
+        status_set = set(disabled)
+        disable_mode = True
+    elif enabled is not None:
+        if not isinstance(enabled, (list, tuple, set)):
+            raise ValueError("`enabled` should be a list, tuple, or set")
+        status_set = set(enabled)
+        disable_mode = False
+    else:
+        status_set = set()
+        disable_mode = False  # Changed to False to enable everything by default
+
+    try:
+        rows = await conn.query(query, params)
+        
+        choices = [
+            ui.choice(
+                name=str(row['name']),
+                label=row['label'],
+                disabled=(disable_mode if row['label'] in status_set else not disable_mode)
+            )
+            for row in rows
+        ]
+        return choices
+
+    except Exception as e:
+        print(f"Error retrieving choices: {str(e)}")
+        return []  # Return an empty list if there's an error
 
 async def get_program_title(conn: TimedSQLiteConnection, program_id: int):
     """
