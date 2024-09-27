@@ -18,10 +18,6 @@ import frontend.serve
 import frontend.pages as pages
 import frontend.cards as cards
 
-@on('#page1')
-async def page1(q: Q):
-    await pages.page1(q)
-
 #######################################################
 ####################  HOME EVENTS  ####################
 #######################################################
@@ -90,6 +86,14 @@ async def select_program(q: Q):
     await pages.select_program(q)
 
 #########################################################
+####################  COURSE EVENTS  ####################
+#########################################################
+
+@on('#course')
+async def course(q: Q):
+    await pages.course(q)
+ 
+#########################################################
 ####################  SKILLS EVENTS  ####################
 #########################################################
 
@@ -112,14 +116,6 @@ async def explore_skills_program(q: Q):
 @on()
 async def select_skills_program(q: Q):
     await pages.select_skills_program(q)
-
-############################################################
-####################  SCHEDULES EVENTS  ####################
-############################################################
-
-@on('#schedule')
-async def schedule(q: Q):
-    await pages.schedule(q)
 
 #####################################################
 ####################  GE EVENTS  ####################
@@ -350,6 +346,55 @@ async def ge_res_3b(q: Q):
 @on()
 async def ge_res_3c(q: Q):
     await pages.ge_res_3c(q)
+
+############################################################
+####################  SCHEDULES EVENTS  ####################
+############################################################
+
+@on('#schedule')
+async def schedule(q: Q):
+    await pages.schedule(q)
+
+###########################
+## Schedule Menu actions ##
+###########################
+
+@on()
+async def submit_schedule_menu(q: Q):
+    await pages.submit_schedule_menu(q)
+
+############################
+## Schedule Table actions ##
+############################
+
+@on()
+async def schedule_table(q: Q):
+    await pages.schedule_table(q)
+
+# view description
+@on()
+async def view_schedule_description(q: Q):
+    await pages.view_schedule_description(q)
+
+# move class
+@on()
+async def move_class(q: Q):
+    await pages.move_class(q)
+
+# lock class
+@on()
+async def lock_class(q: Q):
+    await pages.lock_class(q)
+
+# select elective
+@on()
+async def select_elective(q: Q):
+    await pages.select_elective(q)
+
+
+#######################################################
+####################  MISC EVENTS  ####################
+#######################################################
 
 ############################
 ## Dismiss dialog actions ##

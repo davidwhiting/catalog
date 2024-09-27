@@ -389,8 +389,6 @@ async def menu_program(q: Q):
 
     await q.page.save()
 
-
-
 ###########################################################
 ####################  PROGRAMS EVENTS  ####################
 ###########################################################
@@ -544,8 +542,47 @@ async def select_skills_program(q: Q):
 ####################  COURSES PAGE  ####################
 ########################################################
 
+async def student_course(q: Q):
+    if q.client.student_data['schedule'] is not None:
+        add_card(q, 'courses_instructions', ui.form_card(
+            box='top_horizontal',
+            items=[
+                ui.text('**Instructions**: You have selected courses. You may now add electives or view your schedule.')
+            ]
+        ))
+        await cards.render_course_page_table_use(q, location='horizontal')
+
+    await q.page.save()
+
+async def admin_course(q: Q):
+    await student_course(q)
+
+async def coach_course(q: Q):
+    await student_course(q)
+
+@on('#course')
+async def course(q: Q):
+    clear_cards(q)
+
+    if q.client.role == 'admin':
+        # admin course page
+        await admin_course(q)
+
+    elif q.client.role == 'coach':
+        # coach course page
+        await coach_course(q)
+        
+    elif q.client.role == 'student':
+        # student course page
+        await student_course(q)
+        
+    else:
+        await student_course(q)
+        
+    await q.page.save()
+
 ###########################################################
-####################  COURSES ACTIONS  ####################
+####################  COURSE ACTIONS  ####################
 ###########################################################
 
 ###################################################
@@ -822,24 +859,22 @@ async def ge_res_3c(q: Q):
 #########################################################
 
 async def student_schedule(q: Q):
-    if q.client.student_data['schedule'] is not None:
+    student_data = q.client.student_data
+    student_info = q.client.student_info
+
+    if student_data['schedule'] is not None:
         # need to check whether all terms and sessions are all 0,
         # meaning a schedule template was created but no classes
         # were actually scheduled
 
-        #html_template = cards.create_html_template_13(
-        #    df = q.user.student_data['schedule'], 
-        #    start_term = q.user.student_info['first_term']
-        #)
+        html_template = cards.create_html_template(
+            df = student_data['schedule'], 
+            start_term = student_info['first_term']
+        )
 
-        #html_template = cards.create_html_template(
-        #    df = q.client.student_data['schedule'], 
-        #    start_term = q.client.student_info['first_term']
-        #)
-        ##add_card(q, 'd3plot', cards.render_d3plot(html_template, location='horizontal', width='80%'))
-        #await cards.render_d3plot(q, html_template, location='horizontal', width='75%', height='400px')
+        await cards.render_d3plot(q, html_template, location='horizontal', width='75%', height='400px')
         await cards.render_schedule_menu(q, location='horizontal', width='20%')
-        #await cards.render_schedule_page_table(q, location='bottom_horizontal', width='100%')
+        await cards.render_schedule_page_table(q, location='vertical', width='100%')
 
 async def admin_schedule(q: Q):
     await student_schedule(q)
@@ -876,5 +911,102 @@ async def schedule(q: Q):
 ####################  SCHEDULE ACTIONS  ####################
 ############################################################
 
-#### OLD PAGES BELOW
-#### USE AS EXAMPLES
+###########################
+## Schedule Menu actions ##
+###########################
+
+async def submit_schedule_menu(q: Q):
+    '''
+    Respond to Submit button on menu on Schedule page
+    Launch generate_periods(start_term='SPRING 2024', years=8, max_courses=3, max_credits=18, 
+                     summer=False, sessions=[1,3], as_df=True):
+    '''
+    schedule_menu = {}
+    schedule_menu['first_term'] = q.args.first_term
+    schedule_menu['sessions'] = q.args.sessions_checklist
+    schedule_menu['max_courses'] = q.args.courses_per_session
+    schedule_menu['max_credits'] = q.args.max_credits
+    schedule_menu['attend_summer'] = q.args.attend_summer
+    q.client.student_info['schedule_menu'] = schedule_menu
+
+    q.client.student_data['periods'] = utils.generate_periods(
+            start_term=schedule_menu['first_term'],
+            max_courses=schedule_menu['max_courses'],
+            max_credits=schedule_menu['max_credits'],
+            summer=schedule_menu['attend_summer'],
+            sessions=schedule_menu['sessions'],
+            as_df=True
+        )
+
+    q.page['schedule_debug'].content = f'''
+### q.args values:
+{q.args}
+
+### q.events values:
+{q.events}
+
+### q.client value:
+{q.client}
+
+### q.client.student_info values:
+{q.client.student_info}
+
+### q.client.student_info['schedule_menu'] values:
+{q.client.student_info['schedule_menu']}
+
+### q.client.student_data values:
+
+#### Required:
+{q.client.student_data['required']}
+
+#### Periods:
+{q.client.student_data['periods']}
+
+#### Schedule:
+{q.client.student_data['schedule']}
+    '''
+    await q.page.save()
+
+
+############################
+## Schedule Table actions ##
+############################
+
+async def schedule_table(q: Q):
+    '''
+    Respond to events (clicking Course link or double-clicking row)
+    in the table on Schedule page. This will display the course description
+    by default.
+
+    Notes:
+      - q.args.table_name is set to [row_name]
+      - the name of the table is 'schedule_table'
+      - the name of the row is name = row['name']    
+    '''
+    coursename = q.args.schedule_table[0] # am I getting coursename wrong here?
+    frontend.course_description_dialog(q, coursename, which='schedule')
+    logging.info('The value of coursename in schedule_table is ' + coursename)
+    await q.page.save()
+
+# view description
+async def view_schedule_description(q: Q):
+    '''
+    Respond to the menu event 'Course Description'
+    (Calls same function as schedule_table above)
+    '''
+    coursename = q.args.view_schedule_description
+    frontend.course_description_dialog(q, coursename, which='schedule')
+    logging.info('The value of coursename in view_schedule_description is ' + str(coursename))
+    await q.page.save()
+
+# move class
+async def move_class(q: Q):
+    pass
+
+# lock class
+async def lock_class(q: Q):
+    pass
+
+# select elective (may be multiple tables)
+async def select_elective(q: Q):
+    pass
