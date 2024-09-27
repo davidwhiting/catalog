@@ -112,6 +112,21 @@ async def home(q: Q):
 #        card = cards.return_tasks_card(checked=4, location='top_horizontal', width='350px', height='400px')
 #        add_card(q, 'home/tasks', card)
 
+async def next_demographic_2(q: Q):
+    clear_cards(q)
+
+    student_info = q.client.student_info
+    if q.args.resident_status is not None:
+        try:
+            student_info['resident_status'] = int(q.args.resident_status)
+        except ValueError:
+            pass  # Handle the error or log it if needed
+    logging.info(f'student_info: {student_info}')
+
+    card = cards.create_program_selection_card(location='top_horizontal')
+    add_card(q, 'program_selection_options', card)
+    cards.tasks_checked1(q)
+
     await q.page.save()
 
 #######################################################
@@ -153,7 +168,7 @@ async def next_demographic_1(q: Q) -> None:
 
     await q.page.save()
 
-async def next_demographic_2(q: Q) -> None:
+async def next_demographic_2a(q: Q) -> None:
     '''
     Respond to submission by clicking next on 'Tell us about yourself' card 1
     (from demographics1 function)
@@ -466,6 +481,11 @@ async def skills(q: Q):
             #], align='start'),
         ]
     ))
+    if skills in q.client.student_data:
+        values = q.client.student_data['skills']
+    else:
+        values = None
+
     card = await cards.return_skills_menu_card(conn, location='top_vertical', width='300px')
     add_card(q, 'skill_card', card)
     await q.page.save()
@@ -633,7 +653,7 @@ async def courses(q: Q):
     await q.page.save()
 
 ###########################################################
-####################  COURSE ACTIONS  ####################
+####################  COURSES ACTIONS  ####################
 ###########################################################
 
 ###################################################
@@ -904,6 +924,25 @@ async def ge_res_3c(q: Q):
     # reset dropdown menu items?
     # q.page['ge_debug'].content = ge_debug_content(q)
     await q.page.save()
+
+##########################################################
+####################  ELECTIVES PAGE  ####################
+##########################################################
+
+async def electives(q: Q):
+    q.page['sidebar'].value = '#electives'
+    card_height = '400px'
+    clear_cards(q)
+
+    cards.render_elective_cards(q)
+
+    card = cards.return_tasks_card(checked=2, location='horizontal', width='350px', height=card_height)
+    add_card(q, 'electives/tasks', card)
+    await q.page.save()
+
+#############################################################
+####################  ELECTIVES ACTIONS  ####################
+#############################################################
 
 #########################################################
 ####################  SCHEDULE PAGE  ####################

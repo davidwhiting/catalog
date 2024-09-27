@@ -36,6 +36,8 @@ async def next_demographic_2(q: Q):
     await pages.next_demographic_2(q)
 
 
+## FINISH HOME
+
 ##########################################################
 ####################  PROGRAM EVENTS  ####################
 ##########################################################
@@ -149,21 +151,15 @@ async def ge_arts_2(q: Q):
 
 @on()
 async def ge_beh_check(q: Q):
-    # set nopre = True
-    q.client.student_info['ge']['beh']['nopre'] = True
-    await q.page.save()
+    await pages.ge_beh_check(q)
 
 @on()
 async def ge_beh_1(q: Q):
-    q.client.student_info['ge']['beh']['1'] = q.args.ge_beh_1
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_beh_1(q)
 
 @on()
 async def ge_beh_2(q: Q):
-    q.client.student_info['ge']['beh']['2'] = q.args.ge_beh_2
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_beh_2(q)
 
 ############
 ## GE Bio ##
@@ -171,83 +167,23 @@ async def ge_beh_2(q: Q):
 
 @on()
 async def ge_bio_check(q: Q):
-    # set nopre = True
-    q.client.student_info['ge']['bio']['nopre'] = True
-    await q.page.save()
-
-async def handle_dropdown_change(q, changed_dropdown):
-    '''
-    When one of three menus is selected, clear the others and reset 
-    to defaults
-    '''
-    dropdowns=['ge_bio_1a', 'ge_bio_1b', 'ge_bio_1c']
-    dropdowns.remove(changed_dropdown)
-
-    selected = changed_dropdown.split('_')[2]
-    q.client.student_info['ge']['bio'][selected] = q.args[changed_dropdown]
-
-    for dropdown in dropdowns:
-        # reset menu options to default
-        q.page['ge_req4'].items[dropdown].value = None
-        # clear q.client.student_info['ge']['bio'][which]
-        which = dropdown.split('_')[2]
-        q.client.student_info['ge']['bio'][which] = None
-
-    await q.page.save()
+    await pages.ge_bio_check(q)
 
 @on()
 async def ge_bio_1a(q: Q):
-    logging.info('The value of ge_bio_1a = ' + q.args.ge_bio_1a)
-#    await handle_dropdown_change(q, 'ge_bio_1a')
-#    q.page['ge_debug'].content = ge_debug_content
-#    await q.page.save()
-
-    q.client.student_info['ge']['bio']['1a'] = q.args.ge_bio_1a
-    q.client.student_info['ge']['bio']['1b'] = None
-    q.client.student_info['ge']['bio']['1c'] = None
-    # reset dropdown menu items?
-    #q.page['ge_bio'].
-
-    #q.page['ge_debug'].content = ge_debug_content(q)
-
-    await q.page.save()
+    await pages.ge_bio_1a(q)
 
 @on()
 async def ge_bio_1b(q: Q):
-    logging.info('The value of ge_bio_1b = ' + q.args.ge_bio_1b)
-##    await handle_dropdown_change(q, 'ge_bio_1b')
-##    q.page['ge_debug'].content = ge_debug_content
-##    await q.page.save()
-#   
-    q.client.student_info['ge']['bio']['1a'] = None
-    q.client.student_info['ge']['bio']['1b'] = q.args.ge_bio_1b
-    q.client.student_info['ge']['bio']['1c'] = None
-##    # reset dropdown menu items?
-
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_bio_1b(q)
 
 @on()
 async def ge_bio_1c(q: Q):
-    logging.info('The value of ge_bio_1c = ' + q.args.ge_bio_1c)
-#    await handle_dropdown_change(q, 'ge_bio_1b')
-#    q.page['ge_debug'].content = ge_debug_content
-#    await q.page.save()
-
-    q.client.student_info['ge']['bio']['1a'] = None
-    q.client.student_info['ge']['bio']['1b'] = None
-    q.client.student_info['ge']['bio']['1c'] = q.args.ge_bio_1c
-#    # reset dropdown menu items?
-
-    #q.page['ge_debug'].content = ge_debug_content
-    await q.page.save()
+    await pages.ge_bio_1c(q)
 
 @on()
 async def ge_bio_2(q: Q):
-    q.client.student_info['ge']['bio']['2'] = q.args.ge_bio_2
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_bio_2(q)
 
 #############
 ## GE Comm ##  These all work !!!
@@ -255,37 +191,23 @@ async def ge_bio_2(q: Q):
 
 @on()
 async def ge_comm_check(q: Q):
-    # set nopre = True
-    q.client.student_info['ge']['comm']['nopre'] = True
-    await q.page.save()
+    await pages.ge_comm_check(q)
 
 @on()
 async def ge_comm_1(q: Q):
-    q.client.student_info['ge']['comm']['1'] = q.args.ge_comm_1
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_comm_1(q)
 
 @on()
 async def ge_comm_2(q: Q):
-    q.client.student_info['ge']['comm']['2'] = q.args.ge_comm_2
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_comm_2(q)
 
 @on()
 async def ge_comm_3(q: Q):
-    q.client.student_info['ge']['comm']['3'] = q.args.ge_comm_3
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_comm_3(q)
 
 @on()
 async def ge_comm_4(q: Q):
-    q.client.student_info['ge']['comm']['4'] = q.args.ge_comm_4
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_comm_4(q)
 
 #############
 ## GE Math ##  This works! 
@@ -293,16 +215,11 @@ async def ge_comm_4(q: Q):
 
 @on()
 async def ge_math_check(q: Q):
-    # set nopre = True
-    q.client.student_info['ge']['math']['nopre'] = True
-    await q.page.save()
+    await pages.ge_math_check(q)
 
 @on()
 async def ge_math_1(q: Q):
-    q.client.student_info['ge']['math']['1'] = q.args.ge_math_1
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_math_1(q)
 
 ############
 ## GE Res ##
@@ -310,30 +227,19 @@ async def ge_math_1(q: Q):
 
 @on()
 async def ge_res_check(q: Q):
-    # set nopre = True
-    q.client.student_info['ge']['res']['nopre'] = True
-    await q.page.save()
+    await pages.ge_res_check(q)
 
 @on()
 async def ge_res_1(q: Q):
-    q.client.student_info['ge']['res']['1'] = q.args.ge_res_1
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_res_1(q)
 
 @on()
 async def ge_res_2(q: Q):
-    q.client.student_info['ge']['res']['2'] = q.args.ge_res_2
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_res_2(q)
 
 @on()
 async def ge_res_3(q: Q):
-    q.client.student_info['ge']['res']['3'] = q.args.ge_res_3
-    # reset dropdown menu items?
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+    await pages.ge_res_3(q)
 
 @on()
 async def ge_res_3a(q: Q):
@@ -353,11 +259,7 @@ async def ge_res_3c(q: Q):
 
 @on('#electives')
 async def electives(q: Q):
-    pass
-    #await q.page.save()
-
-    #await pages.schedule(q)
-
+    await pages.electives(q)
 
 ############################################################
 ####################  SCHEDULES EVENTS  ####################

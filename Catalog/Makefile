@@ -18,25 +18,33 @@ ALTERNATE_HOST_PORT := 8002
 # Default target
 default: build_azure
 
-# Docker build commands
+# Unzip bz2 file stored in git to UMGC.db
+unzip_db:
+	@if [ ! -f src/UMGC.db ]; then \
+		bzcat UMGC_source.db.bz2 > src/UMGC.db; \
+	else \
+		echo "src/UMGC.db already exists. Skipping extraction."; \
+	fi
+## Unzip bz2 file stored in git to UMGC.db
+#unzip_db:
+#	bzcat UMGC_source.db.bz2 > src/UMGC.db
 
-build_amd:
+# Docker build commands
+build_amd: unzip_db
 	docker build --platform linux/amd64 \
 		--build-arg PLATFORM=amd64 \
 		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
 		-t $(DOCKER_IMAGE_NAME):latest \
 		-f dockerfile .
 
-build_local: build_amd
-
-build_azure:
+build_azure: unzip_db
 	docker build --platform linux/amd64 \
 		--build-arg PLATFORM=amd64 \
 		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
 		-t $(DOCKER_IMAGE_AZURE):latest \
 		-f dockerfile .
 
-build_arm:
+build_arm: unzip_db
 	docker build --platform linux/arm64 \
 		--build-arg PLATFORM=arm64 \
 		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
@@ -45,8 +53,9 @@ build_arm:
 
 build_apple: build_arm
 build: build_azure
-
-build_all: build_azure build_amd
+build_local: build_amd
+build_mac: build_apple build_azure
+build_all: build_local build_azure
 
 # Docker run commands
 run_amd:
@@ -64,15 +73,27 @@ run_arm:
 		$(DOCKER_IMAGE_NAME_ARM):latest
 
 run_alternate:
-	docker run --rm --name umgc_catalog_arm \
+	docker run --rm --name umgc_catalog_alternate \
+		-p $(ALTERNATE_PORT):$(PORT) \
+		-p $(ALTERNATE_HOST_PORT):$(HOST_PORT) \
+		-e PORT=$(PORT) \
+		$(DOCKER_IMAGE_NAME):latest
+
+run_alternate_arm:
+	docker run --rm --name umgc_catalog_alternate_arm \
 		-p $(ALTERNATE_PORT):$(PORT) \
 		-p $(ALTERNATE_HOST_PORT):$(HOST_PORT) \
 		-e PORT=$(PORT) \
 		$(DOCKER_IMAGE_NAME_ARM):latest
 
-
-
 run: run_amd
+
+docker_login:
+	docker login acraicatalogassistant001.azurecr.io -u acraicatalogassistant001
+
+docker_push:
+	#docker tag umgc-wave-app:latest acraicatalogassistant001.azurecr.io/umgc-wave-app:latest
+	docker push acraicatalogassistant001.azurecr.io/umgc-wave-app:latest
 
 # Virtual environment management
 copy_venv:

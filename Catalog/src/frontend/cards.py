@@ -69,6 +69,7 @@ def return_demographics_card(location='top_horizontal', width='400px') -> ui.For
     )
     return card
 
+
 def return_tasks_card(checked=0, location='top_horizontal', width='350px', height='400px'):
     '''
     Return tasks optionally checked off
@@ -116,6 +117,28 @@ def return_tasks_card(checked=0, location='top_horizontal', width='350px', heigh
             )]),
         ])
     return card
+
+def return_program_selection_card(location='horizontal', width='60%'):
+    """
+    Create the program selection card
+    """
+    card = ui.form_card(
+        box=ui.box(location, width=width),
+        #name='program_selection',
+        #title='Select a UMGC Program',
+        #caption='Choose an option to explore UMGC programs',
+        #category='Program Selection',
+        #icon='Education',
+        items=[
+            ui.text_xl(content='**Select a UMGC Program**'),
+            ui.link(label='Option 1: Explore programs on your own', path='/#program'),
+            ui.link(label='Option 2: Select a program based on your skills', path='/#skills'),
+            ui.link(label='Option 3: Select a program based on your interests', disabled=True),
+            ui.link(label='Option 4: Select a program that finished your degree the quickest', disabled=True)
+        ]
+    )
+    return card
+
 
 ##########################################################
 ####################  PROGRAMS CARDS  ####################
@@ -470,7 +493,7 @@ async def render_program_cards(q: Q):
 ####################  SKILLS CARDS ##########################
 #############################################################
 
-async def return_skills_menu_card(conn: TimedSQLiteConnection, location='vertical', width='300px', height='800px',inline=False):
+async def return_skills_menu_card(conn: TimedSQLiteConnection, defaults=None, location='vertical', width='300px', height='800px',inline=False):
     '''
     Create skills choice menu
     Will send the selected skills to the database query and return a list of courses
@@ -488,6 +511,8 @@ async def return_skills_menu_card(conn: TimedSQLiteConnection, location='vertica
             ui.checklist(
                 name='skills_checklist',
                 label='Skills',
+                #value=str(si['menu']['program']) if (si['menu']['program'] is not None) else q.args.menu_program,
+                values=defaults,
                 inline=inline,
                 choices = choices,
             ),
@@ -1014,6 +1039,29 @@ async def render_ge_res_card(q, menu_width='300px', location='grid',
 ####################  SCHEDULE CARDS  ####################
 ##########################################################
 
+def render_elective_cards(q):
+    caption = '''
+
+### 1. Select electives with no prerequisites
+### 2. Add a Foreign Language sequence (multiple electives)
+### 3. Add a Minor (multiple electives selected)
+### 4. Suggest electives based on skills and interests
+### 5. Suggest electives that are popular (low difficulty?)
+
+'''
+    card = ui.wide_info_card(
+        box=ui.box('horizontal', width='700px'),
+            name='elective1',
+            icon='AccountActivity',
+            title='Elective Methods to be Implemented',
+            caption=caption
+    )
+    add_card(q, 'elective1', card)
+
+##########################################################
+####################  SCHEDULE CARDS  ####################
+##########################################################
+
 async def render_schedule_page_table(q, box=None, location='horizontal', width='90%', height=None):
     '''
     Input comes from 
@@ -1523,21 +1571,7 @@ def sidebar_card(q: Q, home: str = '#home') -> ui.NavCard:
         title='UMGC', 
         subtitle='Registration Assistant',
         value=f'#{q.args["#"]}' if q.args['#'] else home,
-        #current_page = q.args["#"] if q.args['#'] else 'page1',
-        #value=f'#{current_page}',
         image=q.app.logo, 
-        #items=[
-        #    ui.nav_group('Menu', items=[
-        #        ui.nav_item(name='#home', label='Home'),
-        #        ui.nav_item(name='#program_group', label='Program'),
-        #        ui.nav_item(name='#program', label='→ Explore'),
-        #        ui.nav_item(name='#skills', label='→ Skills'),
-        #        ui.nav_item(name='#courses', label='Courses'),
-        #        ui.nav_item(name='#ge', label='→ GE'),
-        #        ui.nav_item(name='#electives', label='→ Electives'),
-        #        ui.nav_item(name='#schedule', label='Schedule'),
-        #    ]),
-        #]
         items=[
             ui.nav_group('1. Student Info', items=[
                 ui.nav_item(name='#home', label='Home'),
