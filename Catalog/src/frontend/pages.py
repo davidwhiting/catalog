@@ -455,7 +455,18 @@ async def skills(q: Q):
     clear_cards(q) # will use in the individual functions
 
     conn = q.client.conn
-    card = await cards.return_skills_menu_card(conn, location='horizontal', width='300px')
+    add_card(q, 'welcome_skills', ui.form_card(
+        box=ui.box('top_horizontal', width='100%'),
+        items=[
+            ui.text_xl('Select two or more skills to find matching programs'),
+            #ui.text('We will guide you through this experience.')
+            #ui.inline([
+            #    ui.text('Click here to display courses without prerequisites:', size=ui.TextSize.L),
+            #    ui.checkbox(name='ge_all_nopre', label='')
+            #], align='start'),
+        ]
+    ))
+    card = await cards.return_skills_menu_card(conn, location='top_vertical', width='300px')
     add_card(q, 'skill_card', card)
     await q.page.save()
 
@@ -477,9 +488,15 @@ async def submit_skills_menu(q: Q):
 
     if not selected_skills:
         # throw an error, not sure that this works
-        q.page['skills_results'] = ui.form_card(box='content', items=[ui.message_bar('No skills selected', type='warning')])
+        q.page['skills_results'] = ui.form_card(box='debug', items=[ui.message_bar('No skills selected', type='warning')])
         return
 
+    if len(selected_skills) == 1:
+        q.page['skills_results'] = ui.form_card(box='debug', items=[
+            ui.message_bar('Please select more than one skill', type='error')
+        ])
+        return
+    
     # Convert selected skills to a tuple for SQL query
     skills_tuple = tuple(selected_skills)
     int_tuple = tuple(map(int, skills_tuple))
@@ -513,10 +530,45 @@ async def program_skills_table(q: Q):
       - the name of the table is 'program_table'
       - the name of the row is name = row['name']    
     '''
-    program_name = q.args.program_skills_table[0] 
-    #frontend.course_description_dialog(q, coursename, which='required')
-    logging.info(f'The value of program_name in program_skills_table is {program_name}')
+    program_val = int(q.args.program_skills_table[0])
+    conn = q.client.conn
+    logging.info(f'The value of program is {program_val}')
+    student_info = q.client.student_info
+    student_info['program_id'] = int(program_val)
+
+    row = await get_program_title(conn, program_val)
+    if row:
+        student_info['degree_program'] = row['title']
+        student_info['degree_id'] = row['id']
+
+    logging.info(f"The value of title is {student_info['degree_program']}")
+    logging.info(f"The value of degree_id is {student_info['degree_id']}")
+
+    q.client.student_data['required'] = await get_required_program_courses(conn, student_info['program_id'])
+
+    # need to also update q.client.student_info['degree_program']
+    #logging.info(f"This is menu_program(q): the value of program_id is {student_info['program_val']}")
+
+    #await cards.render_program_cards(q)
+    clear_cards(q, [])
+    await cards.render_program_description_card(q, location='top_vertical', height='200px', width='100%')
+    await cards.render_program_table(q, location='horizontal', width='90%')
+    await cards.render_program_dashboard_card(q, location='horizontal', width='150px')
+
+    
+    # # program_id an alias used throughout
+
     await q.page.save()
+
+
+##############
+
+    ##frontend.course_description_dialog(q, coursename, which='required')
+    #clear_cards(q)
+    ##q.client.student_info[] = program_name
+    #await cards.render_program_cards(q)
+    #logging.info(f'The value of program_name in program_skills_table is {program_name}')
+    #await q.page.save()
 
 async def explore_skills_program(q: Q):
     '''
@@ -550,7 +602,7 @@ async def student_course(q: Q):
                 ui.text('**Instructions**: You have selected courses. You may now add electives or view your schedule.')
             ]
         ))
-        await cards.render_course_page_table_use(q, location='horizontal')
+        await cards.render_course_page_table_use(q, location='vertical')
 
     await q.page.save()
 
@@ -560,8 +612,7 @@ async def admin_course(q: Q):
 async def coach_course(q: Q):
     await student_course(q)
 
-@on('#course')
-async def course(q: Q):
+async def courses(q: Q):
     clear_cards(q)
 
     if q.client.role == 'admin':
@@ -598,7 +649,7 @@ async def student_ge(q: Q):
             ui.text_xl('Select your General Education courses here.'),
             #ui.text('We will guide you through this experience.')
             ui.inline([
-                ui.text('Click here to display courses without prerequisites:', size=ui.TextSize.L),
+                ui.text('Click to display courses without prerequisites:', size=ui.TextSize.L),
                 ui.checkbox(name='ge_all_nopre', label='')
             ], align='start'),
         ]

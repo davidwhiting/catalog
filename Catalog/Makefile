@@ -9,6 +9,8 @@ PYTHON_VERSION := 3.10.12
 PORT := 10101
 HOST_PORT := 8000
 VENV_PATH := .venv  # Default virtual environment path
+ALTERNATE_PORT := 10102
+ALTERNATE_HOST_PORT := 8002
 
 # Phony targets
 .PHONY: default build build_amd build_arm build_azure build_local build_apple build_all run run_amd run_arm copy_venv clone_venv
@@ -60,6 +62,15 @@ run_arm:
 		-p $(HOST_PORT):$(HOST_PORT) \
 		-e PORT=$(PORT) \
 		$(DOCKER_IMAGE_NAME_ARM):latest
+
+run_alternate:
+	docker run --rm --name umgc_catalog_arm \
+		-p $(ALTERNATE_PORT):$(PORT) \
+		-p $(ALTERNATE_HOST_PORT):$(HOST_PORT) \
+		-e PORT=$(PORT) \
+		$(DOCKER_IMAGE_NAME_ARM):latest
+
+
 
 run: run_amd
 

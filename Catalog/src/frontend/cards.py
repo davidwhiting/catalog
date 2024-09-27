@@ -470,7 +470,7 @@ async def render_program_cards(q: Q):
 ####################  SKILLS CARDS ##########################
 #############################################################
 
-async def return_skills_menu_card(conn: TimedSQLiteConnection, location='vertical', width='300px', inline=False):
+async def return_skills_menu_card(conn: TimedSQLiteConnection, location='vertical', width='300px', height='800px',inline=False):
     '''
     Create skills choice menu
     Will send the selected skills to the database query and return a list of courses
@@ -482,7 +482,7 @@ async def return_skills_menu_card(conn: TimedSQLiteConnection, location='vertica
     choices = await get_choices(conn, query, disabled={""})
 
     card = ui.form_card(
-        box = ui.box(location, width=width),
+        box = ui.box(location, width=width, height=height),
         items=[
             #                ui.separator(),
             ui.checklist(
@@ -530,7 +530,7 @@ async def return_skills_table(results, location='horizontal'):
         ) for row in results
     ]
     card = ui.form_card(
-        box=location,
+        box=ui.box(location),
         items=[
             #ui.inline(justify='between', align='center', items=[
             #    ui.text(title, size=ui.TextSize.L),
@@ -549,6 +549,112 @@ async def return_skills_table(results, location='horizontal'):
         ]
     )
     return card
+
+#########################################################
+####################  COURSES CARDS  ####################
+#########################################################
+
+async def render_course_page_table_use(q, box=None, location='vertical', width=None, height=None, check=True, ge=False, elective=False):
+    '''
+    Input comes from 
+    q:
+    data: a list of dictionaries, each element corresponding to a row of the table 
+    location:
+    cardname:
+    width:
+    height:
+    '''
+
+    df = q.client.student_data['schedule']
+
+    def _get_commands(course, type):
+        # for creating adaptive menus
+        # to complete later
+        if course == 'ELECTIVE':
+            commands = [ui.command(name='select_elective', label='Select Elective')]
+        elif course == 'GENERAL':
+            commands = [ui.command(name='select_general', label='Select GE Course')]
+        else:
+            commands = [
+                ui.command(name='view_description', label='Course Description'),
+            ]
+            if type in ['ELECTIVE', 'GENERAL']:
+                commands.append(ui.command(name='change_course', label='Change Course'))
+
+        return commands
+
+    columns = [
+        #ui.table_column(name='seq', label='Seq', data_type='number'),
+        ui.table_column(name='course', label='Course', searchable=False, min_width='100'),
+        ui.table_column(name='title', label='Title', searchable=False, min_width='180', max_width='300', cell_overflow='wrap'),
+        ui.table_column(name='credits', label='Credits', data_type='number', min_width='50',
+                        align='center'),
+        ui.table_column(
+            name='tag',
+            label='Type',
+            min_width='190',
+            filterable=True,
+            cell_type=ui.tag_table_cell_type(
+                name='tags',
+                tags=constants.UMGC_tags
+            )
+        ),
+        ui.table_column(name='menu', label='Menu', max_width='150',
+            cell_type=ui.menu_table_cell_type(name='commands', 
+                commands=[
+                    ui.command(name='view_description', label='Course Description'),
+                    ui.command(name='select_elective', label='Select Elective'),
+                ]
+        ))
+        #ui.table_column(name='menu', label='Menu', max_width='150',
+        #    cell_type=ui.menu_table_cell_type(name='commands', 
+        #        commands=[
+        #            ui.command(name='view_description', label='Course Description'),
+        #            ui.command(name='show_prereq', label='Show Prerequisites'),
+        #            ui.command(name='select_elective', label='Select Elective'),
+        #        ]
+        #))
+    ]
+    rows = [
+        ui.table_row(
+            #name=str(row['id']),
+            name=row['name'],
+            cells=[
+                #str(row['seq']),
+                row['name'],
+                row['title'],
+                str(row['credits']),
+                row['course_type'].upper(),
+            ]
+        ) for _, row in df.iterrows()
+    ]
+
+    box = ui.box(location, height=height, width=width)
+    degree_program = q.client.student_info['degree_program']
+    title = f'**{degree_program}**: Courses'
+    #title = 'Courses'
+    card = add_card(q, 'course_table', ui.form_card(
+        box=box,
+        items=[
+            ui.inline(justify='between', align='center', items=[
+                ui.text(title, size=ui.TextSize.L),
+                ui.button(name='schedule_coursework', label='Schedule', 
+                    #caption='Description', 
+                    primary=True, disabled=False)
+            ]),
+            ui.table(
+                name='course_table',
+                downloadable=False,
+                resettable=True,
+                groupable=False,
+                height=height,
+                columns=columns,
+                rows=rows
+            )
+        ]
+    ))
+    #return card
+
 
 ####################################################
 ####################  GE CARDS  ####################
@@ -1049,8 +1155,8 @@ async def return_schedule_menu(q, location='vertical', width='300px'):
         ##   - 14 week and 17 week terms: (min 6)
 
         default_sessions = ['Session 1', 'Session 3']
-        default_max_credits = 18
-        default_courses_per_session = 3
+        default_max_credits = 15
+        default_courses_per_session = 2
     elif student_profile == 'Part-time':
         # todo: get courses_per_session and max_credits from university rules
         default_sessions = ['Session 1', 'Session 3']
@@ -1495,7 +1601,7 @@ def return_meta_card() -> ui.MetaCard:
         ui.zone('content', zones=[
             ## Specify various zones and use the one that is currently needed. Empty zones are ignored.
             ## Usually will not need the top_ or bottom_ versions
-            #ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
+            ui.zone('top_horizontal', direction=ui.ZoneDirection.ROW),
             ui.zone('top_vertical'),
             ui.zone('horizontal', direction=ui.ZoneDirection.ROW),
             ui.zone('vertical'),
