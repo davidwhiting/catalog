@@ -769,24 +769,25 @@ async def ge(q: Q):
 ####################  GE ACTIONS  ####################
 ######################################################
 
-#############
-## GE Arts ##  
-#############
-
-async def ge_arts_check(q: Q):
-    # set nopre = True
-    q.client.student_info['ge']['arts']['nopre'] = True
-    await q.page.save()
-
-async def ge_arts_1(q: Q):
-    q.client.student_info['ge']['arts']['1'] = q.args.ge_arts_1
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
-
-async def ge_arts_2(q: Q):
-    q.client.student_info['ge']['arts']['2'] = q.args.ge_arts_2
-    #q.page['ge_debug'].content = ge_debug_content(q)
-    await q.page.save()
+###############
+#### GE Arts ##  
+###############
+##
+##async def ge_arts_check(q: Q):
+##    # set nopre = True
+##    q.client.student_info['ge']['arts']['nopre'] = True
+##    await q.page.save()
+##
+##async def ge_arts_1(q: Q):
+##    q.client.student_info['ge']['arts']['1'] = q.args.ge_arts_1
+##    #q.page['ge_debug'].content = ge_debug_content(q)
+##    await q.page.save()
+##
+##async def ge_arts_2(q: Q):
+##    q.client.student_info['ge']['arts']['2'] = q.args.ge_arts_2
+##    #q.page['ge_debug'].content = ge_debug_content(q)
+##    await q.page.save()
+##
 
 ############
 ## GE Beh ##

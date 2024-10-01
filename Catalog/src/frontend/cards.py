@@ -41,6 +41,7 @@ def return_task1_card(location='top_horizontal', width='350px'):
         icon='AccountActivity',
         title='Task 1',
         caption=task_1_caption
+        #path=None
     )
     return card
 
@@ -1113,6 +1114,10 @@ def render_elective_cards(q):
             caption=caption
     )
     add_card(q, 'elective1', card)
+
+@on()
+async def elective1(q):
+    pass
 
 ##########################################################
 ####################  SCHEDULE CARDS  ####################
