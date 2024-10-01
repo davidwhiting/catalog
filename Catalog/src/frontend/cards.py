@@ -64,7 +64,7 @@ def return_demographics_card(location='top_horizontal', width='400px') -> ui.For
             ui.separator(name='my_separator', width='100%', visible=True),
             ui.checkbox(name='financial_aid', label='I will be using Financial Aid'),
             ui.checkbox(name='transfer_credits', label='I have credits to transfer'),
-            ui.button(name='next_demographic_1', label='Next', primary=True),
+            ui.button(name='next_home', label='Next', primary=True),
         ]
     )
     return card
@@ -218,6 +218,62 @@ async def render_dropdown_menus_horizontal(q, location='horizontal', menu_width=
         ]
     )
     add_card(q, 'dropdown', card)
+
+async def render_dropdown_skills_menu(q, location='horizontal', menu_width='300px'):
+    '''
+    Create menus for selecting program based on skills survey
+    '''
+    si = q.client.student_info
+    conn = q.client.conn    
+    #enabled_degree = {"Bachelor's", "Undergraduate Certificate"}
+    disabled_programs = q.app.disabled_program_menu_items
+
+    # enforcing string because I've got a bug somewhere (passing an int instead of str)
+    dropdowns = ui.inline([
+        ui.dropdown(
+            name='menu_skills_program',
+            label='Program',
+            value=str(si['menu']['program']) if \
+                (si['menu']['program'] is not None) else q.args.menu_skills_program,
+            trigger=True,
+            disabled=False,
+            width='300px',
+            choices=None if (si['menu']['area_of_study'] is None) else \
+                await get_choices(conn, program_query, params=(si['menu']['degree'], si['menu']['area_of_study']),
+                    disabled=disabled_programs
+                )
+        )
+    ], justify='start', align='start')
+
+    command_button = ui.button(
+        name='command_button', 
+        label='Select', 
+        disabled=False,
+        commands=[
+            ui.command(name='select_program', label='Select Program'),
+            #ui.command(name='classes_menu', label='Classes', 
+            #    items=[
+            #        ui.command(name='add_ge', label='Add GE'),
+            #        ui.command(name='add_elective', label='Add Electives'),  
+            #]),
+            #ui.command(name='add_ge', label='Add GE'),
+            #ui.command(name='add_elective', label='Add Electives')  
+    ])
+
+    card = ui.form_card(
+        box = location,
+        items = [
+            #ui.text_xl('Browse Programs'),
+            ui.inline([
+                dropdowns, 
+                command_button
+            ],
+            justify='between', 
+            align='end')
+        ]
+    )
+    add_card(q, 'dropdown', card)
+
 
 async def return_program_description_card(conn: TimedSQLiteConnection, student_info: dict, 
         location: str = 'top_vertical', width: str = '100%', height: str = '100px') -> ui.MarkdownCard:

@@ -6,11 +6,12 @@ DOCKER_IMAGE_NAME := umgc-wave-app
 DOCKER_IMAGE_AZURE := $(AZURE_PREFIX)/$(DOCKER_IMAGE_NAME)
 DOCKER_IMAGE_NAME_ARM := $(DOCKER_IMAGE_NAME)_arm
 PYTHON_VERSION := 3.10.12
-PORT := 10101
 HOST_PORT := 8000
 VENV_PATH := .venv  # Default virtual environment path
+# For running docker on alternated ports
 ALTERNATE_PORT := 10102
 ALTERNATE_HOST_PORT := 8002
+PORT := 10101
 
 # Phony targets
 .PHONY: default build build_amd build_arm build_azure build_local build_apple build_all run run_amd run_arm copy_venv clone_venv
@@ -88,6 +89,7 @@ run_alternate_arm:
 
 run: run_amd
 
+# Deprecated, using a PAT instead of login
 docker_login:
 	docker login acraicatalogassistant001.azurecr.io -u acraicatalogassistant001
 

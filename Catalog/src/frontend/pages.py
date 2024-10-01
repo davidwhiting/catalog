@@ -55,8 +55,8 @@ def course_description_dialog(q, course, which='schedule'):
 #####################################################
 
 async def home(q: Q):
-    q.page['sidebar'].value = '#home'
-    clear_cards(q, ['demographics'])
+    q.page['sidebar'].value = '#home' # set sidebar link
+    clear_cards(q, ['demographics', 'home/tasks'])
     card_height = '400px'
 
     card = cards.return_task1_card(location='horizontal', width='350px')
@@ -112,28 +112,12 @@ async def home(q: Q):
 #        card = cards.return_tasks_card(checked=4, location='top_horizontal', width='350px', height='400px')
 #        add_card(q, 'home/tasks', card)
 
-async def next_demographic_2(q: Q):
-    clear_cards(q)
-
-    student_info = q.client.student_info
-    if q.args.resident_status is not None:
-        try:
-            student_info['resident_status'] = int(q.args.resident_status)
-        except ValueError:
-            pass  # Handle the error or log it if needed
-    logging.info(f'student_info: {student_info}')
-
-    card = cards.create_program_selection_card(location='top_horizontal')
-    add_card(q, 'program_selection_options', card)
-    cards.tasks_checked1(q)
-
-    await q.page.save()
 
 #######################################################
 ####################  HOME EVENTS  ####################
 #######################################################
 
-async def next_demographic_1(q: Q) -> None:
+async def next_home(q: Q) -> None:
     '''
     Respond to submission by clicking next on 'Tell us about yourself' card 1
     (from demographics1 function)
@@ -146,6 +130,7 @@ async def next_demographic_1(q: Q) -> None:
     logging.info(f'q.client.student_info: {q.client.student_info}')
 
     # need to add attendance to student_info
+    # this was renamed to something else
     q.client.my_dict = {
         'attendance': q.args.attendance
     }
@@ -163,17 +148,14 @@ async def next_demographic_1(q: Q) -> None:
         ui.text('This information will help us estimate your tuition costs'),
         ui.choice_group(name='resident_status', label='My Resident status is', choices=resident_choices, required=True),
         ui.separator(label='', name='my_separator2', width='100%', visible=True),
-        ui.button(name='next_demographic_2', label='Next', primary=True),
+        ui.button(name='next_home_2', label='Next', primary=True),
     ]
 
     await q.page.save()
 
-async def next_demographic_2a(q: Q) -> None:
-    '''
-    Respond to submission by clicking next on 'Tell us about yourself' card 1
-    (from demographics1 function)
-    '''
-    # need to map these to the right place, this is a placeholder for now
+async def next_home_2(q: Q):
+    clear_cards(q)
+
     student_info = q.client.student_info
     if q.args.resident_status is not None:
         try:
@@ -181,12 +163,34 @@ async def next_demographic_2a(q: Q) -> None:
         except ValueError:
             pass  # Handle the error or log it if needed
     logging.info(f'student_info: {student_info}')
-    logging.info('Redirecting to the #program page')
 
-    ## Instead of redirect, call the program function directly?
-    #q.page['meta'].redirect = '#program'
-    #q.page['sidebar'].value = '#program'
+    program_card = cards.return_program_selection_card(location='horizontal')
+    add_card(q, 'program_selection_options', program_card)
+
+    task_card = cards.return_tasks_card(1, location='horizontal')
+    add_card(q, 'home/tasks', task_card)
+
     await q.page.save()
+
+#async def next_demographic_2a(q: Q) -> None:
+#    '''
+#    Respond to submission by clicking next on 'Tell us about yourself' card 1
+#    (from demographics1 function)
+#    '''
+#    # need to map these to the right place, this is a placeholder for now
+#    student_info = q.client.student_info
+#    if q.args.resident_status is not None:
+#        try:
+#            student_info['resident_status'] = int(q.args.resident_status)
+#        except ValueError:
+#            pass  # Handle the error or log it if needed
+#    logging.info(f'student_info: {student_info}')
+#    logging.info('Redirecting to the #program page')
+#
+#    ## Instead of redirect, call the program function directly?
+#    #q.page['meta'].redirect = '#program'
+#    #q.page['sidebar'].value = '#program'
+#    await q.page.save()
 
 #########################################################
 ####################  PROGRAMS PAGE  ####################
@@ -274,7 +278,6 @@ async def program(q: Q):
     #    await student_program(q)
 
     await student_program(q)
-
     await q.page.save()
 
 ###############################################################
@@ -474,11 +477,7 @@ async def skills(q: Q):
         box=ui.box('top_horizontal', width='100%'),
         items=[
             ui.text_xl('Select two or more skills to find matching programs'),
-            #ui.text('We will guide you through this experience.')
-            #ui.inline([
-            #    ui.text('Click here to display courses without prerequisites:', size=ui.TextSize.L),
-            #    ui.checkbox(name='ge_all_nopre', label='')
-            #], align='start'),
+
         ]
     ))
     if skills in q.client.student_data:
@@ -486,7 +485,7 @@ async def skills(q: Q):
     else:
         values = None
 
-    card = await cards.return_skills_menu_card(conn, location='top_vertical', width='300px')
+    card = await cards.return_skills_menu_card(conn, location='horizontal', width='300px')
     add_card(q, 'skill_card', card)
     await q.page.save()
 
@@ -524,7 +523,6 @@ async def submit_skills_menu(q: Q):
     query = f"""
         SELECT b.id, a.program, sum(a.score) AS TotalScore 
         FROM program_skill_score_view a, programs b
-
         WHERE a.skill_id IN {int_tuple}
             AND b.degree_id = 3
             AND a.program = b.name 
@@ -532,7 +530,60 @@ async def submit_skills_menu(q: Q):
         ORDER BY TotalScore DESC 
         LIMIT {result_limit}
     """
+
+#    query2 = 'SELECT id AS name, name AS label FROM Skills'
+
     results = await conn.query_dict(query)
+
+    # save for reuse
+    q.client.student_data['skills'] = results
+    card = await cards.return_skills_table(results)
+    add_card(q, 'skills_program_table', card)
+
+async def submit_skills_menu_new(q: Q):
+    """
+    Respond to Submit button on Skills menu
+    """
+    conn = q.client.conn
+    selected_skills = q.args.skills_checklist
+    q.client.skills = {}
+    q.client.skills['selected'] = selected_skills
+
+    result_limit = 15
+    #result_limit = int(q.args.result_limit)
+
+    if not selected_skills:
+        # throw an error, not sure that this works
+        q.page['skills_results'] = ui.form_card(box='debug', items=[ui.message_bar('No skills selected', type='warning')])
+        return
+
+    if len(selected_skills) == 1:
+        q.page['skills_results'] = ui.form_card(box='debug', items=[
+            ui.message_bar('Please select more than one skill', type='error')
+        ])
+        return
+    
+    # Convert selected skills to a tuple for SQL query
+    skills_tuple = tuple(selected_skills)
+    int_tuple = tuple(map(int, skills_tuple))
+
+    query = f"""
+        SELECT b.id as name, a.program as label, sum(a.score) AS TotalScore 
+        FROM program_skill_score_view a, programs b
+        WHERE a.skill_id IN {int_tuple}
+            AND b.degree_id = 3
+            AND a.program = b.name 
+        GROUP BY a.program
+        ORDER BY TotalScore DESC 
+        LIMIT {result_limit}
+    """
+
+    disabled_programs = q.app.disabled_program_menu_items
+    skill_program_choices = await get_choices(conn, query, disabled=disabled_programs)
+
+
+
+    #results = await conn.query_dict(query)
 
     # save for reuse
     q.client.student_data['skills'] = results
@@ -669,8 +720,12 @@ async def student_ge(q: Q):
             ui.text_xl('Select your General Education courses here.'),
             #ui.text('We will guide you through this experience.')
             ui.inline([
-                ui.text('Click to display courses without prerequisites:', size=ui.TextSize.L),
-                ui.checkbox(name='ge_all_nopre', label='')
+                ui.checkbox(name='ge_all_nopre', label=''),
+                ui.text('Display courses without prerequisites', size=ui.TextSize.L),
+           ], align='start'),
+            ui.inline([
+                ui.checkbox(name='ge_all_skills', label='', disabled=True),
+                ui.text('Display courses based on skills (to be implemented)', size=ui.TextSize.L)
             ], align='start'),
         ]
     ))

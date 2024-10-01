@@ -27,13 +27,14 @@ import frontend.cards as cards
 async def home(q: Q):
     await pages.home(q)
 
+# Action upon clicking the Next button on Home page
 @on()
-async def next_demographic_1(q: Q):
-    await pages.next_demographic_1(q)
+async def next_home(q: Q): 
+    await pages.next_home(q)
 
 @on()
-async def next_demographic_2(q: Q):
-    await pages.next_demographic_2(q)
+async def next_home_2(q: Q):
+    await pages.next_home_2(q)
 
 
 ## FINISH HOME
